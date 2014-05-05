@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The DB way of MySQL.
+ * The DB-way of MySQL.
  * @author jflute
  */
 public class WayOfMySQL implements DBWay, Serializable {

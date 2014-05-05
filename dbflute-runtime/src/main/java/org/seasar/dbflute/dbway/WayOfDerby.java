@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The DB way of Derby.
+ * The DB-way of Derby.
  * @author jflute
  */
 public class WayOfDerby implements DBWay, Serializable {

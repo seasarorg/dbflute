@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The DB way of Firebird.
+ * The DB-way of Firebird.
  * @author jflute
  */
 public class WayOfFirebird implements DBWay, Serializable {

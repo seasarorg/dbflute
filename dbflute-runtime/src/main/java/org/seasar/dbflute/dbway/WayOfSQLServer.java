@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * The DB way of SQLServer.
+ * The DB-way of SQLServer.
  * @author jflute
  */
 public class WayOfSQLServer implements DBWay, Serializable {

@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * The DB way of DB2.
+ * The DB-way of DB2.
  * @author jflute
  */
 public class WayOfDB2 implements DBWay, Serializable {

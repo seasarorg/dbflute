@@ -20,6 +20,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.AccessContextNoValueException;
 import org.seasar.dbflute.exception.AccessContextNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -32,17 +34,35 @@ import org.seasar.dbflute.resource.DBFluteSystem;
 public class AccessContext {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(AccessContext.class);
+
+    // ===================================================================================
     //                                                                        Thread Local
     //                                                                        ============
-    /** The thread-local for this. */
-    private static final ThreadLocal<AccessContext> _threadLocal = new ThreadLocal<AccessContext>();
+    // -----------------------------------------------------
+    //                                         Thread Object
+    //                                         -------------
+    /** The default thread-local for this. */
+    protected static final ThreadLocal<AccessContext> _defaultThreadLocal = new ThreadLocal<AccessContext>();
 
+    /** The provider of thread-local for this. (NullAllowed: normally null) */
+    protected static AccessContextThreadLocalProvider _threadLocalProvider;
+
+    /** Is this static world locked? e.g. you should unlock it to set your own provider. */
+    protected static boolean _locked = true; // at first locked
+
+    // -----------------------------------------------------
+    //                                        Basic Handling
+    //                                        --------------
     /**
      * Get access-context on thread.
      * @return The context of DB access. (NullAllowed)
      */
     public static AccessContext getAccessContextOnThread() {
-        return (AccessContext) _threadLocal.get();
+        return getThreadLocal().get();
     }
 
     /**
@@ -54,7 +74,7 @@ public class AccessContext {
             String msg = "The argument 'accessContext' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        _threadLocal.set(accessContext);
+        getThreadLocal().set(accessContext);
     }
 
     /**
@@ -62,14 +82,100 @@ public class AccessContext {
      * @return The determination, true or false.
      */
     public static boolean isExistAccessContextOnThread() {
-        return (_threadLocal.get() != null);
+        return getThreadLocal().get() != null;
     }
 
     /**
      * Clear access-context on thread.
      */
     public static void clearAccessContextOnThread() {
-        _threadLocal.set(null);
+        getThreadLocal().set(null);
+    }
+
+    // -----------------------------------------------------
+    //                                            Management
+    //                                            ----------
+    /**
+     * Get thread local for access context, default instance or provided.
+     * @return The instance of thread local. (NotNull)
+     */
+    protected static ThreadLocal<AccessContext> getThreadLocal() {
+        if (_threadLocalProvider != null) {
+            final ThreadLocal<AccessContext> provided = _threadLocalProvider.provide();
+            if (provided == null) {
+                String msg = "The provider returned null access context: " + _threadLocalProvider;
+                throw new IllegalStateException(msg);
+            }
+            return provided;
+        }
+        return _defaultThreadLocal;
+    }
+
+    /**
+     * Use the specified provider of thread-local for access context. (automatically locked after setting) <br />
+     * You should call this in application initialization if it needs.
+     * @param threadLocalProvider The provider of thread-local. (NullAllowed: if null, use default thread local)
+     */
+    public static void useThreadLocalProvider(AccessContextThreadLocalProvider threadLocalProvider) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting thread-local provider: " + threadLocalProvider);
+        }
+        _threadLocalProvider = threadLocalProvider;
+        _locked = true;
+    }
+
+    /**
+     * Is this static world locked?
+     * @return The determination, true or false.
+     */
+    public static boolean isLocked() {
+        return _locked;
+    }
+
+    /**
+     * Lock this static world, e.g. not to set the provider of thread-local.
+     */
+    public static void lock() {
+        if (_log.isInfoEnabled()) {
+            _log.info("...Locking the static world of the access context!");
+        }
+        _locked = true;
+    }
+
+    /**
+     * Unlock this static world, e.g. to set the provider of thread-local.
+     */
+    public static void unlock() {
+        if (_log.isInfoEnabled()) {
+            _log.info("...Unlocking the static world of the access context!");
+        }
+        _locked = false;
+    }
+
+    /**
+     * Assert this is not locked.
+     */
+    protected static void assertNotLocked() {
+        if (!isLocked()) {
+            return;
+        }
+        String msg = "The access context is locked! Don't access at this timing!";
+        throw new IllegalStateException(msg);
+    }
+
+    /**
+     * The provider of thread-local for access context. <br />
+     * Basically for asynchronous of web framework e.g. Play2.
+     */
+    public static interface AccessContextThreadLocalProvider {
+
+        /**
+         * Provide the thread-local for access context. <br />
+         * You should return same instance in same request.
+         * @return The instance of thread-local. (NotNull)
+         */
+        ThreadLocal<AccessContext> provide();
     }
 
     // ===================================================================================

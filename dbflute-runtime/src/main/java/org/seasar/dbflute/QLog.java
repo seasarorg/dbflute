@@ -28,6 +28,7 @@ public class QLog {
     //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(QLog.class);
+
     protected static boolean _queryLogLevelInfo;
     protected static boolean _loggingInHolidayMood;
     protected static boolean _locked = true;

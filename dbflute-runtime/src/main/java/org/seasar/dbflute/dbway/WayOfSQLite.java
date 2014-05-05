@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The DB way of SQLite.
+ * The DB-way of SQLite.
  * @author jflute
  */
 public class WayOfSQLite implements DBWay, Serializable {

@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The DB way of Unknown.
+ * The DB-way of Unknown.
  * @author jflute
  */
 public class WayOfUnknown implements DBWay, Serializable {

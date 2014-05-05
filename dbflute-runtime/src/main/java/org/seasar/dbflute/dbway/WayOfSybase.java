@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The DB way of Sybase.
+ * The DB-way of Sybase.
  * @author jflute
  */
 public class WayOfSybase implements DBWay, Serializable {

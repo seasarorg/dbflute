@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The DB way of MS-Access.
+ * The DB-way of MS-Access.
  * @author jflute
  */
 public class WayOfMSAccess implements DBWay, Serializable {

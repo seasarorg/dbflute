@@ -18,7 +18,7 @@ package org.seasar.dbflute.dbway;
 import java.util.List;
 
 /**
- * The interface of DB way.
+ * The interface of DB-way.
  * @author jflute
  */
 public interface DBWay {

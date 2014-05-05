@@ -28,6 +28,7 @@ public class XLog {
     //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(XLog.class);
+
     protected static boolean _executeStatusLogLevelInfo;
     protected static boolean _loggingInHolidayMood;
     protected static boolean _locked = true;

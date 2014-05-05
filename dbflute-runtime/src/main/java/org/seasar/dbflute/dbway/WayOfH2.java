@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The DB way of H2.
+ * The DB-way of H2.
  * @author jflute
  */
 public class WayOfH2 implements DBWay, Serializable {

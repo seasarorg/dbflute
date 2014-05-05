@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * The DB way of Oracle.
+ * The DB-way of Oracle.
  * @author jflute
  */
 public class WayOfOracle implements DBWay, Serializable {

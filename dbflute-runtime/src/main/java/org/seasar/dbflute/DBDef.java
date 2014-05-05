@@ -107,13 +107,16 @@ public enum DBDef {
     /** The way of the DB. (NotNull) */
     private DBWay _dbway;
 
+    /** Is this singleton world locked? e.g. you should unlock it to set your own DB-way. */
+    private boolean _locked;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
      * @param code The code of the DB. (NotNull)
      * @param codeAlias The code alias of the DB. (NullAllowed)
-     * @param codeAlias The DB way of the DB. (NotNull)
+     * @param codeAlias The DB-way of the DB. (NotNull)
      */
     private DBDef(String code, String codeAlias, DBWay dbway) {
         _code = code;
@@ -139,19 +142,25 @@ public enum DBDef {
     }
 
     /**
-     * @return The way of the DB. (NotNull)
+     * @return The DB-way instance of the DB. (NotNull)
      */
     public DBWay dbway() {
         return _dbway;
     }
 
     /**
-     * @param dbway The new way of the DB. (NotNull)
+     * Switch from the old DB-way to the specified DB-way for the DB. <br />
+     * You should call this in application initialization if it needs.
+     * @param dbway The new DB-way of the DB. (NotNull)
      */
     public void switchDBWay(DBWay dbway) {
         if (dbway == null) {
-            String msg = "The specified DB way to switch should not be null.";
+            String msg = "The argument 'dbway' should not be null.";
             throw new IllegalArgumentException(msg);
+        }
+        if (_locked) {
+            String msg = "Your switching of DB-way was blocked because of locked.";
+            throw new IllegalStateException(msg);
         }
         final String oldName = _dbway.getClass().getSimpleName();
         _log.info("...Switching DB way from " + oldName + " to " + dbway);

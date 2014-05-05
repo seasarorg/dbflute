@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The DB way of PostgreSQL.
+ * The DB-way of PostgreSQL.
  * @author jflute
  */
 public class WayOfPostgreSQL implements DBWay, Serializable {
