@@ -108,7 +108,7 @@ public enum DBDef {
     private DBWay _dbway;
 
     /** Is this singleton world locked? e.g. you should unlock it to set your own DB-way. */
-    private boolean _locked;
+    private boolean _locked = true; // at first locked;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -125,8 +125,8 @@ public enum DBDef {
     }
 
     // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
+    //                                                                      Basic Handling
+    //                                                                      ==============
     /**
      * @return The code of the DB. (NotNull)
      */
@@ -148,8 +148,50 @@ public enum DBDef {
         return _dbway;
     }
 
+    // ===================================================================================
+    //                                                                          Management
+    //                                                                          ==========
     /**
-     * Switch from the old DB-way to the specified DB-way for the DB. <br />
+     * Is this singleton world locked?
+     * @return The determination, true or false.
+     */
+    public boolean isLocked() {
+        return _locked;
+    }
+
+    /**
+     * Lock this singleton world, e.g. not to set the DB-way.
+     */
+    public void lock() {
+        if (_log.isInfoEnabled()) {
+            _log.info("...Locking the singleton world of the DB definition!");
+        }
+        _locked = true;
+    }
+
+    /**
+     * Unlock this singleton world, e.g. to set the DB-way.
+     */
+    public void unlock() {
+        if (_log.isInfoEnabled()) {
+            _log.info("...Unlocking the singleton world of the DB definition!");
+        }
+        _locked = false;
+    }
+
+    /**
+     * Assert this is not locked.
+     */
+    protected void assertNotLocked() {
+        if (!isLocked()) {
+            return;
+        }
+        String msg = "The DB definition is locked! Don't access at this timing!";
+        throw new IllegalStateException(msg);
+    }
+
+    /**
+     * Switch from the old DB-way to the specified DB-way for the DB. (automatically locked after setting) <br />
      * You should call this in application initialization if it needs.
      * @param dbway The new DB-way of the DB. (NotNull)
      */
@@ -158,12 +200,12 @@ public enum DBDef {
             String msg = "The argument 'dbway' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        if (_locked) {
-            String msg = "Your switching of DB-way was blocked because of locked.";
-            throw new IllegalStateException(msg);
-        }
+        assertNotLocked();
         final String oldName = _dbway.getClass().getSimpleName();
-        _log.info("...Switching DB way from " + oldName + " to " + dbway);
+        if (_log.isInfoEnabled()) {
+            _log.info("...Switching DB way from " + oldName + " to " + dbway);
+        }
         _dbway = dbway;
+        _locked = true;
     }
 }
