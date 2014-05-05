@@ -1862,7 +1862,7 @@ public class Column {
         if (hasQueryRestrictionByFlgClassification()) {
             return false;
         }
-        if (!getDatabaseChecked().isMakeConditionQueryEqualEmptyString()) {
+        if (!getLittleAdjustmentProperties().isMakeConditionQueryEqualEmptyString()) {
             return false;
         }
         return getIncludeQueryProperties().isAvailableStringEmptyString(this);

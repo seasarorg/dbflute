@@ -3071,13 +3071,40 @@ public class Table {
     }
 
     // ===================================================================================
-    //                                                             Non PrimaryKey Writable
-    //                                                             =======================
+    //                                                                 Behavior Adjustment
+    //                                                                 ===================
     public boolean isAvailableNonPrimaryKeyWritable() {
         if (hasPrimaryKey()) {
             return false;
         }
         return getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
+    }
+
+    public boolean isAvailableSelectEntityPlainReturn() {
+        return getLittleAdjustmentProperties().isAvailableSelectEntityPlainReturn();
+    }
+
+    public String filterSelectEntityOptionalReturnIfNeeds(String entityType) {
+        if (isAvailableSelectEntityPlainReturn()) {
+            return entityType;
+        } else {
+            return "OptionalEntity<" + entityType + ">";
+        }
+    }
+
+    protected boolean isAvailableSelectEntityWithDeletedCheck() {
+        return getLittleAdjustmentProperties().isAvailableSelectEntityWithDeletedCheck();
+    }
+
+    public String getSelectEntityWithDeletedCheckModifier() {
+        return isAvailableSelectEntityWithDeletedCheck() ? "public" : "protected";
+    }
+
+    // ===================================================================================
+    //                                                                   Entity Adjustment
+    //                                                                   =================
+    public boolean isMakeEntityChaseRelation() {
+        return getLittleAdjustmentProperties().isMakeEntityChaseRelation();
     }
 
     // ===================================================================================

@@ -382,7 +382,7 @@ public class Database {
         // mainly here
         _tableMap.put(tableDbName, table);
 
-        if (isAvailableSchemaDrivenTable()) { // use only when schema-driven table
+        if (getLittleAdjustmentProperties().isAvailableSchemaDrivenTable()) { // use only when schema-driven table
             final String pureName = Srl.substringLastRear(tableDbName, ".");
             _distinctPureNameTableMap.put(pureName, table);
         }
@@ -1905,40 +1905,12 @@ public class Database {
         return getLittleAdjustmentProperties().isAvailableDatabaseDependency();
     }
 
-    public boolean isAvailableNonPrimaryKeyWritable() {
-        return getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
-    }
-
-    public boolean isAvailableSchemaDrivenTable() {
-        return getLittleAdjustmentProperties().isAvailableSchemaDrivenTable();
-    }
-
-    public boolean isCheckSelectedClassification() {
-        return getLittleAdjustmentProperties().isCheckSelectedClassification();
-    }
-
-    public boolean isForceClassificationSetting() {
-        return getLittleAdjustmentProperties().isForceClassificationSetting();
-    }
-
     public boolean isCDefToStringReturnsName() {
         return getLittleAdjustmentProperties().isCDefToStringReturnsName();
     }
 
     public boolean isMakeEntityOldStyleClassify() {
         return getLittleAdjustmentProperties().isMakeEntityOldStyleClassify();
-    }
-
-    public boolean isMakeEntityChaseRelation() {
-        return getLittleAdjustmentProperties().isMakeEntityChaseRelation();
-    }
-
-    public boolean isEntityConvertEmptyStringToNull() {
-        return getLittleAdjustmentProperties().isEntityConvertEmptyStringToNull();
-    }
-
-    public boolean isMakeConditionQueryEqualEmptyString() {
-        return getLittleAdjustmentProperties().isMakeConditionQueryEqualEmptyString();
     }
 
     public String getConditionQueryNotEqualDefinitionName() {

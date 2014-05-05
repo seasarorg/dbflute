@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.BehaviorSelector;
 import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.OptionalEntity;
 import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.command.AbstractBehaviorCommand;
@@ -67,6 +68,7 @@ import org.seasar.dbflute.exception.PagingOverSafetySizeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
+import org.seasar.dbflute.exception.thrower.OptionalValueNotFoundExceptionThrower;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -112,6 +114,14 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     protected abstract Entity doReadEntity(ConditionBean cb);
+
+    protected <ENTITY> OptionalEntity<ENTITY> createOptionalEntity(ENTITY entity, final ConditionBean cb) {
+        return new OptionalEntity<ENTITY>(entity, new OptionalValueNotFoundExceptionThrower() {
+            public void throwNotFoundException() {
+                throwSelectEntityAlreadyDeletedException(cb);
+            }
+        });
+    }
 
     /**
      * {@inheritDoc}

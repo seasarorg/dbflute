@@ -9,25 +9,20 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute;
-
-import org.seasar.dbflute.Entity.FunCustodial;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+package org.seasar.dbflute.exception.thrower;
 
 /**
  * @author jflute
- * @since 0.9.6.9 (2010/05/13 Thursday)
+ * @since 1.0.5F (2014/05/05 Monday)
  */
-public class EntityTest extends PlainTestCase {
+public interface OptionalValueNotFoundExceptionThrower {
 
-    public void test_FunCustodial_convertEmptyToNull() {
-        assertNull(FunCustodial.convertEmptyToNull(null));
-        assertNull(FunCustodial.convertEmptyToNull(""));
-        assertNotNull(FunCustodial.convertEmptyToNull(" "));
-        assertNotNull(FunCustodial.convertEmptyToNull("a"));
-    }
+    /**
+     * Throw the exception for not-found value.
+     */
+    void throwNotFoundException();
 }

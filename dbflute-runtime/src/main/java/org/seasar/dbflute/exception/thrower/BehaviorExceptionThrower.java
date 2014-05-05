@@ -48,7 +48,7 @@ public class BehaviorExceptionThrower {
     //                                                                              ======
     public void throwSelectEntityAlreadyDeletedException(Object searchKey) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The selected entity was NOT found! it has already been deleted.");
+        br.addNotice("The selected entity was NOT found! It has already been deleted.");
         br.addItem("Advice");
         br.addElement("Please confirm the existence of your target record on your database.");
         br.addElement("Does the target record really created before this operation?");

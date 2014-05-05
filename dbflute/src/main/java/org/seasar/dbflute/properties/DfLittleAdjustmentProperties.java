@@ -108,6 +108,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isAvailableNonPrimaryKeyWritable", false);
     }
 
+    public boolean isAvailableSelectEntityPlainReturn() { // closet
+        return isProperty("isAvailableSelectEntityPlainReturn", true);
+    }
+
+    public boolean isAvailableSelectEntityWithDeletedCheck() { // closet
+        return isProperty("isAvailableSelectEntityWithDeletedCheck", true);
+    }
+
     // ===================================================================================
     //                                                                      Classification
     //                                                                      ==============

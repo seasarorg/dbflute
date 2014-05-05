@@ -190,7 +190,7 @@ public interface Entity {
     // ===================================================================================
     //                                                                      Internal Class
     //                                                                      ==============
-    public static final class InternalUtil {
+    public static final class FunCustodial {
 
         @SuppressWarnings("unchecked")
         public static <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) {
