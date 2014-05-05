@@ -828,8 +828,7 @@ public class Table {
     public Column getPrimaryKeyAsOne() {
         if (getPrimaryKey().size() != 1) {
             String msg = "This method is for only-one primary-key:";
-            msg = msg + " getPrimaryKey().size()=" + getPrimaryKey().size();
-            msg = msg + " table=" + getTableDbName();
+            msg = msg + " getPrimaryKey().size()=" + getPrimaryKey().size() + " table=" + getTableDbName();
             throw new IllegalStateException(msg);
         }
         return getPrimaryKey().get(0);

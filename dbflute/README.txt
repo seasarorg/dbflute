@@ -21,3 +21,7 @@ which finally creates 'DBFlute Module' users can download.
  |-LICENSE            // LICENSE file for this project
  |-NOTICE             // NOTICE file for this project
  |-README.txt         // README file for this project
+
+[Dependencies]
+o ant-1.7.0            // not latest version because of many ant-call's PermGen
+o commons-compress-1.0 // not latest version because of nest library
