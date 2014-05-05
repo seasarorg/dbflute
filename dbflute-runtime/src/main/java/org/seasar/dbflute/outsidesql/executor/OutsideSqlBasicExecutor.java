@@ -142,7 +142,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().<span style="color: #FD4747">selectList</span>(pmb);
+     *     = memberBhv.outsideSql().<span style="color: #DD4747">selectList</span>(pmb);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }
@@ -179,7 +179,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * pmb.setMemberName_PrefixSearch("S");
      * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().<span style="color: #FD4747">selectList</span>(path, pmb, entityType);
+     *     = memberBhv.outsideSql().<span style="color: #DD4747">selectList</span>(path, pmb, entityType);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }
@@ -246,7 +246,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
-     * int count = memberBhv.outsideSql().<span style="color: #FD4747">execute</span>(pmb);
+     * int count = memberBhv.outsideSql().<span style="color: #DD4747">execute</span>(pmb);
      * </pre>
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @return The count of execution.
@@ -267,7 +267,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * String path = MemberBhv.PATH_selectSimpleMember;
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
-     * int count = memberBhv.outsideSql().<span style="color: #FD4747">execute</span>(path, pmb);
+     * int count = memberBhv.outsideSql().<span style="color: #DD4747">execute</span>(path, pmb);
      * </pre>
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
@@ -296,7 +296,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * SpInOutParameterPmb pmb = new SpInOutParameterPmb();
      * pmb.setVInVarchar("foo");
      * pmb.setVInOutVarchar("bar");
-     * memberBhv.outsideSql().<span style="color: #FD4747">call</span>(pmb);
+     * memberBhv.outsideSql().<span style="color: #DD4747">call</span>(pmb);
      * String outVar = pmb.getVOutVarchar();
      * </pre>
      * It needs to use parameter-bean for procedure (ProcedurePmb).
@@ -376,7 +376,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     /**
      * Prepare entity handling.
      * <pre>
-     * memberBhv.outsideSql().<span style="color: #FD4747">entityHandling()</span>.selectEntityWithDeletedCheck(pmb);
+     * memberBhv.outsideSql().<span style="color: #DD4747">entityHandling()</span>.selectEntityWithDeletedCheck(pmb);
      * </pre>
      * @return The cursor executor of outsideSql. (NotNull)
      */
@@ -395,7 +395,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     /**
      * Prepare the paging as manual-paging.
      * <pre>
-     * memberBhv.outsideSql().<span style="color: #FD4747">manualPaging()</span>.selectPage(pmb);
+     * memberBhv.outsideSql().<span style="color: #DD4747">manualPaging()</span>.selectPage(pmb);
      * </pre>
      * If you call this, you need to write paging condition on your SQL.
      * <pre>
@@ -421,7 +421,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     /**
      * Prepare the paging as auto-paging.
      * <pre>
-     * memberBhv.outsideSql().<span style="color: #FD4747">autoPaging()</span>.selectPage(pmb);
+     * memberBhv.outsideSql().<span style="color: #DD4747">autoPaging()</span>.selectPage(pmb);
      * </pre>
      * If you call this, you don't need to write paging condition on your SQL.
      * <pre>
@@ -450,7 +450,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     /**
      * Prepare cursor handling.
      * <pre>
-     * memberBhv.outsideSql().<span style="color: #FD4747">cursorHandling()</span>.selectCursor(pmb);
+     * memberBhv.outsideSql().<span style="color: #DD4747">cursorHandling()</span>.selectCursor(pmb);
      * </pre>
      * @return The cursor executor of outsideSql. (NotNull)
      */

@@ -158,7 +158,7 @@ public class ManualOrderBean implements HpCalculator {
     /**
      * Add 'when' element for 'case' statement as DateFromTo.
      * <pre>
-     * e.g. from:{<span style="color: #FD4747">2007/04/10</span> 08:24:53} to:{<span style="color: #FD4747">2007/04/16</span> 14:36:29}
+     * e.g. from:{<span style="color: #DD4747">2007/04/10</span> 08:24:53} to:{<span style="color: #DD4747">2007/04/16</span> 14:36:29}
      * 
      *   mob.when_DateFromTo(fromDate, toDate);
      *     --&gt; column &gt;= '2007/04/10 00:00:00'

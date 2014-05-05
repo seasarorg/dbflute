@@ -64,9 +64,9 @@ public class PageGroupOption implements Serializable {
      * Set the size of paga group.
      * <pre>
      * PageGroupOption option = new PageGroupOption();
-     * option.<span style="color: #FD4747">setPageGroupSize</span>(10);
-     * page.<span style="color: #FD4747">setPageGroupOption</span>(option);
-     * List&lt;Integer&gt; numberList = page.<span style="color: #FD4747">pageGroup()</span>.createPageNumberList();
+     * option.<span style="color: #DD4747">setPageGroupSize</span>(10);
+     * page.<span style="color: #DD4747">setPageGroupOption</span>(option);
+     * List&lt;Integer&gt; numberList = page.<span style="color: #DD4747">pageGroup()</span>.createPageNumberList();
      * 
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
      * <span style="color: #3F7E5E">// previous 1 2 3 4 5 6 7 8 9 10 next</span>

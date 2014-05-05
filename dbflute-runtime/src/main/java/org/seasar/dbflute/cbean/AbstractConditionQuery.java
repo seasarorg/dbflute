@@ -1601,7 +1601,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * Order with the keyword 'nulls first'.
      * <pre>
      * MemberCB cb = new MemberCB();
-     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #FD4747">withNullsFirst()</span>;
+     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #DD4747">withNullsFirst()</span>;
      * <span style="color: #3F7E5E">// order by BIRTHDATE asc nulls first</span>
      * </pre>
      */
@@ -1613,7 +1613,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * Order with the keyword 'nulls last'.
      * <pre>
      * MemberCB cb = new MemberCB();
-     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #FD4747">withNullsLast()</span>;
+     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #DD4747">withNullsLast()</span>;
      * <span style="color: #3F7E5E">// order by BIRTHDATE asc nulls last</span>
      * </pre>
      */
@@ -1628,7 +1628,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * <pre>
      * MemberCB cb = new MemberCB();
      * List&lt;String&gt; statusCodeList = Arrays.asList("WDL", "FML", "PRV");
-     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #FD4747">withManualOrder(statusCodeList)</span>;
+     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #DD4747">withManualOrder(statusCodeList)</span>;
      * <span style="color: #3F7E5E">// order by </span>
      * <span style="color: #3F7E5E">//   case</span>
      * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'WDL' then 0</span>
@@ -1654,7 +1654,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * MemberCB cb = new MemberCB();
      * ManualOrderBean mob = new ManualOrderBean();
      * mob.when_GreaterEqual(priorityDate); <span style="color: #3F7E5E">// 2000/01/01</span>
-     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #FD4747">withManualOrder(mob)</span>;
+     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #DD4747">withManualOrder(mob)</span>;
      * <span style="color: #3F7E5E">// order by </span>
      * <span style="color: #3F7E5E">//   case</span>
      * <span style="color: #3F7E5E">//     when BIRTHDATE &gt;= '2000/01/01' then 0</span>

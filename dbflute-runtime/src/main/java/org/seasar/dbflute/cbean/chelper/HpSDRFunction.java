@@ -57,12 +57,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * Set up the sub query of referrer for the scalar 'count'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #FD4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #DD4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #FD4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// basically PK to count records</span>
+     *         subCB.specify().<span style="color: #DD4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// basically PK to count records</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #FD4747">ALIAS_purchaseCount</span>);
+     * }, Member.<span style="color: #DD4747">ALIAS_purchaseCount</span>);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -74,12 +74,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * An overload method for count() with an option. So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #FD4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #DD4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #FD4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// basically PK to count records</span>
+     *         subCB.specify().<span style="color: #DD4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// basically PK to count records</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #FD4747">ALIAS_purchaseCount</span>, new DerivedReferrerOption().<span style="color: #FD4747">coalesce</span>(0));
+     * }, Member.<span style="color: #DD4747">ALIAS_purchaseCount</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -99,12 +99,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * Set up the sub query of referrer for the scalar 'count-distinct'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #FD4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #DD4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #FD4747">columnProductId</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #DD4747">columnProductId</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #FD4747">ALIAS_productKindCount</span>);
+     * }, Member.<span style="color: #DD4747">ALIAS_productKindCount</span>);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -116,12 +116,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * An overload method for count() with an option. So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #FD4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #DD4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #FD4747">columnProductId</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #DD4747">columnProductId</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #FD4747">ALIAS_productKindCount</span>, new DerivedReferrerOption().<span style="color: #FD4747">coalesce</span>(0));
+     * }, Member.<span style="color: #DD4747">ALIAS_productKindCount</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -141,12 +141,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * Set up the sub query of referrer for the scalar 'max'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #FD4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #DD4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #FD4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #DD4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #FD4747">ALIAS_latestPurchaseDatetime</span>);
+     * }, Member.<span style="color: #DD4747">ALIAS_latestPurchaseDatetime</span>);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -158,12 +158,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * An overload method for max() with an option. So refer to the method's java-doc.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #FD4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #DD4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #FD4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #DD4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #FD4747">ALIAS_latestPurchaseDatetime</span>, new DerivedReferrerOption().<span style="color: #FD4747">coalesce</span>("2011-06-07"));
+     * }, Member.<span style="color: #DD4747">ALIAS_latestPurchaseDatetime</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>("2011-06-07"));
      * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -183,12 +183,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * Set up the sub query of referrer for the scalar 'min'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #FD4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #DD4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #FD4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #DD4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #FD4747">ALIAS_firstPurchaseDatetime</span>);
+     * }, Member.<span style="color: #DD4747">ALIAS_firstPurchaseDatetime</span>);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -200,12 +200,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * An overload method for min() with an option. So refer to the method's java-doc.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #FD4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #DD4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #FD4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #DD4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #FD4747">ALIAS_firstPurchaseDatetime</span>, new DerivedReferrerOption().<span style="color: #FD4747">coalesce</span>("2011-06-07"));
+     * }, Member.<span style="color: #DD4747">ALIAS_firstPurchaseDatetime</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>("2011-06-07"));
      * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -225,12 +225,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * Set up the sub query of referrer for the scalar 'sum'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #FD4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #DD4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #FD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #FD4747">ALIAS_purchasePriceSummary</span>);
+     * }, Member.<span style="color: #DD4747">ALIAS_purchasePriceSummary</span>);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -242,12 +242,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * An overload method for sum() with an option. So refer to the method's java-doc.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #FD4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #DD4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #FD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #FD4747">ALIAS_purchasePriceSummary</span>, new DerivedReferrerOption().<span style="color: #FD4747">coalesce</span>(0));
+     * }, Member.<span style="color: #DD4747">ALIAS_purchasePriceSummary</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -267,12 +267,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * Set up the sub query of referrer for the scalar 'avg'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #FD4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #DD4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #FD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #FD4747">ALIAS_purchasePriceAverage</span>);
+     * }, Member.<span style="color: #DD4747">ALIAS_purchasePriceAverage</span>);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -284,12 +284,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * An overload method for avg() with an option. So refer to the method's java-doc.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #FD4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #DD4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #FD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #FD4747">ALIAS_purchasePriceAverage</span>, new DerivedReferrerOption().<span style="color: #FD4747">coalesce</span>(0));
+     * }, Member.<span style="color: #DD4747">ALIAS_purchasePriceAverage</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)

@@ -81,17 +81,17 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * purchase.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
      * 
      * <span style="color: #3F7E5E">// e.g. you can update by self calculation values</span>
-     * UpdateOption&lt;PurchaseCB&gt; option = <span style="color: #FD4747">new UpdateOption&lt;PurchaseCB&gt;()</span>;
-     * option.<span style="color: #FD4747">self</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
+     * UpdateOption&lt;PurchaseCB&gt; option = <span style="color: #DD4747">new UpdateOption&lt;PurchaseCB&gt;()</span>;
+     * option.<span style="color: #DD4747">self</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
      *     public void specify(PurchaseCB cb) {
-     *         cb.specify().<span style="color: #FD4747">columnPurchaseCount()</span>;
+     *         cb.specify().<span style="color: #DD4747">columnPurchaseCount()</span>;
      *     }
-     * }).<span style="color: #FD4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
+     * }).<span style="color: #DD4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
      * 
      * <span style="color: #3F7E5E">// e.g. you can update by your values for common columns</span>
-     * option.<span style="color: #FD4747">disableCommonColumnAutoSetup</span>();
+     * option.<span style="color: #DD4747">disableCommonColumnAutoSetup</span>();
      * 
-     * purchaseBhv.<span style="color: #FD4747">varyingUpdate</span>(purchase, option);
+     * purchaseBhv.<span style="color: #DD4747">varyingUpdate</span>(purchase, option);
      * </pre>
      */
     public UpdateOption() {
@@ -109,12 +109,12 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * purchase.setPurchaseId(value); <span style="color: #3F7E5E">// required</span>
      * purchase.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
      * UpdateOption&lt;PurchaseCB&gt; option = new UpdateOption&lt;PurchaseCB&gt;();
-     * option.<span style="color: #FD4747">self</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
+     * option.<span style="color: #DD4747">self</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
      *     public void specify(PurchaseCB cb) {
-     *         cb.specify().<span style="color: #FD4747">columnPurchaseCount()</span>;
+     *         cb.specify().<span style="color: #DD4747">columnPurchaseCount()</span>;
      *     }
-     * }).<span style="color: #FD4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
-     * purchaseBhv.<span style="color: #FD4747">varyingUpdateNonstrict</span>(purchase, option);
+     * }).<span style="color: #DD4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
+     * purchaseBhv.<span style="color: #DD4747">varyingUpdateNonstrict</span>(purchase, option);
      * </pre>
      * @param selfCalculationSpecification The query for specification that specifies only one column. (NotNull)
      * @return The calculation of specification for the specified column. (NotNull)
@@ -316,7 +316,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * member.setMemberId(3);
      * member.setOthers...(value);
      * UpdateOption&lt;MemberCB&gt; option = new UpdateOption&lt;MemberCB&gt;();
-     * option.<span style="color: #FD4747">specify</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     * option.<span style="color: #DD4747">specify</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     public void query(MemberCB cb) {
      *         <span style="color: #3F7E5E">// only MemberName and Birthdate are updated</span>
      *         <span style="color: #3F7E5E">// with common columns for update and an exclusive control column</span>
@@ -563,7 +563,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * member.setUpdateDatetime(updateDatetime);
      * member.setUpdateUser(updateUser);
      * UpdateOption&lt;MemberCB&gt; option = new UpdateOption&lt;MemberCB&gt;();
-     * option.<span style="color: #FD4747">disableCommonColumnAutoSetup</span>();
+     * option.<span style="color: #DD4747">disableCommonColumnAutoSetup</span>();
      * memberBhv.varyingUpdate(member, option);
      * </pre>
      * @return The option of update. (NotNull: returns this)

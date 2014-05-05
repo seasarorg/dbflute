@@ -57,7 +57,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
      * });
      * 
      * <span style="color: #3F7E5E">// PURCHASE (second level referrer)</span>
-     * loadReferrerOption.<span style="color: #FD4747">setEntityListSetupper</span>(new EntityListSetupper&lt;Member&gt;() {
+     * loadReferrerOption.<span style="color: #DD4747">setEntityListSetupper</span>(new EntityListSetupper&lt;Member&gt;() {
      *     public void setup(List&lt;Member&gt; entityList) {
      *         memberBhv.loadPurchaseList(entityList, new ConditionBeanSetupper&lt;PurchaseCB&gt;() {
      *             public void setup(PurchaseCB cb) {
@@ -108,7 +108,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
      * LoadReferrerOption loadReferrerOption = new LoadReferrerOption();
      * 
      * <span style="color: #3F7E5E">// MEMBER (first level referrer)</span>
-     * loadReferrerOption.<span style="color: #FD4747">setConditionBeanSetupper</span>(new ConditionBeanSetupper&lt;MemberCB&gt;() {
+     * loadReferrerOption.<span style="color: #DD4747">setConditionBeanSetupper</span>(new ConditionBeanSetupper&lt;MemberCB&gt;() {
      *     public void setup(MemberCB cb) {
      *         cb.query().addOrderBy_FormalizedDatetime_Desc();
      *     }
@@ -131,7 +131,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
      * LoadReferrerOption loadReferrerOption = new LoadReferrerOption();
      * ...
      * <span style="color: #3F7E5E">// PURCHASE (second level referrer)</span>
-     * loadReferrerOption.<span style="color: #FD4747">setEntityListSetupper</span>(new EntityListSetupper&lt;Member&gt;() {
+     * loadReferrerOption.<span style="color: #DD4747">setEntityListSetupper</span>(new EntityListSetupper&lt;Member&gt;() {
      *     public void setup(List&lt;Member&gt; entityList) {
      *         memberBhv.loadPurchaseList(entityList, new ConditionBeanSetupper&lt;PurchaseCB&gt;() {
      *             public void setup(PurchaseCB cb) {

@@ -76,7 +76,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
     /**
      * Truncate the month and day and time part of the date or the date-time value.
      * <pre>
-     *  e.g. 2012/12/31 01:50:46 -&gt; 2012/<span style="color: #FD4747">01/01 00:00:00</span>
+     *  e.g. 2012/12/31 01:50:46 -&gt; 2012/<span style="color: #DD4747">01/01 00:00:00</span>
      * </pre>
      * @return this. (NotNull)
      */
@@ -88,7 +88,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
     /**
      * Truncate the day and time part of the date or the date-time value.
      * <pre>
-     *  e.g. 2012/12/31 01:50:46 -&gt; 2012/12/<span style="color: #FD4747">01 00:00:00</span>
+     *  e.g. 2012/12/31 01:50:46 -&gt; 2012/12/<span style="color: #DD4747">01 00:00:00</span>
      * </pre>
      * @return this. (NotNull)
      */
@@ -100,7 +100,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
     /**
      * Truncate the time part of the date-time value.
      * <pre>
-     *  e.g. 2012/12/31 01:50:46 -&gt; 2012/12/31 <span style="color: #FD4747">00:00:00</span>
+     *  e.g. 2012/12/31 01:50:46 -&gt; 2012/12/31 <span style="color: #DD4747">00:00:00</span>
      * </pre>
      * @return this. (NotNull)
      */
@@ -192,8 +192,8 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      *      public void query(Purchase subCB) {
      *          cb.columnPurchasePrice();
      *      }
-     *  }, ALIAS_..., new DerivedReferrerOption.<span style="color: #FD4747">plus</span>(
-     *      cb.<span style="color: #FD4747">dreamCruiseCB()</span>.specify().specify...().columnServicePointCount()));
+     *  }, ALIAS_..., new DerivedReferrerOption.<span style="color: #DD4747">plus</span>(
+     *      cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().specify...().columnServicePointCount()));
      * </pre>
      * @param plusColumn The plus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
@@ -224,8 +224,8 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      *      public void query(Purchase subCB) {
      *          cb.columnPurchasePrice();
      *      }
-     *  }, ALIAS_..., new DerivedReferrerOption.<span style="color: #FD4747">minus</span>(
-     *      cb.<span style="color: #FD4747">dreamCruiseCB()</span>.specify().specify...().columnServicePointCount()));
+     *  }, ALIAS_..., new DerivedReferrerOption.<span style="color: #DD4747">minus</span>(
+     *      cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().specify...().columnServicePointCount()));
      * </pre>
      * @param minusColumn The minus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
@@ -256,8 +256,8 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      *      public void query(Purchase subCB) {
      *          cb.columnPurchasePrice();
      *      }
-     *  }, ALIAS_..., new DerivedReferrerOption.<span style="color: #FD4747">multiply</span>(
-     *      cb.<span style="color: #FD4747">dreamCruiseCB()</span>.specify().specify...().columnServicePointCount()));
+     *  }, ALIAS_..., new DerivedReferrerOption.<span style="color: #DD4747">multiply</span>(
+     *      cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().specify...().columnServicePointCount()));
      * </pre>
      * @param multiplyColumn The multiply column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
@@ -288,8 +288,8 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      *      public void query(Purchase subCB) {
      *          cb.columnPurchasePrice();
      *      }
-     *  }, ALIAS_..., new DerivedReferrerOption.<span style="color: #FD4747">divide</span>(
-     *      cb.<span style="color: #FD4747">dreamCruiseCB()</span>.specify().specify...().columnServicePointCount()));
+     *  }, ALIAS_..., new DerivedReferrerOption.<span style="color: #DD4747">divide</span>(
+     *      cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().specify...().columnServicePointCount()));
      * </pre>
      * @param divideColumn The divide column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
