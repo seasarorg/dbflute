@@ -453,10 +453,10 @@ public class DfCollectionUtil {
     //                                                                               =====
     /**
      * Order the unordered list according to specified resources.
-     * @param unorderedList The unordered list. (NotNull)
-     * @param resource The resource of according-to-order. (NotNull)
      * @param <ELEMENT_TYPE> The type of element.
      * @param <ID_TYPE> The type of ID.
+     * @param unorderedList The unordered list. (NotNull)
+     * @param resource The resource of according-to-order. (NotNull)
      */
     public static <ELEMENT_TYPE, ID_TYPE> void orderAccordingTo(List<ELEMENT_TYPE> unorderedList,
             AccordingToOrderResource<ELEMENT_TYPE, ID_TYPE> resource) {

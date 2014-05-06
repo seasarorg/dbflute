@@ -35,7 +35,7 @@ public class DfForeignKeyMeta {
     protected String _localTablePureName;
     protected UnifiedSchema _foreignSchema;
     protected String _foreignTablePureName;
-    protected Map<String, String> _columnNameMap = DfCollectionUtil.newLinkedHashMap();
+    protected final Map<String, String> _columnNameMap = DfCollectionUtil.newLinkedHashMap();
 
     // ===================================================================================
     //                                                                       Name Building
@@ -81,7 +81,7 @@ public class DfForeignKeyMeta {
     }
 
     public void setForeignKeyName(String foreignKeyName) {
-        this._foreignKeyName = foreignKeyName;
+        _foreignKeyName = foreignKeyName;
     }
 
     public UnifiedSchema getLocalSchema() {
@@ -89,7 +89,7 @@ public class DfForeignKeyMeta {
     }
 
     public void setLocalSchema(UnifiedSchema localSchema) {
-        this._localSchema = localSchema;
+        _localSchema = localSchema;
     }
 
     public String getLocalTablePureName() {
@@ -97,7 +97,7 @@ public class DfForeignKeyMeta {
     }
 
     public void setLocalTablePureName(String localTablePureName) {
-        this._localTablePureName = localTablePureName;
+        _localTablePureName = localTablePureName;
     }
 
     public UnifiedSchema getForeignSchema() {
@@ -105,7 +105,7 @@ public class DfForeignKeyMeta {
     }
 
     public void setForeignSchema(UnifiedSchema foreignSchema) {
-        this._foreignSchema = foreignSchema;
+        _foreignSchema = foreignSchema;
     }
 
     public String getForeignTablePureName() {
@@ -113,21 +113,18 @@ public class DfForeignKeyMeta {
     }
 
     public void setForeignTablePureName(String foreignTablePureName) {
-        this._foreignTablePureName = foreignTablePureName;
+        _foreignTablePureName = foreignTablePureName;
     }
 
     public Map<String, String> getColumnNameMap() {
         return _columnNameMap;
     }
 
-    public void setColumnNameMap(Map<String, String> columnNameMap) {
-        if (columnNameMap == null) {
-            throw new IllegalArgumentException("The argument 'columnNameMap' should not be null!");
-        }
-        this._columnNameMap = columnNameMap;
+    public void putColumnName(String localColumnName, String foreignColumnName) {
+        _columnNameMap.put(localColumnName, foreignColumnName);
     }
 
-    public void putColumnNameMap(String localColumnName, String foreignColumnName) {
-        this._columnNameMap.put(localColumnName, foreignColumnName);
+    public void putColumnNameAll(Map<String, String> columnNameMap) {
+        _columnNameMap.putAll(columnNameMap);
     }
 }

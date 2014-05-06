@@ -823,11 +823,7 @@ object ${glDBFluteConfig} {
         }
     }
 
-    class ImplementedOracleArrayType extends OracleArrayType {
-
-        def ImplementedOracleArrayType(arrayTypeName: String, elementType: Class[_]) {
-            super(arrayTypeName, elementType);
-        }
+    class ImplementedOracleArrayType(arrayTypeName: String, elementType: Class[_]) extends OracleArrayType(arrayTypeName, elementType) {
 
         @Override
         protected def createOracleAgent(): OracleAgent = {
@@ -835,11 +831,7 @@ object ${glDBFluteConfig} {
         }
     }
 
-    class ImplementedOracleStructType extends OracleStructType {
-
-        def ImplementedOracleStructType(structTypeName: String, entityType: Class[?]) {
-            super(structTypeName, entityType);
-        }
+    class ImplementedOracleStructType(structTypeName: String, entityType: Class[_]) extends OracleStructType(structTypeName, entityType) {
 
         @Override
         protected def createOracleAgent(): OracleAgent = {
@@ -860,16 +852,16 @@ object ${glDBFluteConfig} {
         }
 
         protected def unwrap(conn: Connection): Connection = {
-            if (conn instanceof NotClosingConnectionWrapper) {
-                return ((NotClosingConnectionWrapper)conn).getActualConnection();
+            if (conn.isInstanceOf[NotClosingConnectionWrapper]) {
+                return conn.asInstanceOf[NotClosingConnectionWrapper].getActualConnection();
             }
             return conn;
         }
 
         protected def resolveS2DBCP(conn: Connection): Connection = {
 #if ($database.isTargetContainerSeasar())
-            if (conn instanceof ConnectionWrapper) {
-                return ((ConnectionWrapper)conn).getPhysicalConnection();
+            if (conn.isInstanceOf[ConnectionWrapper]) {
+                return conn.asInstanceOf[ConnectionWrapper].getPhysicalConnection();
             }
 #end
             return conn;
@@ -888,7 +880,7 @@ object ${glDBFluteConfig} {
 
         protected def getFieldConnection(conn: Connection, fieldName: String): Connection = {
             val field: Field = DfReflectionUtil.getWholeField(conn.getClass(), fieldName);
-            return (Connection)DfReflectionUtil.getValueForcedly(field, conn);
+            return DfReflectionUtil.getValueForcedly(field, conn).asInstanceOf[Connection];
         }
     }
 
@@ -898,7 +890,7 @@ object ${glDBFluteConfig} {
     class ImplementedSQLExceptionDigger extends SQLExceptionDigger {
 
         def digUp(cause: Throwable): SQLException = {
-            val found: SQLException = resolveS2DBCP(cause);
+            var found: SQLException = resolveS2DBCP(cause);
             if (found != null) {
                 return found;
             }
@@ -912,7 +904,7 @@ object ${glDBFluteConfig} {
         protected def resolveS2DBCP(cause: Throwable): SQLException = {
 #if ($database.isTargetContainerSeasar())
             if (cause instanceof SQLRuntimeException) {
-                nestedCause: Throwable = ((SQLRuntimeException)cause).getCause();
+                val nestedCause: Throwable = ((SQLRuntimeException)cause).getCause();
                 if (nestedCause instanceof SQLException) {
                     return (SQLException)nestedCause;
                 }
@@ -923,8 +915,8 @@ object ${glDBFluteConfig} {
 
         protected def resolveDefault(cause: Throwable):SQLException = {
             val nestedCause: Throwable = cause.getCause();
-            if (nestedCause instanceof SQLException) {
-                return (SQLException)nestedCause;
+            if (nestedCause.isInstanceOf[SQLException]) {
+                return nestedCause.asInstanceOf[SQLException];
             }
             return null;
         }

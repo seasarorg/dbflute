@@ -16,6 +16,7 @@
 package org.seasar.dbflute.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -766,44 +767,44 @@ public class Srl {
     // -----------------------------------------------------
     //                                          List Element
     //                                          ------------
-    public static boolean containsElement(List<String> strList, String element) {
+    public static boolean containsElement(Collection<String> strList, String element) {
         return containsElementAll(strList, element);
     }
 
-    public static boolean containsElementIgnoreCase(List<String> strList, String element) {
+    public static boolean containsElementIgnoreCase(Collection<String> strList, String element) {
         return containsElementAllIgnoreCase(strList, element);
     }
 
-    public static boolean containsElementAll(List<String> strList, String... elements) {
+    public static boolean containsElementAll(Collection<String> strList, String... elements) {
         return doContainsElementAll(false, strList, elements);
     }
 
-    public static boolean containsElementAllIgnoreCase(List<String> strList, String... elements) {
+    public static boolean containsElementAllIgnoreCase(Collection<String> strList, String... elements) {
         return doContainsElementAll(true, strList, elements);
     }
 
-    protected static boolean doContainsElementAll(boolean ignoreCase, List<String> strList, String... elements) {
+    protected static boolean doContainsElementAll(boolean ignoreCase, Collection<String> strList, String... elements) {
         assertStringListNotNull(strList);
         assertElementVaryingNotNull(elements);
         return doContainsElement(true, ignoreCase, ListElementContainsType.EQUAL, strList, elements);
     }
 
-    public static boolean containsElementAny(List<String> strList, String... elements) {
+    public static boolean containsElementAny(Collection<String> strList, String... elements) {
         return doContainsElementAny(false, strList, elements);
     }
 
-    public static boolean containsElementAnyIgnoreCase(List<String> strList, String... elements) {
+    public static boolean containsElementAnyIgnoreCase(Collection<String> strList, String... elements) {
         return doContainsElementAny(true, strList, elements);
     }
 
-    protected static boolean doContainsElementAny(boolean ignoreCase, List<String> strList, String... elements) {
+    protected static boolean doContainsElementAny(boolean ignoreCase, Collection<String> strList, String... elements) {
         assertStringListNotNull(strList);
         assertElementVaryingNotNull(elements);
         return doContainsElement(false, ignoreCase, ListElementContainsType.EQUAL, strList, elements);
     }
 
     protected static boolean doContainsElement(boolean all, boolean ignoreCase, ListElementContainsType type,
-            List<String> strList, String... elements) {
+            Collection<String> strList, String... elements) {
         assertStringListNotNull(strList);
         assertElementVaryingNotNull(elements);
         if (elements.length == 0) {
@@ -858,37 +859,37 @@ public class Srl {
     // -----------------------------------------------------
     //                                          List Keyword
     //                                          ------------
-    public static boolean containsKeyword(List<String> strList, String keyword) {
+    public static boolean containsKeyword(Collection<String> strList, String keyword) {
         return containsKeywordAll(strList, keyword);
     }
 
-    public static boolean containsKeywordIgnoreCase(List<String> strList, String keyword) {
+    public static boolean containsKeywordIgnoreCase(Collection<String> strList, String keyword) {
         return containsKeywordAllIgnoreCase(strList, keyword);
     }
 
-    public static boolean containsKeywordAll(List<String> strList, String... keywords) {
+    public static boolean containsKeywordAll(Collection<String> strList, String... keywords) {
         return doContainsKeywordAll(false, strList, keywords);
     }
 
-    public static boolean containsKeywordAllIgnoreCase(List<String> strList, String... keywords) {
+    public static boolean containsKeywordAllIgnoreCase(Collection<String> strList, String... keywords) {
         return doContainsKeywordAll(true, strList, keywords);
     }
 
-    protected static boolean doContainsKeywordAll(boolean ignoreCase, List<String> strList, String... keywords) {
+    protected static boolean doContainsKeywordAll(boolean ignoreCase, Collection<String> strList, String... keywords) {
         assertStringListNotNull(strList);
         assertKeywordVaryingNotNull(keywords);
         return doContainsElement(true, ignoreCase, ListElementContainsType.KEYWORD, strList, keywords);
     }
 
-    public static boolean containsKeywordAny(List<String> strList, String... keywords) {
+    public static boolean containsKeywordAny(Collection<String> strList, String... keywords) {
         return doContainsKeywordAny(false, strList, keywords);
     }
 
-    public static boolean containsKeywordAnyIgnoreCase(List<String> strList, String... keywords) {
+    public static boolean containsKeywordAnyIgnoreCase(Collection<String> strList, String... keywords) {
         return doContainsKeywordAny(true, strList, keywords);
     }
 
-    protected static boolean doContainsKeywordAny(boolean ignoreCase, List<String> strList, String... keywords) {
+    protected static boolean doContainsKeywordAny(boolean ignoreCase, Collection<String> strList, String... keywords) {
         assertStringListNotNull(strList);
         assertKeywordVaryingNotNull(keywords);
         return doContainsElement(false, ignoreCase, ListElementContainsType.KEYWORD, strList, keywords);
@@ -897,36 +898,36 @@ public class Srl {
     // -----------------------------------------------------
     //                                           List Prefix
     //                                           -----------
-    public static boolean containsPrefix(List<String> strList, String prefix) {
+    public static boolean containsPrefix(Collection<String> strList, String prefix) {
         return containsPrefixAll(strList, prefix);
     }
 
-    public static boolean containsPrefixIgnoreCase(List<String> strList, String prefix) {
+    public static boolean containsPrefixIgnoreCase(Collection<String> strList, String prefix) {
         return containsPrefixAllIgnoreCase(strList, prefix);
     }
 
-    public static boolean containsPrefixAll(List<String> strList, String... prefixes) {
+    public static boolean containsPrefixAll(Collection<String> strList, String... prefixes) {
         return doContainsPrefixAll(false, strList, prefixes);
     }
 
-    public static boolean containsPrefixAllIgnoreCase(List<String> strList, String... prefixes) {
+    public static boolean containsPrefixAllIgnoreCase(Collection<String> strList, String... prefixes) {
         return doContainsPrefixAll(true, strList, prefixes);
     }
 
-    protected static boolean doContainsPrefixAll(boolean ignoreCase, List<String> strList, String... prefixes) {
+    protected static boolean doContainsPrefixAll(boolean ignoreCase, Collection<String> strList, String... prefixes) {
         assertStringListNotNull(strList);
         return doContainsElement(true, ignoreCase, ListElementContainsType.PREFIX, strList, prefixes);
     }
 
-    public static boolean containsPrefixAny(List<String> strList, String... prefixes) {
+    public static boolean containsPrefixAny(Collection<String> strList, String... prefixes) {
         return doContainsPrefixAny(false, strList, prefixes);
     }
 
-    public static boolean containsPrefixAnyIgnoreCase(List<String> strList, String... prefixes) {
+    public static boolean containsPrefixAnyIgnoreCase(Collection<String> strList, String... prefixes) {
         return doContainsPrefixAny(true, strList, prefixes);
     }
 
-    protected static boolean doContainsPrefixAny(boolean ignoreCase, List<String> strList, String... prefixes) {
+    protected static boolean doContainsPrefixAny(boolean ignoreCase, Collection<String> strList, String... prefixes) {
         assertStringListNotNull(strList);
         return doContainsElement(false, ignoreCase, ListElementContainsType.PREFIX, strList, prefixes);
     }
@@ -934,36 +935,36 @@ public class Srl {
     // -----------------------------------------------------
     //                                           List Suffix
     //                                           -----------
-    public static boolean containsSuffix(List<String> strList, String suffix) {
+    public static boolean containsSuffix(Collection<String> strList, String suffix) {
         return containsSuffixAll(strList, suffix);
     }
 
-    public static boolean containsSuffixIgnoreCase(List<String> strList, String suffix) {
+    public static boolean containsSuffixIgnoreCase(Collection<String> strList, String suffix) {
         return containsSuffixAllIgnoreCase(strList, suffix);
     }
 
-    public static boolean containsSuffixAll(List<String> strList, String... suffixes) {
+    public static boolean containsSuffixAll(Collection<String> strList, String... suffixes) {
         return doContainsSuffixAll(false, strList, suffixes);
     }
 
-    public static boolean containsSuffixAllIgnoreCase(List<String> strList, String... suffixes) {
+    public static boolean containsSuffixAllIgnoreCase(Collection<String> strList, String... suffixes) {
         return doContainsSuffixAll(true, strList, suffixes);
     }
 
-    protected static boolean doContainsSuffixAll(boolean ignoreCase, List<String> strList, String... suffixes) {
+    protected static boolean doContainsSuffixAll(boolean ignoreCase, Collection<String> strList, String... suffixes) {
         assertStringListNotNull(strList);
         return doContainsElement(true, ignoreCase, ListElementContainsType.SUFFIX, strList, suffixes);
     }
 
-    public static boolean containsSuffixAny(List<String> strList, String... suffixes) {
+    public static boolean containsSuffixAny(Collection<String> strList, String... suffixes) {
         return doContainsSuffixAny(false, strList, suffixes);
     }
 
-    public static boolean containsSuffixAnyIgnoreCase(List<String> strList, String... suffixes) {
+    public static boolean containsSuffixAnyIgnoreCase(Collection<String> strList, String... suffixes) {
         return doContainsSuffixAny(true, strList, suffixes);
     }
 
-    protected static boolean doContainsSuffixAny(boolean ignoreCase, List<String> strList, String... suffixes) {
+    protected static boolean doContainsSuffixAny(boolean ignoreCase, Collection<String> strList, String... suffixes) {
         assertStringListNotNull(strList);
         return doContainsElement(false, ignoreCase, ListElementContainsType.SUFFIX, strList, suffixes);
     }
@@ -1245,18 +1246,18 @@ public class Srl {
     // ===================================================================================
     //                                                                    Connect & Remove
     //                                                                    ================
-    public static String connectByDelimiter(List<String> strList, String delimiter) {
+    public static String connectByDelimiter(Collection<String> strList, String delimiter) {
         assertStringListNotNull(strList);
         return doConnectByDelimiter(strList, delimiter, null);
     }
 
-    public static String connectByDelimiterQuoted(List<String> strList, String delimiter, String quotation) {
+    public static String connectByDelimiterQuoted(Collection<String> strList, String delimiter, String quotation) {
         assertStringListNotNull(strList);
         assertQuotationNotNull(quotation);
         return doConnectByDelimiter(strList, delimiter, quotation);
     }
 
-    protected static String doConnectByDelimiter(List<String> strList, String delimiter, String quotation) {
+    protected static String doConnectByDelimiter(Collection<String> strList, String delimiter, String quotation) {
         assertStringListNotNull(strList);
         final StringBuilder sb = new StringBuilder();
         for (String str : strList) {
@@ -2206,7 +2207,7 @@ public class Srl {
         assertObjectNotNull("str", str);
     }
 
-    protected static void assertStringListNotNull(List<String> strList) {
+    protected static void assertStringListNotNull(Collection<String> strList) {
         assertObjectNotNull("strList", strList);
     }
 

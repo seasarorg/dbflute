@@ -407,7 +407,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                     additionalFK.setLocalTablePureName(fk.getLocalTablePureName());
                     additionalFK.setForeignSchema(newForeignSchema);
                     additionalFK.setForeignTablePureName(newForeignTableName);
-                    additionalFK.setColumnNameMap(fk.getColumnNameMap());
+                    additionalFK.putColumnNameAll(fk.getColumnNameMap());
                     additionalFKMap.put(additionalFK.getForeignKeyName(), additionalFK);
                 }
             }

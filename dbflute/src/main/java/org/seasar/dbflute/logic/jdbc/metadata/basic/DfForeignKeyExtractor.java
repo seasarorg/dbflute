@@ -19,10 +19,12 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
@@ -163,7 +165,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                     final String firstName = meta.getForeignTablePureName(); // pure name is enough for check
                     final String secondName = foreignTableName;
                     if (firstName.equalsIgnoreCase(secondName)) { // means compound FK
-                        meta.putColumnNameMap(localColumnName, foreignColumnName);
+                        meta.putColumnName(localColumnName, foreignColumnName);
                         continue; // putting columns only
                     } else { // here: same-name FK and same different foreign table.
                         // Basically no way!
@@ -187,7 +189,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                 meta.setLocalTablePureName(localTableName);
                 meta.setForeignSchema(foreignSchema);
                 meta.setForeignTablePureName(foreignTableName);
-                meta.putColumnNameMap(localColumnName, foreignColumnName);
+                meta.putColumnName(localColumnName, foreignColumnName);
             }
         } finally {
             if (rs != null) {
@@ -196,7 +198,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         }
         reflectUniqueKeyFk(unifiedSchema, tableName, fkMap);
         handleExceptedForeignKey(exceptedFKMap, tableName);
-        return filterSameStructureForeignKey(fkMap);
+        return immobilizeOrder(filterSameStructureForeignKey(fkMap));
     }
 
     protected ResultSet extractForeignKeyMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
@@ -290,6 +292,34 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         return filteredFKMap;
     }
 
+    protected Map<String, DfForeignKeyMeta> immobilizeOrder(final Map<String, DfForeignKeyMeta> fkMap) {
+        final Comparator<String> comparator = createImmobilizedComparator(fkMap);
+        final TreeMap<String, DfForeignKeyMeta> sortedMap = new TreeMap<String, DfForeignKeyMeta>(comparator);
+        sortedMap.putAll(fkMap);
+        final Map<String, DfForeignKeyMeta> resultMap = newLinkedHashMap();
+        resultMap.putAll(sortedMap);
+        return resultMap; // renewal map just in case
+    }
+
+    protected Comparator<String> createImmobilizedComparator(final Map<String, DfForeignKeyMeta> fkMap) {
+        return new Comparator<String>() {
+            public int compare(String o1, String o2) {
+                // sorted by "column names + FK name" (overridden default sort is by FK name)
+                // because FK name might be auto-generated name by DBMS,
+                // no change FK but generated classes might be changed after ReplaceSchema
+                // (basically FK name should be named fixedly...)
+                // so uses local column names as first key here
+                final DfForeignKeyMeta meta1 = fkMap.get(o1);
+                final DfForeignKeyMeta meta2 = fkMap.get(o2);
+                final Map<String, String> columnNameMap1 = meta1.getColumnNameMap(); // the map is sorted
+                final Map<String, String> columnNameMap2 = meta2.getColumnNameMap();
+                final String exp1 = Srl.connectByDelimiter(columnNameMap1.keySet(), ",") + ":" + o1;
+                final String exp2 = Srl.connectByDelimiter(columnNameMap2.keySet(), ",") + ":" + o2;
+                return exp1.compareTo(exp2);
+            }
+        };
+    }
+
     // ===================================================================================
     //                                                                        UniqueKey FK
     //                                                                        ============
@@ -354,7 +384,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                             break;
                         }
                     }
-                    meta.putColumnNameMap(uniqueFkColumn.getLocalColumnName(), uniqueFkColumn.getForeignColumnName());
+                    meta.putColumnName(uniqueFkColumn.getLocalColumnName(), uniqueFkColumn.getForeignColumnName());
                 }
                 if (meta == null) { // basically no way
                     throw new IllegalStateException("The key should have any elements: " + tableKey);

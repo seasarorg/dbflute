@@ -708,6 +708,9 @@ public class DfSchemaXmlSerializer {
         // ...after that
         // MySQL does not returns random order, auto-generated FK names have problems
         // however this logic is remained just in case 
+        // ...after that
+        // FK map is sorted by local column names (first key) and FK name (second key)
+        // so FK order is immobilized!
         return previousNameSet;
     }
 
