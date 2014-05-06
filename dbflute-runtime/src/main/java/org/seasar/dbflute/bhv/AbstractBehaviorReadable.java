@@ -17,6 +17,7 @@ package org.seasar.dbflute.bhv;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -68,9 +69,10 @@ import org.seasar.dbflute.exception.PagingOverSafetySizeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
-import org.seasar.dbflute.exception.thrower.OptionalValueNotFoundExceptionThrower;
+import org.seasar.dbflute.exception.thrower.OptionalValueExceptionThrower;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.resource.DBFluteSystem;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -79,6 +81,17 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  */
 public abstract class AbstractBehaviorReadable implements BehaviorReadable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** The empty instance for loader of nested referrer. (wild-card generic for downcast) */
+    protected static final NestedReferrerLoader<?> EMPTY_LOADER = new NestedReferrerLoader<Entity>() {
+        public void withNestedReferrer(ReferrerListHandler<Entity> handler) {
+            final List<Entity> emptyList = DfCollectionUtil.emptyList();
+            handler.handle(emptyList);
+        }
+    };
 
     // ===================================================================================
     //                                                                           Attribute
@@ -116,7 +129,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected abstract Entity doReadEntity(ConditionBean cb);
 
     protected <ENTITY> OptionalEntity<ENTITY> createOptionalEntity(ENTITY entity, final ConditionBean cb) {
-        return new OptionalEntity<ENTITY>(entity, new OptionalValueNotFoundExceptionThrower() {
+        return new OptionalEntity<ENTITY>(entity, new OptionalValueExceptionThrower() {
             public void throwNotFoundException() {
                 throwSelectEntityAlreadyDeletedException(cb);
             }
@@ -800,12 +813,13 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param <REFERRER_ENTITY> The type of referrer entity.
      * @param localEntityList The list of local entity. (NotNull)
      * @param loadReferrerOption The option of loadReferrer. (NotNull)
-     * @param callback The internal call-back of loadReferrer. (NotNull) 
+     * @param callback The internal callback of loadReferrer. (NotNull) 
+     * @return The callback to load nested referrer. (NotNull)
      */
-    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> void helpLoadReferrerInternally(
+    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> NestedReferrerLoader<REFERRER_ENTITY> helpLoadReferrerInternally(
             List<LOCAL_ENTITY> localEntityList, LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption,
             InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
-        doHelpLoadReferrerInternally(localEntityList, loadReferrerOption, callback);
+        return doHelpLoadReferrerInternally(localEntityList, loadReferrerOption, callback);
     }
 
     /**
@@ -818,19 +832,22 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param localEntityList The list of local entity. (NotNull)
      * @param loadReferrerOption The option of loadReferrer. (NotNull)
      * @param callback The internal call-back of loadReferrer. (NotNull) 
+     * @return The callback to load nested referrer. (NotNull)
      */
-    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> void doHelpLoadReferrerInternally(
+    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> NestedReferrerLoader<REFERRER_ENTITY> doHelpLoadReferrerInternally(
             List<LOCAL_ENTITY> localEntityList, LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption,
             final InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
 
-        // - - - - - - - - - - -
-        // Assert pre-condition
-        // - - - - - - - - - - -
+        // - - - - - - - - - -
+        // Assert precondition
+        // - - - - - - - - - -
         assertBehaviorSelectorNotNull("loadReferrer");
         assertObjectNotNull("localEntityList", localEntityList);
         assertObjectNotNull("loadReferrerOption", loadReferrerOption);
         if (localEntityList.isEmpty()) {
-            return;
+            @SuppressWarnings("unchecked")
+            final NestedReferrerLoader<REFERRER_ENTITY> empty = (NestedReferrerLoader<REFERRER_ENTITY>) EMPTY_LOADER;
+            return empty;
         }
 
         // - - - - - - - - - - - - - -
@@ -926,6 +943,15 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
                 callback.setRfLs(localEntity, new ArrayList<REFERRER_ENTITY>());
             }
         }
+
+        // - - - - - - - - - - - - - - - - - - - -
+        // Return callback to load nested referrer
+        // - - - - - - - - - - - - - - - - - - - -
+        return new NestedReferrerLoader<REFERRER_ENTITY>() {
+            public void withNestedReferrer(ReferrerListHandler<REFERRER_ENTITY> handler) {
+                handler.handle(Collections.unmodifiableList(referrerList));
+            }
+        };
     }
 
     protected String xbuildReferrerCorrelatedFixedCondition(ConditionBean cb, String referrerPropertyName) {

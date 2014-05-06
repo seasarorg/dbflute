@@ -267,8 +267,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${classificationTop.topCommentForJavaDoc} <br />
 #end
 #if ($group.hasGroupComment())
-     * ${group.groupCommentForJavaDoc}
+     * ${group.groupCommentForJavaDoc} <br />
 #end
+     * ${group.buildElementDisp()}
      */
     public void set${tmpJavaName}_InScope_${group.groupNameInitCap}() {
         set${tmpJavaName}_InScope_As${col.classificationName}(${glCDef}.${col.classificationName}.listOf${group.groupNameInitCap}());
@@ -779,8 +780,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 #if ($group.hasGroupComment())
      * ${group.groupCommentForJavaDoc} <br />
-     * ${group.buildElementDisp()}
 #end
+     * ${group.buildElementDisp()}
      */
     public void set${tmpJavaName}_InScope_${group.groupNameInitCap}() {
         set${tmpJavaName}_InScope_As${col.classificationName}(${glCDef}.${col.classificationName}.listOf${group.groupNameInitCap}());

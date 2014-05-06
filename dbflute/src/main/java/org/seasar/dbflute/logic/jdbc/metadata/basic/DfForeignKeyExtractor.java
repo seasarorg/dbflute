@@ -273,8 +273,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         final Map<String, DfForeignKeyMeta> filteredFKMap = newLinkedHashMap();
         final Map<Map<String, Object>, Object> checkMap = newLinkedHashMap();
         final Object dummyObj = new Object();
-        final Set<Entry<String, DfForeignKeyMeta>> entrySet = fkMap.entrySet();
-        for (Entry<String, DfForeignKeyMeta> entry : entrySet) {
+        for (Entry<String, DfForeignKeyMeta> entry : fkMap.entrySet()) {
             final String foreinKeyName = entry.getKey();
             final DfForeignKeyMeta metaInfo = entry.getValue();
             final Map<String, Object> checkKey = newLinkedHashMap();

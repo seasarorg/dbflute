@@ -19,7 +19,7 @@ package org.seasar.dbflute.exception.thrower;
  * @author jflute
  * @since 1.0.5F (2014/05/05 Monday)
  */
-public interface OptionalValueNotFoundExceptionThrower {
+public interface OptionalValueExceptionThrower {
 
     /**
      * Throw the exception for not-found value.
