@@ -313,8 +313,8 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                 final DfForeignKeyMeta meta2 = fkMap.get(o2);
                 final Map<String, String> columnNameMap1 = meta1.getColumnNameMap(); // the map is sorted
                 final Map<String, String> columnNameMap2 = meta2.getColumnNameMap();
-                final String exp1 = Srl.connectByDelimiter(columnNameMap1.keySet(), ",") + ":" + o1;
-                final String exp2 = Srl.connectByDelimiter(columnNameMap2.keySet(), ",") + ":" + o2;
+                final String exp1 = Srl.connectByDelimiter(columnNameMap1.keySet(), "/") + "," + o1;
+                final String exp2 = Srl.connectByDelimiter(columnNameMap2.keySet(), "/") + "," + o2;
                 return exp1.compareTo(exp2);
             }
         };
