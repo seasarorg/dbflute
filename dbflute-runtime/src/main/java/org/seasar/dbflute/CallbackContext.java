@@ -44,11 +44,43 @@ public class CallbackContext {
     /** The default thread-local for this. */
     protected static final ThreadLocal<CallbackContext> _defaultThreadLocal = new ThreadLocal<CallbackContext>();
 
-    /** The provider of thread-local for this. (NullAllowed: normally null) */
-    protected static CallbackContextThreadLocalProvider _threadLocalProvider;
+    /** The default holder for callback context, using thread local. (NotNull) */
+    protected static final CallbackContextHolder _defaultHolder = new CallbackContextHolder() {
+
+        public CallbackContext provide() {
+            return _defaultThreadLocal.get();
+        }
+
+        public void save(CallbackContext context) {
+            _defaultThreadLocal.set(context);
+        }
+    };
+
+    /** The holder for callback context, might be changed. (NotNull: null setting is not allowed) */
+    protected static CallbackContextHolder _holder = _defaultHolder; // as default
 
     /** Is this static world locked? e.g. you should unlock it to set your own provider. */
     protected static boolean _locked = true; // at first locked
+
+    /**
+     * The holder of for callback context. <br />
+     * Basically for asynchronous of web framework e.g. Play2.
+     */
+    public static interface CallbackContextHolder {
+
+        /**
+         * Provide callback context. <br />
+         * You should return same instance in same request.
+         * @return The instance of callback context. (NullAllowed: when no context, but should exist in real handling)
+         */
+        CallbackContext provide();
+
+        /**
+         * Hold callback context and save it in holder.
+         * @param callbackContext The callback context set by static setter. (NullAllowed: if null, context is removed)
+         */
+        void save(CallbackContext callbackContext);
+    }
 
     // -----------------------------------------------------
     //                                        Basic Handling
@@ -58,7 +90,7 @@ public class CallbackContext {
      * @return The context of callback. (NullAllowed)
      */
     public static CallbackContext getCallbackContextOnThread() {
-        return getThreadLocal().get();
+        return getActiveHolder().provide();
     }
 
     /**
@@ -71,7 +103,7 @@ public class CallbackContext {
             String msg = "The argument 'callbackContext' must not be null.";
             throw new IllegalArgumentException(msg);
         }
-        getThreadLocal().set(callbackContext);
+        getActiveHolder().save(callbackContext);
     }
 
     /**
@@ -80,7 +112,7 @@ public class CallbackContext {
      * @return The determination, true or false.
      */
     public static boolean isExistCallbackContextOnThread() {
-        return getThreadLocal().get() != null;
+        return getActiveHolder().provide() != null;
     }
 
     /**
@@ -89,42 +121,35 @@ public class CallbackContext {
      * because this clear method clears all interfaces. 
      */
     public static void clearCallbackContextOnThread() {
-        getThreadLocal().set(null);
+        getActiveHolder().save(null);
+    }
+
+    /**
+     * Get the active holder for callback context.
+     * @return The holder instance to handle callback context. (NotNull)
+     */
+    protected static CallbackContextHolder getActiveHolder() {
+        return _holder;
     }
 
     // -----------------------------------------------------
     //                                            Management
     //                                            ----------
     /**
-     * Get thread local for callback context, default instance or provided.
-     * @return The instance of thread local. (NotNull)
-     */
-    protected static ThreadLocal<CallbackContext> getThreadLocal() {
-        if (_threadLocalProvider != null) {
-            final ThreadLocal<CallbackContext> provided = _threadLocalProvider.provide();
-            if (provided == null) {
-                String msg = "The provider returned null callback context: " + _threadLocalProvider;
-                throw new IllegalStateException(msg);
-            }
-            return provided;
-        }
-        return _defaultThreadLocal;
-    }
-
-    /**
-     * Use the specified provider of thread local for callback context. (automatically locked after setting) <br />
+     * Use the surrogate holder for callback context. (automatically locked after setting) <br />
      * You should call this in application initialization if it needs.
-     * @param threadLocalProvider The provider of thread-local. (NullAllowed: if null, use default thread local)
+     * @param holder The holder instance. (NullAllowed: if null, use default holder)
      */
-    public static void useThreadLocalProvider(CallbackContextThreadLocalProvider threadLocalProvider) {
-        if (_locked) {
-            String msg = "Your setting of thread local provider was blocked because of locked.";
-            throw new IllegalStateException(msg);
-        }
+    public static void useSurrogateHolder(CallbackContextHolder holder) {
+        assertNotLocked();
         if (_log.isInfoEnabled()) {
-            _log.info("...Setting thread-local provider: " + threadLocalProvider);
+            _log.info("...Setting surrogate holder for callback context: " + holder);
         }
-        _threadLocalProvider = threadLocalProvider;
+        if (holder != null) {
+            _holder = holder;
+        } else {
+            _holder = _defaultHolder;
+        }
         _locked = true;
     }
 
@@ -137,7 +162,7 @@ public class CallbackContext {
     }
 
     /**
-     * Lock this static world, e.g. not to set the provider of thread-local.
+     * Lock this static world, e.g. not to set the holder of thread-local.
      */
     public static void lock() {
         if (_log.isInfoEnabled()) {
@@ -147,7 +172,7 @@ public class CallbackContext {
     }
 
     /**
-     * Unlock this static world, e.g. to set the provider of thread-local.
+     * Unlock this static world, e.g. to set the holder of thread-local.
      */
     public static void unlock() {
         if (_log.isInfoEnabled()) {
@@ -165,20 +190,6 @@ public class CallbackContext {
         }
         String msg = "The callback context is locked! Don't access at this timing!";
         throw new IllegalStateException(msg);
-    }
-
-    /**
-     * The provider of thread-local for callback context. <br />
-     * Basically for asynchronous of web framework e.g. Play2.
-     */
-    public static interface CallbackContextThreadLocalProvider {
-
-        /**
-         * Provide the thread-local for callback context. <br />
-         * You should return same instance in same request.
-         * @return The instance of thread-local. (NotNull)
-         */
-        ThreadLocal<CallbackContext> provide();
     }
 
     // -----------------------------------------------------

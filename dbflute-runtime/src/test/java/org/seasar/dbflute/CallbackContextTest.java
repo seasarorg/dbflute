@@ -15,11 +15,9 @@
  */
 package org.seasar.dbflute;
 
-import org.seasar.dbflute.CallbackContext.CallbackContextThreadLocalProvider;
-import org.seasar.dbflute.bhv.core.BehaviorCommandMeta;
-import org.seasar.dbflute.bhv.core.SqlFireHook;
-import org.seasar.dbflute.bhv.core.SqlFireReadyInfo;
-import org.seasar.dbflute.bhv.core.SqlFireResultInfo;
+import org.seasar.dbflute.CallbackContext.CallbackContextHolder;
+import org.seasar.dbflute.jdbc.SqlLogHandler;
+import org.seasar.dbflute.jdbc.SqlLogInfo;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
@@ -33,40 +31,31 @@ public class CallbackContextTest extends PlainTestCase {
     //                                                                          ==========
     public void test_useThreadLocalProvider_basic() throws Exception {
         // ## Arrange ##
-        final ThreadLocal<CallbackContext> threadLocal = new ThreadLocal<CallbackContext>() {
-            @Override
-            public CallbackContext get() {
-                markHere("get()");
-                return super.get();
-            }
-
-            @Override
-            public void set(CallbackContext value) {
-                if (value != null) { // because of also called by clearing
-                    markHere("set()");
-                }
-                super.set(value);
-            }
-        };
-
         // ## Act ##
         assertTrue(CallbackContext.isLocked());
         CallbackContext.unlock();
         assertFalse(CallbackContext.isLocked());
-        CallbackContext.useThreadLocalProvider(new CallbackContextThreadLocalProvider() {
-            public ThreadLocal<CallbackContext> provide() {
-                return threadLocal;
+        CallbackContextHolder holder = new CallbackContextHolder() {
+
+            private CallbackContext context;
+
+            public void save(CallbackContext context) {
+                markHere("set()");
+                this.context = context;
             }
-        });
-        assertTrue(CallbackContext.isLocked());
+
+            public CallbackContext provide() {
+                markHere("get()");
+                return context;
+            }
+        };
+        CallbackContext.useSurrogateHolder(holder);
 
         // ## Assert ##
+        assertTrue(CallbackContext.isLocked());
         CallbackContext context = new CallbackContext();
-        context.setSqlFireHook(new SqlFireHook() {
-            public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
-            }
-
-            public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
+        context.setSqlLogHandler(new SqlLogHandler() {
+            public void handle(SqlLogInfo info) {
             }
         });
         CallbackContext.setCallbackContextOnThread(context);
@@ -74,43 +63,39 @@ public class CallbackContextTest extends PlainTestCase {
         assertEquals(context, actual);
         assertMarked("get()");
         assertMarked("set()");
+
+        assertNotNull(holder.provide());
+        assertMarked("get()");
+        holder.save(null);
+        assertMarked("set()");
+        assertNull(holder.provide());
+        assertMarked("get()");
+
+        CallbackContext.unlock();
+        CallbackContext.useSurrogateHolder(null); // to suppress mark when tearDown()
     }
 
     public void test_useThreadLocalProvider_locked() throws Exception {
         try {
             assertTrue(CallbackContext.isLocked());
-            CallbackContext.useThreadLocalProvider(new CallbackContextThreadLocalProvider() {
-                public ThreadLocal<CallbackContext> provide() {
-                    return new ThreadLocal<CallbackContext>();
-                }
-            });
-            fail();
-        } catch (IllegalStateException e) {
-            log(e.getMessage());
-        } finally {
-            assertTrue(CallbackContext.isLocked());
-        }
-    }
+            CallbackContext.useSurrogateHolder(new CallbackContextHolder() {
 
-    public void test_useThreadLocalProvider_nullProvided() throws Exception {
-        assertTrue(CallbackContext.isLocked());
-        CallbackContext.unlock();
-        assertFalse(CallbackContext.isLocked());
-        try {
-            CallbackContext.useThreadLocalProvider(new CallbackContextThreadLocalProvider() {
-                public ThreadLocal<CallbackContext> provide() {
-                    return null;
+                private CallbackContext context;
+
+                public void save(CallbackContext context) {
+                    markHere("get()");
+                    this.context = context;
+                }
+
+                public CallbackContext provide() {
+                    markHere("set()");
+                    return context;
                 }
             });
-            assertTrue(CallbackContext.isLocked());
-            CallbackContext.getCallbackContextOnThread();
             fail();
         } catch (IllegalStateException e) {
             log(e.getMessage());
         } finally {
-            CallbackContext.unlock();
-            CallbackContext.useThreadLocalProvider(null);
-            CallbackContext.lock();
             assertTrue(CallbackContext.isLocked());
         }
     }

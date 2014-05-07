@@ -18,7 +18,7 @@ package org.seasar.dbflute;
 import java.sql.Timestamp;
 import java.util.Date;
 
-import org.seasar.dbflute.AccessContext.AccessContextThreadLocalProvider;
+import org.seasar.dbflute.AccessContext.AccessContextHolder;
 import org.seasar.dbflute.AccessContext.AccessDateProvider;
 import org.seasar.dbflute.AccessContext.AccessModuleProvider;
 import org.seasar.dbflute.AccessContext.AccessProcessProvider;
@@ -185,31 +185,25 @@ public class AccessContextTest extends PlainTestCase {
     //                                                                          ==========
     public void test_useThreadLocalProvider_basic() throws Exception {
         // ## Arrange ##
-        final ThreadLocal<AccessContext> threadLocal = new ThreadLocal<AccessContext>() {
-            @Override
-            public AccessContext get() {
-                markHere("get()");
-                return super.get();
-            }
-
-            @Override
-            public void set(AccessContext value) {
-                if (value != null) { // because of also called by clearing
-                    markHere("set()");
-                }
-                super.set(value);
-            }
-        };
-
         // ## Act ##
         assertTrue(AccessContext.isLocked());
         AccessContext.unlock();
         assertFalse(AccessContext.isLocked());
-        AccessContext.useThreadLocalProvider(new AccessContextThreadLocalProvider() {
-            public ThreadLocal<AccessContext> provide() {
-                return threadLocal;
+        AccessContextHolder holder = new AccessContextHolder() {
+
+            private AccessContext context;
+
+            public void save(AccessContext context) {
+                markHere("set()");
+                this.context = context;
             }
-        });
+
+            public AccessContext provide() {
+                markHere("get()");
+                return context;
+            }
+        };
+        AccessContext.useSurrogateHolder(holder);
 
         // ## Assert ##
         assertTrue(AccessContext.isLocked());
@@ -220,43 +214,39 @@ public class AccessContextTest extends PlainTestCase {
         assertEquals(context, actual);
         assertMarked("get()");
         assertMarked("set()");
+
+        assertNotNull(holder.provide());
+        assertMarked("get()");
+        holder.save(null);
+        assertMarked("set()");
+        assertNull(holder.provide());
+        assertMarked("get()");
+
+        AccessContext.unlock();
+        AccessContext.useSurrogateHolder(null); // to suppress mark when tearDown()
     }
 
     public void test_useThreadLocalProvider_locked() throws Exception {
         try {
             assertTrue(AccessContext.isLocked());
-            AccessContext.useThreadLocalProvider(new AccessContextThreadLocalProvider() {
-                public ThreadLocal<AccessContext> provide() {
-                    return new ThreadLocal<AccessContext>();
-                }
-            });
-            fail();
-        } catch (IllegalStateException e) {
-            log(e.getMessage());
-        } finally {
-            assertTrue(AccessContext.isLocked());
-        }
-    }
+            AccessContext.useSurrogateHolder(new AccessContextHolder() {
 
-    public void test_useThreadLocalProvider_nullProvided() throws Exception {
-        assertTrue(AccessContext.isLocked());
-        AccessContext.unlock();
-        assertFalse(AccessContext.isLocked());
-        try {
-            AccessContext.useThreadLocalProvider(new AccessContextThreadLocalProvider() {
-                public ThreadLocal<AccessContext> provide() {
-                    return null;
+                private AccessContext context;
+
+                public void save(AccessContext context) {
+                    markHere("get()");
+                    this.context = context;
+                }
+
+                public AccessContext provide() {
+                    markHere("set()");
+                    return context;
                 }
             });
-            assertTrue(AccessContext.isLocked());
-            AccessContext.getAccessContextOnThread();
             fail();
         } catch (IllegalStateException e) {
             log(e.getMessage());
         } finally {
-            AccessContext.unlock();
-            AccessContext.useThreadLocalProvider(null);
-            AccessContext.lock();
             assertTrue(AccessContext.isLocked());
         }
     }
