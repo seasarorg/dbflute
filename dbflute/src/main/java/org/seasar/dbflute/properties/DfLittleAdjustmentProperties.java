@@ -197,6 +197,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                                   That's Bad Timing
+    //                                                                   =================
+    public boolean isThatsBadTimingChecked() {
+        return isProperty("isThatsBadTimingChecked", false);
+    }
+
+    // ===================================================================================
     //                                                              Display Name UpperCase
     //                                                              ======================
     public boolean isTableDispNameUpperCase() {

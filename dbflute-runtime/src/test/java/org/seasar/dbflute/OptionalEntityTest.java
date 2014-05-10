@@ -16,8 +16,9 @@
 package org.seasar.dbflute;
 
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
-import org.seasar.dbflute.exception.thrower.OptionalValueExceptionThrower;
 import org.seasar.dbflute.mock.MockEntity;
+import org.seasar.dbflute.optional.OptionalEntity;
+import org.seasar.dbflute.optional.OptionalObjectExceptionThrower;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
@@ -107,7 +108,7 @@ public class OptionalEntityTest extends PlainTestCase {
     //                                                                         Test Helper
     //                                                                         ===========
     protected OptionalEntity<MockEntity> prepareOpt(MockEntity entity) {
-        return new OptionalEntity<MockEntity>(entity, new OptionalValueExceptionThrower() {
+        return new OptionalEntity<MockEntity>(entity, new OptionalObjectExceptionThrower() {
             public void throwNotFoundException() {
                 throw new IllegalStateException("foo");
             }

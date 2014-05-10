@@ -87,7 +87,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                                                          Definition
     //                                                                          ==========
     /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L; // but serializing is already bankrupt
 
     protected static final SelectClauseType DEFAULT_SELECT_CLAUSE_TYPE = SelectClauseType.COLUMNS;
     protected static final String SELECT_HINT = "/*$pmb.selectHint*/";
@@ -295,6 +295,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                          ------------
     /** The purpose of condition-bean for check at condition-query. (NotNull) */
     protected HpCBPurpose _purpose = HpCBPurpose.NORMAL_USE; // as default
+
+    /** Is the clause object locked? e.g. true if in sub-query process. */
+    protected boolean _locked;
+
+    /** Does it allow "that's bad timing" check? */
+    protected boolean _thatsBadTimingChecked;
 
     // -----------------------------------------------------
     //                                        Lazy Reflector
@@ -3226,6 +3232,26 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public void setPurpose(HpCBPurpose purpose) {
         _purpose = purpose;
+    }
+
+    public boolean isLocked() {
+        return _thatsBadTimingChecked && _locked;
+    }
+
+    public void lock() {
+        _locked = true;
+    }
+
+    public void unlock() {
+        _locked = false;
+    }
+
+    public void allowThatsBadTiming() {
+        _thatsBadTimingChecked = true;
+    }
+
+    public void suppressThatsBadTiming() {
+        _thatsBadTimingChecked = false;
     }
 
     // [DBFlute-0.9.4]

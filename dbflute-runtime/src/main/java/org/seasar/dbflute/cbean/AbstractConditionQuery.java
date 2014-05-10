@@ -2497,6 +2497,21 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // ===================================================================================
+    //                                                                        Purpose Type
+    //                                                                        ============
+    protected boolean isLocked() {
+        return xgetSqlClause().isLocked();
+    }
+
+    protected void lock() {
+        xgetSqlClause().lock();
+    }
+
+    protected void unlock() {
+        xgetSqlClause().unlock();
+    }
+
+    // ===================================================================================
     //                                                                    Exception Helper
     //                                                                    ================
     protected ConditionBeanExceptionThrower createCBExThrower() {

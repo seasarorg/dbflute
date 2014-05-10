@@ -98,6 +98,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** The purpose of condition-bean. (NotNull) */
     protected HpCBPurpose _purpose = HpCBPurpose.NORMAL_USE; // as default
 
+    /** Is the condition-bean locked? e.g. true if in sub-query process */
+    protected boolean _locked = false;
+
     // -----------------------------------------------------
     //                                          Dream Cruise
     //                                          ------------
@@ -188,6 +191,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
             final String titleName = DfTypeUtil.toClassTitle(this);
             throwSetupSelectIllegalPurposeException(titleName, foreignPropertyName);
         }
+        if (isLocked()) {
+            createCBExThrower().throwSetupSelectThatsBadTimingException(this);
+        }
     }
 
     protected void throwSetupSelectIllegalPurposeException(String className, String foreignPropertyName) {
@@ -213,6 +219,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
         if (_purpose.isNoSpecify()) {
             throwSpecifyIllegalPurposeException();
         }
+        if (isLocked()) {
+            createCBExThrower().throwSpecifyThatsBadTimingException(this);
+        }
     }
 
     protected void throwSpecifyIllegalPurposeException() {
@@ -225,6 +234,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected void assertQueryPurpose() {
         if (_purpose.isNoQuery()) {
             throwQueryIllegalPurposeException();
+        }
+        if (isLocked()) {
+            createCBExThrower().throwQueryThatsBadTimingException(this);
         }
     }
 
@@ -1475,6 +1487,35 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected abstract void xprepareSyncQyCall(ConditionBean mainCB);
+
+    // -----------------------------------------------------
+    //                                                  Lock
+    //                                                  ----
+    protected boolean isLocked() {
+        return getSqlClause().isLocked();
+    }
+
+    protected void lock() {
+        getSqlClause().lock();
+    }
+
+    protected void unlock() {
+        getSqlClause().unlock();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void allowThatsBadTiming() {
+        getSqlClause().allowThatsBadTiming();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void suppressThatsBadTiming() {
+        getSqlClause().suppressThatsBadTiming();
+    }
 
     // ===================================================================================
     //                                                                    Exception Helper

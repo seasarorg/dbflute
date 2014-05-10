@@ -35,11 +35,13 @@ import org.seasar.dbflute.exception.QueryDerivedReferrerInvalidColumnSpecificati
 import org.seasar.dbflute.exception.QueryDerivedReferrerSelectAllPossibleException;
 import org.seasar.dbflute.exception.QueryDerivedReferrerUnmatchedColumnTypeException;
 import org.seasar.dbflute.exception.QueryIllegalPurposeException;
+import org.seasar.dbflute.exception.QueryThatsBadTimingException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 import org.seasar.dbflute.exception.ScalarConditionInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.ScalarConditionUnmatchedColumnTypeException;
 import org.seasar.dbflute.exception.ScalarSelectInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.SetupSelectIllegalPurposeException;
+import org.seasar.dbflute.exception.SetupSelectThatsBadTimingException;
 import org.seasar.dbflute.exception.SpecifiedDerivedOrderByAliasNameNotFoundException;
 import org.seasar.dbflute.exception.SpecifyColumnAlreadySpecifiedEveryColumnException;
 import org.seasar.dbflute.exception.SpecifyColumnAlreadySpecifiedExceptColumnException;
@@ -57,6 +59,7 @@ import org.seasar.dbflute.exception.SpecifyEveryColumnAlreadySpecifiedColumnExce
 import org.seasar.dbflute.exception.SpecifyExceptColumnAlreadySpecifiedColumnException;
 import org.seasar.dbflute.exception.SpecifyIllegalPurposeException;
 import org.seasar.dbflute.exception.SpecifyRelationIllegalPurposeException;
+import org.seasar.dbflute.exception.SpecifyThatsBadTimingException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -73,7 +76,7 @@ public class ConditionBeanExceptionThrower {
     public void throwSetupSelectIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB,
             String foreignPropertyName) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The purpose was illegal for setting up select.");
+        br.addNotice("The purpose was illegal for SetupSelect.");
         br.addItem("Advice");
         br.addElement("This condition-bean is not allowed to set up select.");
         br.addElement("Because this is for " + purpose + ".");
@@ -99,6 +102,32 @@ public class ConditionBeanExceptionThrower {
         br.addElement(foreignPropertyName);
         final String msg = br.buildExceptionMessage();
         throw new SetupSelectIllegalPurposeException(msg);
+    }
+
+    public void throwSetupSelectThatsBadTimingException(ConditionBean lockedCB) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("That's bad timing for SetupSelect.");
+        br.addItem("Advice");
+        br.addElement("The condition-bean was locked in the timing.");
+        br.addElement("For example:");
+        br.addElement("(x):");
+        br.addElement("  MemberCB cb = new MemberCB()");
+        br.addElement("  cb.setupSelect_MemberStatus();");
+        br.addElement("  ListResultBean<Member> memberList = memberBhv.selectList(cb);");
+        br.addElement("  memberBhv.loadPurchaseList(cb, referrerCB -> {");
+        br.addElement("      cb.setupSelect_MemberStatus(); // *NG");
+        br.addElement("  });");
+        br.addElement("(o):");
+        br.addElement("  MemberCB cb = new MemberCB()");
+        br.addElement("  cb.setupSelect_MemberStatus();");
+        br.addElement("  ListResultBean<Member> memberList = memberBhv.selectList(cb);");
+        br.addElement("  memberBhv.loadPurchaseList(cb, referrerCB -> {");
+        br.addElement("      referrerCB.setupSelect_Product(); // OK");
+        br.addElement("  });");
+        br.addItem("Locked ConditionBean");
+        br.addElement(lockedCB.getClass().getName());
+        final String msg = br.buildExceptionMessage();
+        throw new SetupSelectThatsBadTimingException(msg);
     }
 
     // unused because it has been allowed
@@ -167,6 +196,30 @@ public class ConditionBeanExceptionThrower {
         br.addElement(baseCB.getClass().getName());
         final String msg = br.buildExceptionMessage();
         throw new SpecifyIllegalPurposeException(msg);
+    }
+
+    public void throwSpecifyThatsBadTimingException(ConditionBean lockedCB) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("That's bad timing for Specify.");
+        br.addItem("Advice");
+        br.addElement("The condition-bean was locked in the timing.");
+        br.addElement("For example:");
+        br.addElement("(x):");
+        br.addElement("  MemberCB cb = new MemberCB()");
+        br.addElement("  cb.specify().derivedPurchaseList().max(subCB -> {");
+        br.addElement("      cb.specify().columnMemberId(); // *NG");
+        br.addElement("      subCB.query().setPurchasePrice_GreaterThan(2000);");
+        br.addElement("  }, ...);");
+        br.addElement("(o):");
+        br.addElement("  MemberCB cb = new MemberCB()");
+        br.addElement("  cb.specify().derivedPurchaseList().max(subCB -> {");
+        br.addElement("      subCB.specify().columnMemberId(); // *OK");
+        br.addElement("      subCB.query().setPurchasePrice_GreaterThan(2000);");
+        br.addElement("  }, ...);");
+        br.addItem("Locked ConditionBean");
+        br.addElement(lockedCB.getClass().getName());
+        final String msg = br.buildExceptionMessage();
+        throw new SpecifyThatsBadTimingException(msg);
     }
 
     public void throwSpecifyColumnTwoOrMoreColumnException(HpCBPurpose purpose, ConditionBean baseCB, String columnName) {
@@ -810,6 +863,30 @@ public class ConditionBeanExceptionThrower {
         br.addElement(baseCB.getClass().getName());
         final String msg = br.buildExceptionMessage();
         throw new QueryIllegalPurposeException(msg);
+    }
+
+    public void throwQueryThatsBadTimingException(ConditionBean lockedCB) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("That's bad timing for Query.");
+        br.addItem("Advice");
+        br.addElement("The condition-bean was locked in the timing.");
+        br.addElement("For example:");
+        br.addElement("(x):");
+        br.addElement("  MemberCB cb = new MemberCB()");
+        br.addElement("  cb.query().existsPurchaseList(subCB -> {");
+        br.addElement("      subCB.query().setPurchasePrice_GreaterThan(2000);");
+        br.addElement("      cb.query().setBirthdate_GreaterThan(currentDate()); // *NG");
+        br.addElement("  });");
+        br.addElement("(o):");
+        br.addElement("  MemberCB cb = new MemberCB()");
+        br.addElement("  cb.query().existsPurchaseList(subCB -> {");
+        br.addElement("      subCB.query().setPurchasePrice_GreaterThan(2000);");
+        br.addElement("  });");
+        br.addElement("  cb.query().setBirthdate_GreaterThan(currentDate()); // OK");
+        br.addItem("Locked ConditionBean");
+        br.addElement(lockedCB.getClass().getName());
+        final String msg = br.buildExceptionMessage();
+        throw new QueryThatsBadTimingException(msg);
     }
 
     public void throwInvalidQueryRegisteredException(HpInvalidQueryInfo... invalidQueryInfoAry) {

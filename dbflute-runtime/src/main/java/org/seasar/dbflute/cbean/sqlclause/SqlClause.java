@@ -1165,6 +1165,46 @@ public interface SqlClause {
      */
     void setPurpose(HpCBPurpose purpose);
 
+    /**
+     * Is the clause object locked? e.g. true if in sub-query process and check allowed <br />
+     * Java8 cannot use the same name as lambda argument with already existing name in the scope.
+     * <pre>
+     * cb.query().existsPurchaseList(subCB -&gt; {
+     *     subCB.query().existsPurchaseDetailList(<span style="color: #DD4747">subCB</span> -&gt; { <span style="color: #3F7E5E">// *NG</span>
+     *     });
+     * });
+     * </pre>
+     * <p>You should rename it, however the other condition-bean might be called.
+     * So it is necessary to check it, and condition-bean has lock.</p>
+     *
+     * <p>While, you can suppress it by option for compatible. (if suppressed, always returns false)</p>
+     *
+     * @return The determination, true or false.
+     */
+    boolean isLocked();
+
+    /**
+     * Lock the clause object. <br />
+     * Only saving lock status here, you should rightly check by this status.
+     */
+    void lock();
+
+    /**
+     * Unlock the clause object.
+     */
+    void unlock();
+
+    /**
+     * Allow "that's bad timing" check.
+     */
+    void allowThatsBadTiming();
+
+    /**
+     * Suppress "that's bad timing" check for compatible. <br />
+     * If suppressed, isLocked() always returns false.
+     */
+    void suppressThatsBadTiming();
+
     // [DBFlute-0.9.4]
     // ===================================================================================
     //                                                                       InScope Limit

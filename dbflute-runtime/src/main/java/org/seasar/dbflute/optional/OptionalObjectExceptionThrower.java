@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception.thrower;
+package org.seasar.dbflute.optional;
 
 /**
  * @author jflute
  * @since 1.0.5F (2014/05/05 Monday)
  */
-public interface OptionalValueExceptionThrower {
+public interface OptionalObjectExceptionThrower {
 
     /**
      * Throw the exception for not-found value.

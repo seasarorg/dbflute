@@ -13,11 +13,9 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute;
+package org.seasar.dbflute.optional;
 
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
-import org.seasar.dbflute.exception.thrower.OptionalValueExceptionThrower;
-import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The entity as optional object, which has entity instance in it. <br />
@@ -41,14 +39,14 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 1.0.5F (2014/05/05 Monday)
  */
-public class OptionalEntity<ENTITY> {
+public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     protected static final OptionalEntity<Object> EMPTY_INSTANCE;
     static {
-        EMPTY_INSTANCE = new OptionalEntity<Object>(null, new OptionalValueExceptionThrower() {
+        EMPTY_INSTANCE = new OptionalEntity<Object>(null, new OptionalObjectExceptionThrower() {
             public void throwNotFoundException() {
                 String msg = "The empty optional so the value is null.";
                 throw new EntityAlreadyDeletedException(msg);
@@ -57,24 +55,10 @@ public class OptionalEntity<ENTITY> {
     }
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    /** The entity instance for this optional object. (NullAllowed) */
-    protected final ENTITY _entity;
-
-    /** The exception thrower e.g. when entity value is not-found. (NotNull) */
-    protected final OptionalValueExceptionThrower _thrower;
-
-    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OptionalEntity(ENTITY entity, OptionalValueExceptionThrower thrower) { // basically called by DBFlute
-        _entity = entity; // may be null
-        if (thrower == null) {
-            String msg = "The argument should not be null: entity=" + entity;
-            throw new IllegalArgumentException(msg);
-        }
-        _thrower = thrower;
+    public OptionalEntity(ENTITY entity, OptionalObjectExceptionThrower thrower) { // basically called by DBFlute
+        super(entity, thrower);
     }
 
     @SuppressWarnings("unchecked")
@@ -83,10 +67,10 @@ public class OptionalEntity<ENTITY> {
     }
 
     // ===================================================================================
-    //                                                                      Value Handling
-    //                                                                      ==============
+    //                                                                     Object Handling
+    //                                                                     ===============
     /**
-     * Get the entity or throw exception if null.
+     * Get the entity or exception if null.
      * <pre>
      * MemberCB cb = new MemberCB();
      * cb.query().set...
@@ -102,14 +86,27 @@ public class OptionalEntity<ENTITY> {
      *     ...
      * }
      * </pre>
-     * @return The entity instance saved in this optional object. (NotNull)
-     * @exception EntityAlreadyDeletedException When the entity instance saved in this optional object is null, which means entity has already been deleted (point is not found).
+     * @return The entity instance wrapped in this optional object. (NotNull)
+     * @exception EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
      */
     public ENTITY get() {
-        if (!isPresent()) {
-            _thrower.throwNotFoundException();
-        }
-        return _entity;
+        return directlyGet();
+    }
+
+    /**
+     * Handle the entity in the optional object if the entity is present. <br />
+     * You should call this if null entity handling is unnecessary (do nothing if null). <br />
+     * If exception is preferred when null entity, use required().
+     * <pre>
+     * opt.<span style="color: #DD4747">ifPresent</span>(member -&gt; {
+     *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
+     *     ... = member.getMemberName();
+     * });
+     * </pre>
+     * @param consumer The callback interface to consume the optional value. (NotNull)
+     */
+    public void ifPresent(OptionalObjectConsumer<ENTITY> consumer) {
+        callbackIfPresent(consumer);
     }
 
     /**
@@ -127,49 +124,58 @@ public class OptionalEntity<ENTITY> {
      * @return The determination, true or false.
      */
     public boolean isPresent() {
-        return _entity != null;
+        return exists();
     }
 
     /**
-     * Get the entity instance or specified entity if null.
+     * Apply the mapping of entity to result object.
+     * <pre>
+     * OptionalEntity&lt;MemberWebBean&gt; beanOpt = entityOpt.<span style="color: #DD4747">map</span>(member -&gt; {
+     *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
+     *     return new MemberWebBean(member);
+     * });
+     * </pre>
+     * @param mapper The callback interface to apply. (NotNull)
+     * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
+     */
+    public <RESULT> OptionalEntity<RESULT> map(OptionalObjectFunction<? super ENTITY, ? extends RESULT> mapper) {
+        return (OptionalEntity<RESULT>) callbackMapping(mapper); // downcast allowed because factory is overridden
+    }
+
+    /**
+     * Get the entity instance or null if not present.
      * <pre>
      * MemberCB cb = new MemberCB();
      * cb.query().set...
      * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
-     * Member other = ...
-     * Member member = entity.orElse(other) <span style="color: #3F7E5E">// returns other instance if null</span>
+     * Member member = entity.<span style="color: #DD4747">orElseNull</span>() <span style="color: #3F7E5E">// returns null if not present</span>
      * </pre>
-     * @param other The other instance to be returned if null. (NullAllowed: if null, returns null if entity is null)
-     * @return The determination, true or false.
+     * @return The object instance wrapped in this optional object or null. (NullAllowed: if not present)
      */
-    public ENTITY orElse(ENTITY other) {
-        return isPresent() ? _entity : other;
+    public ENTITY orElseNull() {
+        return directlyGetOrElse(null);
     }
 
-    // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    @Override
-    public int hashCode() {
-        return _entity != null ? _entity.hashCode() : 0;
+    /**
+     * Handle the entity in the optional object or exception if not present.
+     * <pre>
+     * opt.<span style="color: #DD4747">required</span>(member -&gt; {
+     *     <span style="color: #3F7E5E">// called if value exists, or exception if not present</span>
+     *     ... = member.getMemberName();
+     * });
+     * </pre>
+     * @param consumer The callback interface to consume the optional value. (NotNull)
+     * @exception EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
+     */
+    public void required(OptionalObjectConsumer<ENTITY> consumer) {
+        callbackRequired(consumer);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof OptionalEntity<?>) {
-            final OptionalEntity<?> other = (OptionalEntity<?>) obj;
-            if (_entity != null) {
-                return _entity.equals(other.get());
-            } else { // null v.s. null?
-                return !other.isPresent();
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        final String title = DfTypeUtil.toClassTitle(this);
-        return title + ":{" + (_entity != null ? _entity.toString() : "null") + "}";
+    protected <OBJECT> OptionalEntity<OBJECT> createOptionalObject(OBJECT value) {
+        return new OptionalEntity<OBJECT>(value, _thrower);
     }
 }

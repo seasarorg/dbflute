@@ -272,10 +272,6 @@ public class MockConditionBean implements ConditionBean {
     public void acceptInvalidQuery() {
     }
 
-    public HpCBPurpose getPurpose() {
-        return null;
-    }
-
     public void allowInnerJoinAutoDetect() {
     }
 
@@ -364,5 +360,15 @@ public class MockConditionBean implements ConditionBean {
 
     public boolean isCheckCountBeforeQueryUpdate() {
         return false;
+    }
+
+    public HpCBPurpose getPurpose() {
+        return null;
+    }
+
+    public void allowThatsBadTiming() {
+    }
+
+    public void suppressThatsBadTiming() {
     }
 }

@@ -28,6 +28,7 @@ import org.seasar.dbflute.dbmeta.hierarchy.HierarchyBasicRequest;
 import org.seasar.dbflute.dbmeta.hierarchy.HierarchyRequest;
 #end
 import org.seasar.dbflute.exception.*;
+import org.seasar.dbflute.optional.*;
 import org.seasar.dbflute.outsidesql.executor.*;
 #if ($table.hasPrimaryKeyForcedClassificationSetting())
 import ${glPackageBaseCommon}.${glCDef};
@@ -199,7 +200,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #if ($table.isAvailableSelectEntityPlainReturn())
         return doSelectEntity(cb, ${myExtendedObjectClassName}.class);
 #else
-        return createOptionalEntity(doSelectEntity(cb, ${myExtendedObjectClassName}.class), cb);
+        return doSelectOptionalEntity(cb, ${myExtendedObjectClassName}.class);
 #end
     }
 
@@ -207,6 +208,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         assertCBStateValid(cb); assertObjectNotNull("entityType", tp);
         return helpSelectEntityInternally(cb, tp, new InternalSelectEntityCallback<ENTITY, ${myConditionBeanClassName}>() {
             public List<ENTITY> callbackSelectList(${myConditionBeanClassName} lcb, Class<ENTITY> ltp) { return doSelectList(lcb, ltp); } });
+    }
+
+    protected <ENTITY extends ${myExtendedObjectClassName}> OptionalEntity<ENTITY> doSelectOptionalEntity(${myConditionBeanClassName} cb, Class<ENTITY> tp) {
+        return createOptionalEntity(doSelectEntity(cb, tp), cb);
     }
 
     @Override

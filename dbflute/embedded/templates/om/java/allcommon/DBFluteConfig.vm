@@ -77,6 +77,7 @@ public class ${glDBFluteConfig} {
     protected boolean _pagingCountLater = ${database.isPagingCountLater()};
     protected boolean _pagingCountLeastJoin = ${database.isPagingCountLeastJoin()};
     protected boolean _innerJoinAutoDetect = ${database.isInnerJoinAutoDetect()};
+    protected boolean _thatsBadTimingChecked = ${database.isThatsBadTimingChecked()};
     protected boolean _emptyStringQueryAllowed;
     protected boolean _emptyStringParameterAllowed;
     protected boolean _invalidQueryChecked;
@@ -206,6 +207,21 @@ public class ${glDBFluteConfig} {
             _log.info("...Setting innerJoinAutoDetect: " + innerJoinAutoDetect);
         }
         _innerJoinAutoDetect = innerJoinAutoDetect;
+    }
+
+    // ===================================================================================
+    //                                                                   That's Bad Timing
+    //                                                                   =================
+    public boolean isThatsBadTimingChecked() {
+        return _thatsBadTimingChecked;
+    }
+
+    public void setThatsBadTimingChecked(boolean thatsBadTimingChecked) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting thatsBadTimingChecked: " + thatsBadTimingChecked);
+        }
+        _thatsBadTimingChecked = thatsBadTimingChecked;
     }
 
     // ===================================================================================

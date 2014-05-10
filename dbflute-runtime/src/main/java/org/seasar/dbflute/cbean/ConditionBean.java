@@ -121,6 +121,16 @@ public interface ConditionBean extends PagingBean {
      */
     void suppressInnerJoinAutoDetect();
 
+    /**
+     * Allow "that's bad timing" check.
+     */
+    void allowThatsBadTiming();
+
+    /**
+     * Suppress "that's bad timing" check.
+     */
+    void suppressThatsBadTiming();
+
     // ===================================================================================
     //                                                                        Dream Cruise
     //                                                                        ============

@@ -191,16 +191,16 @@ public class AccessContextTest extends PlainTestCase {
         assertFalse(AccessContext.isLocked());
         AccessContextHolder holder = new AccessContextHolder() {
 
-            private AccessContext context;
-
-            public void save(AccessContext context) {
-                markHere("set()");
-                this.context = context;
-            }
+            private AccessContext accessContext;
 
             public AccessContext provide() {
                 markHere("get()");
-                return context;
+                return accessContext;
+            }
+
+            public void save(AccessContext accessContext) {
+                markHere("set()");
+                this.accessContext = accessContext;
             }
         };
         AccessContext.useSurrogateHolder(holder);
@@ -231,16 +231,16 @@ public class AccessContextTest extends PlainTestCase {
             assertTrue(AccessContext.isLocked());
             AccessContext.useSurrogateHolder(new AccessContextHolder() {
 
-                private AccessContext context;
-
-                public void save(AccessContext context) {
-                    markHere("get()");
-                    this.context = context;
-                }
+                private AccessContext accessContext;
 
                 public AccessContext provide() {
                     markHere("set()");
-                    return context;
+                    return accessContext;
+                }
+
+                public void save(AccessContext accessContext) {
+                    markHere("get()");
+                    this.accessContext = accessContext;
                 }
             });
             fail();
