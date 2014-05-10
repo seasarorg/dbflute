@@ -176,11 +176,17 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * OptionalEntity&lt;${myExtendedObjectClassName}&gt; entity = ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectEntity</span>(cb);
      *
      * <span style="color: #3F7E5E">// if the data always exists as your business rule</span>
-     * ${myExtendedObjectClassName} ${myEntityVariableName} = entity.get();
+     * entity.<span style="color: #DD4747">required</span>(${myEntityVariableName} -&gt; {
+     *     ...
+     * });
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = entity.entity.<span style="color: #DD4747">get()</span>;
      *
-     * <span style="color: #3F7E5E">// if it might be no data, isPresent(), orElse(), ...</span>
-     * if (entity.isPresent()) {
-     *     ${myExtendedObjectClassName} ${myEntityVariableName} = entity.get();
+     * <span style="color: #3F7E5E">// if it might be no data, ifPresent(), isPresent(), ...</span>
+     * entity.<span style="color: #DD4747">ifPresent</span>(${myEntityVariableName} -&gt; {
+     *     ...
+     * });
+     * if (entity.entity.<span style="color: #DD4747">isPresent()</span>) {
+     *     ${myExtendedObjectClassName} ${myEntityVariableName} = entity.entity.<span style="color: #DD4747">get()</span>;
      * } else {
      *     ...
      * }
@@ -219,7 +225,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #if ($table.isAvailableSelectEntityPlainReturn())
         return selectEntity(downcast(cb));
 #else
-        return selectEntity(downcast(cb)).orElse(null);
+        return selectEntity(downcast(cb)).orElseNull();
 #end
     }
 

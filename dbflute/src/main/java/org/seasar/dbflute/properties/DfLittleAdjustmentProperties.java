@@ -109,10 +109,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public boolean isAvailableSelectEntityPlainReturn() { // closet
-        return isProperty("isAvailableSelectEntityPlainReturn", true);
+        final boolean defaultValue = isCompatibleUnderJava8();
+        return isProperty("isAvailableSelectEntityPlainReturn", defaultValue);
     }
 
     public boolean isAvailableSelectEntityWithDeletedCheck() { // closet
+        // selectEntityWithDeletedCheck() coexists with optional entity
+        //final boolean defaultValue = isCompatibleUnderJava8();
         return isProperty("isAvailableSelectEntityWithDeletedCheck", true);
     }
 
@@ -200,7 +203,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                                   That's Bad Timing
     //                                                                   =================
     public boolean isThatsBadTimingChecked() {
-        return isProperty("isThatsBadTimingChecked", false);
+        final boolean defaultValue = !isCompatibleUnderJava8();
+        return isProperty("isThatsBadTimingChecked", defaultValue);
     }
 
     // ===================================================================================
@@ -843,5 +847,9 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public boolean isCompatibleBatchUpdateDefaultEveryColumn() { // closet
         return isProperty("isCompatibleBatchUpdateDefaultEveryColumn", false);
+    }
+
+    public boolean isCompatibleUnderJava8() { // closet
+        return isProperty("isCompatibleUnderJava8", true); // #later true from DBFlute-1.1
     }
 }
