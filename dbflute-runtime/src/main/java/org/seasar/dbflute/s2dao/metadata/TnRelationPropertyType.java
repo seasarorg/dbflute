@@ -76,12 +76,29 @@ public interface TnRelationPropertyType extends TnPropertyType {
      */
     TnBeanMetaData getYourBeanMetaData();
 
-    // TODO jflute
+    /**
+     * Get the list of property type of unique key (basically primary key).
+     * @return The list of property type. (NotNull)
+     */
     List<TnPropertyType> getUniquePropertyTypeList();
 
+    /**
+     * Does it have simple unique key? (not compound?) <br />
+     * Derived method for performance.
+     * @return The determination, true or false.
+     */
     boolean hasSimpleUniqueKey();
 
+    /**
+     * Does it have compound unique key? <br />
+     * Derived method for performance.
+     * @return The determination, true or false.
+     */
     boolean hasCompoundUniqueKey();
 
+    /**
+     * Get the property type of simple unique key.
+     * @return The property type of simple unique key. (NullAllowed: when not simple)
+     */
     TnPropertyType getSimpleUniquePropertyType();
 }

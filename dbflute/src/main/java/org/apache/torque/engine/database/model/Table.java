@@ -3175,6 +3175,40 @@ public class Table {
     }
 
     // ===================================================================================
+    //                                                                     Optional Object
+    //                                                                     ===============
+    // #thinking optional property
+    //protected String getEntityOptionalPropertyClassName() {
+    //    return getLittleAdjustmentProperties().getEntityOptionalPropertyClassName();
+    //}
+    //
+    //protected String getEntityOptionalPropertyClassSimpleName() {
+    //    return getLittleAdjustmentProperties().getEntityOptionalPropertyClassSimpleName();
+    //}
+    //
+    //public boolean hasOptionalColumn() {
+    //    final List<Column> columnList = getColumnList();
+    //    for (Column column : columnList) {
+    //        if (column.isOptionalProperty()) {
+    //            return true;
+    //        }
+    //    }
+    //    return false;
+    //}
+    //
+    //public String toPropertyType(String columnName, String javaNative) {
+    //    final Column column = getColumn(columnName);
+    //    if (column == null) {
+    //        String msg = "Not found the column in the table: column=" + columnName + ", table=" + getTableDbName();
+    //        throw new IllegalArgumentException(msg);
+    //    }
+    //    if (column.isOptionalProperty()) {
+    //        return column.buildOptionalExpression(javaNative);
+    //    }
+    //    return javaNative;
+    //}
+
+    // ===================================================================================
     //                                                                          Simple DTO
     //                                                                          ==========
     public String getSimpleDtoBaseDtoClassName() {

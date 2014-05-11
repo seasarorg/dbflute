@@ -68,8 +68,8 @@ public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <ENTITY> OptionalEntity<ENTITY> empty() {
-        return (OptionalEntity<ENTITY>) EMPTY_INSTANCE;
+    public static <EMPTY> OptionalEntity<EMPTY> empty() {
+        return (OptionalEntity<EMPTY>) EMPTY_INSTANCE;
     }
 
     // ===================================================================================
@@ -153,6 +153,11 @@ public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
     public <RESULT> OptionalEntity<RESULT> map(OptionalObjectFunction<? super ENTITY, ? extends RESULT> mapper) {
         return (OptionalEntity<RESULT>) callbackMapping(mapper); // downcast allowed because factory is overridden
     }
+
+    // absolutely no needed
+    //public ENTITY orElse(ENTITY other) {
+    //    return directlyGetOrElse(other);
+    //}
 
     /**
      * Get the entity instance or null if not present.

@@ -179,8 +179,8 @@ public class Column {
     private String _synonym;
     private String _dbType;
     private String _columnSize;
-    private boolean _isNotNull;
-    private boolean _isAutoIncrement;
+    private boolean _notNull;
+    private boolean _autoIncrement;
     private String _defaultValue;
     private String _plainComment;
 
@@ -251,11 +251,11 @@ public class Column {
 
         // not null
         final String notNull = attrib.getValue("required");
-        _isNotNull = (notNull != null && "true".equals(notNull));
+        _notNull = (notNull != null && "true".equals(notNull));
 
         // auto-increment
         final String autoIncrement = attrib.getValue("autoIncrement");
-        _isAutoIncrement = ("true".equals(autoIncrement));
+        _autoIncrement = ("true".equals(autoIncrement));
 
         // others
         _defaultValue = attrib.getValue("default");
@@ -562,14 +562,14 @@ public class Column {
      * Return the isNotNull property of the column
      */
     public boolean isNotNull() {
-        return _isNotNull;
+        return _notNull;
     }
 
     /**
      * Set the isNotNull property of the column
      */
     public void setNotNull(boolean status) {
-        _isNotNull = status;
+        _notNull = status;
     }
 
     public boolean isMakeIsNullOrEmpty() {
@@ -591,7 +591,7 @@ public class Column {
      * @return The determination, true or false.
      */
     public boolean isAutoIncrement() {
-        return _isAutoIncrement;
+        return _autoIncrement;
     }
 
     /**
@@ -600,7 +600,7 @@ public class Column {
      * @param value Determination.
      */
     public void setAutoIncrement(boolean value) {
-        _isAutoIncrement = value;
+        _autoIncrement = value;
     }
 
     // -----------------------------------------------------
@@ -1512,6 +1512,11 @@ public class Column {
         if (_sql2EntityForcedJavaNative != null && _sql2EntityForcedJavaNative.trim().length() > 0) {
             return _sql2EntityForcedJavaNative;
         }
+        assertJdbcTypeExists();
+        return TypeMap.findJavaNativeByJdbcType(_jdbcType, getIntegerColumnSize(), getDecimalDigits());
+    }
+
+    protected void assertJdbcTypeExists() {
         if (Srl.is_Null_or_TrimmedEmpty(_jdbcType)) {
             ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Not found JDBC type of the column.");
@@ -1520,7 +1525,6 @@ public class Column {
             String msg = br.buildExceptionMessage();
             throw new IllegalStateException(msg);
         }
-        return TypeMap.findJavaNativeByJdbcType(_jdbcType, getIntegerColumnSize(), getDecimalDigits());
     }
 
     public String getJavaNativeTypeLiteral() {
@@ -1648,6 +1652,27 @@ public class Column {
         return isDbTypeBytesOid();
     }
 
+    // -----------------------------------------------------
+    //                                     Property Handling
+    //                                     -----------------
+    // #thinking optional property
+    //public String getPropertyType() {
+    //    return getJavaNative();
+    //}
+    //
+    //public String getPropertyGetterType() {
+    //    // optional property means getter only
+    //    final String javaNative = getJavaNative();
+    //    if (isOptionalProperty()) {
+    //        return buildOptionalExpression(javaNative);
+    //    }
+    //    return javaNative;
+    //}
+
+    public String getPropertySettingModifier() {
+        return isForceClassificationSetting() ? "protected" : "public";
+    }
+
     // ===================================================================================
     //                                                               Sql2Entity Definition
     //                                                               =====================
@@ -1715,7 +1740,7 @@ public class Column {
             result.append(" primaryKey=\"").append(_isPrimaryKey).append('"');
         }
 
-        if (_isNotNull) {
+        if (_notNull) {
             result.append(" required=\"true\"");
         } else {
             result.append(" required=\"false\"");
@@ -2065,10 +2090,6 @@ public class Column {
         return hasClassification() && !isCommonColumn();
     }
 
-    public String getPropertySettingModifier() {
-        return isForceClassificationSetting() ? "protected" : "public";
-    }
-
     public DfClassificationTop getClassificationTop() {
         final Map<String, DfClassificationTop> definitionMap = getClassificationTopMap();
         final String classificationName = getClassificationName();
@@ -2163,7 +2184,7 @@ public class Column {
     //                                                                            Identity
     //                                                                            ========
     public boolean isIdentity() {
-        if (_isAutoIncrement) {
+        if (_autoIncrement) {
             // It gives priority to auto-increment information of JDBC.
             return true;
         } else {
@@ -2240,6 +2261,44 @@ public class Column {
         }
         return getLittleAdjustmentProperties().isEntityConvertEmptyStringToNull();
     }
+
+    // ===================================================================================
+    //                                                                     Optional Object
+    //                                                                     ===============
+    // #thinking optional property
+    //protected String getEntityOptionalPropertyClassName() {
+    //    return getLittleAdjustmentProperties().getEntityOptionalPropertyClassName();
+    //}
+    //
+    //protected String getEntityOptionalPropertyClassSimpleName() {
+    //    return getLittleAdjustmentProperties().getEntityOptionalPropertyClassSimpleName();
+    //}
+    //
+    //public boolean isOptionalProperty() {
+    //    // #thinking optional property specification
+    //    if (isCommonColumn()) { // unsupported for now
+    //        return false;
+    //    }
+    //    if (getLittleAdjustmentProperties().isEntityOptionalPropertyAllColumn()) {
+    //        return true;
+    //    }
+    //    if (getLittleAdjustmentProperties().isEntityOptionalPropertyxIfNullable()) {
+    //        // view object might have additional primary key without not null constraint
+    //        return !isPrimaryKey() && !isNotNull();
+    //    }
+    //    return false;
+    //}
+    //
+    //public String toPropertyType(String javaNative) {
+    //    if (isOptionalProperty()) {
+    //        return buildOptionalExpression(javaNative);
+    //    }
+    //    return javaNative;
+    //}
+    //
+    //protected String buildOptionalExpression(String javaNative) {
+    //    return getEntityOptionalPropertyClassSimpleName() + "<" + javaNative + ">";
+    //}
 
     // ===================================================================================
     //                                                                          Simple DTO

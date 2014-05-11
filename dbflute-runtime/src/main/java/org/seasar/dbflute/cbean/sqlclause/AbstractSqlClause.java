@@ -300,7 +300,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected boolean _locked;
 
     /** Does it allow "that's bad timing" check? */
-    protected boolean _thatsBadTimingChecked;
+    protected boolean _thatsBadTimingAllowed;
 
     // -----------------------------------------------------
     //                                        Lazy Reflector
@@ -3235,7 +3235,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     public boolean isLocked() {
-        return _thatsBadTimingChecked && _locked;
+        return _thatsBadTimingAllowed && _locked;
     }
 
     public void lock() {
@@ -3246,12 +3246,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _locked = false;
     }
 
+    public boolean isThatsBadTimingAllowed() {
+        return _thatsBadTimingAllowed;
+    }
+
     public void allowThatsBadTiming() {
-        _thatsBadTimingChecked = true;
+        _thatsBadTimingAllowed = true;
     }
 
     public void suppressThatsBadTiming() {
-        _thatsBadTimingChecked = false;
+        _thatsBadTimingAllowed = false;
     }
 
     // [DBFlute-0.9.4]

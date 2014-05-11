@@ -1195,6 +1195,12 @@ public interface SqlClause {
     void unlock();
 
     /**
+     * Does it allow "that's bad timing" check?
+     * @return The determination, true or false.
+     */
+    boolean isThatsBadTimingAllowed();
+
+    /**
      * Allow "that's bad timing" check.
      */
     void allowThatsBadTiming();

@@ -177,6 +177,17 @@ public interface ConditionBean extends PagingBean {
     ConditionBean xcreateDreamCruiseCB();
 
     /**
+     * Mark as departure port for dream cruise.
+     */
+    void xmarkAsDeparturePortForDreamCruise();
+
+    /**
+     * Is this condition-bean departure port for dream cruise?
+     * @return The determination, true or false.
+     */
+    boolean xisDreamCruiseDeparturePort();
+
+    /**
      * Is this condition-bean for dream cruise?
      * @return The determination, true or false.
      */

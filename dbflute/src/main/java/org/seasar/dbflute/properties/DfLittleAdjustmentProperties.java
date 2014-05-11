@@ -109,7 +109,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public boolean isAvailableSelectEntityPlainReturn() { // closet
-        final boolean defaultValue = isCompatibleUnderJava8();
+        final boolean defaultValue = isCompatibleBeforeJava8();
         return isProperty("isAvailableSelectEntityPlainReturn", defaultValue);
     }
 
@@ -153,6 +153,42 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isEntityConvertEmptyStringToNull", false);
     }
 
+    // -----------------------------------------------------
+    //                                              Optional
+    //                                              --------
+    // #thinking optional property
+    //public boolean isEntityOptionalPropertyAllColumn() { // closet
+    //    return isProperty("isEntityOptionalPropertyAllColumn", false);
+    //}
+    //
+    //public boolean isEntityOptionalPropertyxIfNullable() { // closet
+    //    return isProperty("isEntityOptionalPropertyIfNullable", false);
+    //}
+    //
+    //protected String _entityOptionalPropertyClassName;
+    //protected String _entityOptionalPropertyClassSimpleName;
+    //
+    //protected String getEntityOptionalPropertyClass() { // closet
+    //    return OptionalProperty.class.getName();
+    //    // fixedly for now
+    //    //return getProperty("entityOptionalPropertyClass", OptionalProperty.class.getName());
+    //}
+    //
+    //public String getEntityOptionalPropertyClassName() {
+    //    if (_entityOptionalPropertyClassName == null) {
+    //        _entityOptionalPropertyClassName = getEntityOptionalPropertyClass();
+    //    }
+    //    return _entityOptionalPropertyClassName;
+    //}
+    //
+    //public String getEntityOptionalPropertyClassSimpleName() {
+    //    if (_entityOptionalPropertyClassSimpleName == null) {
+    //        final String className = getEntityOptionalPropertyClassName();
+    //        _entityOptionalPropertyClassSimpleName = Srl.substringLastRear(className, ".");
+    //    }
+    //    return _entityOptionalPropertyClassSimpleName;
+    //}
+
     // ===================================================================================
     //                                                                      ConditionQuery
     //                                                                      ==============
@@ -172,12 +208,12 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public boolean isMakeConditionQueryExistsReferrerToOne() { // closet
-        // default is true but it might be false at future...
+        // #review default is true but it might be false at future...
         return isProperty("isMakeConditionQueryExistsReferrerToOne", true);
     }
 
     public boolean isMakeConditionQueryInScopeRelationToOne() { // closet
-        // default is true but it might be false at future...
+        // #review default is true but it might be false at future...
         return isProperty("isMakeConditionQueryInScopeRelationToOne", true);
     }
 
@@ -203,7 +239,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                                   That's Bad Timing
     //                                                                   =================
     public boolean isThatsBadTimingChecked() {
-        final boolean defaultValue = !isCompatibleUnderJava8();
+        final boolean defaultValue = !isCompatibleBeforeJava8();
         return isProperty("isThatsBadTimingChecked", defaultValue);
     }
 
@@ -849,7 +885,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isCompatibleBatchUpdateDefaultEveryColumn", false);
     }
 
-    public boolean isCompatibleUnderJava8() { // closet
-        return isProperty("isCompatibleUnderJava8", true); // #later true from DBFlute-1.1
+    public boolean isCompatibleBeforeJava8() { // closet
+        return isProperty("isCompatibleBeforeJava8", true); // #later false from DBFlute-1.1
     }
 }

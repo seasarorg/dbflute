@@ -128,10 +128,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** SQL clause. */
+    /** SQL clause. (NotNull) */
     protected final SqlClause _sqlClause;
 
-    /** My alias name. */
+    /** My alias name. (NotNull) */
     protected final String _aliasName;
 
     /** The nest level of relation. */
@@ -140,7 +140,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /** The level of subQuery. */
     protected int _subQueryLevel;
 
-    /** The base condition-bean of this query. */
+    /** The base condition-bean of this query. (NotNull: after setting, basically is set) */
     protected ConditionBean _baseCB;
 
     // -----------------------------------------------------
@@ -916,10 +916,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             RangeOfOption option) {
         assertObjectNotNull("option(RangeOfOption)", option);
         if (option.hasCalculationRange()) {
-            final ConditionBean dreamCruiseCB = _baseCB.xcreateDreamCruiseCB();
+            final ConditionBean dreamCruiseCB = xgetBaseCB().xcreateDreamCruiseCB();
             //dreamCruiseCB.x
             //dreamCruiseCB.overTheWaves(xcreateManualOrderSpecifiedColumn(dreamCruiseCB));
-            option.xinitCalculationRange(_baseCB, dreamCruiseCB);
+            option.xinitCalculationRange(xgetBaseCB(), dreamCruiseCB);
         }
         final ConditionKey minKey = option.getMinNumberConditionKey();
         final boolean minValidQuery = isValidQueryNoCheck(minKey, minNumber, cvalue, columnDbName);
@@ -1208,7 +1208,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String aliasName, DerivedReferrerOption option) {
         assertFunctionNotNull("SpecifyDerivedReferrer", columnDbName, function);
         assertSubQueryNotNull("SpecifyDerivedReferrer", columnDbName, subQuery);
-        option.xacceptBaseCB(_baseCB);
+        option.xacceptBaseCB(xgetBaseCB());
         if (isDerivedReferrerSelectAllPossible(subQuery, option)) {
             createCBExThrower().throwSpecifyDerivedReferrerSelectAllPossibleException(function, subQuery, aliasName);
         }
@@ -1270,7 +1270,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String parameterPropertyName, DerivedReferrerOption option) {
         assertFunctionNotNull("QueryDerivedReferrer", columnDbName, function);
         assertSubQueryNotNull("QueryDerivedReferrer", columnDbName, subQuery);
-        option.xacceptBaseCB(_baseCB);
+        option.xacceptBaseCB(xgetBaseCB());
         if (isDerivedReferrerSelectAllPossible(subQuery, option)) {
             createCBExThrower().throwQueryDerivedReferrerSelectAllPossibleException(function, subQuery);
         }
@@ -1593,8 +1593,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwOrderByIllegalPurposeException(String columnDbName) {
-        createCBExThrower().throwOrderByIllegalPurposeException(xgetSqlClause().getPurpose(), getTableDbName(),
-                columnDbName);
+        createCBExThrower().throwOrderByIllegalPurposeException(xgetSqlClause().getPurpose(), xgetBaseCB(),
+                getTableDbName(), columnDbName);
     }
 
     /**
@@ -1671,9 +1671,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         });
         if (manualOrderBean.hasCalculationOrder()) {
-            final ConditionBean dreamCruiseCB = _baseCB.xcreateDreamCruiseCB();
+            final ConditionBean dreamCruiseCB = xgetBaseCB().xcreateDreamCruiseCB();
             dreamCruiseCB.overTheWaves(xcreateManualOrderSpecifiedColumn(dreamCruiseCB));
-            manualOrderBean.xinitCalculationOrder(_baseCB, dreamCruiseCB);
+            manualOrderBean.xinitCalculationOrder(xgetBaseCB(), dreamCruiseCB);
         }
         manualOrderBean.validate();
         xgetSqlClause().addManualOrderToPreviousOrderByElement(manualOrderBean);
@@ -1728,8 +1728,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected String resolveNextRelationPath(String localTableName, String foreignPropertyName) {
         final int relationNo = xgetSqlClause().resolveRelationNo(localTableName, foreignPropertyName);
         String nextRelationPath = "_" + relationNo;
-        if (_relationPath != null) {
-            nextRelationPath = _relationPath + nextRelationPath;
+        final String relationPath = xgetRelationPath();
+        if (relationPath != null) {
+            nextRelationPath = relationPath + nextRelationPath;
         }
         return nextRelationPath;
     }
@@ -2499,10 +2500,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                        Purpose Type
     //                                                                        ============
-    protected boolean isLocked() {
-        return xgetSqlClause().isLocked();
-    }
-
     protected void lock() {
         xgetSqlClause().lock();
     }

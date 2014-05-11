@@ -104,6 +104,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // -----------------------------------------------------
     //                                          Dream Cruise
     //                                          ------------
+    /** Is this condition-bean departure port for dream cruise? */
+    protected boolean _departurePortForDreamCruise;
+
     /** The departure port (base point condition-bean) of dream cruise. (used when dream cruise) */
     protected ConditionBean _dreamCruiseDeparturePort;
 
@@ -171,7 +174,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                        ============
     protected void doSetupSelect(SsCall callback) {
         final String foreignPropertyName = callback.qf().xgetForeignPropertyName();
-        assertSetupSelectPurpose(foreignPropertyName);
         // allowed since 0.9.9.4C but basically SetupSelect should be called before Union
         // (basically for DBFlute internal operation, Dream Cruise)
         //assertSetupSelectBeforeUnion(foreignPropertyName);
@@ -186,13 +188,13 @@ public abstract class AbstractConditionBean implements ConditionBean {
         public ConditionQuery qf();
     }
 
-    protected void assertSetupSelectPurpose(String foreignPropertyName) {
+    protected void assertSetupSelectPurpose(String foreignPropertyName) { // called by setupSelect_...() of sub-class
         if (_purpose.isNoSetupSelect()) {
             final String titleName = DfTypeUtil.toClassTitle(this);
             throwSetupSelectIllegalPurposeException(titleName, foreignPropertyName);
         }
         if (isLocked()) {
-            createCBExThrower().throwSetupSelectThatsBadTimingException(this);
+            createCBExThrower().throwSetupSelectThatsBadTimingException(this, foreignPropertyName);
         }
     }
 
@@ -215,11 +217,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                             Specify
     //                                                                             =======
-    protected void assertSpecifyPurpose() {
+    protected void assertSpecifyPurpose() { // called by specify() of sub-class
         if (_purpose.isNoSpecify()) {
             throwSpecifyIllegalPurposeException();
         }
-        if (isLocked()) {
+        if (isLocked() && !xisDreamCruiseShip()) { // DreamCruise might call specify() and query()
             createCBExThrower().throwSpecifyThatsBadTimingException(this);
         }
     }
@@ -231,7 +233,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                               Query
     //                                                                               =====
-    protected void assertQueryPurpose() {
+    protected void assertQueryPurpose() { // called by query() of sub-class and other queries
         if (_purpose.isNoQuery()) {
             throwQueryIllegalPurposeException();
         }
@@ -260,8 +262,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     // [DBFlute-0.9.5.3]
     // ===================================================================================
-    //                                                                         ColumnQuery
-    //                                                                         ===========
+    //                                                                        Column Query
+    //                                                                        ============
     protected <CB extends ConditionBean> HpCalculator xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp,
             SpecifyQuery<CB> rightSp, final String operand) {
         assertQueryPurpose();
@@ -294,7 +296,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
             HpCalcSpecification<CB> calcSp) {
         final ColumnRealName realName = calcSp.getResolvedSpecifiedColumnRealName();
         if (realName == null) {
-            createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
+            createCBExThrower().throwColumnQueryInvalidColumnSpecificationException(this);
         }
         return realName;
     }
@@ -469,6 +471,20 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
+    public void xmarkAsDeparturePortForDreamCruise() {
+        _departurePortForDreamCruise = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean xisDreamCruiseDeparturePort() {
+        return _departurePortForDreamCruise;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean xisDreamCruiseShip() {
         return HpCBPurpose.DREAM_CRUISE.equals(getPurpose());
     }
@@ -568,8 +584,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     // [DBFlute-0.9.6.3]
     // ===================================================================================
-    //                                                                        OrScopeQuery
-    //                                                                        ============
+    //                                                                       OrScope Query
+    //                                                                       =============
     protected <CB extends ConditionBean> void xorSQ(CB cb, OrQuery<CB> orQuery) {
         assertQueryPurpose();
         if (getSqlClause().isOrScopeQueryAndPartEffective()) {
@@ -1416,6 +1432,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     public void xsetupForDreamCruise(ConditionBean mainCB) {
+        mainCB.xmarkAsDeparturePortForDreamCruise();
         xinheritSubQueryInfo(mainCB.localCQ());
         xchangePurposeSqlClause(HpCBPurpose.DREAM_CRUISE, mainCB.localCQ());
         _dreamCruiseDeparturePort = mainCB;
@@ -1454,9 +1471,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
             // (purposes not allowed to use query() also may have nested query())
             xinheritInvalidQueryInfo(mainCQ);
 
-            // and also inherits inner-join
+            // and also inherits inner-join and "that's bad timing"
             xinheritStructurePossibleInnerJoin(mainCQ);
             xinheritWhereUsedInnerJoin(mainCQ);
+            xinheritThatsBadTiming(mainCQ);
         }
     }
 
@@ -1486,12 +1504,23 @@ public abstract class AbstractConditionBean implements ConditionBean {
         }
     }
 
+    protected void xinheritThatsBadTiming(ConditionQuery mainCQ) {
+        if (mainCQ.xgetSqlClause().isThatsBadTimingAllowed()) { // DBFlute default
+            getSqlClause().allowThatsBadTiming();
+        } else { // e.g. if it suppresses it by DBFlute property
+            getSqlClause().suppressThatsBadTiming();
+        }
+    }
+
     protected abstract void xprepareSyncQyCall(ConditionBean mainCB);
 
     // -----------------------------------------------------
     //                                                  Lock
     //                                                  ----
     protected boolean isLocked() {
+        if (xisDreamCruiseDeparturePort()) {
+            return false; // dream cruise might call everywhere
+        }
         return getSqlClause().isLocked();
     }
 

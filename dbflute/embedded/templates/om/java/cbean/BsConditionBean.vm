@@ -369,6 +369,7 @@ public class ${myClassName} extends AbstractConditionBean {
      * @return The set-upper of nested relation. {setupSelect...().with[nested-relation]} (NotNull)
      */
     public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
+        assertSetupSelectPurpose("${tmpPropertyName}");
 #if ($fk.hasLocalColumnExceptPrimaryKey())
         if (hasSpecifiedColumn()) { // if reverse call
 #foreach ($col in $fk.localColumnList)
@@ -407,6 +408,7 @@ public class ${myClassName} extends AbstractConditionBean {
      * @return The set-upper of nested relation. {setupSelect...().with[nested-relation]} (NotNull)
      */
     public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
+        assertSetupSelectPurpose("${tmpPropertyName}");
         doSetupSelect(new SsCall() { public ConditionQuery qf() { return query().query${tmpPropertyNameInitCap}(); } });
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}()); }
         return _nss${tmpPropertyNameInitCap};
@@ -639,8 +641,8 @@ public class ${myClassName} extends AbstractConditionBean {
 
     // [DBFlute-0.9.5.3]
     // ===================================================================================
-    //                                                                         ColumnQuery
-    //                                                                         ===========
+    //                                                                        Column Query
+    //                                                                        ============
     /**
      * Set up column-query. {column1 = column2}
      * <pre>
@@ -692,8 +694,8 @@ public class ${myClassName} extends AbstractConditionBean {
 
     // [DBFlute-0.9.6.3]
     // ===================================================================================
-    //                                                                        OrScopeQuery
-    //                                                                        ============
+    //                                                                       OrScope Query
+    //                                                                       =============
     /**
      * Set up the query for or-scope. <br />
      * (Same-column-and-same-condition-key conditions are allowed in or-scope)

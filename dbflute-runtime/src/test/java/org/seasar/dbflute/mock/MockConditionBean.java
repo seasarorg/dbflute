@@ -327,6 +327,13 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
+    public void xmarkAsDeparturePortForDreamCruise() {
+    }
+
+    public boolean xisDreamCruiseDeparturePort() {
+        return false;
+    }
+
     public boolean xisDreamCruiseShip() {
         return false;
     }

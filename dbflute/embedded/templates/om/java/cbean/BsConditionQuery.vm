@@ -713,7 +713,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public void exists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); } String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
         registerExistsReferrer(cb.query(), "${referrer.foreignColumnNameCommaString}", "${referrer.localColumnNameCommaString}", pp, "${relationPropertyName}");
     }
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
@@ -752,7 +753,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public void notExists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); } String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotExistsReferrer(cb.query(), "${referrer.foreignColumnNameCommaString}", "${referrer.localColumnNameCommaString}", pp, "${relationPropertyName}");
     }
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
@@ -791,7 +793,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public void xsderive${relationPropertyNameInitCap}(String fn, SubQuery<${relatedCBClassName}> sq, String al, DerivedReferrerOption op) {
         assertObjectNotNull("subQuery", sq);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this);
-        try { lock(); sq.query(cb); } finally { unlock(); } String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        try { lock(); sq.query(cb); } finally { unlock(); }
+        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
         registerSpecifyDerivedReferrer(fn, cb.query(), "${referrer.foreignColumnNameCommaString}", "${referrer.localColumnNameCommaString}", pp, "${relationPropertyName}", al, op);
     }
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
