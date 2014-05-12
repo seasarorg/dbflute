@@ -55,43 +55,43 @@ import javax.enterprise.inject.spi.BeanManager;
  * The implementation of behavior selector.
  * @author DBFlute(AutoGenerator)
  */
-public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
+class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(${glImplementedBehaviorSelector}.class);
+    private val _log: Log = LogFactory.getLog(classOf[${glImplementedBehaviorSelector}]);
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** The cache of behavior. */
-    protected final Map<Class<? extends BehaviorReadable>, BehaviorReadable> _behaviorCache = newHashMap();
+    protected var Map[Class[? extends BehaviorReadable], BehaviorReadable] _behaviorCache = newHashMap();
 
 #if ($database.isTargetContainerSeasar())
     /** The container of Seasar. */
-    protected S2Container _container;
+    protected var _container: S2Container;
 #end
 #if ($database.isTargetContainerSpring())
     /** The container of Spring. */
-    protected ApplicationContext _container;
+    protected var _container: ApplicationContext;
 #end
 #if ($database.isTargetContainerLucy())
     /** The container of Lucy. */
-    protected Lucy _container;
+    protected var _container: Lucy;
 #end
 #if ($database.isTargetContainerGuice())
     /** The container of Guice. */
-    protected Injector _container;
+    protected var _container: Injector;
 #end
 #if ($database.isTargetContainerSlim3())
     /** The container of Slim3. */
-    protected S3Container _container;
+    protected var _container: S3Container;
 #end
 #if ($database.isTargetContainerCDI())
     /** The container of CDI. */
-    protected BeanManager _container;
+    protected var _container: BeanManager;
 #end
 
     // ===================================================================================
@@ -100,7 +100,7 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     /**
      * Initialize condition-bean meta data.
      */
-    public void initializeConditionBeanMetaData() {
+    def initializeConditionBeanMetaData(): Unit = {
         final Map<String, DBMeta> dbmetaMap = ${glDBMetaInstanceHandler}.getUnmodifiableDBMetaMap();
         final Collection<DBMeta> dbmetas = dbmetaMap.values();
         long before = 0;

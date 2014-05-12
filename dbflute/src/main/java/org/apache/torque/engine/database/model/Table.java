@@ -143,6 +143,8 @@ import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.bhv.ConditionBeanSetupper;
+import org.seasar.dbflute.bhv.ReferrerConditionSetupper;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
@@ -3172,6 +3174,24 @@ public class Table {
     //                                                                 ===================
     public boolean isCursorSelectOptionAllowed() {
         return getLittleAdjustmentProperties().isCursorSelectOptionAllowed();
+    }
+
+    // ===================================================================================
+    //                                                                       Load Referrer
+    //                                                                       =============
+    public boolean isAvailableLoadReferrerByOldOption() {
+        // #later load referrer option is old style so suppress it since 1.1
+        return getLittleAdjustmentProperties().isCompatibleBeforeJava8();
+    }
+
+    public String getLoadReferrerConditionSetupperName() {
+        final Class<?> type;
+        if (isAvailableLoadReferrerByOldOption()) {
+            type = ConditionBeanSetupper.class;
+        } else {
+            type = ReferrerConditionSetupper.class;
+        }
+        return type.getSimpleName();
     }
 
     // ===================================================================================

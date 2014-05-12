@@ -484,58 +484,25 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     // ===================================================================================
     //                                                                       Load Referrer
     //                                                                       =============
-#foreach ($referrer in $table.referrerList)
+#foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerBhvClassName = "${referrer.referrerTableExtendedBehaviorClassName}")
 #set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
-#if (!$referrer.isOneToOne())
     /**
      * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} by the set-upper of referrer. <br />
      * ${referrer.referrerDispForJavaDoc}
      * <pre>
-     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">load${referrer.referrerJavaBeansRulePropertyNameInitCap}</span>(${myEntityListVariableName}, new ConditionBeanSetupper&lt;${referrerCBClassName}&gt;() {
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">load${referrer.referrerJavaBeansRulePropertyNameInitCap}</span>(${myEntityListVariableName}, new ${table.loadReferrerConditionSetupperName}&lt;${referrerCBClassName}&gt;() {
      *     public void setup(${referrerCBClassName} cb) {
      *         cb.setupSelect...();
      *         cb.query().setFoo...(value);
-     *         cb.query().addOrderBy_Bar...(); <span style="color: #3F7E5E">// basically you should order referrer list</span>
+     *         cb.query().addOrderBy_Bar...();
      *     }
-     * }); <span style="color: #3F7E5E">// you can load nested referrer from here by calling like '}).withNestedList(new ...)'</span>
-     * for (${myExtendedObjectClassName} ${myEntityVariableName} : ${myEntityListVariableName}) {
-     *     ... = ${myEntityVariableName}.<span style="color: #DD4747">get${referrer.referrerJavaBeansRulePropertyNameInitCap}()</span>;
-     * }
-     * </pre>
-     * About internal policy, the value of primary key (and others too) is treated as case-insensitive. <br />
-     * The condition-bean, which the set-upper provides, has settings before callback as follows:
-     * <pre>
-#if ($referrer.isSimpleKeyFK())
-     * cb.query().set${referrer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
-     * cb.query().addOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc();
-#else
-     * cb.query().set[ForeignKey]_InScope(pkList);
-     * cb.query().addOrderBy_[ForeignKey]_Asc();
-#end
-     * </pre>
-     * @param ${myEntityVariableName} The entity of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param conditionBeanSetupper The instance of referrer condition-bean set-upper for registering referrer condition. (NotNull)
-     * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
-     */
-    public NestedReferrerLoader<${referrerEntityClassName}> load${referrer.referrerPropertyNameInitCap}(${myExtendedObjectClassName} ${myEntityVariableName}, ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
-        xassLRArg(${myEntityVariableName}, conditionBeanSetupper);
-        return load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), conditionBeanSetupper);
-    }
-
-    /**
-     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} by the set-upper of referrer. <br />
-     * ${referrer.referrerDispForJavaDoc}
-     * <pre>
-     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">load${referrer.referrerJavaBeansRulePropertyNameInitCap}</span>(${myEntityListVariableName}, new ConditionBeanSetupper&lt;${referrerCBClassName}&gt;() {
-     *     public void setup(${referrerCBClassName} cb) {
-     *         cb.setupSelect...();
-     *         cb.query().setFoo...(value);
-     *         cb.query().addOrderBy_Bar...(); <span style="color: #3F7E5E">// basically you should order referrer list</span>
-     *     }
-     * }); <span style="color: #3F7E5E">// you can load nested referrer from here by calling like '}).withNestedList(new ...)'</span>
+     * }); <span style="color: #3F7E5E">// you can load nested referrer from here</span>
+     * <span style="color: #3F7E5E">//}).withNestedList(referrerList -&gt {</span>
+     * <span style="color: #3F7E5E">//    ...</span>
+     * <span style="color: #3F7E5E">//});</span>
      * for (${myExtendedObjectClassName} ${myEntityVariableName} : ${myEntityListVariableName}) {
      *     ... = ${myEntityVariableName}.<span style="color: #DD4747">get${referrer.referrerJavaBeansRulePropertyNameInitCap}()</span>;
      * }
@@ -552,14 +519,51 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
      * </pre>
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param conditionBeanSetupper The instance of referrer condition-bean set-upper for registering referrer condition. (NotNull)
+     * @param setupper The callback to set up referrer condition-bean for loading referrer. (NotNull)
      * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
      */
-    public NestedReferrerLoader<${referrerEntityClassName}> load${referrer.referrerPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
-        xassLRArg(${myEntityListVariableName}, conditionBeanSetupper);
-        return load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>().xinit(conditionBeanSetupper));
+    public NestedReferrerLoader<${referrerEntityClassName}> load${referrer.referrerPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${table.loadReferrerConditionSetupperName}<${referrerCBClassName}> setupper) {
+        xassLRArg(${myEntityListVariableName}, setupper);
+        return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>().xinit(setupper));
     }
 
+    /**
+     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} by the set-upper of referrer. <br />
+     * ${referrer.referrerDispForJavaDoc}
+     * <pre>
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">load${referrer.referrerJavaBeansRulePropertyNameInitCap}</span>(${myEntityListVariableName}, new ${table.loadReferrerConditionSetupperName}&lt;${referrerCBClassName}&gt;() {
+     *     public void setup(${referrerCBClassName} cb) {
+     *         cb.setupSelect...();
+     *         cb.query().setFoo...(value);
+     *         cb.query().addOrderBy_Bar...();
+     *     }
+     * }); <span style="color: #3F7E5E">// you can load nested referrer from here</span>
+     * <span style="color: #3F7E5E">//}).withNestedList(referrerList -&gt {</span>
+     * <span style="color: #3F7E5E">//    ...</span>
+     * <span style="color: #3F7E5E">//});</span>
+     * ... = ${myEntityVariableName}.<span style="color: #DD4747">get${referrer.referrerJavaBeansRulePropertyNameInitCap}()</span>;
+     * </pre>
+     * About internal policy, the value of primary key (and others too) is treated as case-insensitive. <br />
+     * The condition-bean, which the set-upper provides, has settings before callback as follows:
+     * <pre>
+#if ($referrer.isSimpleKeyFK())
+     * cb.query().set${referrer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
+     * cb.query().addOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc();
+#else
+     * cb.query().set[ForeignKey]_InScope(pkList);
+     * cb.query().addOrderBy_[ForeignKey]_Asc();
+#end
+     * </pre>
+     * @param ${myEntityVariableName} The entity of ${table.javaBeansRulePropertyName}. (NotNull)
+     * @param setupper The callback to set up referrer condition-bean for loading referrer. (NotNull)
+     * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
+     */
+    public NestedReferrerLoader<${referrerEntityClassName}> load${referrer.referrerPropertyNameInitCap}(${myExtendedObjectClassName} ${myEntityVariableName}, ${table.loadReferrerConditionSetupperName}<${referrerCBClassName}> setupper) {
+        xassLRArg(${myEntityVariableName}, setupper);
+        return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), new LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>().xinit(setupper));
+    }
+
+#if ($table.isAvailableLoadReferrerByOldOption())
     /**
      * {Refer to overload method that has an argument of the list of entity.}
      * @param ${myEntityVariableName} The entity of ${table.javaBeansRulePropertyName}. (NotNull)
@@ -571,10 +575,12 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), loadReferrerOption);
     }
 
+#end
 #if ($referrer.isSimpleKeyFK())
 #set ($referrerColumn = ${referrer.localColumnAsOne})
 #set ($localColumn = ${referrer.foreignColumnAsOne})
 #set ($keyJavaNative = "${referrerColumn.javaNative}")
+#if ($table.isAvailableLoadReferrerByOldOption())
     /**
      * {Refer to overload method that has an argument of condition-bean setupper.}
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
@@ -588,6 +594,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}, loadReferrerOption);
     }
 
+#end
     protected NestedReferrerLoader<${referrerEntityClassName}> doLoad${referrer.referrerPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> option) {
         final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
         return helpLoadReferrerInternally(${myEntityListVariableName}, option, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
@@ -623,6 +630,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
 #else
 #set ($keyJavaNative = "java.util.Map<String, Object>")
+#if ($table.isAvailableLoadReferrerByOldOption())
     /**
      * {Refer to overload method that has an argument of condition-bean setupper.}
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
@@ -636,6 +644,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}, loadReferrerOption);
     }
 
+#end
     protected NestedReferrerLoader<${referrerEntityClassName}> doLoad${referrer.referrerPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> option) {
         final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
         return helpLoadReferrerInternally(${myEntityListVariableName}, option, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
@@ -693,7 +702,6 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         });
     }
 
-#end
 #end
 #end
 #end

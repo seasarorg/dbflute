@@ -20,19 +20,19 @@ import org.seasar.dbflute.Entity;
 /**
  * The loader of nested referrer.
  * <pre>
- * MemberStatusCB cb = new MemberStatusCB();
+ * MemberCB cb = new MemberCB();
  * cb.query().set...
- * List&lt;MemberStatus&gt; statusList = memberStatusBhv.selectList(cb);
- * memberStatusBhv.loadMemberList(statusList, new ConditionBeanSetupper&lt;MemberCB&gt;() {
- *     public void setup(MemberCB cb) {
- *         cb.query().addOrderBy_Birthdate_Asc();
+ * List&lt;Member&gt; memberList = memberBhv.selectList(cb);
+ * memberBhv.loadPurchaseList(memberList, new ReferrerConditionSetupper&lt;PurchaseCB&gt;() {
+ *     public void setup(PurchaseCB cb) {
+ *         cb.query().addOrderBy_PurchaseDatetime_Asc();
  *     }
- * }).<span style="color: #DD4747">withNestedReferrer</span>(new ReferrerListHandler&lt;Member&gt;() {
- *     public void <span style="color: #DD4747">handle</span>(List&lt;Member&gt; referrerList) {
+ * }).<span style="color: #DD4747">withNestedReferrer</span>(new ReferrerListHandler&lt;Purchase&gt;() {
+ *     public void <span style="color: #DD4747">handle</span>(List&lt;Purchase&gt; referrerList) {
  *         <span style="color: #3F7E5E">// you can call LoadReferrer here for nested referrer as you like it</span>
- *         memberBhv.loadPurchaseList(referrerList, new ConditionBeanSetupper&lt;PurchaseCB&gt;() {
- *             public void setup(PurchaseCB cb) {
- *                 cb.query().addOrderBy_PurchasePrice_Desc();
+ *         purchaseBhv.loadPurchaseDetailList(referrerList, new ReferrerConditionSetupper&lt;PurchaseDetailCB&gt;() {
+ *             public void setup(PurchaseDetailCB cb) {
+ *                 ...
  *             }
  *         });
  *         ...
@@ -48,26 +48,26 @@ public interface NestedReferrerLoader<REFERRER extends Entity> {
     /**
      * Set up nested referrer by the handler.
      * <pre>
-     * MemberStatusCB cb = new MemberStatusCB();
+     * MemberCB cb = new MemberCB();
      * cb.query().set...
-     * List&lt;MemberStatus&gt; statusList = memberStatusBhv.selectList(cb);
-     * memberStatusBhv.loadMemberList(statusList, new ConditionBeanSetupper&lt;MemberCB&gt;() {
-     *     public void setup(MemberCB cb) {
-     *         cb.query().addOrderBy_Birthdate_Asc();
+     * List&lt;Member&gt; memberList = memberBhv.selectList(cb);
+     * memberBhv.loadPurchaseList(memberList, new ReferrerConditionSetupper&lt;PurchaseCB&gt;() {
+     *     public void setup(PurchaseCB cb) {
+     *         cb.query().addOrderBy_PurchaseDatetime_Asc();
      *     }
-     * }).<span style="color: #DD4747">withNestedReferrer</span>(new ReferrerListHandler&lt;Member&gt;() {
-     *     public void <span style="color: #DD4747">handle</span>(List&lt;Member&gt; referrerList) {
+     * }).<span style="color: #DD4747">withNestedReferrer</span>(new ReferrerListHandler&lt;Purchase&gt;() {
+     *     public void <span style="color: #DD4747">handle</span>(List&lt;Purchase&gt; referrerList) {
      *         <span style="color: #3F7E5E">// you can call LoadReferrer here for nested referrer as you like it</span>
-     *         memberBhv.loadPurchaseList(referrerList, new ConditionBeanSetupper&lt;PurchaseCB&gt;() {
-     *             public void setup(PurchaseCB cb) {
-     *                 cb.query().addOrderBy_PurchasePrice_Desc();
+     *         purchaseBhv.loadPurchaseDetailList(referrerList, new ReferrerConditionSetupper&lt;PurchaseDetailCB&gt;() {
+     *             public void setup(PurchaseDetailCB cb) {
+     *                 ...
      *             }
      *         });
      *         ...
      *     }
      * }
      * </pre>
-     * @param handler The handler of referrer list. (NotNull)
+     * @param handler The handler of referrer list to load nested referrer. (NotNull)
      */
     void withNestedReferrer(ReferrerListHandler<REFERRER> handler);
 }

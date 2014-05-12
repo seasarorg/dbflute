@@ -1195,21 +1195,21 @@ public interface SqlClause {
     void unlock();
 
     /**
-     * Does it allow "that's bad timing" check?
+     * Does it allow "that's-bad-timing" detect?
      * @return The determination, true or false.
      */
-    boolean isThatsBadTimingAllowed();
+    boolean isThatsBadTimingDetectAllowed();
 
     /**
-     * Allow "that's bad timing" check.
+     * Allow "that's-bad-timing" detect.
      */
-    void allowThatsBadTiming();
+    void allowThatsBadTimingDetect();
 
     /**
-     * Suppress "that's bad timing" check for compatible. <br />
+     * Suppress "that's-bad-timing" detect for compatible. <br />
      * If suppressed, isLocked() always returns false.
      */
-    void suppressThatsBadTiming();
+    void suppressThatsBadTimingDetect();
 
     // [DBFlute-0.9.4]
     // ===================================================================================

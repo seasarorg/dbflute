@@ -35,20 +35,29 @@ public abstract class TnAbstractMapResultSetHandler implements TnResultSetHandle
 
     protected Map<String, ValueType> createPropertyTypeMap(ResultSetMetaData rsmd) throws SQLException {
         final int count = rsmd.getColumnCount();
-        final Map<String, ValueType> propertyTypeMap = DfCollectionUtil.newLinkedHashMap();
+        final Map<String, ValueType> propertyTypeMap = newPropertyTypeMap();
         for (int i = 0; i < count; ++i) {
             final String propertyName = rsmd.getColumnLabel(i + 1);
 
             // because it can only use by-JDBC-type value type here 
-            final ValueType valueType = TnValueTypes.getValueType(rsmd.getColumnType(i + 1));
+            final int columnType = rsmd.getColumnType(i + 1);
+            final ValueType valueType = getValueType(columnType);
 
             propertyTypeMap.put(propertyName, valueType);
         }
         return propertyTypeMap;
     }
 
+    protected Map<String, ValueType> newPropertyTypeMap() {
+        return DfCollectionUtil.newLinkedHashMap();
+    }
+
+    protected ValueType getValueType(int columnType) {
+        return TnValueTypes.getValueType(columnType);
+    }
+
     protected Map<String, Object> createRow(ResultSet rs, Map<String, ValueType> propertyTypeMap) throws SQLException {
-        final Map<String, Object> row = StringKeyMap.createAsFlexibleOrdered();
+        final Map<String, Object> row = newRowMap();
         final Set<Entry<String, ValueType>> entrySet = propertyTypeMap.entrySet();
         int index = 0;
         for (Entry<String, ValueType> entry : entrySet) {
@@ -59,5 +68,9 @@ public abstract class TnAbstractMapResultSetHandler implements TnResultSetHandle
             ++index;
         }
         return row;
+    }
+
+    protected StringKeyMap<Object> newRowMap() {
+        return StringKeyMap.createAsFlexibleOrdered();
     }
 }

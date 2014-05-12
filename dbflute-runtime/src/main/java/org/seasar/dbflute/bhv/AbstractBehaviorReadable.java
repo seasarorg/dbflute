@@ -1028,26 +1028,26 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     // assertLoadReferrerArgument() as Internal
-    protected void xassLRArg(Entity entity, ConditionBeanSetupper<? extends ConditionBean> conditionBeanSetupper) {
+    protected void xassLRArg(List<? extends Entity> entityList,
+            ReferrerConditionSetupper<? extends ConditionBean> setupper) {
+        assertObjectNotNull("List<" + DfTypeUtil.toClassTitle(getDBMeta().getEntityType()) + ">", entityList);
+        assertObjectNotNull("setupper", setupper);
+    }
+
+    protected void xassLRArg(Entity entity, ReferrerConditionSetupper<? extends ConditionBean> setupper) {
         assertObjectNotNull("entity(" + DfTypeUtil.toClassTitle(getDBMeta().getEntityType()) + ")", entity);
-        assertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
+        assertObjectNotNull("setupper", setupper);
     }
 
     protected void xassLRArg(List<? extends Entity> entityList,
-            ConditionBeanSetupper<? extends ConditionBean> conditionBeanSetupper) {
+            LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
         assertObjectNotNull("List<" + DfTypeUtil.toClassTitle(getDBMeta().getEntityType()) + ">", entityList);
-        assertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
+        assertObjectNotNull("loadReferrerOption", loadReferrerOption);
     }
 
     protected void xassLRArg(Entity entity,
             LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
         assertObjectNotNull("entity(" + DfTypeUtil.toClassTitle(getDBMeta().getEntityType()) + ")", entity);
-        assertObjectNotNull("loadReferrerOption", loadReferrerOption);
-    }
-
-    protected void xassLRArg(List<? extends Entity> entityList,
-            LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
-        assertObjectNotNull("List<" + DfTypeUtil.toClassTitle(getDBMeta().getEntityType()) + ">", entityList);
         assertObjectNotNull("loadReferrerOption", loadReferrerOption);
     }
 

@@ -157,6 +157,9 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
         if (isInnerJoinAutoDetect()) {
             sqlClause.allowInnerJoinAutoDetect();
         }
+        if (isThatsBadTimingDetect()) {
+            sqlClause.allowThatsBadTimingDetect();
+        }
         if (isEmptyStringQueryAllowed()) {
             sqlClause.allowEmptyStringQuery();
         }
@@ -177,6 +180,10 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 
     protected boolean isInnerJoinAutoDetect() {
 	    return ${glDBFluteConfig}.getInstance().isInnerJoinAutoDetect();
+    }
+
+    protected boolean isThatsBadTimingDetect() {
+	    return ${glDBFluteConfig}.getInstance().isThatsBadTimingDetect();
     }
 
     protected boolean isEmptyStringQueryAllowed() {

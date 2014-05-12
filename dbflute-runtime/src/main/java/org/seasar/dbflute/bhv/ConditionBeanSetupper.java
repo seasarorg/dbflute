@@ -22,11 +22,6 @@ import org.seasar.dbflute.cbean.ConditionBean;
  * @param <CONDITION_BEAN> The type of condition-bean.
  * @author jflute
  */
-public interface ConditionBeanSetupper<CONDITION_BEAN extends ConditionBean> {
-
-    /**
-     * Set up condition-bean.
-     * @param cb The prepared instance of condition-bean. (NotNull)
-     */
-    void setup(CONDITION_BEAN cb);
+public interface ConditionBeanSetupper<CONDITION_BEAN extends ConditionBean> extends
+        ReferrerConditionSetupper<CONDITION_BEAN> {
 }

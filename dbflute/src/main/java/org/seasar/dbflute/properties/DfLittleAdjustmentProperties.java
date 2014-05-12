@@ -208,13 +208,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public boolean isMakeConditionQueryExistsReferrerToOne() { // closet
-        // #review default is true but it might be false at future...
-        return isProperty("isMakeConditionQueryExistsReferrerToOne", true);
+        final boolean defaultValue = isCompatibleBeforeJava8();
+        return isProperty("isMakeConditionQueryExistsReferrerToOne", defaultValue);
     }
 
     public boolean isMakeConditionQueryInScopeRelationToOne() { // closet
-        // #review default is true but it might be false at future...
-        return isProperty("isMakeConditionQueryInScopeRelationToOne", true);
+        final boolean defaultValue = isCompatibleBeforeJava8();
+        return isProperty("isMakeConditionQueryInScopeRelationToOne", defaultValue);
     }
 
     // ===================================================================================
@@ -238,9 +238,9 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                   That's Bad Timing
     //                                                                   =================
-    public boolean isThatsBadTimingChecked() {
+    public boolean isThatsBadTimingDetect() { // closet
         final boolean defaultValue = !isCompatibleBeforeJava8();
-        return isProperty("isThatsBadTimingChecked", defaultValue);
+        return isProperty("isThatsBadTimingDetect", defaultValue);
     }
 
     // ===================================================================================

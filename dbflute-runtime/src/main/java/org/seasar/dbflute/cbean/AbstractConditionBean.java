@@ -1505,10 +1505,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected void xinheritThatsBadTiming(ConditionQuery mainCQ) {
-        if (mainCQ.xgetSqlClause().isThatsBadTimingAllowed()) { // DBFlute default
-            getSqlClause().allowThatsBadTiming();
+        if (mainCQ.xgetSqlClause().isThatsBadTimingDetectAllowed()) { // DBFlute default
+            getSqlClause().allowThatsBadTimingDetect();
         } else { // e.g. if it suppresses it by DBFlute property
-            getSqlClause().suppressThatsBadTiming();
+            getSqlClause().suppressThatsBadTimingDetect();
         }
     }
 
@@ -1536,14 +1536,14 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void allowThatsBadTiming() {
-        getSqlClause().allowThatsBadTiming();
+        getSqlClause().allowThatsBadTimingDetect();
     }
 
     /**
      * {@inheritDoc}
      */
     public void suppressThatsBadTiming() {
-        getSqlClause().suppressThatsBadTiming();
+        getSqlClause().suppressThatsBadTimingDetect();
     }
 
     // ===================================================================================

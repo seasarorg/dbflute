@@ -13,32 +13,33 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.rshandler;
+package org.seasar.dbflute.outsidesql.irregular;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.jdbc.CursorHandler;
+import org.seasar.dbflute.s2dao.rshandler.TnMapListResultSetHandler;
 
 /**
- * The result set handler converting to list for map.
- * @author modified by jflute (originated in S2Dao)
+ * The cursor handler returning list for map. <br />
+ * Normally it should not be used. <br />
+ * Basically only for direct SQL when it cannot be helped.
+ * @author jflute
+ * @since 1.0.5F (2014/05/12 Monday)
  */
-public class TnMapListResultSetHandler extends TnAbstractMapResultSetHandler {
+public class IrgMapListCursorHandler implements CursorHandler {
 
     public Object handle(ResultSet rs) throws SQLException {
-        final Map<String, ValueType> propertyTypeMap = createPropertyTypeMap(rs.getMetaData());
-        final List<Map<String, Object>> resultList = newResultList();
-        while (rs.next()) {
-            resultList.add(createRow(rs, propertyTypeMap));
-        }
+        final TnMapListResultSetHandler rsHandler = createMapListResultSetHandler();
+        @SuppressWarnings("unchecked")
+        final List<Map<String, Object>> resultList = (List<Map<String, Object>>) rsHandler.handle(rs);
         return resultList;
     }
 
-    protected List<Map<String, Object>> newResultList() {
-        return new ArrayList<Map<String, Object>>();
+    protected TnMapListResultSetHandler createMapListResultSetHandler() {
+        return new TnMapListResultSetHandler();
     }
 }

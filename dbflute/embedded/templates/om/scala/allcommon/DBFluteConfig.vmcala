@@ -74,6 +74,7 @@ object ${glDBFluteConfig} {
     protected var _pagingCountLater: Boolean = ${database.isPagingCountLater()};
     protected var _pagingCountLeastJoin: Boolean = ${database.isPagingCountLeastJoin()};
     protected var _innerJoinAutoDetect: Boolean = ${database.isInnerJoinAutoDetect()};
+    protected var _thatsBadTimingDetect: Boolean = ${database.isThatsBadTimingDetect()};
     protected var _emptyStringQueryAllowed: Boolean = false;
     protected var _emptyStringParameterAllowed: Boolean = false;
     protected var _invalidQueryChecked: Boolean = false;
@@ -188,6 +189,21 @@ object ${glDBFluteConfig} {
             _log.info("...Setting innerJoinAutoDetect: " + innerJoinAutoDetect);
         }
         _innerJoinAutoDetect = innerJoinAutoDetect;
+    }
+
+    // ===================================================================================
+    //                                                                   That's Bad Timing
+    //                                                                   =================
+    def isThatsBadTimingDetect(): Boolean = {
+        return _thatsBadTimingDetect;
+    }
+
+    def setThatsBadTimingDetect(thatsBadTimingDetect: Boolean): Unit = {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting thatsBadTimingDetect: " + thatsBadTimingDetect);
+        }
+        _thatsBadTimingDetect = thatsBadTimingDetect;
     }
 
     // ===================================================================================

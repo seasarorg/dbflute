@@ -1929,8 +1929,8 @@ public class Database {
         return getLittleAdjustmentProperties().isInnerJoinAutoDetect();
     }
 
-    public boolean isThatsBadTimingChecked() {
-        return getLittleAdjustmentProperties().isThatsBadTimingChecked();
+    public boolean isThatsBadTimingDetect() {
+        return getLittleAdjustmentProperties().isThatsBadTimingDetect();
     }
 
     public boolean isAvailableDatabaseNativeJDBC() {

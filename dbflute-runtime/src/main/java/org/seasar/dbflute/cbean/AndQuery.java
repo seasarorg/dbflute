@@ -18,11 +18,10 @@ package org.seasar.dbflute.cbean;
 /**
  * The interface of and-query.
  * <pre>
- * e.g. OrScopeQueryAndPart
  * cb.orScopeQuery(new OrQuery&lt;FooCB&gt;() {
  *     public void query(FooCB orCB) {
  *         orCB.query().setFoo...
- *         orCB.orScopeQueryAndPart(new AndQuery&lt;FooCB&gt;() {
+ *         orCB.<span style="color: #DD4747">orScopeQueryAndPart</span>(new AndQuery&lt;FooCB&gt;() {
  *             public void query(FooCB andCB) {
  *                 andCB.query().setBar...
  *                 andCB.query().setQux...
