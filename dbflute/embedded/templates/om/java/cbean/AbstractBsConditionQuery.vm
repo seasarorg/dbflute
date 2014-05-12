@@ -1600,8 +1600,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * The order values are bound (treated as bind parameter).
      * <pre>
      * MemberCB cb = new MemberCB();
-     * List&lt;String&gt; statusCodeList = Arrays.asList("WDL", "FML", "PRV");
-     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #DD4747">withManualOrder(statusCodeList)</span>;
+     * List&lt;CDef.MemberStatus&gt; orderValueList = new ArrayList&lt;CDef.MemberStatus&gt;();
+     * orderValueList.add(CDef.MemberStatus.Withdrawal);
+     * orderValueList.add(CDef.MemberStatus.Formalized);
+     * orderValueList.add(CDef.MemberStatus.Provisional);
+     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #DD4747">withManualOrder(orderValueList)</span>;
      * <span style="color: #3F7E5E">// order by </span>
      * <span style="color: #3F7E5E">//   case</span>
      * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'WDL' then 0</span>
