@@ -18,7 +18,7 @@ package org.seasar.dbflute.bhv;
 import org.seasar.dbflute.cbean.ConditionBean;
 
 /**
- * The set-upper of condition-bean.
+ * The set-upper of condition-bean. #beforejava8
  * @param <CONDITION_BEAN> The type of condition-bean.
  * @author jflute
  */

@@ -21,7 +21,7 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.ConditionBean;
 
 /**
- * The class of load referrer option. <br />
+ * The class of load referrer option. #beforejava8 <br />
  * This option is basically for loading second or more level referrer.
  * @param <REFERRER_CB> The type of referrer condition-bean.
  * @param <REFERRER_ENTITY> The type of referrer entity.

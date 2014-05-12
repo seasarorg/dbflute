@@ -217,6 +217,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isMakeConditionQueryInScopeRelationToOne", defaultValue);
     }
 
+    public boolean isMakeConditionQueryPlainListManualOrder() { // closet
+        final boolean defaultValue = isCompatibleBeforeJava8();
+        return isProperty("isMakeConditionQueryPlainListManualOrder", defaultValue);
+    }
+
     // ===================================================================================
     //                                                                       Paging Select
     //                                                                       =============

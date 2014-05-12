@@ -152,7 +152,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                                       =============
     /**
 #if ($table.isAvailableSelectEntityPlainReturn())
-     * Select the entity by the condition-bean. <br />
+     * Select the entity by the condition-bean. #beforejava8 <br />
      * <span style="color: #AD4747; font-size: 120%">The return might be null if no data, so you should have null check.</span> <br />
      * <span style="color: #AD4747; font-size: 120%">If the data always exists as your business rule, use selectEntityWithDeletedCheck().</span>
      * <pre>
@@ -565,7 +565,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
 #if ($table.isAvailableLoadReferrerByOldOption())
     /**
-     * {Refer to overload method that has an argument of the list of entity.}
+     * {Refer to overload method that has an argument of the list of entity.} #beforejava8
      * @param ${myEntityVariableName} The entity of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param loadReferrerOption The option of load-referrer. (NotNull)
      * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
@@ -582,7 +582,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #set ($keyJavaNative = "${referrerColumn.javaNative}")
 #if ($table.isAvailableLoadReferrerByOldOption())
     /**
-     * {Refer to overload method that has an argument of condition-bean setupper.}
+     * {Refer to overload method that has an argument of condition-bean setupper.} #beforejava8
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param loadReferrerOption The option of load-referrer. (NotNull)
      * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
@@ -632,7 +632,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #set ($keyJavaNative = "java.util.Map<String, Object>")
 #if ($table.isAvailableLoadReferrerByOldOption())
     /**
-     * {Refer to overload method that has an argument of condition-bean setupper.}
+     * {Refer to overload method that has an argument of condition-bean setupper.} #beforejava8
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param loadReferrerOption The option of load-referrer. (NotNull)
      * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)

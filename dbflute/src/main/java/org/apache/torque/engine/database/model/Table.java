@@ -3110,6 +3110,13 @@ public class Table {
     }
 
     // ===================================================================================
+    //                                                           ConditionQuery Adjustment
+    //                                                           =========================
+    public boolean isMakeConditionQueryPlainListManualOrder() {
+        return getLittleAdjustmentProperties().isMakeConditionQueryPlainListManualOrder();
+    }
+
+    // ===================================================================================
     //                                                               Adding Schema/Catalog
     //                                                               =====================
     protected boolean isAvailableAddingSchemaToTableSqlName() {
