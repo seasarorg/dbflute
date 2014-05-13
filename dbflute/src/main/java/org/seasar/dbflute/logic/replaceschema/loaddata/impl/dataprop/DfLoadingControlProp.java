@@ -454,7 +454,7 @@ public class DfLoadingControlProp {
         if (isSpecifiedValidProperty(prop)) {
             return prop.trim().equalsIgnoreCase("true");
         }
-        return true; // default is checked
+        return false; // default is NO-trimming since 1.0.5F
     }
 
     // ===================================================================================
