@@ -122,7 +122,7 @@ public class DfOutsideSqlCollector {
         final DfLanguageDependency lang = basicProp.getLanguageDependency();
         final String secondaryDirectory = lang.convertToSecondaryOutsideSqlDirectory(sqlDirectory);
         final boolean foundSecondaryDirectory;
-        if (!sqlDirectory.equals(secondaryDirectory)) {
+        if (secondaryDirectory != null && !sqlDirectory.equals(secondaryDirectory)) {
             try {
                 outsideSqlPack.addAll(collectSqlFile(secondaryDirectory, sqlLocation));
             } catch (FileNotFoundException e) {
