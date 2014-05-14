@@ -171,7 +171,9 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
             assertionEx = e;
         }
         final DfTakeFinallyFinalInfo finalInfo = createFinalInfo(fireResult, assertionEx);
-        incrementSequenceToDataMax();
+        if (!finalInfo.isFailure()) { // because it might fail to create sequence
+            incrementSequenceToDataMax();
+        }
         return finalInfo;
     }
 
