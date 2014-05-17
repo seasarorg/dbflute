@@ -54,16 +54,16 @@ import org.seasar.framework.util.DisposableUtil;
 /**
  * @author ${database.classAuthor}
  */
-public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
+class ${glImplementedInvokerAssistant} extends InvokerAssistant {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected static final String[] DEFAULT_CLIENT_INVOKE_NAMES
-        = new String[] { "Page", "Action", "Controller", "ControllerImpl", "Task", "Test" };
+    protected val DEFAULT_CLIENT_INVOKE_NAMES: Array[String]
+        = Array[String]("Page", "Action", "Controller", "ControllerImpl", "Task", "Test");
 
-    protected static final String[] DEFAULT_BYPASS_INVOKE_NAMES
-        = new String[] { "Service", "ServiceImpl", "Facade", "FacadeImpl", "Logic", "LogicImpl" };
+    protected val DEFAULT_BYPASS_INVOKE_NAMES: Array[String]
+        = Array[String]("Service", "ServiceImpl", "Facade", "FacadeImpl", "Logic", "LogicImpl");
 
     // ===================================================================================
     //                                                                           Attribute
@@ -71,25 +71,34 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // -----------------------------------------------------
     //                                          DI Component
     //                                          ------------
-    protected DataSource _dataSource;
-    protected ${glDBFluteInitializer} _introduction;
+    protected var _dataSource: DataSource = null;
+    protected var _introduction: ${glDBFluteInitializer} = null;
 
     // -----------------------------------------------------
     //                                        Lazy Component
     //                                        --------------
-    protected volatile DBMetaProvider _dbmetaProvider;
-    protected volatile SqlClauseCreator _sqlClauseCreator;
-    protected volatile StatementFactory _statementFactory;
-    protected volatile TnBeanMetaDataFactory _beanMetaDataFactory;
-    protected volatile SqlAnalyzerFactory _sqlAnalyzerFactory;
-    protected volatile OutsideSqlExecutorFactory _outsideSqlExecutorFactory;
-    protected volatile SQLExceptionHandlerFactory _sqlExceptionHandlerFactory;
-    protected volatile SequenceCacheHandler _sequenceCacheHandler;
+    @volatile
+    protected var _dbmetaProvider: DBMetaProvider = null;
+    @volatile
+    protected var _sqlClauseCreator: SqlClauseCreator = null;
+    @volatile
+    protected var _statementFactory: StatementFactory = null;
+    @volatile
+    protected var _beanMetaDataFactory: TnBeanMetaDataFactory = null;
+    @volatile
+    protected var _sqlAnalyzerFactory: SqlAnalyzerFactory = null;
+    @volatile
+    protected var _outsideSqlExecutorFactory: OutsideSqlExecutorFactory = null;
+    @volatile
+    protected var _sqlExceptionHandlerFactory: SQLExceptionHandlerFactory = null;
+    @volatile
+    protected var _sequenceCacheHandler: SequenceCacheHandler = null;
 
     // -----------------------------------------------------
     //                                       Disposable Flag
     //                                       ---------------
-    protected volatile boolean _disposable;
+    @volatile
+    protected var _disposable: Boolean = false;
 
     // ===================================================================================
     //                                                                 Assistant Main Work
@@ -97,29 +106,29 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // -----------------------------------------------------
     //                                         Current DBDef
     //                                         -------------
-    public DBDef assistCurrentDBDef() {
-        return ${glDBCurrent}.getInstance().currentDBDef();
+    def assistCurrentDBDef(): DBDef = {
+        return ${glDBCurrent}.currentDBDef();
     }
 
     // -----------------------------------------------------
     //                                           Data Source
     //                                           -----------
-    public DataSource assistDataSource() { // DI component
+    def assistDataSource(): DataSource = { // DI component
         // this instance will be cached in SQL executions
         // so the handler should be set before initialization of DBFlute
         // (and it means you cannot switch data source after initialization)
-        DataSourceHandler handler = ${glDBFluteConfig}.getInstance().getDataSourceHandler();
-        return handler != null ? new HandlingDataSourceWrapper(_dataSource, handler) : _dataSource;
+        val handler: DataSourceHandler = ${glDBFluteConfig}.getDataSourceHandler();
+        return if (handler != null) { new HandlingDataSourceWrapper(_dataSource, handler) } else { _dataSource };
     }
 
     // -----------------------------------------------------
     //                                       DBMeta Provider
     //                                       ---------------
-    public DBMetaProvider assistDBMetaProvider() { // lazy component
+    def assistDBMetaProvider(): DBMetaProvider = { // lazy component
         if (_dbmetaProvider != null) {
             return _dbmetaProvider;
         }
-        synchronized (this) {
+        this.synchronized {
             if (_dbmetaProvider != null) {
                 return _dbmetaProvider;
             }
@@ -128,18 +137,18 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         return _dbmetaProvider;
     }
 
-    protected DBMetaProvider createDBMetaProvider() {
+    protected def createDBMetaProvider(): DBMetaProvider = {
         return ${glDBMetaInstanceHandler}.getProvider();
     }
 
     // -----------------------------------------------------
     //                                    SQL Clause Creator
     //                                    ------------------
-    public SqlClauseCreator assistSqlClauseCreator() { // lazy component
+    def assistSqlClauseCreator(): SqlClauseCreator = { // lazy component
         if (_sqlClauseCreator != null) {
             return _sqlClauseCreator;
         }
-        synchronized (this) {
+        this.synchronized {
             if (_sqlClauseCreator != null) {
                 return _sqlClauseCreator;
             }
@@ -148,8 +157,8 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         return _sqlClauseCreator;
     }
 
-    protected SqlClauseCreator createSqlClauseCreator() {
-        SqlClauseCreator creator = ${glDBFluteConfig}.getInstance().getSqlClauseCreator();
+    protected def createSqlClauseCreator(): SqlClauseCreator = {
+        val creator: SqlClauseCreator = ${glDBFluteConfig}.getSqlClauseCreator();
         if (creator != null) {
             return creator;
         }
@@ -159,11 +168,11 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // -----------------------------------------------------
     //                                     Statement Factory
     //                                     -----------------
-    public StatementFactory assistStatementFactory() { // lazy component
+    def assistStatementFactory(): StatementFactory = { // lazy component
         if (_statementFactory != null) {
             return _statementFactory;
         }
-        synchronized (this) {
+        this.synchronized {
             if (_statementFactory != null) {
                 return _statementFactory;
             }
@@ -172,22 +181,22 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         return _statementFactory;
     }
 
-    protected StatementFactory createStatementFactory() {
-        final TnStatementFactoryImpl factory = new TnStatementFactoryImpl();
+    protected def createStatementFactory(): StatementFactory = {
+        val factory: TnStatementFactoryImpl = new TnStatementFactoryImpl();
         factory.setDefaultStatementConfig(assistDefaultStatementConfig());
-        factory.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
-        factory.setCursorSelectFetchSize(${glDBFluteConfig}.getInstance().getCursorSelectFetchSize());
+        factory.setInternalDebug(${glDBFluteConfig}.isInternalDebug());
+        factory.setCursorSelectFetchSize(${glDBFluteConfig}.getCursorSelectFetchSize());
         return factory;
     }
 
     // -----------------------------------------------------
     //                                Bean Meta Data Factory
     //                                ----------------------
-    public TnBeanMetaDataFactory assistBeanMetaDataFactory() { // lazy component
+    def assistBeanMetaDataFactory(): TnBeanMetaDataFactory = { // lazy component
         if (_beanMetaDataFactory != null) {
             return _beanMetaDataFactory;
         }
-        synchronized (this) {
+        this.synchronized {
             if (_beanMetaDataFactory != null) {
                 return _beanMetaDataFactory;
             }
@@ -196,10 +205,10 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         return _beanMetaDataFactory;
     }
 
-    protected TnBeanMetaDataFactory createBeanMetaDataFactory() {
-        final TnBeanMetaDataFactoryExtension factory = new TnBeanMetaDataFactoryExtension();
+    protected def createBeanMetaDataFactory(): TnBeanMetaDataFactory = {
+        val factory: TnBeanMetaDataFactoryExtension = new TnBeanMetaDataFactoryExtension();
         factory.setDataSource(_dataSource);
-        factory.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
+        factory.setInternalDebug(${glDBFluteConfig}.isInternalDebug());
         return factory;
     }
 
@@ -209,11 +218,11 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     /**
      * {@inheritDoc}
      */
-    public SqlAnalyzerFactory assistSqlAnalyzerFactory() { // lazy component
+    def assistSqlAnalyzerFactory(): SqlAnalyzerFactory = { // lazy component
         if (_sqlAnalyzerFactory != null) {
             return _sqlAnalyzerFactory;
         }
-        synchronized (this) {
+        this.synchronized {
             if (_sqlAnalyzerFactory != null) {
                 return _sqlAnalyzerFactory;
             }
@@ -222,7 +231,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         return _sqlAnalyzerFactory;
     }
 
-    protected SqlAnalyzerFactory createSqlAnalyzerFactory() {
+    protected def createSqlAnalyzerFactory(): SqlAnalyzerFactory = {
         return new DefaultSqlAnalyzerFactory();
     }
 
@@ -232,11 +241,11 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     /**
      * {@inheritDoc}
      */
-    public OutsideSqlExecutorFactory assistOutsideSqlExecutorFactory() {
+    def assistOutsideSqlExecutorFactory(): OutsideSqlExecutorFactory = {
         if (_outsideSqlExecutorFactory != null) {
             return _outsideSqlExecutorFactory;
         }
-        synchronized (this) {
+        this.synchronized {
             if (_outsideSqlExecutorFactory != null) {
                 return _outsideSqlExecutorFactory;
             }
@@ -245,8 +254,8 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         return _outsideSqlExecutorFactory;
     }
 
-    protected OutsideSqlExecutorFactory createOutsideSqlExecutorFactory() {
-        OutsideSqlExecutorFactory factory = ${glDBFluteConfig}.getInstance().getOutsideSqlExecutorFactory();
+    protected def createOutsideSqlExecutorFactory(): OutsideSqlExecutorFactory = {
+        val factory: OutsideSqlExecutorFactory = ${glDBFluteConfig}.getOutsideSqlExecutorFactory();
         if (factory != null) {
             return factory;
         }
@@ -259,8 +268,8 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     /**
      * {@inheritDoc}
      */
-    public SQLExceptionDigger assistSQLExceptionDigger() {
-        return ${glDBFluteConfig}.getInstance().getSQLExceptionDigger();
+    def assistSQLExceptionDigger(): SQLExceptionDigger = {
+        return ${glDBFluteConfig}.getSQLExceptionDigger();
     }
 
     // -----------------------------------------------------
@@ -269,11 +278,11 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     /**
      * {@inheritDoc}
      */
-    public SQLExceptionHandlerFactory assistSQLExceptionHandlerFactory() { // lazy component
+    def assistSQLExceptionHandlerFactory(): SQLExceptionHandlerFactory = { // lazy component
         if (_sqlExceptionHandlerFactory != null) {
             return _sqlExceptionHandlerFactory;
         }
-        synchronized (this) {
+        this.synchronized {
             if (_sqlExceptionHandlerFactory != null) {
                 return _sqlExceptionHandlerFactory;
             }
@@ -282,7 +291,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         return _sqlExceptionHandlerFactory;
     }
 
-    protected SQLExceptionHandlerFactory createSQLExceptionHandlerFactory() {
+    protected def createSQLExceptionHandlerFactory(): SQLExceptionHandlerFactory = {
         return new DefaultSQLExceptionHandlerFactory();
     }
 
@@ -292,11 +301,11 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     /**
      * {@inheritDoc}
      */
-    public SequenceCacheHandler assistSequenceCacheHandler() { // lazy component
+    def assistSequenceCacheHandler(): SequenceCacheHandler = { // lazy component
         if (_sequenceCacheHandler != null) {
             return _sequenceCacheHandler;
         }
-        synchronized (this) {
+        this.synchronized {
             if (_sequenceCacheHandler != null) {
                 return _sequenceCacheHandler;
             }
@@ -305,87 +314,87 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         return _sequenceCacheHandler;
     }
 
-    protected SequenceCacheHandler createSequenceCacheHandler() {
-        SequenceCacheHandler handler = new SequenceCacheHandler();
-        SequenceCacheKeyGenerator generator = ${glDBFluteConfig}.getInstance().getSequenceCacheKeyGenerator();
+    protected def createSequenceCacheHandler(): SequenceCacheHandler = {
+        val handler: SequenceCacheHandler = new SequenceCacheHandler();
+        val generator: SequenceCacheKeyGenerator = ${glDBFluteConfig}.getSequenceCacheKeyGenerator();
         if (generator != null) {
             handler.setSequenceCacheKeyGenerator(generator);
         }
-        handler.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
+        handler.setInternalDebug(${glDBFluteConfig}.isInternalDebug());
         return handler;
     }
 
     // -----------------------------------------------------
     //                                     SQL File Encoding
     //                                     -----------------
-    public String assistSqlFileEncoding() {
+    def assistSqlFileEncoding(): String = {
         return "${database.sqlFileEncoding}";
     }
 
     // -----------------------------------------------------
     //                               Statement Configuration
     //                               -----------------------
-    public StatementConfig assistDefaultStatementConfig() {
-        return ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
+    def assistDefaultStatementConfig(): StatementConfig = {
+        return ${glDBFluteConfig}.getDefaultStatementConfig();
     }
 
     // -----------------------------------------------------
     //                            Behavior Exception Thrower
     //                            --------------------------
-    public BehaviorExceptionThrower assistBehaviorExceptionThrower() {
+    def assistBehaviorExceptionThrower(): BehaviorExceptionThrower = {
         return new BehaviorExceptionThrower();
     }
 
     // -----------------------------------------------------
     //                                 Geared Cipher Manager
     //                                 ---------------------
-    public GearedCipherManager assistGearedCipherManager() {
-        return ${glDBFluteConfig}.getInstance().getGearedCipherManager();
+    def assistGearedCipherManager(): GearedCipherManager = {
+        return ${glDBFluteConfig}.getGearedCipherManager();
     }
 
     // -----------------------------------------------------
     //                                    Resource Parameter
     //                                    ------------------
-    public ResourceParameter assistResourceParameter() {
-        ResourceParameter resourceParameter = new ResourceParameter();
-        resourceParameter.setOutsideSqlPackage(${glDBFluteConfig}.getInstance().getOutsideSqlPackage());
-        resourceParameter.setLogDateFormat(${glDBFluteConfig}.getInstance().getLogDateFormat());
-        resourceParameter.setLogTimestampFormat(${glDBFluteConfig}.getInstance().getLogTimestampFormat());
-        resourceParameter.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
+    def assistResourceParameter(): ResourceParameter = {
+        val resourceParameter: ResourceParameter = new ResourceParameter();
+        resourceParameter.setOutsideSqlPackage(${glDBFluteConfig}.getOutsideSqlPackage());
+        resourceParameter.setLogDateFormat(${glDBFluteConfig}.getLogDateFormat());
+        resourceParameter.setLogTimestampFormat(${glDBFluteConfig}.getLogTimestampFormat());
+        resourceParameter.setInternalDebug(${glDBFluteConfig}.isInternalDebug());
         return resourceParameter;
     }
 
     // -----------------------------------------------------
     //                                          Invoke Names
     //                                          ------------
-    public String[] assistClientInvokeNames() {
+    def assistClientInvokeNames(): Array[String] = {
         return DEFAULT_CLIENT_INVOKE_NAMES;
     }
 
-    public String[] assistByPassInvokeNames() {
+    def assistByPassInvokeNames(): Array[String] = {
         return DEFAULT_BYPASS_INVOKE_NAMES;
     }
 
     // ===================================================================================
     //                                                                             Dispose
     //                                                                             =======
-    public void toBeDisposable(final DisposableProcess callerProcess) { // for HotDeploy
+    def toBeDisposable(callerProcess: InvokerAssistant.DisposableProcess): Unit = { // for HotDeploy
 #if ($database.isTargetContainerSeasar())
         if (_disposable) {
             return;
         }
-        synchronized (this) {
+        this.synchronized {
             if (_disposable) {
                 return;
             }
             DisposableUtil.add(new Disposable() {
-                public void dispose() {
+                def dispose(): Unit = {
                     callerProcess.dispose();
                     _disposable = false;
                 }
             });
             DisposableUtil.add(new Disposable() {
-                public void dispose() {
+                def dispose(): Unit = {
                     DfBeanDescFactory.clear();
                 }
             });
@@ -396,14 +405,14 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
 #end
     }
 
-    public boolean isDisposable() {
+    def isDisposable(): Boolean = {
         return _disposable;
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setDataSource(DataSource dataSource) {
+    def setDataSource(dataSource: DataSource): Unit = {
         _dataSource = dataSource;
     }
 
@@ -415,7 +424,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
 #if ($database.isTargetContainerSeasar())
     @Binding(bindingType=BindingType.MUST)
 #end
-    public void setIntroduction(${glDBFluteInitializer} introduction) {
+    def setIntroduction(introduction: ${glDBFluteInitializer}): Unit = {
         _introduction = introduction;
     }
 }

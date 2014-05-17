@@ -49,7 +49,7 @@ object ${glDBCurrent} {
 		    _log.info("...Setting currentDBDef: " + currentDBDef);
 		}
 		if (currentDBDef == null) {
-		    val msg = "The argument 'currentDBDef' should not be null!";
+		    val msg: String = "The argument 'currentDBDef' should not be null!";
 		    throw new IllegalArgumentException(msg);
 		}
         _currentDBDef = currentDBDef;

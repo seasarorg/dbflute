@@ -15,6 +15,8 @@
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+import scala.collection.JavaConverters._
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
@@ -32,43 +34,37 @@ import org.seasar.dbflute.util.DfAssertUtil;
  * The handler of the instance of DB meta.
  * @author ${database.classAuthor}
  */
-public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
+object ${glDBMetaInstanceHandler} extends DBMetaProvider {
 
     // ===================================================================================
     //                                                                        Resource Map
     //                                                                        ============
     /** The map of DB meta instance by key: table DB-name. */
-    protected static final Map<String, DBMeta> _tableDbNameInstanceMap = newHashMap();
+    protected val _tableDbNameInstanceMap: Map[String, DBMeta] = new HashMap();
 
     /** The map of DB meta instance by key: entity type. */
-    protected static final Map<Class<?>, DBMeta> _entityTypeInstanceMap = newHashMap();
+    protected val _entityTypeInstanceMap: Map[Class[_], DBMeta] = new HashMap();
 
     /** The map of table DB name and DB meta class name. */
-    protected static final Map<String, String> _tableDbNameClassNameMap;
-    static {
-        final Map<String, String> tmpMap = newHashMap();
+    protected var _tableDbNameClassNameMap: Map[String, String] = null;
+    val tmpMap: Map[String, String] = new HashMap();
 #foreach ($table in $database.tables)
-        tmpMap.put("${table.tableDbName}", "${table.DBMetaFullClassName}");
+    tmpMap.put("${table.tableDbName}", "${table.DBMetaFullClassName}");
 #end
-        _tableDbNameClassNameMap = Collections.unmodifiableMap(tmpMap);
-    }
+    _tableDbNameClassNameMap = Collections.unmodifiableMap(tmpMap);
 
     /** The flexible map of table DB name. This is for conversion at finding. */
-    protected static final Map<String, String> _tableDbNameFlexibleMap = StringKeyMap.createAsFlexible();
-    static {
-        final Set<String> tableDbNameSet = _tableDbNameClassNameMap.keySet();
-        for (String tableDbName : tableDbNameSet) {
-            _tableDbNameFlexibleMap.put(tableDbName, tableDbName);
-        }
-    }
+    protected val _tableDbNameFlexibleMap: Map[String, String] = StringKeyMap.createAsFlexible();
+    val tableDbNameSet: Set[String] = _tableDbNameClassNameMap.keySet();
+    tableDbNameSet.asScala.foreach(tableDbName => _tableDbNameFlexibleMap.put(tableDbName, tableDbName))
 
     /**
      * Get the unmodifiable map of DB meta.
      * @return The unmodifiable map that contains all instances of DB meta. (NotNull & NotEmpty)
      */
-    public static Map<String, DBMeta> getUnmodifiableDBMetaMap() {
+    def getUnmodifiableDBMetaMap(): Map[String, DBMeta] = {
         initializeDBMetaMap();
-        synchronized (_tableDbNameInstanceMap) {
+        _tableDbNameInstanceMap.synchronized {
             return Collections.unmodifiableMap(_tableDbNameInstanceMap);
         }
     }
@@ -76,48 +72,45 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     /**
      * Initialize the map of DB meta.
      */
-    protected static void initializeDBMetaMap() {
+    protected def initializeDBMetaMap(): Unit = {
         if (isInitialized()) {
             return;
         }
-        synchronized (_tableDbNameInstanceMap) {
-            for (String tableDbName : _tableDbNameClassNameMap.keySet()) {
-                findDBMeta(tableDbName); // initialize
-            }
+        _tableDbNameInstanceMap.synchronized {
+            _tableDbNameClassNameMap.keySet().asScala.foreach(tableDbName => findDBMeta(tableDbName)); // initialize
             if (!isInitialized()) {
-                String msg = "Failed to initialize tableDbNameInstanceMap:";
-                msg = msg + " tableDbNameInstanceMap=" + _tableDbNameInstanceMap;
+                val msg: String = "Failed to initialize tableDbNameInstanceMap: " + _tableDbNameInstanceMap;
                 throw new IllegalStateException(msg);
             }
         }
     }
 
-    protected static boolean isInitialized() {
+    protected def isInitialized(): Boolean = {
         return _tableDbNameInstanceMap.size() == _tableDbNameClassNameMap.size();
     }
 
     // ===================================================================================
     //                                                                  Provider Singleton
     //                                                                  ==================
-    protected static final DBMetaProvider _provider = new ${glDBMetaInstanceHandler}();
+    protected val _provider: DBMetaProvider = this;
 
-    public static DBMetaProvider getProvider() {
+    def getProvider(): DBMetaProvider = {
         return _provider;
     }
 
-    public DBMeta provideDBMeta(String tableFlexibleName) {
+    def provideDBMeta(tableFlexibleName: String): DBMeta = {
         return byTableFlexibleName(tableFlexibleName);
     }
 
-    public DBMeta provideDBMeta(Class<?> entityType) {
+    def provideDBMeta(entityType: Class[_]): DBMeta = {
         return byEntityType(entityType);
     }
 
-    public DBMeta provideDBMetaChecked(String tableFlexibleName) {
+    def provideDBMetaChecked(tableFlexibleName: String): DBMeta = {
         return findDBMeta(tableFlexibleName);
     }
 
-    public DBMeta provideDBMetaChecked(Class<?> entityType) {
+    def provideDBMetaChecked(entityType: Class[_]): DBMeta = {
         return findDBMeta(entityType);
     }
 
@@ -130,10 +123,10 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
      * @return The instance of DB meta. (NotNull)
      * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
      */
-    public static DBMeta findDBMeta(String tableFlexibleName) {
-        DBMeta dbmeta = byTableFlexibleName(tableFlexibleName);
+    def findDBMeta(tableFlexibleName: String): DBMeta = {
+        val dbmeta: DBMeta = byTableFlexibleName(tableFlexibleName);
         if (dbmeta == null) {
-            String msg = "The DB meta was not found by the table flexible name: key=" + tableFlexibleName;
+            val msg: String = "The DB meta was not found by the table flexible name: key=" + tableFlexibleName;
             throw new DBMetaNotFoundException(msg);
         }
         return dbmeta;
@@ -145,35 +138,35 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
      * @return The instance of DB meta. (NotNull)
      * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
      */
-    public static DBMeta findDBMeta(Class<?> entityType) {
-        DBMeta dbmeta = byEntityType(entityType);
+    def findDBMeta(entityType: Class[_]): DBMeta = {
+        val dbmeta: DBMeta = byEntityType(entityType);
         if (dbmeta == null) {
-            String msg = "The DB meta was not found by the entity type: key=" + entityType;
+            val msg: String = "The DB meta was not found by the entity type: key=" + entityType;
             throw new DBMetaNotFoundException(msg);
         }
         return dbmeta;
     }
 
     // ===================================================================================
-    //                                                                       By Table Name
+    //                                                                       by Table Name
     //                                                                       =============
     /**
      * @param tableFlexibleName The flexible name of table. (NotNull)
      * @return The instance of DB meta. (NullAllowed: If the DB meta is not found, it returns null)
      */
-    protected static DBMeta byTableFlexibleName(String tableFlexibleName) {
+    protected def byTableFlexibleName(tableFlexibleName: String): DBMeta = {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
-        String tableDbName = _tableDbNameFlexibleMap.get(tableFlexibleName);
+        var tableDbName: String = _tableDbNameFlexibleMap.get(tableFlexibleName);
         if (tableDbName == null) {
             tableDbName = retryByNormalizedName(tableFlexibleName);
         }
-        return tableDbName != null ? byTableDbName(tableDbName) : null;
+        return if (tableDbName != null) { byTableDbName(tableDbName) } else { null };
     }
 
-    protected static String retryByNormalizedName(String tableFlexibleName) {
-        String tableDbName = null;
-        String pureName = normalizeTableFlexibleName(tableFlexibleName);
-        String schema = extractSchemaIfExists(tableFlexibleName);
+    protected def retryByNormalizedName(tableFlexibleName: String): String = {
+        var tableDbName: String = null;
+        val pureName: String = normalizeTableFlexibleName(tableFlexibleName);
+        val schema: String = extractSchemaIfExists(tableFlexibleName);
         if (schema != null) { // first, find by qualified name
             tableDbName = _tableDbNameFlexibleMap.get(schema + "." + pureName);
         }
@@ -183,11 +176,11 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
         return tableDbName;
     }
 
-    protected static String normalizeTableFlexibleName(String tableFlexibleName) {
+    protected def normalizeTableFlexibleName(tableFlexibleName: String): String = {
         return removeQuoteIfExists(removeSchemaIfExists(tableFlexibleName));
     }
 
-    protected static String removeQuoteIfExists(String name) {
+    protected def removeQuoteIfExists(name: String): String = {
         if (name.startsWith("\"") && name.endsWith("\"")) {
             return strip(name);
         } else if (name.startsWith("[") && name.endsWith("]")) {
@@ -196,17 +189,17 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
         return name;
     }
 
-    protected static String removeSchemaIfExists(String name) {
-        int dotLastIndex = name.lastIndexOf(".");
-        return dotLastIndex >= 0 ? name.substring(dotLastIndex + ".".length()) : name; 
+    protected def removeSchemaIfExists(name: String): String = {
+        val dotLastIndex: Integer = name.lastIndexOf(".");
+        return if (dotLastIndex >= 0) { name.substring(dotLastIndex + ".".length()) } else { name }; 
     }
 
-    protected static String extractSchemaIfExists(String name) {
-        int dotLastIndex = name.lastIndexOf(".");
-        return dotLastIndex >= 0 ? name.substring(0, dotLastIndex) : null; 
+    protected def extractSchemaIfExists(name: String): String = {
+        val dotLastIndex: Integer = name.lastIndexOf(".");
+        return if (dotLastIndex >= 0) { name.substring(0, dotLastIndex) } else { null }; 
     }
 
-    protected static String strip(String name) {
+    protected def strip(name: String): String = {
         return name.substring(1, name.length() - 1);
     }
 
@@ -214,19 +207,19 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
      * @param tableDbName The DB name of table. (NotNull)
      * @return The instance of DB meta. (NullAllowed: If the DB meta is not found, it returns null)
      */
-    protected static DBMeta byTableDbName(String tableDbName) {
+    protected def byTableDbName(tableDbName: String): DBMeta = {
         assertStringNotNullAndNotTrimmedEmpty("tableDbName", tableDbName);
         return getCachedDBMeta(tableDbName);
     }
 
     // ===================================================================================
-    //                                                                      By Entity Type
+    //                                                                      by Entity Type
     //                                                                      ==============
     /**
      * @param entityType The entity type of table, which should implement the entity interface. (NotNull)
      * @return The instance of DB meta. (NullAllowed: If the DB meta is not found, it returns null)
      */
-    protected static DBMeta byEntityType(Class<?> entityType) {
+    protected def byEntityType(entityType: Class[_]): DBMeta = {
         assertObjectNotNull("entityType", entityType);
         return getCachedDBMeta(entityType);
     }
@@ -234,52 +227,55 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     // ===================================================================================
     //                                                                       Cached DBMeta
     //                                                                       =============
-    protected static DBMeta getCachedDBMeta(String tableDbName) { // lazy-load (thank you koyak!)
-        DBMeta dbmeta = _tableDbNameInstanceMap.get(tableDbName);
+    protected def getCachedDBMeta(tableDbName: String): DBMeta = { // lazy-load (thank you koyak!)
+        var dbmeta: DBMeta = _tableDbNameInstanceMap.get(tableDbName);
         if (dbmeta != null) {
             return dbmeta;
         }
-        synchronized (_tableDbNameInstanceMap) {
+        _tableDbNameInstanceMap.synchronized {
             dbmeta = _tableDbNameInstanceMap.get(tableDbName);
             if (dbmeta != null) {
                 // an other thread might have initialized
                 // or reading might failed by same-time writing
                 return dbmeta;
             }
-            String dbmetaName = _tableDbNameClassNameMap.get(tableDbName);
+            val dbmetaName: String = _tableDbNameClassNameMap.get(tableDbName);
             if (dbmetaName == null) {
                 return null;
             }
-            _tableDbNameInstanceMap.put(tableDbName, getDBMeta(dbmetaName));
+            _tableDbNameInstanceMap.put(tableDbName, toDBMetaInstance(dbmetaName));
             return _tableDbNameInstanceMap.get(tableDbName);
         }
     }
 
-    protected static DBMeta getDBMeta(String className) {
+    protected def toDBMetaInstance(dbmetaName: String): DBMeta = {
         try {
-            Class<?> clazz = Class.forName(className);
-            Method methoz = clazz.getMethod("getInstance", (Class[])null);
-            Object result = methoz.invoke(null, (Object[])null);
-            return (DBMeta)result;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get the instance: " + className, e);
+            val dbmetaType: Class[_] = Class.forName(dbmetaName);
+            val field: Field = dbmetaType.getField("MODULE$");
+            val result: Object = field.get(null);
+            return result.asInstanceOf[DBMeta];
+        } catch {
+            case e: Exception => {
+                val msg: String = "Failed to get the instance: " + dbmetaName;
+                throw new IllegalStateException(msg, e);
+            }
         }
     }
 
-    protected static DBMeta getCachedDBMeta(Class<?> entityType) { // lazy-load same as by-name
-        DBMeta dbmeta = _entityTypeInstanceMap.get(entityType);
+    protected def getCachedDBMeta(entityType: Class[_]): DBMeta = { // lazy-load same as by-name
+        var dbmeta: DBMeta = _entityTypeInstanceMap.get(entityType);
         if (dbmeta != null) {
             return dbmeta;
         }
-        synchronized (_entityTypeInstanceMap) {
+        _entityTypeInstanceMap.synchronized {
             dbmeta = _entityTypeInstanceMap.get(entityType);
             if (dbmeta != null) {
                 // an other thread might have initialized
                 // or reading might failed by same-time writing
                 return dbmeta;
             }
-            if (Entity.class.isAssignableFrom(entityType)) { // required
-                Entity entity = newEntity(entityType);
+            if (classOf[Entity].isAssignableFrom(entityType)) { // required
+                val entity: Entity = newEntity(entityType);
                 dbmeta = getCachedDBMeta(entity.getTableDbName());
             }
             if (dbmeta == null) {
@@ -290,32 +286,31 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
         }
     }
 
-    protected static Entity newEntity(Class<?> entityType) {
+    protected def newEntity(entityType: Class[_]): Entity = {
         try {
-            return (Entity)entityType.newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to new the instance: " + entityType, e);
+            return entityType.newInstance().asInstanceOf[Entity];
+        } catch {
+            case e: Exception => {
+                val msg: String = "Failed to new the instance: " + entityType;
+                throw new IllegalStateException(msg, e);
+            }
         }
     }
 
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected static <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
-        return new HashMap<KEY, VALUE>();
-    }
-
     // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------
-    protected static void assertObjectNotNull(String variableName, Object value) {
+    protected def assertObjectNotNull(variableName: String, value: Object): Unit = {
         DfAssertUtil.assertObjectNotNull(variableName, value);
     }
 
     // -----------------------------------------------------
     //                                         Assert String
     //                                         -------------
-    protected static void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+    protected def assertStringNotNullAndNotTrimmedEmpty(variableName: String, value: String): Unit = {
         DfAssertUtil.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }
 }
