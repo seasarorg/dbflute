@@ -16,44 +16,40 @@
 ${database.allClassCopyright}package ${glPackageBaseCQ};
 
 #set ($myClassName = "${myAbstractBaseConditionQueryClassName}")
-import java.util.*;
+import java.lang.Long;
+import java.util._;
 
-import org.seasar.dbflute.cbean.*;
-import org.seasar.dbflute.cbean.chelper.*;
-import org.seasar.dbflute.cbean.ckey.*;
-import org.seasar.dbflute.cbean.coption.*;
+import org.seasar.dbflute.cbean._;
+import org.seasar.dbflute.cbean.AbstractConditionQuery._;
+import org.seasar.dbflute.cbean.chelper._;
+import org.seasar.dbflute.cbean.ckey._;
+import org.seasar.dbflute.cbean.coption._;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
-import ${glPackageBaseCommon}.*;
-import ${glPackageCB}.*;
-import ${glPackageCQ}.*;
+import ${glPackageBaseCommon}._;
+import ${glPackageCB}._;
+import ${glPackageCQ}._;
 
 /**
  * The abstract condition-query of ${table.tableDbName}.
  * @author ${database.classAuthor}
  */
-public abstract class ${myClassName} extends AbstractConditionQuery {
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    public ${myClassName}(ConditionQuery referrerQuery, SqlClause sqlClause, String aliasName, int nestLevel) {
-        super(referrerQuery, sqlClause, aliasName, nestLevel);
-    }
+abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasName: String, nestLevel: Integer)
+        extends AbstractConditionQuery(referrerQuery, sqlClause, aliasName, nestLevel) {
 
     // ===================================================================================
     //                                                                     DBMeta Provider
     //                                                                     ===============
     @Override
-    protected DBMetaProvider xgetDBMetaProvider() {
+    protected def xgetDBMetaProvider(): DBMetaProvider = {
         return ${glDBMetaInstanceHandler}.getProvider();
     }
 
     // ===================================================================================
     //                                                                          Table Name
     //                                                                          ==========
-    public String getTableDbName() {
+    def getTableDbName(): String = {
         return "${table.tableDbName}";
     }
 
@@ -71,7 +67,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (NullAllowed: if null (or empty), no condition)
      */
-    ${col.propertySettingModifier} void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    ${col.propertySettingModifier} def set${tmpJavaName}_Equal(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         doSet${tmpJavaName}_Equal(fRES(${tmpUncapitalisedJavaName}));
     }
 #if (${col.isAvailableStringEmptyString()})
@@ -80,7 +76,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Equal(=). As the empty-string. And OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      */
-    ${col.propertySettingModifier} void set${tmpJavaName}_Equal_EmptyString() {
+    ${col.propertySettingModifier} def set${tmpJavaName}_Equal_EmptyString(): Unit = {
         doSet${tmpJavaName}_Equal("");
     }
 #end
@@ -95,7 +91,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
+    def set${tmpJavaName}_Equal_As${col.classificationName}(cdef: ${glCDef}.${col.classificationName}): Unit = {
         doSet${tmpJavaName}_Equal(cdef != null ? cdef.code() : null);
     }
 #if ($classificationTop.isSisterBooleanHandling())
@@ -108,7 +104,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
      * @param determination The determination, true or false. (NullAllowed: if null, no condition)
      */
-    public void set${col.javaName}_Equal_AsBoolean(Boolean determination) {
+    def set${col.javaName}_Equal_AsBoolean(determination: Boolean): Unit = {
         set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(determination));
     }
 #end
@@ -121,13 +117,13 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($classificationElement.isDeprecated())
     @Deprecated
 #end
-    public void set${tmpJavaName}_Equal_${classificationElement.name}() {
+    def set${tmpJavaName}_Equal_${classificationElement.name}(): Unit = {
         set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
     }
 #end
 #end
 
-    protected void doSet${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    protected def doSet${tmpJavaName}_Equal(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
 #if ($database.isShortCharHandlingValid() && $col.isJdbcTypeChar())
         reg${tmpJavaName}(CK_EQ, hSC("${col.name}", ${tmpUncapitalisedJavaName}, ${col.columnSizeSettingExpression}, "${database.shortCharHandlingModeCode}"));
 #else
@@ -141,7 +137,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual. (NullAllowed: if null (or empty), no condition)
      */
-    ${col.propertySettingModifier} void set${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    ${col.propertySettingModifier} def set${tmpJavaName}_NotEqual(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         doSet${tmpJavaName}_NotEqual(fRES(${tmpUncapitalisedJavaName}));
     }
 #if (${col.isAvailableStringEmptyString()})
@@ -150,7 +146,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * NotEqual(&lt;&gt;). As the empty-string. And OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      */
-    ${col.propertySettingModifier} void set${tmpJavaName}_NotEqual_EmptyString() {
+    ${col.propertySettingModifier} def set${tmpJavaName}_NotEqual_EmptyString(): Unit = {
         doSet${tmpJavaName}_NotEqual("");
     }
 #end
@@ -165,7 +161,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
+    def set${tmpJavaName}_NotEqual_As${col.classificationName}(cdef: ${glCDef}.${col.classificationName}): Unit = {
         doSet${tmpJavaName}_NotEqual(cdef != null ? cdef.code() : null);
     }
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
@@ -177,13 +173,13 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($classificationElement.isDeprecated())
     @Deprecated
 #end
-    public void set${tmpJavaName}_NotEqual_${classificationElement.name}() {
+    def set${tmpJavaName}_NotEqual_${classificationElement.name}(): Unit = {
         set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
     }
 #end
 #end
 
-    protected void doSet${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    protected def doSet${tmpJavaName}_NotEqual(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
 #if ($database.isShortCharHandlingValid() && $col.isJdbcTypeChar())
         reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, hSC("${col.name}", ${tmpUncapitalisedJavaName}, ${col.columnSizeSettingExpression}, "${database.shortCharHandlingModeCode}"));
 #else
@@ -198,7 +194,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan. (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_GreaterThan(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_GreaterThan(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         reg${tmpJavaName}(CK_GT, fRES(${tmpUncapitalisedJavaName}));
     }
 #end
@@ -209,7 +205,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan. (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_LessThan($col.javaNative ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_LessThan(${tmpUncapitalisedJavaName}: $col.javaNative): Unit = {
         reg${tmpJavaName}(CK_LT, fRES(${tmpUncapitalisedJavaName}));
     }
 #end
@@ -220,7 +216,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual. (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_GreaterEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_GreaterEqual(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         reg${tmpJavaName}(CK_GE, fRES(${tmpUncapitalisedJavaName}));
     }
 #end
@@ -231,7 +227,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual. (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_LessEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_LessEqual(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         reg${tmpJavaName}(CK_LE, fRES(${tmpUncapitalisedJavaName}));
     }
 #end
@@ -242,7 +238,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    def set${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
         doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List);
     }
 #if ($col.hasClassification())
@@ -256,7 +252,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_InScope_As${col.classificationName}(Collection<${glCDef}.${col.classificationName}> cdefList) {
+    def set${tmpJavaName}_InScope_As${col.classificationName}(cdefList: Collection[${glCDef}.${col.classificationName}]): Unit = {
         doSet${tmpJavaName}_InScope(cTStrL(cdefList));
     }
 #foreach ($group in $classificationTop.groupList)
@@ -271,13 +267,13 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
      * ${group.buildElementDisp()}
      */
-    public void set${tmpJavaName}_InScope_${group.groupNameInitCap}() {
+    def set${tmpJavaName}_InScope_${group.groupNameInitCap}(): Unit = {
         set${tmpJavaName}_InScope_As${col.classificationName}(${glCDef}.${col.classificationName}.listOf${group.groupNameInitCap}());
     }
 #end
 #end
 
-    public void doSet${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    def doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
         regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
     }
 #end
@@ -288,7 +284,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope. (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    def set${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
         doSet${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List);
     }
 #if ($col.hasClassification())
@@ -302,12 +298,12 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_NotInScope_As${col.classificationName}(Collection<${glCDef}.${col.classificationName}> cdefList) {
+    def set${tmpJavaName}_NotInScope_As${col.classificationName}(cdefList: Collection[${glCDef}.${col.classificationName}]): Unit = {
         doSet${tmpJavaName}_NotInScope(cTStrL(cdefList));
     }
 #end
 
-    public void doSet${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    def doSet${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
         regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
     }
 #end
@@ -318,7 +314,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as prefixSearch. (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_PrefixSearch(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_PrefixSearch(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}, cLSOP());
     }
 #end
@@ -331,7 +327,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch. (NullAllowed: if null (or empty), no condition)
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, LikeSearchOption likeSearchOption) {
+    def set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}: ${col.javaNative}, likeSearchOption: LikeSearchOption): Unit = {
         regLSQ(CK_LS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", likeSearchOption);
     }
 #end
@@ -344,7 +340,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notLikeSearch. (NullAllowed: if null (or empty), no condition)
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, LikeSearchOption likeSearchOption) {
+    def set${tmpJavaName}_NotLikeSearch(${tmpUncapitalisedJavaName}: ${col.javaNative}, likeSearchOption: LikeSearchOption): Unit = {
         regLSQ(CK_NLS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", likeSearchOption);
     }
 #end
@@ -377,14 +373,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
      */
-    public void exists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    def exists${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
         assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerExistsReferrer(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
@@ -416,14 +412,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
      */
-    public void notExists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    def notExists${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
         assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotExistsReferrer(cb.query(), "${col.name}", "${referrer.FirstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
 #end
 #end
 #if (${col.isInScopeRelationAllowedForeignKey()})
@@ -438,14 +434,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
-    public void inScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    def inScope${fk.foreignPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
         assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.inScopeRelationReferrers)
@@ -469,14 +465,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
-    public void inScope${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    def inScope${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
         assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
 #end
 #end
 #if (${col.isInScopeRelationAllowedForeignKey()})
@@ -491,14 +487,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
-    public void notInScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    def notInScope${fk.foreignPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
         assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.inScopeRelationReferrers)
@@ -522,14 +518,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
-    public void notInScope${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    def notInScope${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
         assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
@@ -540,14 +536,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 
-    public void xsderive${referrer.referrerPropertyNameInitCap}(String fn, SubQuery<${relatedCBClassName}> sq, String al, DerivedReferrerOption op) {
+    def xsderive${referrer.referrerPropertyNameInitCap}(fn: String, sq: SubQuery[${relatedCBClassName}], al: String, op: DerivedReferrerOption): Unit = {
         assertObjectNotNull("subQuery", sq);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this);
         try { lock(); sq.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerSpecifyDerivedReferrer(fn, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${referrer.referrerPropertyName}", al, op);
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
 #end
 #end
 #end
@@ -573,25 +569,25 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @return The object to set up a function for referrer table. (NotNull)
      */
-    public HpQDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
+    def derived${referrer.referrerPropertyNameInitCap}(): HpQDRFunction[${relatedCBClassName}] = {
         return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
     }
-    protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
+    protected def xcreateQDRFunction${referrer.referrerPropertyNameInitCap}(): HpQDRFunction[${relatedCBClassName}] = {
         return new HpQDRFunction<${relatedCBClassName}>(new HpQDRSetupper<${relatedCBClassName}>() {
-            public void setup(String fn, SubQuery<${relatedCBClassName}> sq, String rd, Object vl, DerivedReferrerOption op) {
+            def setup(fn: String, sq: SubQuery[${relatedCBClassName}], rd: String, vl: Object, op: DerivedReferrerOption): Unit = {
                 xqderive${referrer.referrerPropertyNameInitCap}(fn, sq, rd, vl, op);
             }
         });
     }
-    public void xqderive${referrer.referrerPropertyNameInitCap}(String fn, SubQuery<${relatedCBClassName}> sq, String rd, Object vl, DerivedReferrerOption op) {
+    def xqderive${referrer.referrerPropertyNameInitCap}(fn: String, sq: SubQuery[${relatedCBClassName}], rd: String, vl: Object, op: DerivedReferrerOption): Unit = {
         assertObjectNotNull("subQuery", sq);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this);
         try { lock(); sq.query(cb); } finally { unlock(); }
-        String sqpp = keep${subQueryPropertyNameInitCap}(cb.query()); String prpp = keep${subQueryPropertyNameInitCap}Parameter(vl);
+        val sqpp: String = keep${subQueryPropertyNameInitCap}(cb.query()); String prpp = keep${subQueryPropertyNameInitCap}Parameter(vl);
         registerQueryDerivedReferrer(fn, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", sqpp, "${referrer.referrerPropertyName}", rd, vl, prpp, op);
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
-    public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object vl);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}Parameter(Object vl): String;
 #end
 #end
 #end
@@ -603,7 +599,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (NullAllowed: if null, no condition)
      */
-    ${col.propertySettingModifier} void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    ${col.propertySettingModifier} def set${tmpJavaName}_Equal(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         doSet${tmpJavaName}_Equal(${tmpUncapitalisedJavaName});
     }
 #if ($col.hasClassification())
@@ -617,8 +613,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
-        doSet${tmpJavaName}_Equal(cTNum(cdef != null ? cdef.code() : null, ${col.javaNative}.class));
+    def set${tmpJavaName}_Equal_As${col.classificationName}(cdef: ${glCDef}.${col.classificationName}): Unit = {
+        doSet${tmpJavaName}_Equal(cTNum(cdef != null ? cdef.code() : null, classOf[${col.javaNative}]));
     }
 #if ($classificationTop.isSisterBooleanHandling())
 
@@ -630,7 +626,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
      * @param determination The determination, true or false. (NullAllowed: if null, no condition)
      */
-    public void set${col.javaName}_Equal_AsBoolean(Boolean determination) {
+    def set${col.javaName}_Equal_AsBoolean(determination: Boolean): Unit = {
         set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(determination));
     }
 #end
@@ -643,13 +639,13 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($classificationElement.isDeprecated())
     @Deprecated
 #end
-    public void set${tmpJavaName}_Equal_${classificationElement.name}() {
+    def set${tmpJavaName}_Equal_${classificationElement.name}(): Unit = {
         set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
     }
 #end
 #end
 
-    protected void doSet${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    protected def doSet${tmpJavaName}_Equal(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
     }
 #if (${col.isAvailableNumberNotEqual()})
@@ -659,7 +655,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual. (NullAllowed: if null, no condition)
      */
-    ${col.propertySettingModifier} void set${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    ${col.propertySettingModifier} def set${tmpJavaName}_NotEqual(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         doSet${tmpJavaName}_NotEqual(${tmpUncapitalisedJavaName});
     }
 #if ($col.hasClassification())
@@ -673,8 +669,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
-        doSet${tmpJavaName}_NotEqual(cTNum(cdef != null ? cdef.code() : null, ${col.javaNative}.class));
+    def set${tmpJavaName}_NotEqual_As${col.classificationName}(cdef: ${glCDef}.${col.classificationName}): Unit = {
+        doSet${tmpJavaName}_NotEqual(cTNum(cdef != null ? cdef.code() : null, classOf[${col.javaNative}]));
     }
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
 
@@ -685,13 +681,13 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($classificationElement.isDeprecated())
     @Deprecated
 #end
-    public void set${tmpJavaName}_NotEqual_${classificationElement.name}() {
+    def set${tmpJavaName}_NotEqual_${classificationElement.name}(): Unit = {
         set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
     }
 #end
 #end
 
-    protected void doSet${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    protected def doSet${tmpJavaName}_NotEqual(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, ${tmpUncapitalisedJavaName});
     }
 #end
@@ -702,7 +698,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan. (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_GreaterThan(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_GreaterThan(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         reg${tmpJavaName}(CK_GT, ${tmpUncapitalisedJavaName});
     }
 #end
@@ -713,7 +709,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan. (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_LessThan(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_LessThan(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         reg${tmpJavaName}(CK_LT, ${tmpUncapitalisedJavaName});
     }
 #end
@@ -724,7 +720,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual. (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_GreaterEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_GreaterEqual(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         reg${tmpJavaName}(CK_GE, ${tmpUncapitalisedJavaName});
     }
 #end
@@ -735,7 +731,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual. (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_LessEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_LessEqual(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         reg${tmpJavaName}(CK_LE, ${tmpUncapitalisedJavaName});
     }
 #end
@@ -750,7 +746,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param maxNumber The max number of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      * @param rangeOfOption The option of range-of. (NotNull)
      */
-    public void set${tmpJavaName}_RangeOf(${col.javaNative} minNumber, ${col.javaNative} maxNumber, RangeOfOption rangeOfOption) {
+    def set${tmpJavaName}_RangeOf(minNumber: ${col.javaNative}, maxNumber: ${col.javaNative}, rangeOfOption: RangeOfOption): Unit = {
         regROO(minNumber, maxNumber, getCValue${tmpJavaName}(), "${col.name}", rangeOfOption);
     }
 #end
@@ -761,7 +757,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    def set${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
         doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List);
     }
 #if ($col.hasClassification())
@@ -775,8 +771,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_InScope_As${col.classificationName}(Collection<${glCDef}.${col.classificationName}> cdefList) {
-        doSet${tmpJavaName}_InScope(cTNumL(cdefList, ${col.javaNative}.class));
+    def set${tmpJavaName}_InScope_As${col.classificationName}(cdefList: Collection[${glCDef}.${col.classificationName}]): Unit = {
+        doSet${tmpJavaName}_InScope(cTNumL(cdefList, classOf[${col.javaNative}]));
     }
 #foreach ($group in $classificationTop.groupList)
 
@@ -790,13 +786,13 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
      * ${group.buildElementDisp()}
      */
-    public void set${tmpJavaName}_InScope_${group.groupNameInitCap}() {
+    def set${tmpJavaName}_InScope_${group.groupNameInitCap}(): Unit = {
         set${tmpJavaName}_InScope_As${col.classificationName}(${glCDef}.${col.classificationName}.listOf${group.groupNameInitCap}());
     }
 #end
 #end
 
-    protected void doSet${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    protected def doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
         regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
     }
 #end
@@ -807,7 +803,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope. (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    def set${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
         doSet${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List);
     }
 #if ($col.hasClassification())
@@ -821,12 +817,12 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_NotInScope_As${col.classificationName}(Collection<${glCDef}.${col.classificationName}> cdefList) {
-        doSet${tmpJavaName}_NotInScope(cTNumL(cdefList, ${col.javaNative}.class));
+    def set${tmpJavaName}_NotInScope_As${col.classificationName}(cdefList: Collection[${glCDef}.${col.classificationName}]): Unit = {
+        doSet${tmpJavaName}_NotInScope(cTNumL(cdefList, classOf[${col.javaNative}]));
     }
 #end
 
-    protected void doSet${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    protected def doSet${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
         regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
     }
 #end
@@ -859,14 +855,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
      */
-    public void exists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    def exists${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
         assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerExistsReferrer(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
@@ -898,14 +894,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
      */
-    public void notExists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    def notExists${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
         assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotExistsReferrer(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
 #end
 #end
 #if (${col.isInScopeRelationAllowedForeignKey()})
@@ -920,14 +916,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
-    public void inScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    def inScope${fk.foreignPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
         assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.inScopeRelationReferrers)
@@ -951,14 +947,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
-    public void inScope${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    def inScope${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
         assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
 #end
 #end
 #if (${col.isInScopeRelationAllowedForeignKey()})
@@ -973,14 +969,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
-    public void notInScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    def notInScope${fk.foreignPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
         assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotInScopeRelation(cb.query(), "${col.name}", "${col.foreignKey.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.inScopeRelationReferrers)
@@ -1004,14 +1000,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
-    public void notInScope${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    def notInScope${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
         assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
@@ -1022,14 +1018,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 
-    public void xsderive${referrer.referrerPropertyNameInitCap}(String fn, SubQuery<${relatedCBClassName}> sq, String al, DerivedReferrerOption op) {
+    def xsderive${referrer.referrerPropertyNameInitCap}(fn: String, sq: SubQuery[${relatedCBClassName}], al: String, op: DerivedReferrerOption): Unit = {
         assertObjectNotNull("subQuery", sq);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this);
         try { lock(); sq.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerSpecifyDerivedReferrer(fn, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${referrer.referrerPropertyName}", al, op);
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
 #end
 #end
 #end
@@ -1055,25 +1051,25 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @return The object to set up a function for referrer table. (NotNull)
      */
-    public HpQDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
+    def derived${referrer.referrerPropertyNameInitCap}(): HpQDRFunction[${relatedCBClassName}] = {
         return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
     }
-    protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
+    protected def xcreateQDRFunction${referrer.referrerPropertyNameInitCap}(): HpQDRFunction[${relatedCBClassName}] = {
         return new HpQDRFunction<${relatedCBClassName}>(new HpQDRSetupper<${relatedCBClassName}>() {
-            public void setup(String fn, SubQuery<${relatedCBClassName}> sq, String rd, Object vl, DerivedReferrerOption op) {
+            def setup(fn: String, sq: SubQuery[${relatedCBClassName}], rd: String, vl: Object, op: DerivedReferrerOption): Unit = {
                 xqderive${referrer.referrerPropertyNameInitCap}(fn, sq, rd, vl, op);
             }
         });
     }
-    public void xqderive${referrer.referrerPropertyNameInitCap}(String fn, SubQuery<${relatedCBClassName}> sq, String rd, Object vl, DerivedReferrerOption op) {
+    def xqderive${referrer.referrerPropertyNameInitCap}(fn: String, sq: SubQuery[${relatedCBClassName}], rd: String, vl: Object, op: DerivedReferrerOption): Unit = {
         assertObjectNotNull("subQuery", sq);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this);
         try { lock(); sq.query(cb); } finally { unlock(); }
-        String sqpp = keep${subQueryPropertyNameInitCap}(cb.query()); String prpp = keep${subQueryPropertyNameInitCap}Parameter(vl);
+        val sqpp: String = keep${subQueryPropertyNameInitCap}(cb.query()); String prpp = keep${subQueryPropertyNameInitCap}Parameter(vl);
         registerQueryDerivedReferrer(fn, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", sqpp, "${referrer.referrerPropertyName}", rd, vl, prpp, op);
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
-    public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object vl);
+    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}Parameter(Object vl): String;
 #end
 #end
 #end
@@ -1085,7 +1081,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_Equal($col.javaNative ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_Equal(${tmpUncapitalisedJavaName}: $col.javaNative): Unit = {
         reg${tmpJavaName}(CK_EQ, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
     }
 #if (${col.isAvailableDateNotEqual()})
@@ -1095,7 +1091,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual. (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_NotEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_NotEqual(${tmpUncapitalisedJavaName}: $col.javaNative): Unit = {
         reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
     }
 #end
@@ -1106,7 +1102,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan. (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_GreaterThan($col.javaNative ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_GreaterThan(${tmpUncapitalisedJavaName}: $col.javaNative): Unit = {
         reg${tmpJavaName}(CK_GT, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
     }
 #end
@@ -1117,7 +1113,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan. (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_LessThan($col.javaNative ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_LessThan(${tmpUncapitalisedJavaName}: $col.javaNative): Unit = {
         reg${tmpJavaName}(CK_LT, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
     }
 #end
@@ -1128,7 +1124,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual. (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_GreaterEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_GreaterEqual(${tmpUncapitalisedJavaName}: $col.javaNative): Unit = {
         reg${tmpJavaName}(CK_GE, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
     }
 #end
@@ -1139,7 +1135,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual. (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_LessEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_LessEqual(${tmpUncapitalisedJavaName}: $col.javaNative): Unit = {
         reg${tmpJavaName}(CK_LE,#if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
     }
 #end
@@ -1154,11 +1150,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      * @param fromToOption The option of from-to. (NotNull)
      */
-    public void set${tmpJavaName}_FromTo(Date fromDatetime, Date toDatetime, FromToOption fromToOption) {
+    def set${tmpJavaName}_FromTo(fromDatetime: Date, toDatetime: Date, fromToOption: FromToOption): Unit = {
 #if ($col.isJavaNativeUtilDate())
         regFTQ(fCTPD(fromDatetime), fCTPD(toDatetime), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
 #else
-        regFTQ((fromDatetime != null ? new ${col.javaNative}(fromDatetime.getTime()) : null), (toDatetime != null ? new ${col.javaNative}(toDatetime.getTime()) : null), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
+        regFTQ(if (fromDatetime != null) { new ${col.javaNative}(fromDatetime.getTime()) } else { null }, if (toDatetime != null) { new ${col.javaNative}(toDatetime.getTime()) } else { null }, getCValue${tmpJavaName}(), "${col.name}", fromToOption);
 #end
     }
 #end
@@ -1175,7 +1171,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param fromDate The from-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
      * @param toDate The to-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      */
-    public void set${tmpJavaName}_DateFromTo(Date fromDate, Date toDate) {
+    def set${tmpJavaName}_DateFromTo(fromDate: Date, toDate: Date): Unit = {
         set${tmpJavaName}_FromTo(fromDate, toDate, new FromToOption().compareAsDate());
     }
 #end
@@ -1186,11 +1182,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    def set${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
         doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List);
     }
 
-    protected void doSet${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    protected def doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
         regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
     }
 #end
@@ -1201,11 +1197,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope. (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    def set${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
         doSet${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List);
     }
 
-    protected void doSet${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    protected def doSet${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
         regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
     }
 #end
@@ -1217,7 +1213,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_Equal(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
     }
 #if ($col.hasClassification())
@@ -1230,7 +1226,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($classificationElement.isDeprecated())
     @Deprecated
 #end
-    public void set${tmpJavaName}_Equal_${classificationElement.name}() {
+    def set${tmpJavaName}_Equal_${classificationElement.name}(): Unit = {
         reg${tmpJavaName}(CK_EQ, ${col.javaNative}.valueOf(${glCDef}.${col.classificationName}.${classificationElement.name}.code()));
     }
 #end
@@ -1243,7 +1239,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (NullAllowed: if null, no condition)
      */
-    public void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+    def set${tmpJavaName}_Equal(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
         reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
     }
 #if (${col.isAvailableStringInScope()})
@@ -1253,7 +1249,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    def set${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
         regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
     }
 #end
@@ -1264,25 +1260,25 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * IsNull {is null}. And OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      */
-    public void set${tmpJavaName}_IsNull() { reg${tmpJavaName}(CK_ISN, DOBJ); }
+    def set${tmpJavaName}_IsNull(): Unit = { reg${tmpJavaName}(CK_ISN, AbstractConditionQuery.DOBJ); }
 #if ($col.isMakeIsNullOrEmpty())
 
     /**
      * IsNullOrEmpty {is null or empty}. And OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      */
-    public void set${tmpJavaName}_IsNullOrEmpty() { reg${tmpJavaName}(CK_ISNOE, DOBJ); }
+    def set${tmpJavaName}_IsNullOrEmpty(): Unit = { reg${tmpJavaName}(CK_ISNOE, AbstractConditionQuery.DOBJ); }
 #end
 
     /**
      * IsNotNull {is not null}. And OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      */
-    public void set${tmpJavaName}_IsNotNull() { reg${tmpJavaName}(CK_ISNN, DOBJ); }
+    def set${tmpJavaName}_IsNotNull(): Unit = { reg${tmpJavaName}(CK_ISNN, AbstractConditionQuery.DOBJ); }
 #end
 
-    protected void reg${tmpJavaName}(ConditionKey ky, Object vl) { regQ(ky, vl, getCValue${tmpJavaName}(), "${col.name}"); }
-    protected abstract ConditionValue getCValue${tmpJavaName}();
+    protected def reg${tmpJavaName}(ky: ConditionKey, vl: Object): Unit = { regQ(ky, vl, getCValue${tmpJavaName}(), "${col.name}"); }
+    protected def getCValue${tmpJavaName}(): ConditionValue;
 #end
 #if ($table.hasSinglePrimaryKey())
 #if ($table.isAvailableMyselfScalarCondition())
@@ -1303,8 +1299,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @return The object to set up a function. (NotNull)
      */
-    public HpSSQFunction<${myConditionBeanClassName}> scalar_Equal() {
-        return xcreateSSQFunction(CK_EQ.getOperand(), ${myConditionBeanClassName}.class);
+    def scalar_Equal(): HpSSQFunction[${myConditionBeanClassName}] = {
+        return xcreateSSQFunction(CK_EQ.getOperand(), classOf[${myConditionBeanClassName}]);
     }
 
     /**
@@ -1320,8 +1316,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @return The object to set up a function. (NotNull)
      */
-    public HpSSQFunction<${myConditionBeanClassName}> scalar_NotEqual() {
-        return xcreateSSQFunction(CK_NES.getOperand(), ${myConditionBeanClassName}.class);
+    def scalar_NotEqual(): HpSSQFunction[${myConditionBeanClassName}] = {
+        return xcreateSSQFunction(CK_NES.getOperand(), classOf[${myConditionBeanClassName}]);
     }
 
     /**
@@ -1337,8 +1333,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @return The object to set up a function. (NotNull)
      */
-    public HpSSQFunction<${myConditionBeanClassName}> scalar_GreaterThan() {
-        return xcreateSSQFunction(CK_GT.getOperand(), ${myConditionBeanClassName}.class);
+    def scalar_GreaterThan(): HpSSQFunction[${myConditionBeanClassName}] = {
+        return xcreateSSQFunction(CK_GT.getOperand(), classOf[${myConditionBeanClassName}]);
     }
 
     /**
@@ -1354,8 +1350,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @return The object to set up a function. (NotNull)
      */
-    public HpSSQFunction<${myConditionBeanClassName}> scalar_LessThan() {
-        return xcreateSSQFunction(CK_LT.getOperand(), ${myConditionBeanClassName}.class);
+    def scalar_LessThan(): HpSSQFunction[${myConditionBeanClassName}] = {
+        return xcreateSSQFunction(CK_LT.getOperand(), classOf[${myConditionBeanClassName}]);
     }
 
     /**
@@ -1371,8 +1367,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @return The object to set up a function. (NotNull)
      */
-    public HpSSQFunction<${myConditionBeanClassName}> scalar_GreaterEqual() {
-        return xcreateSSQFunction(CK_GE.getOperand(), ${myConditionBeanClassName}.class);
+    def scalar_GreaterEqual(): HpSSQFunction[${myConditionBeanClassName}] = {
+        return xcreateSSQFunction(CK_GE.getOperand(), classOf[${myConditionBeanClassName}]);
     }
 
     /**
@@ -1388,26 +1384,25 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @return The object to set up a function. (NotNull)
      */
-    public HpSSQFunction<${myConditionBeanClassName}> scalar_LessEqual() {
-        return xcreateSSQFunction(CK_LE.getOperand(), ${myConditionBeanClassName}.class);
+    def scalar_LessEqual(): HpSSQFunction[${myConditionBeanClassName}] = {
+        return xcreateSSQFunction(CK_LE.getOperand(), classOf[${myConditionBeanClassName}]);
     }
 
-    @SuppressWarnings("unchecked")
-    protected <CB extends ConditionBean> void xscalarCondition(String fn, SubQuery<CB> sq, String rd, HpSSQOption<CB> op) {
+    protected def xscalarCondition[CB <: ConditionBean](fn: String, sq: SubQuery[CB], rd: String, op: HpSSQOption[CB]): Unit = {
         assertObjectNotNull("subQuery", sq);
-        ${myConditionBeanClassName} cb = xcreateScalarConditionCB(); sq.query((CB)cb);
-        String pp = keepScalarCondition(cb.query()); // for saving query-value
-        op.setPartitionByCBean((CB)xcreateScalarConditionPartitionByCB()); // for using partition-by
+        val cb: ${myConditionBeanClassName} = xcreateScalarConditionCB(); sq.query(cb.asInstanceOf[CB]);
+        val pp: String = keepScalarCondition(cb.query()); // for saving query-value
+        op.setPartitionByCBean(xcreateScalarConditionPartitionByCB().asInstanceOf[CB]); // for using partition-by
         registerScalarCondition(fn, cb.query(), pp, rd, op);
     }
-    public abstract String keepScalarCondition(${myConditionQueryClassName} sq);
+    def keepScalarCondition(sq: ${myConditionQueryClassName}): String;
 
-    protected ${myConditionBeanClassName} xcreateScalarConditionCB() {
-        ${myConditionBeanClassName} cb = newMyCB(); cb.xsetupForScalarCondition(this); return cb;
+    protected def xcreateScalarConditionCB(): ${myConditionBeanClassName} = {
+        val cb: ${myConditionBeanClassName} = newMyCB(); cb.xsetupForScalarCondition(this); return cb;
     }
 
-    protected ${myConditionBeanClassName} xcreateScalarConditionPartitionByCB() {
-        ${myConditionBeanClassName} cb = newMyCB(); cb.xsetupForScalarConditionPartitionBy(this); return cb;
+    protected def xcreateScalarConditionPartitionByCB(): ${myConditionBeanClassName} = {
+        val cb: ${myConditionBeanClassName} = newMyCB(); cb.xsetupForScalarConditionPartitionBy(this); return cb;
     }
 #end
 #if ($table.isAvailableMyselfMyselfDerived())
@@ -1415,34 +1410,33 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     // ===================================================================================
     //                                                                       MyselfDerived
     //                                                                       =============
-    public void xsmyselfDerive(String fn, SubQuery<${myConditionBeanClassName}> sq, String al, DerivedReferrerOption op) {
+    def xsmyselfDerive(fn: String, sq: SubQuery[${myConditionBeanClassName}], al: String, op: DerivedReferrerOption): Unit = {
         assertObjectNotNull("subQuery", sq);
-        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForDerivedReferrer(this);
+        val cb: ${myConditionBeanClassName} = new ${myConditionBeanClassName}(); cb.xsetupForDerivedReferrer(this);
         try { lock(); sq.query(cb); } finally { unlock(); }
-        String pp = keepSpecifyMyselfDerived(cb.query());
-        String pk = "${table.primaryKeyAsOne.name}";
+        val pp: String = keepSpecifyMyselfDerived(cb.query());
+        val pk: String = "${table.primaryKeyAsOne.name}";
         registerSpecifyMyselfDerived(fn, cb.query(), pk, pk, pp, "myselfDerived", al, op);
     }
-    public abstract String keepSpecifyMyselfDerived(${myConditionQueryClassName} sq);
+    def keepSpecifyMyselfDerived(sq: ${myConditionQueryClassName}): String;
 
     /**
      * Prepare for (Query)MyselfDerived (SubQuery).
      * @return The object to set up a function for myself table. (NotNull)
      */
-    public HpQDRFunction<${myConditionBeanClassName}> myselfDerived() {
-        return xcreateQDRFunctionMyselfDerived(${myConditionBeanClassName}.class);
+    def myselfDerived(): HpQDRFunction[${myConditionBeanClassName}] = {
+        return xcreateQDRFunctionMyselfDerived(classOf[${myConditionBeanClassName}]);
     }
-    @SuppressWarnings("unchecked")
-    protected <CB extends ConditionBean> void xqderiveMyselfDerived(String fn, SubQuery<CB> sq, String rd, Object vl, DerivedReferrerOption op) {
+    protected def xqderiveMyselfDerived[CB <: ConditionBean](fn: String, sq: SubQuery[CB], rd: String, vl: Object, op: DerivedReferrerOption): Unit = {
         assertObjectNotNull("subQuery", sq);
-        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForDerivedReferrer(this); sq.query((CB)cb);
-        String pk = "${table.primaryKeyAsOne.name}";
-        String sqpp = keepQueryMyselfDerived(cb.query()); // for saving query-value.
-        String prpp = keepQueryMyselfDerivedParameter(vl);
+        val cb: ${myConditionBeanClassName} = new ${myConditionBeanClassName}(); cb.xsetupForDerivedReferrer(this); sq.query(cb.asInstanceOf[CB]);
+        val pk: String = "${table.primaryKeyAsOne.name}";
+        val sqpp: String = keepQueryMyselfDerived(cb.query()); // for saving query-value.
+        val prpp: String = keepQueryMyselfDerivedParameter(vl);
         registerQueryMyselfDerived(fn, cb.query(), pk, pk, sqpp, "myselfDerived", rd, vl, prpp, op);
     }
-    public abstract String keepQueryMyselfDerived(${myConditionQueryClassName} sq);
-    public abstract String keepQueryMyselfDerivedParameter(Object vl);
+    def keepQueryMyselfDerived(sq: ${myConditionQueryClassName}): String;
+    def keepQueryMyselfDerivedParameter(vl: Object): String;
 #end
 #if ($table.isAvailableMyselfMyselfExists())
 
@@ -1453,14 +1447,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Prepare for MyselfExists (SubQuery).
      * @param subQuery The implementation of sub query. (NotNull)
      */
-    public void myselfExists(SubQuery<${myConditionBeanClassName}> subQuery) {
+    def myselfExists(subQuery: SubQuery[${myConditionBeanClassName}]): Unit = {
         assertObjectNotNull("subQuery", subQuery);
-        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForMyselfExists(this);
+        val cb: ${myConditionBeanClassName} = new ${myConditionBeanClassName}(); cb.xsetupForMyselfExists(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keepMyselfExists(cb.query());
+        val pp: String = keepMyselfExists(cb.query());
         registerMyselfExists(cb.query(), pp);
     }
-    public abstract String keepMyselfExists(${myConditionQueryClassName} sq);
+    def keepMyselfExists(sq: ${myConditionQueryClassName}): String;
 #end
 #if ($table.isAvailableMyselfMyselfInScope())
 
@@ -1471,14 +1465,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Prepare for MyselfInScope (SubQuery).
      * @param subQuery The implementation of sub query. (NotNull)
      */
-    public void myselfInScope(SubQuery<${myConditionBeanClassName}> subQuery) {
+    def myselfInScope(subQuery: SubQuery[${myConditionBeanClassName}]): Unit = {
         assertObjectNotNull("subQuery", subQuery);
-        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForMyselfInScope(this);
+        val cb: ${myConditionBeanClassName} = new ${myConditionBeanClassName}(); cb.xsetupForMyselfInScope(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keepMyselfInScope(cb.query());
+        val pp: String = keepMyselfInScope(cb.query());
         registerMyselfInScope(cb.query(), pp);
     }
-    public abstract String keepMyselfInScope(${myConditionQueryClassName} sq);
+    def keepMyselfInScope(sq: ${myConditionQueryClassName}): String;
 #end
 #end
 #if ($database.isAvailableDatabaseDependency())
@@ -1524,7 +1518,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn, String conditionValue) {
+    def match(textColumn: org.seasar.dbflute.dbmeta.info.ColumnInfo, conditionValue: String): Unit = {
         assertObjectNotNull("textColumn", textColumn);
         match(newArrayList(textColumn), conditionValue);
     }
@@ -1534,23 +1528,23 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    public void match(List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList, String conditionValue) {
+    def match(textColumnList: List[org.seasar.dbflute.dbmeta.info.ColumnInfo], conditionValue: String): Unit = {
         xdoMatchByLikeSearch(textColumnList, conditionValue);
     }
 
     @Override
-    protected String xescapeFullTextSearchValue(String conditionValue) {
+    protected def xescapeFullTextSearchValue(conditionValue: String): String = {
         return conditionValue; // non escape
     }
 
     @Override
-    protected LikeSearchOption xcreateMatchLikeSearch() {
+    protected def xcreateMatchLikeSearch(): LikeSearchOption = {
         return new PostgreSQLMatchLikeSearch();
     }
 
     @Override
-    protected org.seasar.dbflute.dbway.ExtensionOperand xgetPostgreSQLMatchOperand() {
-        return ${glDBFluteConfig}.getInstance().getFullTextSearchOperand();
+    protected def xgetPostgreSQLMatchOperand(): org.seasar.dbflute.dbway.ExtensionOperand = {
+        return ${glDBFluteConfig}.getFullTextSearchOperand();
     }
 #end
 #if ($database.isDatabaseOracle())
@@ -1563,7 +1557,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn, String conditionValue) {
+    def match(textColumn: org.seasar.dbflute.dbmeta.info.ColumnInfo, conditionValue: String): Unit = {
         assertObjectNotNull("textColumn", textColumn);
         match(newArrayList(textColumn), conditionValue);
     }
@@ -1574,17 +1568,17 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    public void match(List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList, String conditionValue) {
+    def match(textColumnList: List[org.seasar.dbflute.dbmeta.info.ColumnInfo], conditionValue: String): Unit = {
         xdoMatchByLikeSearch(textColumnList, conditionValue);
     }
 
     @Override
-    protected String xescapeFullTextSearchValue(String conditionValue) {
+    protected def xescapeFullTextSearchValue(conditionValue: String): String = {
         return xescapeOracleFullTextSearchValue(conditionValue);
     }
 
     @Override
-    protected LikeSearchOption xcreateMatchLikeSearch() {
+    protected def xcreateMatchLikeSearch(): LikeSearchOption = {
         return new OracleMatchLikeSearch();
     }
 #end
@@ -1615,9 +1609,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @param orderValueList The list of order values for manual ordering. (NotNull)
      */
-    public void withManualOrder(List<? extends Object> orderValueList) { // is user public!
+    def withManualOrder(orderValueList: List[_ <: Object]): Unit = { // is user public!
         assertObjectNotNull("withManualOrder(orderValueList)", orderValueList);
-        final ManualOrderBean manualOrderBean = new ManualOrderBean();
+        val manualOrderBean: ManualOrderBean = new ManualOrderBean();
         manualOrderBean.acceptOrderValueList(orderValueList);
         withManualOrder(manualOrderBean);
     }
@@ -1626,15 +1620,15 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     // ===================================================================================
     //                                                                       Very Internal
     //                                                                       =============
-    protected ${myConditionBeanClassName} newMyCB() {
+    protected def newMyCB(): ${myConditionBeanClassName} = {
         return new ${myConditionBeanClassName}();
     }
     // very internal (for suppressing warn about 'Not Use Import')
-    protected String xabCQ() { return ${myConditionQueryClassName}.class.getName(); }
-    protected String xabLSO() { return LikeSearchOption.class.getName(); }
-    protected String xabSSQS() { return HpSSQSetupper.class.getName(); }
+    protected def xabCQ(): String = { return classOf[${myConditionQueryClassName}].getName(); }
+    protected def xabLSO(): String = { return classOf[LikeSearchOption].getName(); }
+    protected def xabSSQS(): String = { return classOf[HpSSQSetupper[_]].getName(); }
 #if ($database.isDatabaseMSAccess())
     @Override
-    protected boolean xsuppressEscape() { return true; } // bacause MS-Access does not support escape
+    protected def xsuppressEscape(): Boolean = { return true; } // bacause MS-Access does not support escape
 #end
 }

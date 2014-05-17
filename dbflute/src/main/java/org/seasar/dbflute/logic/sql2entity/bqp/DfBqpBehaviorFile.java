@@ -166,7 +166,7 @@ public class DfBqpBehaviorFile {
                         }
 
                         defSb.append(adjustedIndent);
-                        defSb.append(grammar.getPublicStaticDefinition());
+                        defSb.append(grammar.getPublicStaticFinal());
                         final String keySubDirectoryPath = DfBehaviorQueryPathSetupper.KEY_SUB_DIRECTORY_PATH;
                         final String subDirectoryPath = behaviorQueryElementMap.get(keySubDirectoryPath);
                         if (Srl.is_NotNull_and_NotTrimmedEmpty(subDirectoryPath)) {

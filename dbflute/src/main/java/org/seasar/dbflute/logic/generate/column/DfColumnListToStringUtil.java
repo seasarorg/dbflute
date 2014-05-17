@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.properties.DfBasicProperties;
 
 /**
@@ -27,7 +28,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
  */
 public class DfColumnListToStringUtil {
 
-    public static String getColumnArgsString(List<Column> columnList) {
+    public static String getColumnArgsString(List<Column> columnList, DfLanguageGrammar grammar) {
         validateColumnList(columnList);
 
         final StringBuilder sb = new StringBuilder();
@@ -46,7 +47,7 @@ public class DfColumnListToStringUtil {
             if (sb.length() > 0) {
                 sb.append(", ");
             }
-            sb.append(javaNative).append(" ").append(uncapitalisedJavaName);
+            sb.append(grammar.buildVariableSimpleDefinition(javaNative, uncapitalisedJavaName));
         }
         return sb.toString();
     }

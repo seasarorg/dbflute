@@ -43,18 +43,35 @@ public interface DfLanguageGrammar {
     String getImplementsStringMark();
 
     /**
-     * @return The definition of 'public'. (NotNull)
+     * @return The modifier of 'public'. e.g. 'public' (NotNull)
      */
-    String getPublicDefinition();
+    String getPublicModifier();
 
     /**
-     * @return The definition of 'public static'. (NotNull)
+     * @return The modifier of 'protected'. e.g. 'protected' (NotNull)
      */
-    String getPublicStaticDefinition();
+    String getProtectedModifier();
+
+    /**
+     * @return The definition of 'public'. e.g. 'public final' (NotNull)
+     */
+    String getPublicFinal();
+
+    /**
+     * @return The definition of 'public static'. e.g. 'public static final' (NotNull)
+     */
+    String getPublicStaticFinal();
 
     // ===================================================================================
     //                                                              Programming Expression
     //                                                              ======================
+    /**
+     * @param type The type name of program data. (NotNull)
+     * @param variable The variable name. (NotNull)
+     * @return The simple definition expression of the variable. e.g. 'String name' (NotNull)
+     */
+    String buildVariableSimpleDefinition(String type, String variable);
+
     /**
      * @param methodName The method name that might not be adjusted. (NotNull)
      * @return The initial-character-adjusted name for the method. (NotNull)

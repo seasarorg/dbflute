@@ -1,0 +1,75 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageNss};
+#set ($myClassName = "${myNestSelectSetupperClassName}")
+
+#if ($table.hasForeignKeyOrReferrerAsOne())
+import org.seasar.dbflute.cbean.ConditionQuery;
+#end
+import ${glPackageCQ}.${myConditionQueryClassName};
+
+/**
+ * The nest select set-upper of ${table.tableDbName}.
+ * @author ${database.classAuthor}
+ */
+class ${myClassName}(query: ${myConditionQueryClassName}) {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected var _query: ${myConditionQueryClassName} = query;
+    def hasConditionQuery(): Boolean = { return _query != null; }
+
+    // ===================================================================================
+    //                                                                     Nested Relation
+    //                                                                     ===============
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($dynamicFixedConditionArgs = "")
+#set ($dynamicFixedConditionVariables = "")
+#if ($fk.hasDynamicFixedCondition())
+#set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionFinalArgs}")
+#set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
+#end
+    /**
+     * With nested relation columns to select clause. <br />
+     * ${fk.foreignDispForJavaDoc}
+#if ($fk.hasDynamicFixedCondition())
+     * ${fk.dynamicFixedConditionArgsJavaDocString}
+#end
+     * @return The set-upper of more nested relation. {...with[nested-relation].with[more-nested-relation]} (NotNull)
+     */
+    def with${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}): ${fk.foreignTableNestSelectSetupperClassName} = {
+        _query.doNss(new ${myConditionQueryClassName}.NssCall() { def qf(): ConditionQuery = { return _query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
+        return new ${fk.foreignTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
+    }
+#end
+
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+    /**
+     * With nested relation columns to select clause. <br />
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * @return The set-upper of more nested relation. {...with[nested-relation].with[more-nested-relation]} (NotNull)
+     */
+    def with${tmpPropertyNameInitCap}(): ${referrer.referrerTableNestSelectSetupperClassName} = {
+        _query.doNss(new ${myConditionQueryClassName}.NssCall() { def qf(): ConditionQuery = { return _query.query${tmpPropertyNameInitCap}(); }});
+        return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
+    }
+#end
+}

@@ -43,18 +43,17 @@ class ${glDBFluteInitializer} {
     //                                                                           Attribute
     //                                                                           =========
 #if ($database.isTargetContainerSpring())
-    protected final String _dataSourceFqcn;
+    protected val _dataSourceFqcn: String = dataSource.getClass().getName();
 #end
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-#if ($database.isTargetContainerSpring())
-     _dataSourceFqcn = dataSource.getClass().getName();
-#end
-    announce();
-    prologue();
-    standBy();
+    {
+        announce();
+        prologue();
+        standBy();
+    }
 
     // ===================================================================================
     //                                                                             Curtain

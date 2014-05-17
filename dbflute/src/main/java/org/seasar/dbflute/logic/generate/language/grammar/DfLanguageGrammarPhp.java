@@ -40,17 +40,29 @@ public class DfLanguageGrammarPhp implements DfLanguageGrammar {
         return "implements";
     }
 
-    public String getPublicDefinition() {
+    public String getPublicModifier() {
+        return "public";
+    }
+
+    public String getProtectedModifier() {
+        return "protected";
+    }
+
+    public String getPublicFinal() {
         return "const";
     }
 
-    public String getPublicStaticDefinition() {
+    public String getPublicStaticFinal() {
         return "const";
     }
 
     // ===================================================================================
     //                                                              Programming Expression
     //                                                              ======================
+    public String buildVariableSimpleDefinition(String type, String variable) {
+        return type + " " + variable;
+    }
+
     public String adjustMethodInitialChar(String methodNameResource) {
         return Srl.initUncap(methodNameResource);
     }

@@ -44,12 +44,20 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
         return "implements";
     }
 
-    public String getPublicDefinition() {
-        return "val";
+    public String getPublicModifier() {
+        return "";
     }
 
-    public String getPublicStaticDefinition() {
-        return "val";
+    public String getProtectedModifier() {
+        return "protected";
+    }
+
+    public String getPublicFinal() {
+        return "val"; // it has no public
+    }
+
+    public String getPublicStaticFinal() {
+        return "val"; // it has no static
     }
 
     // ===================================================================================
@@ -57,6 +65,10 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
     //                                                              ======================
     // #pending jflute Scala's collections
     // #pending jflute same as Java for now
+
+    public String buildVariableSimpleDefinition(String type, String variable) {
+        return variable + ": " + type;
+    }
 
     public String adjustMethodInitialChar(String methodName) {
         return _grammarJava.adjustMethodInitialChar(methodName);

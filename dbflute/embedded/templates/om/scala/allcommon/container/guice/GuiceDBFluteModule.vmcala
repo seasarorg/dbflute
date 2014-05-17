@@ -22,7 +22,7 @@ import org.seasar.dbflute.BehaviorSelector;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
 import org.seasar.dbflute.bhv.core.InvokerAssistant;
-import ${glPackageExtendedBhv}.*;
+import ${glPackageExtendedBhv}._;
 
 /**
  * @author ${database.classAuthor}
@@ -62,7 +62,7 @@ class ${glDBFluteModule}(dataSource: DataSource) extends AbstractModule {
     }
 
     protected def createImplementedInvokerAssistant(): ${glImplementedInvokerAssistant} = {
-        val invokerAssistant:${glImplementedInvokerAssistant} = new ${database.implementedInvokerAssistantClass}();
+        val invokerAssistant: ${glImplementedInvokerAssistant} = new ${database.implementedInvokerAssistantClass}();
         invokerAssistant.setDataSource(dataSource);
         return invokerAssistant;
     }

@@ -28,22 +28,8 @@ import ${glPackageBaseCQ}.${myBaseConditionQueryClassName};
  * </p>
  * @author ${database.classAuthor}
  */
-public class ${myClassName} extends ${myBaseConditionQueryClassName} {
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    // You should NOT touch with this constructor.
-    /**
-     * Auto-generated constructor to create query instance, basically called in DBFlute.
-     * @param referrerQuery The instance of referrer query. (NullAllowed: if null, this is base query)
-     * @param sqlClause The instance of SQL clause. (NotNull)
-     * @param aliasName The alias name for this query. (NotNull)
-     * @param nestLevel The nest level of this query. (if zero, this is base query)
-     */
-    public ${myClassName}(ConditionQuery referrerQuery, SqlClause sqlClause, String aliasName, int nestLevel) {
-        super(referrerQuery, sqlClause, aliasName, nestLevel);
-    }
+class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasName: String, nestLevel: Integer)
+        extends ${myBaseConditionQueryClassName}(referrerQuery, sqlClause, aliasName, nestLevel) {
 
     // ===================================================================================
     //                                                                       Arrange Query

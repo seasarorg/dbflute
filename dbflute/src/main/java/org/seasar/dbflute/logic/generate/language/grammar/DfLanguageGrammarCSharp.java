@@ -55,17 +55,29 @@ public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
         return ":";
     }
 
-    public String getPublicDefinition() {
+    public String getPublicModifier() {
+        return "public";
+    }
+
+    public String getProtectedModifier() {
+        return "protected";
+    }
+
+    public String getPublicFinal() {
         return "public readonly";
     }
 
-    public String getPublicStaticDefinition() {
+    public String getPublicStaticFinal() {
         return "public static readonly";
     }
 
     // ===================================================================================
     //                                                              Programming Expression
     //                                                              ======================
+    public String buildVariableSimpleDefinition(String type, String variable) {
+        return type + " " + variable;
+    }
+
     public String adjustMethodInitialChar(String methodName) {
         return Srl.initCap(methodName);
     }

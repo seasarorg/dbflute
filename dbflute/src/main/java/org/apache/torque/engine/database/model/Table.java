@@ -872,7 +872,8 @@ public class Table {
      * @return The value of primaryKeyArgsString. (NotNull)
      */
     public String getPrimaryKeyArgsString() {
-        return DfColumnListToStringUtil.getColumnArgsString(getPrimaryKey());
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        return DfColumnListToStringUtil.getColumnArgsString(getPrimaryKey(), lang.getLanguageGrammar());
     }
 
     /**
@@ -3099,7 +3100,14 @@ public class Table {
     }
 
     public String getSelectEntityWithDeletedCheckModifier() {
-        return isAvailableSelectEntityWithDeletedCheck() ? "public" : "protected";
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final DfLanguageGrammar grammar = lang.getLanguageGrammar();
+        return isAvailableSelectEntityWithDeletedCheck() ? grammar.getPublicModifier() : grammar.getProtectedModifier();
+    }
+
+    public String getSelectEntityWithDeletedCheckModifierAsPrefix() {
+        final String modifier = getSelectEntityWithDeletedCheckModifier();
+        return !modifier.isEmpty() ? modifier + " " : "";
     }
 
     // ===================================================================================

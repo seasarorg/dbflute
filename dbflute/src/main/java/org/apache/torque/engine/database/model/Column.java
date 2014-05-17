@@ -138,6 +138,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfClassificationDeploymentClassificationNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -1670,7 +1671,16 @@ public class Column {
     //}
 
     public String getPropertySettingModifier() {
-        return isForceClassificationSetting() ? "protected" : "public";
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final DfLanguageGrammar grammar = lang.getLanguageGrammar();
+        final String publicModifier = grammar.getPublicModifier();
+        final String protectedModifier = grammar.getProtectedModifier();
+        return isForceClassificationSetting() ? protectedModifier : publicModifier;
+    }
+
+    public String getPropertySettingModifierAsPrefix() {
+        final String modifier = getPropertySettingModifier(); // Scala might return empty for public
+        return !modifier.isEmpty() ? modifier + " " : ""; // add rear space if exists
     }
 
     // ===================================================================================
