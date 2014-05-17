@@ -95,11 +95,11 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
     }
 
     public String buildGenericOneClassHint(String first) {
-        return _grammarJava.buildGenericOneClassHint(first);
+        return "[" + first + "]";
     }
 
     public String buildGenericTwoClassHint(String first, String second) {
-        return _grammarJava.buildGenericTwoClassHint(first, second);
+        return "[" + first + ", " + second + "]";
     }
 
     public String buildEntityPropertyGetSet(Column fromCol, Column toCol) {

@@ -18,6 +18,7 @@ ${database.allClassCopyright}package ${glPackageNss};
 
 #if ($table.hasForeignKeyOrReferrerAsOne())
 import org.seasar.dbflute.cbean.ConditionQuery;
+import org.seasar.dbflute.cbean.AbstractConditionQuery._;
 #end
 import ${glPackageCQ}.${myConditionQueryClassName};
 
@@ -54,7 +55,7 @@ class ${myClassName}(query: ${myConditionQueryClassName}) {
      * @return The set-upper of more nested relation. {...with[nested-relation].with[more-nested-relation]} (NotNull)
      */
     def with${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}): ${fk.foreignTableNestSelectSetupperClassName} = {
-        _query.doNss(new ${myConditionQueryClassName}.NssCall() { def qf(): ConditionQuery = { return _query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
+        _query.doNss(new NssCall() { def qf(): ConditionQuery = { return _query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
         return new ${fk.foreignTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
     }
 #end
@@ -68,7 +69,7 @@ class ${myClassName}(query: ${myConditionQueryClassName}) {
      * @return The set-upper of more nested relation. {...with[nested-relation].with[more-nested-relation]} (NotNull)
      */
     def with${tmpPropertyNameInitCap}(): ${referrer.referrerTableNestSelectSetupperClassName} = {
-        _query.doNss(new ${myConditionQueryClassName}.NssCall() { def qf(): ConditionQuery = { return _query.query${tmpPropertyNameInitCap}(); }});
+        _query.doNss(new NssCall() { def qf(): ConditionQuery = { return _query.query${tmpPropertyNameInitCap}(); }});
         return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
     }
 #end

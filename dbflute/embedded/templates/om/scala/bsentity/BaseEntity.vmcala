@@ -16,6 +16,8 @@
 ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
+import scala.collection.JavaConverters._
+
 import java.lang.Long;
 import java.io.Serializable;
 import java.util.List;
@@ -204,11 +206,11 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
      */
     def set${col.javaName}As${col.classificationName}(cdef: ${glCDef}.${col.classificationName}): Unit = {
 #if ($col.isJavaNativeNumberObject())
-        set${col.javaName}(cdef != null ? FunCustodial.toNumber(cdef.code(), classOf[${col.javaNative}]) : null);
+        set${col.javaName}(if (cdef != null) { FunCustodial.toNumber(cdef.code, classOf[${col.javaNative}]) } else { null });
 #elseif ($col.isJavaNativeBooleanObject())
-        set${col.javaName}(cdef != null ? FunCustodial.toBoolean(cdef.code()) : null);
+        set${col.javaName}(if (cdef != null) { FunCustodial.toBoolean(cdef.code) } else { null });
 #else
-        set${col.javaName}(cdef != null ? cdef.code() : null);
+        set${col.javaName}(if (cdef != null) { cdef.code } else { null });
 #end
     }
 #if ($classificationTop.isSisterBooleanHandling())
@@ -285,7 +287,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
 #end
     def is${col.javaName}${classificationElement.name}(): Boolean = {
         val cdef: ${glCDef}.${col.classificationName} = get${col.javaName}As${col.classificationName}();
-        return cdef != null ? cdef.equals(${glCDef}.${col.classificationName}.${classificationElement.name}) : false;
+        return if (cdef != null) { cdef.equals(${glCDef}.${col.classificationName}.${classificationElement.name}) } else { false };
     }
 
 #end
@@ -319,7 +321,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
      */
     def get${col.JavaName}Name(): String = {
         val cdef: ${glCDef}.${col.classificationName} = get${col.javaName}As${col.classificationName}();
-        return cdef != null ? cdef.name() : null;
+        return if (cdef != null) { cdef.name() } else { null };
     }
 
 #end
@@ -330,7 +332,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
      */
     def get${col.JavaName}Alias(): String = {
         val cdef: ${glCDef}.${col.classificationName} = get${col.javaName}As${col.classificationName}();
-        return cdef != null ? cdef.alias() : null;
+        return if (cdef != null) { cdef.alias } else { null };
     }
 
 #end
@@ -574,38 +576,45 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
      * @param obj The object as other entity. (NullAllowed: if null, returns false fixedly)
      * @return Comparing result.
      */
-    def equals(obj: Object): Boolean = {
-        if (obj == null || !(obj.isInstanceOf[$myClassName])) { return false; }
-        val other: $myClassName = obj.asInstanceOf[$myClassName];
+    override def equals(obj: Any) = {
+        obj match {
+            case obj: $myClassName => {
+                val other: $myClassName = obj.asInstanceOf[$myClassName];
+                {
+#set ($equalsCount = 0)
 #foreach ($col in $table.equalsHashcodeColumnList)
-        if (!xSV(get${col.javaName}(), other.get${col.javaName}())) { return false; }
+                    #if ($equalsCount > 0) &&#end xSV(get${col.javaName}(), other.get${col.javaName}())
+#set ($equalsCount = $equalsCount + 1)
 #end
-        return true;
+                }
+            }
+            case _ => false
+        }
     }
-    protected def xSV(value1: Object, value2: Object): Boolean = {
-        return FunCustodial.isSameValue(value1, value2);
+    protected def xSV(v1: Object, v2: Object): Boolean = {
+        return FunCustodial.isSameValue(v1, v2);
     }
 
     /**
      * Calculate the hash-code from primary-keys or columns.
      * @return The hash-code from primary-key or columns.
      */
-    def hashCode(): Integer = {
-        var result: Integer = 17;
-        result = xCH(result, getTableDbName());
+    override def hashCode(): Int = {
+        var hs: Int = 17;
+        hs = xCH(hs, getTableDbName());
 #foreach ($col in $table.equalsHashcodeColumnList)
-        result = xCH(result, get${col.JavaName}());
+        hs = xCH(hs, get${col.JavaName}());
 #end
-        return result;
+        return hs;
     }
-    protected def xCH(result: Integer, value: Object): Integer = {
-        return FunCustodial.calculateHashcode(result, value);
+    protected def xCH(hs: Int, value: Object): Int = {
+        return FunCustodial.calculateHashcode(hs, value);
     }
 
     /**
      * {@inheritDoc}
      */
-    def instanceHash(): Integer = {
+    def instanceHash(): Int = {
         return super.hashCode();
     }
 
@@ -613,7 +622,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
      * Convert to display string of entity's data. (no relation data)
      * @return The display string of all columns and relation existences. (NotNull)
      */
-    def toString(): String = {
+    override def toString(): String = {
         return buildDisplayString(FunCustodial.toClassTitle(this), true, true);
     }
 
@@ -637,8 +646,9 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
 #end
 #foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
-        if (${referrerVariableName} != null) { for (Entity e : ${referrerVariableName})
-        { if (e != null) { sb.append(l).append(xbRDS(e, "${referrer.referrerPropertyName}")); } } }
+        if (${referrerVariableName} != null) {
+            ${referrerVariableName}.asScala.foreach(e => { if (e != null) { sb.append(l).append(xbRDS(e, "${referrer.referrerPropertyName}")) } });
+        }
 #end
 #end
         return sb.toString();
@@ -725,7 +735,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
      * Clone entity instance using super.clone(). (shallow copy) 
      * @return The cloned instance of this entity. (NotNull)
      */
-    def clone(): ${myExtendedObjectClassName} = {
+    override def clone(): ${myExtendedObjectClassName} = {
         try {
             return super.clone().asInstanceOf[${myExtendedObjectClassName}];
         } catch {

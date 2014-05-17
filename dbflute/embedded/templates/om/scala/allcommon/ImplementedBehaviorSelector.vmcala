@@ -73,27 +73,27 @@ class ${glImplementedBehaviorSelector} extends BehaviorSelector {
 
 #if ($database.isTargetContainerSeasar())
     /** The container of Seasar. */
-    protected var _container: S2Container;
+    protected var _container: S2Container = null;
 #end
 #if ($database.isTargetContainerSpring())
     /** The container of Spring. */
-    protected var _container: ApplicationContext;
+    protected var _container: ApplicationContext = null;
 #end
 #if ($database.isTargetContainerLucy())
     /** The container of Lucy. */
-    protected var _container: Lucy;
+    protected var _container: Lucy = null;
 #end
 #if ($database.isTargetContainerGuice())
     /** The container of Guice. */
-    protected var _container: Injector;
+    protected var _container: Injector = null;
 #end
 #if ($database.isTargetContainerSlim3())
     /** The container of Slim3. */
-    protected var _container: S3Container;
+    protected var _container: S3Container = null;
 #end
 #if ($database.isTargetContainerCDI())
     /** The container of CDI. */
-    protected var _container: BeanManager;
+    protected var _container: BeanManager = null;
 #end
 
     // ===================================================================================
@@ -114,7 +114,8 @@ class ${glImplementedBehaviorSelector} extends BehaviorSelector {
         dbmetas.asScala.foreach(dbmeta => {
             try {
                 val bhv: BehaviorReadable = byName(dbmeta.getTableDbName());
-                bhv.warmUpCommand();
+                // #pending illegal cyclic reference involving class?
+                //bhv.warmUpCommand();
                 count = count + 1;
             } catch { // means the behavior is suppressed
                 case ignored: IllegalBehaviorStateException => {

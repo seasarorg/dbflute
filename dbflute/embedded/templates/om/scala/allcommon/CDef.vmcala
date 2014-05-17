@@ -27,7 +27,7 @@ import org.seasar.dbflute.jdbc.ClassificationMeta;
  * The definition of classification.
  * @author ${database.classAuthor}
  */
-object ${glCDef} extends Classification {
+object ${glCDef} {
 
     /** The empty array for no sisters. */
     val EMPTY_SISTERS: Array[String] = Array[String]();
@@ -37,8 +37,9 @@ object ${glCDef} extends Classification {
 
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationTop = $database.getClassificationTop($classificationName))
-    sealed abstract class ${classificationName}(val code:String, val alias:String, val sisters:Array[String]) extends Classification {
+    sealed abstract class ${classificationName}(val code: String, val alias: String, val sisters: Array[String]) extends Classification {
 
+        def name(): String = { return getClass().getSimpleName(); }
 #if ($database.hasClassificationSubItemMap($classificationName))
         def subItemMap(): Map[String, Object] = { return _subItemMapMap.get(code); }
 #else
@@ -103,9 +104,9 @@ object ${glCDef} extends Classification {
         }
 
 #if ($database.isCDefToStringReturnsName())
-        @Override def toString(): String = { return name; }
+        override def toString(): String = { return name; }
 #else
-        @Override def toString(): String = { return code; }
+        override def toString(): String = { return code; }
 #end
     }
 

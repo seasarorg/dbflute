@@ -473,10 +473,10 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
     // ===================================================================================
     //                                                                         Union Query
     //                                                                         ===========
-    protected def reflectRelationOnUnionQuery(bqs: ConditionQuery, uqs: ConditionQuery): Unit = {
+    def reflectRelationOnUnionQuery(bqs: ConditionQuery, uqs: ConditionQuery): Unit = {
 #if ($table.hasForeignKeyOrReferrerAsOne())
-        val bq: ${myConditionQueryClassName} = (${myConditionQueryClassName})bqs;
-        val uq: ${myConditionQueryClassName} = (${myConditionQueryClassName})uqs;
+        val bq: ${myConditionQueryClassName} = bqs.asInstanceOf[${myConditionQueryClassName}];
+        val uq: ${myConditionQueryClassName} = uqs.asInstanceOf[${myConditionQueryClassName}];
 #end
 #foreach ($fk in $table.foreignKeys)
         if (bq.hasConditionQuery${fk.foreignPropertyNameInitCap}()) {
@@ -550,7 +550,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
     }
     protected def xsetupOuterJoin${fk.foreignPropertyNameInitCap}(): Unit = {
         val cq: ${foreignCQClassName} = getConditionQuery${fk.foreignPropertyNameInitCap}();
-        Map<String, String> joinOnMap = newLinkedHashMapSized(4);
+        val joinOnMap: Map[String, String] = newLinkedHashMapSized(4);
 #foreach ($columnName in $fk.localColumnNameList)
 #set ($localColumn = $table.getColumn($columnName))
 #set ($foreignColumnName = $fk.getLocalForeignMapping().get($columnName))
@@ -591,7 +591,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
     }
     protected def xsetupOuterJoin${referrer.referrerPropertyNameInitCapAsOne}(): Unit = {
         val cq: ${relatedCQClassName} = getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}();
-        Map<String, String> joinOnMap = newLinkedHashMapSized(4);
+        val joinOnMap: Map[String, String] = newLinkedHashMapSized(4);
 #foreach ($columnName in $referrer.foreignColumnNameList)
 #set ($foreignColumn = $table.getColumn($columnName))
 #set ($referrerColumnName = $referrer.getForeignLocalMapping().get($columnName))

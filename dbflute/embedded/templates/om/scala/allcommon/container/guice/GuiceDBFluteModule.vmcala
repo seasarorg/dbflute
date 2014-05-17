@@ -19,6 +19,7 @@ import javax.sql.DataSource;
 
 import com.google.inject.AbstractModule;
 import org.seasar.dbflute.BehaviorSelector;
+import org.seasar.dbflute.bhv._;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
 import org.seasar.dbflute.bhv.core.InvokerAssistant;
@@ -72,15 +73,17 @@ class ${glDBFluteModule}(dataSource: DataSource) extends AbstractModule {
     }
 
     protected def setupBehavior(ker: BehaviorCommandInvoker, tor: BehaviorSelector, per: CommonColumnAutoSetupper): Unit = {
+        // unknown compile error 'illegal cyclic reference' if directly create the behaviors
+        // so use reflection here
 #foreach ($table in $database.behaviorTableList)
         {
-            val bhv: ${table.extendedBehaviorClassName} = new ${table.extendedBehaviorClassName}();
+            val bhv: ${table.baseBehaviorExtendsClassName} = Class.forName("${table.extendedBehaviorFullClassName}").newInstance().asInstanceOf[${table.baseBehaviorExtendsClassName}];
 #if ($table.isWritable())
             bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor); bhv.setCommonColumnAutoSetupper(per);
 #else
             bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor);
 #end
-            bind(classOf[${table.extendedBehaviorClassName}]).toInstance(bhv);
+            bind(classOf[${table.extendedBehaviorClassName}]).toInstance(bhv.asInstanceOf[${table.extendedBehaviorClassName}]);
         }
 #end
     }

@@ -1990,6 +1990,10 @@ public class Table {
         return getBaseBehaviorClassName() + suffix;
     }
 
+    public String getBaseBehaviorExtendsClassName() {
+        return isWritable() ? "AbstractBehaviorWritable" : "AbstractBehaviorReadable";
+    }
+
     public String getBaseConditionBeanClassName() {
         return getBaseEntityClassName() + "CB";
     }
@@ -2361,6 +2365,14 @@ public class Table {
 
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
+    }
+
+    protected DfLanguageDependency getLanguageDependency() {
+        return getBasicProperties().getLanguageDependency();
+    }
+
+    protected DfLanguageGrammar getLanguageGrammar() {
+        return getLanguageDependency().getLanguageGrammar();
     }
 
     protected DfDatabaseProperties getDatabaseProperties() {
@@ -3016,9 +3028,8 @@ public class Table {
     }
 
     protected String buildCommonColumnListSetupExpression(List<Column> commonColumnList) {
-        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
-        final DfLanguageGrammar grammar = lang.getLanguageGrammar();
-        final DfLanguageImplStyle implStyle = lang.getLanguageImplStyle();
+        final DfLanguageImplStyle implStyle = getLanguageDependency().getLanguageImplStyle();
+        final DfLanguageGrammar grammar = getLanguageGrammar();
         final StringBuilder sb = new StringBuilder();
         int index = 0;
         for (Column column : commonColumnList) {
@@ -3091,7 +3102,7 @@ public class Table {
         if (isAvailableSelectEntityPlainReturn()) {
             return entityType;
         } else {
-            return "OptionalEntity<" + entityType + ">";
+            return "OptionalEntity" + getLanguageGrammar().buildGenericOneClassHint(entityType);
         }
     }
 
@@ -3100,8 +3111,7 @@ public class Table {
     }
 
     public String getSelectEntityWithDeletedCheckModifier() {
-        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
-        final DfLanguageGrammar grammar = lang.getLanguageGrammar();
+        final DfLanguageGrammar grammar = getLanguageGrammar();
         return isAvailableSelectEntityWithDeletedCheck() ? grammar.getPublicModifier() : grammar.getProtectedModifier();
     }
 

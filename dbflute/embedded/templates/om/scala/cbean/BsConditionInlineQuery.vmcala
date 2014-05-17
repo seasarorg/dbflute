@@ -53,29 +53,24 @@ class ${myClassName}(childQuery: ConditionQuery, sqlClause: SqlClause, aliasName
     // ===================================================================================
     //                                                             Override about Register
     //                                                             =======================
-    @Override
-    protected def reflectRelationOnUnionQuery(bq: ConditionQuery, uq: ConditionQuery): Unit = {
+    override protected def reflectRelationOnUnionQuery(bq: ConditionQuery, uq: ConditionQuery): Unit = {
         val msg: String = "InlineView must not need UNION method: " + bq + " : " + uq;
         throw new IllegalConditionBeanOperationException(msg);
     }
 
-    @Override
-    protected def setupConditionValueAndRegisterWhereClause(k: ConditionKey, v: Object, cv: ConditionValue, col: String): Unit = {
+    override protected def setupConditionValueAndRegisterWhereClause(k: ConditionKey, v: Object, cv: ConditionValue, col: String): Unit = {
         regIQ(k, v, cv, col);
     }
 
-    @Override
-    protected def setupConditionValueAndRegisterWhereClause(k: ConditionKey, v: Object, cv: ConditionValue, col: String, op: ConditionOption): Unit = {
+    override protected def setupConditionValueAndRegisterWhereClause(k: ConditionKey, v: Object, cv: ConditionValue, col: String, op: ConditionOption): Unit = {
         regIQ(k, v, cv, col, op);
     }
 
-    @Override
-    protected def registerWhereClause(wc: String): Unit = {
+    override protected def registerWhereClause(wc: String): Unit = {
         registerInlineWhereClause(wc);
     }
 
-    @Override
-    protected def isInScopeRelationSuppressLocalAliasName(): Boolean = {
+    override protected def isInScopeRelationSuppressLocalAliasName(): Boolean = {
         if (_onClause) {
             throw new IllegalConditionBeanOperationException("InScopeRelation on OnClause is unsupported.");
         }

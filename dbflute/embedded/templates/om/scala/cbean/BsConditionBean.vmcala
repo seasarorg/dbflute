@@ -17,6 +17,7 @@ ${database.allClassCopyright}package ${glPackageBaseCB};
 #set ($myClassName = "${myBaseConditionBeanClassName}")
 
 import org.seasar.dbflute.cbean.AbstractConditionBean;
+import org.seasar.dbflute.cbean.AbstractConditionBean._;
 import org.seasar.dbflute.cbean.AndQuery;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
@@ -381,9 +382,9 @@ class ${myClassName} extends AbstractConditionBean {
 #end
         }
 #end
-        doSetupSelect(new SsCall() { public ConditionQuery qf() { return query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); } });
+        doSetupSelect(new SsCall() { def qf(): ConditionQuery = { return query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); } });
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery())
-        val _nss${tmpPropertyNameInitCap}: { = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})); }
+        { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})); }
         return _nss${tmpPropertyNameInitCap};
     }
 #end
@@ -411,7 +412,7 @@ class ${myClassName} extends AbstractConditionBean {
      */
     def setupSelect_${tmpPropertyNameInitCap}(): ${nestSelectSetuppperClassName} = {
         assertSetupSelectPurpose("${tmpPropertyName}");
-        doSetupSelect(new SsCall() { public ConditionQuery qf() { return query().query${tmpPropertyNameInitCap}(); } });
+        doSetupSelect(new SsCall() { def qf(): ConditionQuery = { return query().query${tmpPropertyNameInitCap}(); } });
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}()); }
         return _nss${tmpPropertyNameInitCap};
     }
@@ -421,7 +422,7 @@ class ${myClassName} extends AbstractConditionBean {
     // ===================================================================================
     //                                                                             Specify
     //                                                                             =======
-    protected var _specification: HpSpecification = null;
+    protected var _specification: Hp${myConditionBeanClassName}.HpSpecification = null;
 
     /**
      * Prepare for SpecifyColumn, (Specify)DerivedReferrer. <br />
@@ -439,9 +440,9 @@ class ${myClassName} extends AbstractConditionBean {
      * </pre>
      * @return The instance of specification. (NotNull)
      */
-    def specify(): HpSpecification = {
+    def specify(): Hp${myConditionBeanClassName}.HpSpecification = {
         assertSpecifyPurpose();
-        if (_specification == null) { _specification = new HpSpecification(this
+        if (_specification == null) { _specification = new Hp${myConditionBeanClassName}.HpSpecification(this
             , new HpSpQyCall[${myConditionQueryClassName}]() {
                 def has(): Boolean = { return true; }
                 def qy(): ${myConditionQueryClassName} = { return getConditionQuery(); }
@@ -456,187 +457,6 @@ class ${myClassName} extends AbstractConditionBean {
 
     def hasSpecifiedColumn(): Boolean = {
         return _specification != null && _specification.isAlreadySpecifiedRequiredColumn();
-    }
-
-    class HpSpecification(baseCB: ConditionBean, qyCall: HpSpQyCall[${myConditionQueryClassName}], purpose: HpCBPurpose, dbmetaProvider: DBMetaProvider)
-            extends HpAbstractSpecification[${myConditionQueryClassName}](baseCB, qyCall, purpose, dbmetaProvider) {
-#foreach ($fk in $table.foreignKeys)
-#set ($tmpPropertyName = "${fk.foreignPropertyName}")
-#set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
-        protected var _${tmpPropertyName}: ${tmpCBClassName}.HpSpecification = null;
-#end
-#foreach ($referrer in $table.referrerAsOneList)
-#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
-#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-        protected var _${tmpPropertyName}: ${tmpCBClassName}.HpSpecification = null;
-#end
-#foreach ($col in $table.columns)
-        /**
-         * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-         * @return The information object of specified column. (NotNull)
-         */
-        def column${col.javaName}(): HpSpecifiedColumn = { return doColumn("${col.name}"); }
-#end
-        def everyColumn(): Unit = { doEveryColumn(); }
-        def exceptRecordMetaColumn(): Unit = { doExceptRecordMetaColumn(); }
-        @Override
-        protected def doSpecifyRequiredColumn(): Unit = {
-#foreach ($col in $table.primaryKey)
-            column${col.javaName}(); // PK
-#end
-#foreach ($referrer in $table.referrerBothNonPKList)
-            if (qyCall().qy().xgetReferrerQuery() instanceof ${referrer.referrerTableExtendedConditionQueryClassName}) {
-#foreach ($col in $referrer.foreignColumnList)
-                column${col.javaName}(); // non PK but referred column (and referrer also non PK)
-#end
-            }
-#end
-#foreach ($fk in $table.foreignKeyList)
-#set ($tmpPropertyName = "${fk.foreignPropertyName}")
-#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
-#if ($fk.hasLocalColumnExceptPrimaryKey())
-            if (qyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}()
-                    || qyCall().qy().xgetReferrerQuery() instanceof ${fk.foreignTableExtendedConditionQueryClassName}) {
-#foreach ($col in $fk.localColumnList)
-#if (!$col.isPrimaryKey())
-                column${col.javaName}(); // FK or one-to-one referrer
-#end
-#end
-            }
-#end
-#end
-        }
-        @Override
-        protected def getTableDbName(): String = { return "$table.tableDbName"; }
-#foreach ($fk in $table.foreignKeys)
-#set ($tmpPropertyName = "${fk.foreignPropertyName}")
-#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
-#set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
-#set ($tmpCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
-#if ($fk.hasDynamicFixedCondition())
-        /**
-         * Prepare to specify functions about relation table. <br />
-         * ${fk.foreignDispForJavaDocNest}
-         * ${fk.dynamicFixedConditionArgsJavaDocStringNest}
-         * @return The instance for specification for relation table to specify. (NotNull)
-         */
-        def specify${tmpPropertyNameInitCap}(${fk.dynamicFixedConditionFinalArgs}): ${tmpCBClassName}.HpSpecification = {
-            assertRelation("${tmpPropertyName}");
-            if (_${tmpPropertyName} == null) {
-                _${tmpPropertyName} = new ${tmpCBClassName}.HpSpecification(_baseCB, new HpSpQyCall<${tmpCQClassName}>() {
-                    def has(): Boolean = { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
-                    def qy(): ${tmpCQClassName} = { return _qyCall.qy().query${tmpPropertyNameInitCap}(${fk.dynamicFixedConditionVariables}); } }
-                    , _purpose, _dbmetaProvider);
-                if (xhasSyncQyCall()) { // inherits it
-                    _${tmpPropertyName}.xsetSyncQyCall(new HpSpQyCall<${tmpCQClassName}>() {
-                        def has(): Boolean = { return xsyncQyCall().has() && xsyncQyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
-                        def qy(): ${tmpCQClassName} = { return xsyncQyCall().qy().query${tmpPropertyNameInitCap}(${fk.dynamicFixedConditionVariables}); }
-                    });
-                }
-            }
-            return _${tmpPropertyName};
-        }
-#end
-        /**
-         * Prepare to specify functions about relation table. <br />
-         * ${fk.foreignDispForJavaDocNest}
-         * @return The instance for specification for relation table to specify. (NotNull)
-         */
-        def specify${tmpPropertyNameInitCap}(): ${tmpCBClassName}.HpSpecification = {
-            assertRelation("${tmpPropertyName}");
-            if (_${tmpPropertyName} == null) {
-                _${tmpPropertyName} = new ${tmpCBClassName}.HpSpecification(_baseCB, new HpSpQyCall<${tmpCQClassName}>() {
-                    def has(): Boolean = { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
-#if ($fk.hasDynamicFixedCondition())
-                    def qy(): ${tmpCQClassName} = { return _qyCall.qy().getConditionQuery${tmpPropertyNameInitCap}(); } }
-#else
-                    def qy(): ${tmpCQClassName} = { return _qyCall.qy().query${tmpPropertyNameInitCap}(); } }
-#end
-                    , _purpose, _dbmetaProvider);
-                if (xhasSyncQyCall()) { // inherits it
-                    _${tmpPropertyName}.xsetSyncQyCall(new HpSpQyCall<${tmpCQClassName}>() {
-                        def has(): Boolean = { return xsyncQyCall().has() && xsyncQyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
-#if ($fk.hasDynamicFixedCondition())
-                        def qy(): ${tmpCQClassName} = { return xsyncQyCall().qy().getConditionQuery${tmpPropertyNameInitCap}(); }
-#else
-                        def qy(): ${tmpCQClassName} = { return xsyncQyCall().qy().query${tmpPropertyNameInitCap}(); }
-#end
-                    });
-                }
-            }
-            return _${tmpPropertyName};
-        }
-#end
-#foreach ($referrer in $table.referrerAsOneList)
-#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
-#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($tmpCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-        /**
-         * Prepare to specify functions about relation table. <br />
-         * ${referrer.referrerDispAsOneForJavaDocNest}
-         * @return The instance for specification for relation table to specify. (NotNull)
-         */
-        def specify${tmpPropertyNameInitCap}(): ${tmpCBClassName}.HpSpecification = {
-            assertRelation("${tmpPropertyName}");
-            if (_${tmpPropertyName} == null) {
-                _${tmpPropertyName} = new ${tmpCBClassName}.HpSpecification(_baseCB, new HpSpQyCall<${tmpCQClassName}>() {
-                    def has(): Boolean = { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
-                    def qy(): ${tmpCQClassName} = { return _qyCall.qy().query${tmpPropertyNameInitCap}(); } }
-                    , _purpose, _dbmetaProvider);
-                if (xhasSyncQyCall()) { // inherits it
-                    _${tmpPropertyName}.xsetSyncQyCall(new HpSpQyCall<${tmpCQClassName}>() {
-                        def has(): Boolean = { return xsyncQyCall().has() && xsyncQyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
-                        def qy(): ${tmpCQClassName} = { return xsyncQyCall().qy().query${tmpPropertyNameInitCap}(); }
-                    });
-                }
-            }
-            return _${tmpPropertyName};
-        }
-#end
-#foreach ($referrer in $table.derivedReferrerReferrers)
-#if (!${referrer.isOneToOne()})
-#set ($tmpPropertyName = "${referrer.referrerPropertyName}")
-#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
-#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($tmpEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
-#set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
-        /**
-         * Prepare for (Specify)DerivedReferrer (correlated sub-query). <br />
-         * {select max(FOO) from ${referrer.table.tableDbName} where ...) as FOO_MAX} <br />
-         * ${referrer.referrerDispForJavaDocNest}
-         * <pre>
-         * cb.specify().<span style="color: #DD4747">derived${tmpPropertyNameInitCap}()</span>.<span style="color: #DD4747">max</span>(new SubQuery&lt;${tmpCBClassName}&gt;() {
-         *     public void query(${tmpCBClassName} subCB) {
-         *         subCB.specify().<span style="color: #DD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
-         *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
-         *     }
-         * }, ${tmpEntityClassName}.<span style="color: #DD4747">ALIAS_foo...</span>);
-         * </pre>
-         * @return The object to set up a function for referrer table. (NotNull)
-         */
-        def derived${tmpPropertyNameInitCap}(): HpSDRFunction[${tmpCBClassName}, ${tmpLocalCQClassName}] = {
-            assertDerived("${tmpPropertyName}"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
-            return new HpSDRFunction[${tmpCBClassName}, ${tmpLocalCQClassName}](_baseCB, _qyCall.qy(), new HpSDRSetupper[${tmpCBClassName}, ${tmpLocalCQClassName}]() {
-                def setup(fn: String, sq: SubQuery[${tmpCBClassName}], cq: ${tmpLocalCQClassName}, al: String, op: DerivedReferrerOption): Unit = {
-                    cq.xsderive${referrer.referrerPropertyNameInitCap}(fn, sq, al, op); } }, _dbmetaProvider);
-        }
-#end
-#end
-#if ($table.hasSinglePrimaryKey())
-#if ($table.isAvailableMyselfMyselfDerived())
-        /**
-         * Prepare for (Specify)MyselfDerived (SubQuery).
-         * @return The object to set up a function for myself table. (NotNull)
-         */
-        def myselfDerived(): HpSDRFunction[${myConditionBeanClassName}, ${myConditionQueryClassName}] = {
-            assertDerived("myselfDerived"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
-            return new HpSDRFunction[${myConditionBeanClassName}, ${myConditionQueryClassName}](_baseCB, _qyCall.qy(), new HpSDRSetupper[${myConditionBeanClassName}, ${myConditionQueryClassName}]() {
-                def setup(fn: String, sq: SubQuery[${myConditionBeanClassName}], cq: ${myConditionQueryClassName}, al: String, op: DerivedReferrerOption): Unit = {
-                    cq.xsmyselfDerive(fn, sq, al, op); } }, _dbmetaProvider);
-        }
-#end
-#end
     }
 
     // [DBFlute-0.9.5.3]
@@ -788,4 +608,192 @@ class ${myClassName} extends AbstractConditionBean {
     protected def getConditionQueryClassNameInternally(): String = { return classOf[${myConditionQueryClassName}].getName(); }
     protected def getSubQueryClassNameInternally(): String = { return classOf[SubQuery[_]].getName(); }
     protected def getConditionOptionClassNameInternally(): String = { return classOf[ConditionOption].getName(); }
+}
+
+/**
+ * The singleton object to define condition-bean's specification.
+ * @author ${database.classAuthor}
+ */
+object Hp${myConditionBeanClassName} {
+
+    class HpSpecification(baseCB: ConditionBean, qyCall: HpSpQyCall[${myConditionQueryClassName}], purpose: HpCBPurpose, dbmetaProvider: DBMetaProvider)
+            extends HpAbstractSpecification[${myConditionQueryClassName}](baseCB, qyCall, purpose, dbmetaProvider) {
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+        protected var _${tmpPropertyName}: Hp${tmpCBClassName}.HpSpecification = null;
+#end
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+        protected var _${tmpPropertyName}: Hp${tmpCBClassName}.HpSpecification = null;
+#end
+#foreach ($col in $table.columns)
+        /**
+         * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+         * @return The information object of specified column. (NotNull)
+         */
+        def column${col.javaName}(): HpSpecifiedColumn = { return doColumn("${col.name}"); }
+#end
+        def everyColumn(): Unit = { doEveryColumn(); }
+        def exceptRecordMetaColumn(): Unit = { doExceptRecordMetaColumn(); }
+        @Override
+        protected def doSpecifyRequiredColumn(): Unit = {
+#foreach ($col in $table.primaryKey)
+            column${col.javaName}(); // PK
+#end
+#foreach ($referrer in $table.referrerBothNonPKList)
+            if (qyCall().qy().xgetReferrerQuery().isInstanceOf[${referrer.referrerTableExtendedConditionQueryClassName}]) {
+#foreach ($col in $referrer.foreignColumnList)
+                column${col.javaName}(); // non PK but referred column (and referrer also non PK)
+#end
+            }
+#end
+#foreach ($fk in $table.foreignKeyList)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#if ($fk.hasLocalColumnExceptPrimaryKey())
+            if (qyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}()
+                    || qyCall().qy().xgetReferrerQuery().isInstanceOf[${fk.foreignTableExtendedConditionQueryClassName}]) {
+#foreach ($col in $fk.localColumnList)
+#if (!$col.isPrimaryKey())
+                column${col.javaName}(); // FK or one-to-one referrer
+#end
+#end
+            }
+#end
+#end
+        }
+        @Override
+        protected def getTableDbName(): String = { return "$table.tableDbName"; }
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($tmpCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#if ($fk.hasDynamicFixedCondition())
+        /**
+         * Prepare to specify functions about relation table. <br />
+         * ${fk.foreignDispForJavaDocNest}
+         * ${fk.dynamicFixedConditionArgsJavaDocStringNest}
+         * @return The instance for specification for relation table to specify. (NotNull)
+         */
+        def specify${tmpPropertyNameInitCap}(${fk.dynamicFixedConditionFinalArgs}): ${tmpCBClassName}${database.sharp}HpSpecification = {
+            assertRelation("${tmpPropertyName}");
+            if (_${tmpPropertyName} == null) {
+                _${tmpPropertyName} = new Hp${tmpCBClassName}.HpSpecification(_baseCB, new HpSpQyCall[${tmpCQClassName}]() {
+                    def has(): Boolean = { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                    def qy(): ${tmpCQClassName} = { return _qyCall.qy().query${tmpPropertyNameInitCap}(${fk.dynamicFixedConditionVariables}); } }
+                    , _purpose, _dbmetaProvider);
+                if (xhasSyncQyCall()) { // inherits it
+                    _${tmpPropertyName}.xsetSyncQyCall(new HpSpQyCall[${tmpCQClassName}]() {
+                        def has(): Boolean = { return xsyncQyCall().has() && xsyncQyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                        def qy(): ${tmpCQClassName} = { return xsyncQyCall().qy().query${tmpPropertyNameInitCap}(${fk.dynamicFixedConditionVariables}); }
+                    });
+                }
+            }
+            return _${tmpPropertyName};
+        }
+#end
+        /**
+         * Prepare to specify functions about relation table. <br />
+         * ${fk.foreignDispForJavaDocNest}
+         * @return The instance for specification for relation table to specify. (NotNull)
+         */
+        def specify${tmpPropertyNameInitCap}(): Hp${tmpCBClassName}.HpSpecification = {
+            assertRelation("${tmpPropertyName}");
+            if (_${tmpPropertyName} == null) {
+                _${tmpPropertyName} = new Hp${tmpCBClassName}.HpSpecification(_baseCB, new HpSpQyCall[${tmpCQClassName}]() {
+                    def has(): Boolean = { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+#if ($fk.hasDynamicFixedCondition())
+                    def qy(): ${tmpCQClassName} = { return _qyCall.qy().getConditionQuery${tmpPropertyNameInitCap}(); } }
+#else
+                    def qy(): ${tmpCQClassName} = { return _qyCall.qy().query${tmpPropertyNameInitCap}(); } }
+#end
+                    , _purpose, _dbmetaProvider);
+                if (xhasSyncQyCall()) { // inherits it
+                    _${tmpPropertyName}.xsetSyncQyCall(new HpSpQyCall[${tmpCQClassName}]() {
+                        def has(): Boolean = { return xsyncQyCall().has() && xsyncQyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+#if ($fk.hasDynamicFixedCondition())
+                        def qy(): ${tmpCQClassName} = { return xsyncQyCall().qy().getConditionQuery${tmpPropertyNameInitCap}(); }
+#else
+                        def qy(): ${tmpCQClassName} = { return xsyncQyCall().qy().query${tmpPropertyNameInitCap}(); }
+#end
+                    });
+                }
+            }
+            return _${tmpPropertyName};
+        }
+#end
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($tmpCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+        /**
+         * Prepare to specify functions about relation table. <br />
+         * ${referrer.referrerDispAsOneForJavaDocNest}
+         * @return The instance for specification for relation table to specify. (NotNull)
+         */
+        def specify${tmpPropertyNameInitCap}(): Hp${tmpCBClassName}.HpSpecification = {
+            assertRelation("${tmpPropertyName}");
+            if (_${tmpPropertyName} == null) {
+                _${tmpPropertyName} = new Hp${tmpCBClassName}.HpSpecification(_baseCB, new HpSpQyCall[${tmpCQClassName}]() {
+                    def has(): Boolean = { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                    def qy(): ${tmpCQClassName} = { return _qyCall.qy().query${tmpPropertyNameInitCap}(); } }
+                    , _purpose, _dbmetaProvider);
+                if (xhasSyncQyCall()) { // inherits it
+                    _${tmpPropertyName}.xsetSyncQyCall(new HpSpQyCall[${tmpCQClassName}]() {
+                        def has(): Boolean = { return xsyncQyCall().has() && xsyncQyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                        def qy(): ${tmpCQClassName} = { return xsyncQyCall().qy().query${tmpPropertyNameInitCap}(); }
+                    });
+                }
+            }
+            return _${tmpPropertyName};
+        }
+#end
+#foreach ($referrer in $table.derivedReferrerReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($tmpPropertyName = "${referrer.referrerPropertyName}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($tmpEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+#set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
+        /**
+         * Prepare for (Specify)DerivedReferrer (correlated sub-query). <br />
+         * {select max(FOO) from ${referrer.table.tableDbName} where ...) as FOO_MAX} <br />
+         * ${referrer.referrerDispForJavaDocNest}
+         * <pre>
+         * cb.specify().<span style="color: #DD4747">derived${tmpPropertyNameInitCap}()</span>.<span style="color: #DD4747">max</span>(new SubQuery&lt;${tmpCBClassName}&gt;() {
+         *     public void query(${tmpCBClassName} subCB) {
+         *         subCB.specify().<span style="color: #DD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
+         *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
+         *     }
+         * }, ${tmpEntityClassName}.<span style="color: #DD4747">ALIAS_foo...</span>);
+         * </pre>
+         * @return The object to set up a function for referrer table. (NotNull)
+         */
+        def derived${tmpPropertyNameInitCap}(): HpSDRFunction[${tmpCBClassName}, ${tmpLocalCQClassName}] = {
+            assertDerived("${tmpPropertyName}"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
+            return new HpSDRFunction[${tmpCBClassName}, ${tmpLocalCQClassName}](_baseCB, _qyCall.qy(), new HpSDRSetupper[${tmpCBClassName}, ${tmpLocalCQClassName}]() {
+                def setup(fn: String, sq: SubQuery[${tmpCBClassName}], cq: ${tmpLocalCQClassName}, al: String, op: DerivedReferrerOption): Unit = {
+                    cq.xsderive${referrer.referrerPropertyNameInitCap}(fn, sq, al, op); } }, _dbmetaProvider);
+        }
+#end
+#end
+#if ($table.hasSinglePrimaryKey())
+#if ($table.isAvailableMyselfMyselfDerived())
+        /**
+         * Prepare for (Specify)MyselfDerived (SubQuery).
+         * @return The object to set up a function for myself table. (NotNull)
+         */
+        def myselfDerived(): HpSDRFunction[${myConditionBeanClassName}, ${myConditionQueryClassName}] = {
+            assertDerived("myselfDerived"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
+            return new HpSDRFunction[${myConditionBeanClassName}, ${myConditionQueryClassName}](_baseCB, _qyCall.qy(), new HpSDRSetupper[${myConditionBeanClassName}, ${myConditionQueryClassName}]() {
+                def setup(fn: String, sq: SubQuery[${myConditionBeanClassName}], cq: ${myConditionQueryClassName}, al: String, op: DerivedReferrerOption): Unit = {
+                    cq.xsmyselfDerive(fn, sq, al, op); } }, _dbmetaProvider);
+        }
+#end
+#end
+    }
 }

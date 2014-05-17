@@ -40,12 +40,6 @@ import ${glPackageExtendedEntity}._;
 import ${myDBMetaPackageName}._;
 import ${glPackageCB}._;
 
-#set ($myExtendClassName = "")
-#if ($table.isWritable())
-  #set ($myExtendClassName = "AbstractBehaviorWritable")
-#else
-  #set ($myExtendClassName = "AbstractBehaviorReadable")
-#end
 /**
  * The behavior of ${table.basicInfoDispString}. <br />
  * <pre>
@@ -78,7 +72,7 @@ import ${glPackageCB}._;
  * </pre>
  * @author ${database.classAuthor}
  */
-abstract class ${myClassName} extends ${myExtendClassName} {
+abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     // ===================================================================================
     //                                                                          Definition
@@ -141,8 +135,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
         return delegateSelectCountPlainly(cb);
     }
 
-    @Override
-    protected def doReadCount(cb: ConditionBean): Integer = {
+    override protected def doReadCount(cb: ConditionBean): Int = {
         return selectCount(downcast(cb));
     }
 
@@ -364,7 +357,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
     protected def doSelectPage[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY]): PagingResultBean[ENTITY] = {
         assertCBStateValid(cb); assertObjectNotNull("entityType", tp);
         return helpSelectPageInternally(cb, tp, new InternalSelectPageCallback[ENTITY, ${myConditionBeanClassName}]() {
-            def callbackSelectCount(cb: ${myConditionBeanClassName}): Integer = { return doSelectCountPlainly(cb); }
+            def callbackSelectCount(cb: ${myConditionBeanClassName}): Int = { return doSelectCountPlainly(cb); }
             def callbackSelectList(cb: ${myConditionBeanClassName}, tp: Class[ENTITY]): List[ENTITY] = { return doSelectList(cb, tp); }
         });
     }
@@ -523,7 +516,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      */
     def load${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], setupper: ${table.loadReferrerConditionSetupperName}[${referrerCBClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
         xassLRArg(${myEntityListVariableName}, setupper);
-        return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>().xinit(setupper));
+        return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]().xinit(setupper));
     }
 
     /**
@@ -559,7 +552,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      */
     def load${referrer.referrerPropertyNameInitCap}(${myEntityVariableName}: ${myExtendedObjectClassName}, setupper: ${table.loadReferrerConditionSetupperName}[${referrerCBClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
         xassLRArg(${myEntityVariableName}, setupper);
-        return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), new LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>().xinit(setupper));
+        return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), new LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]().xinit(setupper));
     }
 
 #if ($table.isAvailableLoadReferrerByOldOption())
@@ -589,15 +582,15 @@ abstract class ${myClassName} extends ${myExtendClassName} {
     @SuppressWarnings("unchecked")
     def load${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], loadReferrerOption: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
         xassLRArg(${myEntityListVariableName}, loadReferrerOption);
-        if (${myEntityListVariableName}.isEmpty()) { return (NestedReferrerLoader<${referrerEntityClassName}>)EMPTY_LOADER; }
+        if (${myEntityListVariableName}.isEmpty()) { return (NestedReferrerLoader[${referrerEntityClassName}])EMPTY_LOADER; }
         return doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}, loadReferrerOption);
     }
 
 #end
     protected def doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
         val referrerBhv: ${referrerBhvClassName} = xgetBSFLR().select(classOf[${referrerBhvClassName}]);
-        return helpLoadReferrerInternally(${myEntityListVariableName}, option, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
-            public ${keyJavaNative} getPKVal(${myExtendedObjectClassName} et)
+        return helpLoadReferrerInternally(${myEntityListVariableName}, option, new InternalLoadReferrerCallback[${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}]() {
+            def getPKVal(et: ${myExtendedObjectClassName}): ${keyJavaNative} =
 #if ($referrer.canImplicitConversion())
             { if (et.get${localColumn.javaName}() == null) { return null; }
 #if ($referrer.isConvertToReferrerByToString())
@@ -612,16 +605,16 @@ abstract class ${myClassName} extends ${myExtendClassName} {
 #else
             { return et.get${localColumn.javaName}(); }
 #end
-            public void setRfLs(${myExtendedObjectClassName} et, List<${referrerEntityClassName}> ls)
+            def setRfLs(et: ${myExtendedObjectClassName}, ls: List[${referrerEntityClassName}]): Unit =
             { et.set${referrer.referrerPropertyNameInitCap}(ls); }
             def newMyCB(): ${referrerCBClassName} = { return referrerBhv.newMyConditionBean(); }
-            public void qyFKIn(${referrerCBClassName} cb, List<${keyJavaNative}> ls)
+            def qyFKIn(cb: ${referrerCBClassName}, ls: List[${keyJavaNative}]): Unit =
             { cb.query().set${referrerColumn.javaName}_InScope(ls); }
             def qyOdFKAsc(cb: ${referrerCBClassName}): Unit = { cb.query().addOrderBy_${referrerColumn.javaName}_Asc(); }
             def spFKCol(cb: ${referrerCBClassName}): Unit = { cb.specify().column${referrerColumn.javaName}(); }
             def selRfLs(cb: ${referrerCBClassName}): List[${referrerEntityClassName}] = { return referrerBhv.selectList(cb); }
             def getFKVal(re: ${referrerEntityClassName}): ${keyJavaNative} = { return re.get${referrerColumn.javaName}(); }
-            public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} le)
+            def setlcEt(re: ${referrerEntityClassName}, le: ${myExtendedObjectClassName}): Unit =
             { re.set${referrer.foreignPropertyNameInitCap}(le); }
             def getRfPrNm(): String = { return "${referrer.referrerPropertyName}"; }
         });
@@ -639,16 +632,16 @@ abstract class ${myClassName} extends ${myExtendClassName} {
     @SuppressWarnings("unchecked")
     def load${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], loadReferrerOption: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
         xassLRArg(${myEntityListVariableName}, loadReferrerOption);
-        if (${myEntityListVariableName}.isEmpty()) { return (NestedReferrerLoader<${referrerEntityClassName}>)EMPTY_LOADER; }
+        if (${myEntityListVariableName}.isEmpty()) { return (NestedReferrerLoader[${referrerEntityClassName}])EMPTY_LOADER; }
         return doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}, loadReferrerOption);
     }
 
 #end
     protected def doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
         val referrerBhv: ${referrerBhvClassName} = xgetBSFLR().select(classOf[${referrerBhvClassName}]);
-        return helpLoadReferrerInternally(${myEntityListVariableName}, option, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
+        return helpLoadReferrerInternally(${myEntityListVariableName}, option, new InternalLoadReferrerCallback[${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}]() {
             def getPKVal(et: ${myExtendedObjectClassName}): ${keyJavaNative} = {
-                val primaryKeyMap: ${keyJavaNative} = new java.util.LinkedHashMap<String,  Object>();
+                val primaryKeyMap: ${keyJavaNative} = new java.util.LinkedHashMap();
 #foreach ($col in $referrer.foreignColumnList)
                 primaryKeyMap.put("${col.javaName}", et.get${col.javaName}());
 #end
@@ -660,7 +653,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
                 val aliasName: String = cb.getSqlClause().getBasePointAliasName();
                 val identity: String = null;
                 val sb: StringBuilder = new StringBuilder();
-                for (${keyJavaNative} primaryKeyMap : ls) {
+                ls.asScala.foreach(primaryKeyMap => {
                     if (sb.length() > 0) { sb.append(")").append(ln()).append("     or ("); }
 #set ($referrerColumnIndex = 0)
 #foreach ($localColumn in $referrer.foreignColumnList)
@@ -715,19 +708,19 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      * @return The list of foreign table. (NotNull, EmptyAllowed, NotNullElement)
      */
     def pullout${foreignKey.foreignPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): List[${foreignEntityClassName}] = {
-        return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}>() {
+        return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback[${myExtendedObjectClassName}, ${foreignEntityClassName}]() {
             def getFr(et: ${myExtendedObjectClassName}): ${foreignEntityClassName} = { return et.get${foreignKey.foreignPropertyNameInitCap}(); }
             def hasRf(): Boolean = { return ${foreignKey.canBeReferrer()}; }
 #if ($foreignKey.canBeReferrer())
 #if ($foreignKey.isOneToOne())
-            public void setRfLs(${foreignEntityClassName} et, List[${myExtendedObjectClassName}] ls)
+            def setRfLs(et: ${foreignEntityClassName}, ls: List[${myExtendedObjectClassName}]): Unit =
             { if (!ls.isEmpty()) { et.set${foreignKey.referrerPropertyNameInitCapAsOne}(ls.get(0)); } }
 #else
-            public void setRfLs(${foreignEntityClassName} et, List[${myExtendedObjectClassName}] ls)
+            def setRfLs(et: ${foreignEntityClassName}, ls: List[${myExtendedObjectClassName}]): Unit =
             { et.set${foreignKey.referrerPropertyNameInitCap}(ls); }
 #end
 #else
-            public void setRfLs(${foreignEntityClassName} et, List[${myExtendedObjectClassName}] ls)
+            def setRfLs(et: ${foreignEntityClassName}, ls: List[${myExtendedObjectClassName}]): Unit =
             { throw new UnsupportedOperationException(); }
 #end
         });
@@ -742,10 +735,10 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      * @return The list of referrer-as-one table. (NotNull, EmptyAllowed, NotNullElement)
      */
     def pullout${referrer.referrerPropertyNameInitCapAsOne}(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): List[${referrerEntityClassName}] = {
-        return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${referrerEntityClassName}>() {
+        return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback[${myExtendedObjectClassName}, ${referrerEntityClassName}]() {
             def getFr(et: ${myExtendedObjectClassName}): ${referrerEntityClassName} = { return et.get${referrer.referrerPropertyNameInitCapAsOne}(); }
             def hasRf(): Boolean = { return ${referrer.canBeReferrer()}; }
-            public void setRfLs(${referrerEntityClassName} et, List[${myExtendedObjectClassName}] ls)
+            def setRfLs(et: ${referrerEntityClassName}, ls: List[${myExtendedObjectClassName}]): Unit =
             { if (!ls.isEmpty()) { et.set${referrer.foreignPropertyNameInitCap}(ls.get(0)); } }
         });
     }
@@ -870,7 +863,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
         prepareUpdateOption(op);
         helpUpdateInternally(${myEntityVariableName}, new InternalUpdateCallback[${myExtendedObjectClassName}]() {
-            def callbackDelegateUpdate(et: ${myExtendedObjectClassName}): Integer = { return delegateUpdate(et, op); } });
+            def callbackDelegateUpdate(et: ${myExtendedObjectClassName}): Int = { return delegateUpdate(et, op); } });
     }
 
     protected def prepareUpdateOption(op: UpdateOption[${myConditionBeanClassName}]): Unit = {
@@ -930,7 +923,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
         prepareUpdateOption(op);
         helpUpdateNonstrictInternally(${myEntityVariableName}, new InternalUpdateNonstrictCallback[${myExtendedObjectClassName}]() {
-            def callbackDelegateUpdateNonstrict(et: ${myExtendedObjectClassName}): Integer = { return delegateUpdateNonstrict(et, op); } });
+            def callbackDelegateUpdateNonstrict(et: ${myExtendedObjectClassName}): Int = { return delegateUpdateNonstrict(et, op); } });
     }
 #end
 
@@ -970,7 +963,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
             def callbackInsert(et: ${myExtendedObjectClassName}): Unit = { doInsert(et, iop); }
             def callbackUpdate(et: ${myExtendedObjectClassName}): Unit = { doUpdate(et, uop); }
             def callbackNewMyConditionBean(): ${myConditionBeanClassName} = { return newMyConditionBean(); }
-            def callbackSelectCount(cb: ${myConditionBeanClassName}): Integer = { return selectCount(cb); }
+            def callbackSelectCount(cb: ${myConditionBeanClassName}): Int = { return selectCount(cb); }
         });
     }
 
@@ -1053,7 +1046,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
         prepareDeleteOption(op);
         helpDeleteInternally(${myEntityVariableName}, new InternalDeleteCallback[${myExtendedObjectClassName}]() {
-            def callbackDelegateDelete(et: ${myExtendedObjectClassName}): Integer = { return delegateDelete(et, op); } });
+            def callbackDelegateDelete(et: ${myExtendedObjectClassName}): Int = { return delegateDelete(et, op); } });
     }
 
     protected def prepareDeleteOption(op: DeleteOption[${myConditionBeanClassName}]): Unit = {
@@ -1090,7 +1083,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
         prepareDeleteOption(op);
         helpDeleteNonstrictInternally(${myEntityVariableName}, new InternalDeleteNonstrictCallback[${myExtendedObjectClassName}]() {
-            def callbackDelegateDeleteNonstrict(et: ${myExtendedObjectClassName}): Integer = { return delegateDeleteNonstrict(et, op); } });
+            def callbackDelegateDeleteNonstrict(et: ${myExtendedObjectClassName}): Int = { return delegateDeleteNonstrict(et, op); } });
     }
 
     /**
@@ -1115,7 +1108,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
         prepareDeleteOption(op);
         helpDeleteNonstrictIgnoreDeletedInternally(${myEntityVariableName}, new InternalDeleteNonstrictIgnoreDeletedCallback[${myExtendedObjectClassName}]() {
-            def callbackDelegateDeleteNonstrict(et: ${myExtendedObjectClassName}): Integer = { return delegateDeleteNonstrict(et, op); } });
+            def callbackDelegateDeleteNonstrict(et: ${myExtendedObjectClassName}): Int = { return delegateDeleteNonstrict(et, op); } });
     }
 #end
 
@@ -1156,12 +1149,12 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNullAllowed: when auto-increment)
      * @return The array of inserted count. (NotNull, EmptyAllowed)
      */
-    def batchInsert(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): Array[Integer] = {
+    def batchInsert(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): Array[Int] = {
         val op: InsertOption[${myConditionBeanClassName}] = createInsertUpdateOption();
         return doBatchInsert(${myEntityListVariableName}, op);
     }
 
-    protected def doBatchInsert(${myEntityListVariableName}: List[${myExtendedObjectClassName}], op: InsertOption[${myConditionBeanClassName}]): Array[Integer] = {
+    protected def doBatchInsert(${myEntityListVariableName}: List[${myExtendedObjectClassName}], op: InsertOption[${myConditionBeanClassName}]): Array[Int] = {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         prepareBatchInsertOption(${myEntityListVariableName}, op);
         return delegateBatchInsert(${myEntityListVariableName}, op);
@@ -1179,7 +1172,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    protected def doLumpCreate(ls: List[Entity], op: InsertOption[_ <: ConditionBean]): Array[Integer] = {
+    protected def doLumpCreate(ls: List[Entity], op: InsertOption[_ <: ConditionBean]): Array[Int] = {
         if (op == null) { return batchInsert(downcast(ls)); }
         else { return varyingBatchInsert(downcast(ls), downcast(op)); }
     }
@@ -1216,12 +1209,12 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
-    def batchUpdate(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): Array[Integer] = {
+    def batchUpdate(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): Array[Int] = {
         val op: UpdateOption[${myConditionBeanClassName}] = createPlainUpdateOption();
         return doBatchUpdate(${myEntityListVariableName}, op);
     }
 
-    protected def doBatchUpdate(${myEntityListVariableName}: List[${myExtendedObjectClassName}], op: UpdateOption[${myConditionBeanClassName}]): Array[Integer] = {
+    protected def doBatchUpdate(${myEntityListVariableName}: List[${myExtendedObjectClassName}], op: UpdateOption[${myConditionBeanClassName}]): Array[Int] = {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         prepareBatchUpdateOption(${myEntityListVariableName}, op);
         return delegateBatchUpdate(${myEntityListVariableName}, op);
@@ -1239,7 +1232,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    protected def doLumpModify(ls: List[Entity], op: UpdateOption[_ <: ConditionBean]): Array[Integer] = {
+    protected def doLumpModify(ls: List[Entity], op: UpdateOption[_ <: ConditionBean]): Array[Int] = {
         if (op == null) { return batchUpdate(downcast(ls)); }
         else { return varyingBatchUpdate(downcast(ls), downcast(op)); }
     }
@@ -1280,7 +1273,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
-    def batchUpdate(${myEntityListVariableName}: List[${myExtendedObjectClassName}], updateColumnSpec: SpecifyQuery[${myConditionBeanClassName}]): Array[Integer] = {
+    def batchUpdate(${myEntityListVariableName}: List[${myExtendedObjectClassName}], updateColumnSpec: SpecifyQuery[${myConditionBeanClassName}]): Array[Int] = {
         return doBatchUpdate(${myEntityListVariableName}, createSpecifiedUpdateOption(updateColumnSpec));
     }
 #if ($table.hasOptimisticLock())
@@ -1309,12 +1302,12 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      * @return The array of updated count. (NotNull, EmptyAllowed)
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
-    def batchUpdateNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): Array[Integer] = {
+    def batchUpdateNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): Array[Int] = {
         val option: UpdateOption[${myConditionBeanClassName}] = createPlainUpdateOption();
         return doBatchUpdateNonstrict(${myEntityListVariableName}, option);
     }
 
-    protected def doBatchUpdateNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}], op: UpdateOption[${myConditionBeanClassName}]): Array[Integer] = {
+    protected def doBatchUpdateNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}], op: UpdateOption[${myConditionBeanClassName}]): Array[Int] = {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         prepareBatchUpdateOption(${myEntityListVariableName}, op);
         return delegateBatchUpdateNonstrict(${myEntityListVariableName}, op);
@@ -1347,13 +1340,13 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      * @return The array of updated count. (NotNull, EmptyAllowed)
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
-    def batchUpdateNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}], updateColumnSpec: SpecifyQuery[${myConditionBeanClassName}]): Array[Integer] = {
+    def batchUpdateNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}], updateColumnSpec: SpecifyQuery[${myConditionBeanClassName}]): Array[Int] = {
         return doBatchUpdateNonstrict(${myEntityListVariableName}, createSpecifiedUpdateOption(updateColumnSpec));
     }
 #end
 
     @Override
-    protected def doLumpModifyNonstrict(ls: List[Entity], op: UpdateOption[_ <: ConditionBean]): Array[Integer] = {
+    protected def doLumpModifyNonstrict(ls: List[Entity], op: UpdateOption[_ <: ConditionBean]): Array[Int] = {
 #if ($table.hasOptimisticLock())
         if (op == null) { return batchUpdateNonstrict(downcast(ls)); }
         else { return varyingBatchUpdateNonstrict(downcast(ls), downcast(op)); }
@@ -1377,18 +1370,18 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
-    def batchDelete(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): Array[Integer] = {
+    def batchDelete(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): Array[Int] = {
         return doBatchDelete(${myEntityListVariableName}, null);
     }
 
-    protected def doBatchDelete(${myEntityListVariableName}: List[${myExtendedObjectClassName}], op: DeleteOption[${myConditionBeanClassName}]): Array[Integer] = {
+    protected def doBatchDelete(${myEntityListVariableName}: List[${myExtendedObjectClassName}], op: DeleteOption[${myConditionBeanClassName}]): Array[Int] = {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         prepareDeleteOption(op);
         return delegateBatchDelete(${myEntityListVariableName}, op);
     }
 
     @Override
-    protected def doLumpRemove(ls: List[Entity], op: DeleteOption[_ <: ConditionBean]): Array[Integer] = {
+    protected def doLumpRemove(ls: List[Entity], op: DeleteOption[_ <: ConditionBean]): Array[Int] = {
         if (op == null) { return batchDelete(downcast(ls)); }
         else { return varyingBatchDelete(downcast(ls), downcast(op)); }
     }
@@ -1401,11 +1394,11 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      * @return The array of deleted count. (NotNull, EmptyAllowed)
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
-    def batchDeleteNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): Array[Integer] = {
+    def batchDeleteNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): Array[Int] = {
         return doBatchDeleteNonstrict(${myEntityListVariableName}, null);
     }
 
-    protected def doBatchDeleteNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}], op: DeleteOption[${myConditionBeanClassName}]): Array[Integer] = {
+    protected def doBatchDeleteNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}], op: DeleteOption[${myConditionBeanClassName}]): Array[Int] = {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         prepareDeleteOption(op);
         return delegateBatchDeleteNonstrict(${myEntityListVariableName}, op);
@@ -1413,7 +1406,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
 #end
 
     @Override
-    protected def doLumpRemoveNonstrict(ls: List[Entity], op: DeleteOption[_ <: ConditionBean]): Array[Integer] = {
+    protected def doLumpRemoveNonstrict(ls: List[Entity], op: DeleteOption[_ <: ConditionBean]): Array[Int] = {
 #if ($table.hasOptimisticLock())
         if (op == null) { return batchDeleteNonstrict(downcast(ls)); }
         else { return varyingBatchDeleteNonstrict(downcast(ls), downcast(op)); }
@@ -1470,7 +1463,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    protected def doRangeCreate(setupper: QueryInsertSetupper[_ <: Entity, _ <: ConditionBean], option: InsertOption[_ <: ConditionBean]): Integer = {
+    protected def doRangeCreate(setupper: QueryInsertSetupper[_ <: Entity, _ <: ConditionBean], option: InsertOption[_ <: ConditionBean]): Int = {
         if (option == null) { return queryInsert(downcast(setupper)); }
         else { return varyingQueryInsert(downcast(setupper), downcast(option)); }
     }
@@ -1508,7 +1501,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    protected def doRangeModify(et: Entity, cb: ConditionBean, op: UpdateOption[_ <: ConditionBean]): Integer = {
+    protected def doRangeModify(et: Entity, cb: ConditionBean, op: UpdateOption[_ <: ConditionBean]): Int = {
         if (op == null) { return queryUpdate(downcast(et), cb.asInstanceOf[${myConditionBeanClassName}]); }
         else { return varyingQueryUpdate(downcast(et), cb.asInstanceOf[${myConditionBeanClassName}], downcast(op)); }
     }
@@ -1535,7 +1528,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    protected def doRangeRemove(cb: ConditionBean, op: DeleteOption[_ <: ConditionBean]): Integer = {
+    protected def doRangeRemove(cb: ConditionBean, op: DeleteOption[_ <: ConditionBean]): Int = {
         if (op == null) { return queryDelete(cb.asInstanceOf[${myConditionBeanClassName}]); }
         else { return varyingQueryDelete(cb.asInstanceOf[${myConditionBeanClassName}], downcast(op)); }
     }
@@ -1731,7 +1724,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      * @param option The option of insert for varying requests. (NotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
      */
-    def varyingBatchInsert(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: InsertOption[${myConditionBeanClassName}]): Array[Integer] = {
+    def varyingBatchInsert(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: InsertOption[${myConditionBeanClassName}]): Array[Int] = {
         assertInsertOptionNotNull(option);
         return doBatchInsert(${myEntityListVariableName}, option);
     }
@@ -1745,7 +1738,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      * @param option The option of update for varying requests. (NotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
      */
-    def varyingBatchUpdate(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: UpdateOption[${myConditionBeanClassName}]): Array[Integer] = {
+    def varyingBatchUpdate(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: UpdateOption[${myConditionBeanClassName}]): Array[Int] = {
         assertUpdateOptionNotNull(option);
         return doBatchUpdate(${myEntityListVariableName}, option);
     }
@@ -1760,7 +1753,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      * @param option The option of update for varying requests. (NotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
      */
-    def varyingBatchUpdateNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: UpdateOption[${myConditionBeanClassName}]): Array[Integer] = {
+    def varyingBatchUpdateNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: UpdateOption[${myConditionBeanClassName}]): Array[Int] = {
         assertUpdateOptionNotNull(option);
         return doBatchUpdateNonstrict(${myEntityListVariableName}, option);
     }
@@ -1774,7 +1767,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      * @param option The option of delete for varying requests. (NotNull)
      * @return The array of deleted count. (NotNull, EmptyAllowed)
      */
-    def varyingBatchDelete(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: DeleteOption[${myConditionBeanClassName}]): Array[Integer] = {
+    def varyingBatchDelete(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: DeleteOption[${myConditionBeanClassName}]): Array[Int] = {
         assertDeleteOptionNotNull(option);
         return doBatchDelete(${myEntityListVariableName}, option);
     }
@@ -1788,7 +1781,7 @@ abstract class ${myClassName} extends ${myExtendClassName} {
      * @param option The option of delete for varying requests. (NotNull)
      * @return The array of deleted count. (NotNull, EmptyAllowed)
      */
-    def varyingBatchDeleteNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: DeleteOption[${myConditionBeanClassName}]): Array[Integer] = {
+    def varyingBatchDeleteNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: DeleteOption[${myConditionBeanClassName}]): Array[Int] = {
         assertDeleteOptionNotNull(option);
         return doBatchDeleteNonstrict(${myEntityListVariableName}, option);
     }
@@ -1969,29 +1962,29 @@ abstract class ${myClassName} extends ${myExtendClassName} {
     { if (!processBeforeDelete(et, op)) { return 0; }
       return invoke(createDeleteNonstrictEntityCommand(et, op)); }
 
-    protected def delegateBatchInsert(ls: List[${myExtendedObjectClassName}], op: InsertOption[${myConditionBeanClassName}]): Array[Integer] =
-    { if (ls.isEmpty()) { return new Array[Integer](0); }
-      return invoke(createBatchInsertCommand(processBatchInternally(ls, op), op)).asInstanceOf[Array[Integer]]; }
-    protected def delegateBatchUpdate(ls: List[${myExtendedObjectClassName}], op: UpdateOption[${myConditionBeanClassName}]): Array[Integer] =
-    { if (ls.isEmpty()) { return new Array[Integer](0); }
+    protected def delegateBatchInsert(ls: List[${myExtendedObjectClassName}], op: InsertOption[${myConditionBeanClassName}]): Array[Int] =
+    { if (ls.isEmpty()) { return new Array[Int](0); }
+      return invoke(createBatchInsertCommand(processBatchInternally(ls, op), op)).asInstanceOf[Array[Int]]; }
+    protected def delegateBatchUpdate(ls: List[${myExtendedObjectClassName}], op: UpdateOption[${myConditionBeanClassName}]): Array[Int] =
+    { if (ls.isEmpty()) { return new Array[Int](0); }
 #if ($table.hasOptimisticLock())
-      return invoke(createBatchUpdateCommand(processBatchInternally(ls, op, false), op)).asInstanceOf[Array[Integer]]; }
+      return invoke(createBatchUpdateCommand(processBatchInternally(ls, op, false), op)).asInstanceOf[Array[Int]]; }
 #else
       return delegateBatchUpdateNonstrict(ls, op); }
 #end
-    protected def delegateBatchUpdateNonstrict(ls: List[${myExtendedObjectClassName}], op: UpdateOption[${myConditionBeanClassName}]): Array[Integer] =
-    { if (ls.isEmpty()) { return new Array[Integer](0); }
-      return invoke(createBatchUpdateNonstrictCommand(processBatchInternally(ls, op, true), op)).asInstanceOf[Array[Integer]]; }
-    protected def delegateBatchDelete(ls: List[${myExtendedObjectClassName}], op: DeleteOption[${myConditionBeanClassName}]): Array[Integer] =
-    { if (ls.isEmpty()) { return new Array[Integer](0); }
+    protected def delegateBatchUpdateNonstrict(ls: List[${myExtendedObjectClassName}], op: UpdateOption[${myConditionBeanClassName}]): Array[Int] =
+    { if (ls.isEmpty()) { return new Array[Int](0); }
+      return invoke(createBatchUpdateNonstrictCommand(processBatchInternally(ls, op, true), op)).asInstanceOf[Array[Int]]; }
+    protected def delegateBatchDelete(ls: List[${myExtendedObjectClassName}], op: DeleteOption[${myConditionBeanClassName}]): Array[Int] =
+    { if (ls.isEmpty()) { return new Array[Int](0); }
 #if ($table.hasOptimisticLock())
-      return invoke(createBatchDeleteCommand(processBatchInternally(ls, op, false), op)).asInstanceOf[Array[Integer]]; }
+      return invoke(createBatchDeleteCommand(processBatchInternally(ls, op, false), op)).asInstanceOf[Array[Int]]; }
 #else
       return delegateBatchDeleteNonstrict(ls, op); }
 #end
-    protected def delegateBatchDeleteNonstrict(ls: List[${myExtendedObjectClassName}], op: DeleteOption[${myConditionBeanClassName}]): Array[Integer] =
-    { if (ls.isEmpty()) { return new Array[Integer](0); }
-      return invoke(createBatchDeleteNonstrictCommand(processBatchInternally(ls, op, true), op)).asInstanceOf[Array[Integer]]; }
+    protected def delegateBatchDeleteNonstrict(ls: List[${myExtendedObjectClassName}], op: DeleteOption[${myConditionBeanClassName}]): Array[Int] =
+    { if (ls.isEmpty()) { return new Array[Int](0); }
+      return invoke(createBatchDeleteNonstrictCommand(processBatchInternally(ls, op, true), op)).asInstanceOf[Array[Int]]; }
 
     protected def delegateQueryInsert(et: ${myExtendedObjectClassName}, inCB: ${myConditionBeanClassName}, resCB: ConditionBean, op: InsertOption[${myConditionBeanClassName}]): Integer =
     { if (!processBeforeQueryInsert(et, inCB, resCB, op)) { return 0; }

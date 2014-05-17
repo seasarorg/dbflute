@@ -92,7 +92,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     def set${tmpJavaName}_Equal_As${col.classificationName}(cdef: ${glCDef}.${col.classificationName}): Unit = {
-        doSet${tmpJavaName}_Equal(cdef != null ? cdef.code() : null);
+        doSet${tmpJavaName}_Equal(if (cdef != null) { cdef.code } else { null });
     }
 #if ($classificationTop.isSisterBooleanHandling())
 
@@ -162,7 +162,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     def set${tmpJavaName}_NotEqual_As${col.classificationName}(cdef: ${glCDef}.${col.classificationName}): Unit = {
-        doSet${tmpJavaName}_NotEqual(cdef != null ? cdef.code() : null);
+        doSet${tmpJavaName}_NotEqual(if (cdef != null) { cdef.code } else { null });
     }
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
 
@@ -380,7 +380,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerExistsReferrer(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
@@ -419,7 +419,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotExistsReferrer(cb.query(), "${col.name}", "${referrer.FirstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
 #end
 #end
 #if (${col.isInScopeRelationAllowedForeignKey()})
@@ -441,7 +441,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.inScopeRelationReferrers)
@@ -472,7 +472,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
 #end
 #end
 #if (${col.isInScopeRelationAllowedForeignKey()})
@@ -494,7 +494,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.inScopeRelationReferrers)
@@ -525,7 +525,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
@@ -543,7 +543,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerSpecifyDerivedReferrer(fn, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${referrer.referrerPropertyName}", al, op);
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
 #end
 #end
 #end
@@ -573,7 +573,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
     }
     protected def xcreateQDRFunction${referrer.referrerPropertyNameInitCap}(): HpQDRFunction[${relatedCBClassName}] = {
-        return new HpQDRFunction<${relatedCBClassName}>(new HpQDRSetupper<${relatedCBClassName}>() {
+        return new HpQDRFunction[${relatedCBClassName}](new HpQDRSetupper[${relatedCBClassName}]() {
             def setup(fn: String, sq: SubQuery[${relatedCBClassName}], rd: String, vl: Object, op: DerivedReferrerOption): Unit = {
                 xqderive${referrer.referrerPropertyNameInitCap}(fn, sq, rd, vl, op);
             }
@@ -583,11 +583,12 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         assertObjectNotNull("subQuery", sq);
         val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this);
         try { lock(); sq.query(cb); } finally { unlock(); }
-        val sqpp: String = keep${subQueryPropertyNameInitCap}(cb.query()); String prpp = keep${subQueryPropertyNameInitCap}Parameter(vl);
+        val sqpp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        val prpp: String = keep${subQueryPropertyNameInitCap}Parameter(vl);
         registerQueryDerivedReferrer(fn, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", sqpp, "${referrer.referrerPropertyName}", rd, vl, prpp, op);
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
-    def keep${subQueryPropertyNameInitCap}Parameter(Object vl): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+    def keep${subQueryPropertyNameInitCap}Parameter(vl: Object): String;
 #end
 #end
 #end
@@ -614,7 +615,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     def set${tmpJavaName}_Equal_As${col.classificationName}(cdef: ${glCDef}.${col.classificationName}): Unit = {
-        doSet${tmpJavaName}_Equal(cTNum(cdef != null ? cdef.code() : null, classOf[${col.javaNative}]));
+        doSet${tmpJavaName}_Equal(cTNum(if (cdef != null) { cdef.code } else { null }, classOf[${col.javaNative}]));
     }
 #if ($classificationTop.isSisterBooleanHandling())
 
@@ -670,7 +671,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     def set${tmpJavaName}_NotEqual_As${col.classificationName}(cdef: ${glCDef}.${col.classificationName}): Unit = {
-        doSet${tmpJavaName}_NotEqual(cTNum(cdef != null ? cdef.code() : null, classOf[${col.javaNative}]));
+        doSet${tmpJavaName}_NotEqual(cTNum(if (cdef != null) { cdef.code } else { null }, classOf[${col.javaNative}]));
     }
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
 
@@ -862,7 +863,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerExistsReferrer(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
@@ -901,7 +902,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotExistsReferrer(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
 #end
 #end
 #if (${col.isInScopeRelationAllowedForeignKey()})
@@ -923,7 +924,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.inScopeRelationReferrers)
@@ -954,7 +955,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
 #end
 #end
 #if (${col.isInScopeRelationAllowedForeignKey()})
@@ -976,7 +977,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotInScopeRelation(cb.query(), "${col.name}", "${col.foreignKey.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.inScopeRelationReferrers)
@@ -1007,7 +1008,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
 #end
 #end
 #if (${col.hasSingleKeyReferrer()})
@@ -1025,7 +1026,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerSpecifyDerivedReferrer(fn, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${referrer.referrerPropertyName}", al, op);
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
 #end
 #end
 #end
@@ -1055,7 +1056,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
     }
     protected def xcreateQDRFunction${referrer.referrerPropertyNameInitCap}(): HpQDRFunction[${relatedCBClassName}] = {
-        return new HpQDRFunction<${relatedCBClassName}>(new HpQDRSetupper<${relatedCBClassName}>() {
+        return new HpQDRFunction[${relatedCBClassName}](new HpQDRSetupper[${relatedCBClassName}]() {
             def setup(fn: String, sq: SubQuery[${relatedCBClassName}], rd: String, vl: Object, op: DerivedReferrerOption): Unit = {
                 xqderive${referrer.referrerPropertyNameInitCap}(fn, sq, rd, vl, op);
             }
@@ -1065,11 +1066,12 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         assertObjectNotNull("subQuery", sq);
         val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this);
         try { lock(); sq.query(cb); } finally { unlock(); }
-        val sqpp: String = keep${subQueryPropertyNameInitCap}(cb.query()); String prpp = keep${subQueryPropertyNameInitCap}Parameter(vl);
+        val sqpp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        val prpp: String = keep${subQueryPropertyNameInitCap}Parameter(vl);
         registerQueryDerivedReferrer(fn, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", sqpp, "${referrer.referrerPropertyName}", rd, vl, prpp, op);
     }
-    def keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq): String;
-    def keep${subQueryPropertyNameInitCap}Parameter(Object vl): String;
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+    def keep${subQueryPropertyNameInitCap}Parameter(vl: Object): String;
 #end
 #end
 #end
@@ -1388,7 +1390,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         return xcreateSSQFunction(CK_LE.getOperand(), classOf[${myConditionBeanClassName}]);
     }
 
-    protected def xscalarCondition[CB <: ConditionBean](fn: String, sq: SubQuery[CB], rd: String, op: HpSSQOption[CB]): Unit = {
+    override protected def xscalarCondition[CB <: ConditionBean](fn: String, sq: SubQuery[CB], rd: String, op: HpSSQOption[CB]): Unit = {
         assertObjectNotNull("subQuery", sq);
         val cb: ${myConditionBeanClassName} = xcreateScalarConditionCB(); sq.query(cb.asInstanceOf[CB]);
         val pp: String = keepScalarCondition(cb.query()); // for saving query-value
@@ -1427,7 +1429,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
     def myselfDerived(): HpQDRFunction[${myConditionBeanClassName}] = {
         return xcreateQDRFunctionMyselfDerived(classOf[${myConditionBeanClassName}]);
     }
-    protected def xqderiveMyselfDerived[CB <: ConditionBean](fn: String, sq: SubQuery[CB], rd: String, vl: Object, op: DerivedReferrerOption): Unit = {
+    override protected def xqderiveMyselfDerived[CB <: ConditionBean](fn: String, sq: SubQuery[CB], rd: String, vl: Object, op: DerivedReferrerOption): Unit = {
         assertObjectNotNull("subQuery", sq);
         val cb: ${myConditionBeanClassName} = new ${myConditionBeanClassName}(); cb.xsetupForDerivedReferrer(this); sq.query(cb.asInstanceOf[CB]);
         val pk: String = "${table.primaryKeyAsOne.name}";
