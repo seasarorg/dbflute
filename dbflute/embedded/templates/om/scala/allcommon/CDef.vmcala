@@ -76,7 +76,7 @@ object ${glCDef} {
                 subItemMap.put("${entry.key}", null);
 #end
 #end
-                _subItemMapMap.put(${classificationName}.${classificationElement.name}.code, Collections.unmodifiableMap(subItemMap));
+                _subItemMapMap.put("${classificationElement.code}", Collections.unmodifiableMap(subItemMap));
             }
 #end
         }

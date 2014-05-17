@@ -114,8 +114,7 @@ class ${glImplementedBehaviorSelector} extends BehaviorSelector {
         dbmetas.asScala.foreach(dbmeta => {
             try {
                 val bhv: BehaviorReadable = byName(dbmeta.getTableDbName());
-                // #pending illegal cyclic reference involving class?
-                //bhv.warmUpCommand();
+                bhv.warmUpCommand();
                 count = count + 1;
             } catch { // means the behavior is suppressed
                 case ignored: IllegalBehaviorStateException => {

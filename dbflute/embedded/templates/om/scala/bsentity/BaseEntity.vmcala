@@ -672,7 +672,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
     }
     protected def buildColumnString(): String = {
         val sb: StringBuilder = new StringBuilder();
-        val delimiter: String = ",  ";
+        val delimiter: String = ", ";
 #foreach ($col in $table.columns)
 #if ($col.isJavaNativeUtilDate())
         sb.append(delimiter).append(xfUD(get${col.javaName}()));
