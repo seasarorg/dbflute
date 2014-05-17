@@ -128,6 +128,10 @@ public class ${myClassName} extends AbstractDBMeta {
 #end
 
 #foreach ($col in $table.columns)
+    /**
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @return The information object of specified column. (NotNull)
+     */
     public ColumnInfo column${col.javaBeansRulePropertyNameInitCap}() { return _column${col.javaBeansRulePropertyNameInitCap}; }
 #end
 
@@ -174,6 +178,10 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                      Foreign Property
     //                                      ----------------
 #foreach ($fk in $table.foreignKeys)
+    /**
+     * ${fk.foreignDispForJavaDoc}
+     * @return The information object of foreign property. (NotNull)
+     */
     public ForeignInfo foreign${fk.foreignJavaBeansRulePropertyNameInitCap}() {
 #if ($fk.isSimpleKeyFK())
 #set ($col = $fk.localColumnAsOne)
@@ -191,6 +199,10 @@ public class ${myClassName} extends AbstractDBMeta {
 #end
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($genericsColumnInfoMap = "ColumnInfo, ColumnInfo")
+    /**
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * @return The information object of foreign property(referrer-as-one). (NotNull)
+     */
     public ForeignInfo foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
 #if ($referrer.isSimpleKeyFK())
 #set ($col = $referrer.foreignColumnAsOne)
@@ -211,6 +223,10 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                     Referrer Property
     //                                     -----------------
 #foreach ($referrer in $table.referrerAsManyList)
+    /**
+     * ${referrer.referrerDispForJavaDoc}
+     * @return The information object of referrer property. (NotNull)
+     */
     public ReferrerInfo referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
 #if ($referrer.isSimpleKeyFK())
 #set ($col = $referrer.foreignColumnAsOne)
