@@ -194,7 +194,7 @@ public class ${myClassName} extends AbstractDBMeta {
         mp.put(column${col.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
 #end
 #end
-        return cfi("${fk.name}", "${fk.foreignJavaBeansRulePropertyName}", this, ${fk.foreignTableDBMetaClassName}.getInstance(), mp, ${table.resolveForeignIndex($fk)}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()}, false, ${fk.isAdditionalForeignKey()}, ${fk.fixedConditionArg}, ${fk.dynamicFixedConditionDBMetaSetupList}, ${fk.isFixedInline()}, ${fk.foreignReverseRelationPropertyNameArg});
+        return cfi("${fk.name}", "${fk.foreignJavaBeansRulePropertyName}", this, ${fk.foreignTableDBMetaClassName}.getInstance(), mp, ${table.resolveForeignIndex($fk)}, null, ${fk.isOneToOne()}, ${fk.isBizOneToOne()}, false, ${fk.isAdditionalForeignKey()}, ${fk.fixedConditionArg}, ${fk.dynamicFixedConditionDBMetaSetupList}, ${fk.isFixedInline()}, ${fk.foreignReverseRelationPropertyNameArg});
     }
 #end
 #foreach ($referrer in $table.referrerAsOneList)

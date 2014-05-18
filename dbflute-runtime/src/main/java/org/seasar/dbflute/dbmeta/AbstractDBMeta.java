@@ -400,14 +400,16 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     // createForeignInfo()
-    protected ForeignInfo cfi(String consName, String propName // name
+    protected ForeignInfo cfi(String constraintName, String propertyName // name
             , DBMeta localDbm, DBMeta foreignDbm // DB meta
-            , Map<ColumnInfo, ColumnInfo> locFrColMap, int relNo // relation attribute
-            , boolean oneToOne, boolean bizOne, boolean asOne, boolean addFK // relation type
-            , String fixedCond, List<String> dynParamList, boolean fixedInl // fixed condition
-            , String revsName) { // various info
-        return new ForeignInfo(consName, propName, localDbm, foreignDbm, locFrColMap, relNo, oneToOne, bizOne, asOne,
-                addFK, fixedCond, dynParamList, fixedInl, revsName);
+            , Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo, Class<?> propertyType // relation attribute
+            , boolean oneToOne, boolean bizOneToOne, boolean referrerAsOne, boolean additionalFK // relation type
+            , String fixedCondition, List<String> dynamicParameterList, boolean fixedInline // fixed condition
+            , String reversePropertyName) { // various info
+        final Class<?> realPt = propertyType != null ? propertyType : foreignDbm.getEntityType(); // basically default, or specified Optional
+        return new ForeignInfo(constraintName, propertyName, localDbm, foreignDbm, localForeignColumnInfoMap,
+                relationNo, realPt, oneToOne, bizOneToOne, referrerAsOne, additionalFK, fixedCondition,
+                dynamicParameterList, fixedInline, reversePropertyName);
     }
 
     /**
@@ -507,11 +509,28 @@ public abstract class AbstractDBMeta implements DBMeta {
         return referrerInfo;
     }
 
-    protected ReferrerInfo cri(String consName, String propName // name
+    // createReferrerInfo()
+    protected ReferrerInfo cri(String constraintName, String propertyName // name
             , DBMeta localDbm, DBMeta referrerDbm // DB meta
-            , Map<ColumnInfo, ColumnInfo> locRfColMap // relation info
-            , boolean oneToOne, String revsName) { // createReferrerInfo()
-        return new ReferrerInfo(consName, propName, localDbm, referrerDbm, locRfColMap, oneToOne, revsName);
+            , Map<ColumnInfo, ColumnInfo> localReferrerColumnInfoMap // relation attribute
+            , boolean oneToOne, String reversePropertyName) { // relation type and various info
+        final Class<?> propertyType;
+        if (oneToOne) {
+            propertyType = referrerDbm.getEntityType();
+        } else {
+            final Class<?> listType = getReferrerPropertyListType();
+            propertyType = listType != null ? listType : List.class;
+        }
+        return new ReferrerInfo(constraintName, propertyName, localDbm, referrerDbm, localReferrerColumnInfoMap,
+                propertyType, oneToOne, reversePropertyName);
+    }
+
+    /**
+     * Get the list type of referrer property in entity.
+     * @return The class instance of list type. (NullAllowed: if null, Java's List used as default)
+     */
+    protected Class<?> getReferrerPropertyListType() { // might be overridden
+        return null; // as default (List)
     }
 
     /**

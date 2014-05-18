@@ -43,6 +43,7 @@ public class ForeignInfo implements RelationInfo {
     protected final Map<ColumnInfo, ColumnInfo> _localForeignColumnInfoMap;
     protected final Map<ColumnInfo, ColumnInfo> _foreignLocalColumnInfoMap;
     protected final int _relationNo;
+    protected final Class<?> _propertyType;
     protected final boolean _oneToOne;
     protected final boolean _bizOneToOne;
     protected final boolean _referrerAsOne;
@@ -59,7 +60,7 @@ public class ForeignInfo implements RelationInfo {
     //                                                                         ===========
     public ForeignInfo(String constraintName, String foreignPropertyName // name
             , DBMeta localDBMeta, DBMeta foreignDBMeta // DB meta
-            , Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo // relation attribute
+            , Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo, Class<?> propertyType // relation attribute
             , boolean oneToOne, boolean bizOneToOne, boolean referrerAsOne, boolean additionalFK // relation type
             , String fixedCondition, List<String> dynamicParameterList, boolean fixedInline // fixed condition
             , String reversePropertyName) { // various info
@@ -79,6 +80,7 @@ public class ForeignInfo implements RelationInfo {
         }
         _foreignLocalColumnInfoMap = Collections.unmodifiableMap(foreignLocalColumnInfoMap);
         _relationNo = relationNo;
+        _propertyType = propertyType;
         _oneToOne = oneToOne;
         _bizOneToOne = bizOneToOne;
         _referrerAsOne = referrerAsOne;
@@ -362,6 +364,13 @@ public class ForeignInfo implements RelationInfo {
      */
     public int getRelationNo() {
         return _relationNo;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Class<?> getPropertyType() {
+        return _propertyType;
     }
 
     /**

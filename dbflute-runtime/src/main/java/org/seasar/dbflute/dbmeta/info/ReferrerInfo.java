@@ -42,6 +42,7 @@ public class ReferrerInfo implements RelationInfo {
     protected final DBMeta _referrerDBMeta;
     protected final Map<ColumnInfo, ColumnInfo> _localReferrerColumnInfoMap;
     protected final Map<ColumnInfo, ColumnInfo> _referrerLocalColumnInfoMap;
+    protected final Class<?> _propertyType;
     protected final boolean _oneToOne;
     protected final String _reversePropertyName;
     protected final Method _readMethod;
@@ -50,8 +51,11 @@ public class ReferrerInfo implements RelationInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ReferrerInfo(String constraintName, String referrerPropertyName, DBMeta localDBMeta, DBMeta referrerDBMeta,
-            Map<ColumnInfo, ColumnInfo> localReferrerColumnInfoMap, boolean oneToOne, String reversePropertyName) {
+    public ReferrerInfo(String constraintName, String referrerPropertyName // name
+            , DBMeta localDBMeta, DBMeta referrerDBMeta // DB meta
+            , Map<ColumnInfo, ColumnInfo> localReferrerColumnInfoMap, Class<?> propertyType // relation attribute
+            , boolean oneToOne // relation type
+            , String reversePropertyName) { // various info
         assertObjectNotNull("constraintName", constraintName);
         assertObjectNotNull("referrerPropertyName", referrerPropertyName);
         assertObjectNotNull("localDBMeta", localDBMeta);
@@ -67,6 +71,7 @@ public class ReferrerInfo implements RelationInfo {
             referrerLocalColumnInfoMap.put(entry.getValue(), entry.getKey());
         }
         _referrerLocalColumnInfoMap = Collections.unmodifiableMap(referrerLocalColumnInfoMap);
+        _propertyType = propertyType;
         _oneToOne = oneToOne;
         _reversePropertyName = reversePropertyName;
         _readMethod = findReadMethod();
@@ -191,10 +196,9 @@ public class ReferrerInfo implements RelationInfo {
     protected Method findWriteMethod() {
         final Class<? extends Entity> localType = _localDBMeta.getEntityType();
         final String methodName = buildAccessorName("set");
-        final Class<?> propertyType = List.class;
-        final Method method = findMethod(localType, methodName, new Class[] { propertyType });
+        final Method method = findMethod(localType, methodName, new Class[] { _propertyType });
         if (method == null) {
-            String msg = "Not found the method by the name and type: " + methodName + ", " + propertyType;
+            String msg = "Not found the method by the name and type: " + methodName + ", " + _propertyType;
             throw new IllegalStateException(msg);
         }
         return method;
@@ -332,6 +336,13 @@ public class ReferrerInfo implements RelationInfo {
      */
     public Map<ColumnInfo, ColumnInfo> getReferrerLocalColumnInfoMap() {
         return _referrerLocalColumnInfoMap;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Class<?> getPropertyType() {
+        return _propertyType;
     }
 
     /**

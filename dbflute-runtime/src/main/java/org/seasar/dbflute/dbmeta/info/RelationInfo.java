@@ -46,6 +46,13 @@ public interface RelationInfo {
     Map<ColumnInfo, ColumnInfo> getLocalTargetColumnInfoMap();
 
     /**
+     * Get the property type of the relation in entity. <br />
+     * e.g. Entity or Optional if many-to-one and one-to-one, Java or Scala List if one-to-many
+     * @return The class instance for the relation property. (NotNull)
+     */
+    Class<?> getPropertyType();
+
+    /**
      * Does the relation is one-to-one?
      * @return The determination, true or false.
      */

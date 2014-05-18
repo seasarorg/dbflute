@@ -63,6 +63,10 @@ public class MockDBMeta extends AbstractDBMeta {
         return null;
     }
 
+    protected Class<?> getReferrerPropertyListType() {
+        return null;
+    }
+
     public RelationInfo findRelationInfo(String relationPropertyName) {
         return null;
     }

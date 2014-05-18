@@ -200,7 +200,7 @@ public class ColumnInfo {
         final String methodName = buildAccessorName("get");
         final Method method = findMethod(entityType, methodName, new Class<?>[] {});
         if (method == null) {
-            String msg = "Not found the metho by the name: " + methodName;
+            String msg = "Not found the method by the name: " + methodName;
             throw new IllegalStateException(msg);
         }
         return method;
@@ -211,7 +211,7 @@ public class ColumnInfo {
         final String methodName = buildAccessorName("set");
         final Method method = findMethod(entityType, methodName, new Class<?>[] { _propertyType });
         if (method == null) {
-            String msg = "Not found the metho by the name and type: " + methodName + ", " + _propertyType;
+            String msg = "Not found the method by the name and type: " + methodName + ", " + _propertyType;
             throw new IllegalStateException(msg);
         }
         return method;
