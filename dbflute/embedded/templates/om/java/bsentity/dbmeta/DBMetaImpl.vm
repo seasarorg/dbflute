@@ -215,7 +215,7 @@ public class ${myClassName} extends AbstractDBMeta {
         mp.put(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
 #end
 #end
-        return cfi("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), mp, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()}, true, ${referrer.isAdditionalForeignKey()}, ${referrer.fixedConditionArg}, ${referrer.dynamicFixedConditionDBMetaSetupList}, ${referrer.isFixedInline()}, ${referrer.referrerReverseRelationPropertyNameArg});
+        return cfi("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), mp, ${table.resolveReferrerIndexAsOne($referrer)}, null, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()}, true, ${referrer.isAdditionalForeignKey()}, ${referrer.fixedConditionArg}, ${referrer.dynamicFixedConditionDBMetaSetupList}, ${referrer.isFixedInline()}, ${referrer.referrerReverseRelationPropertyNameArg});
     }
 #end
 

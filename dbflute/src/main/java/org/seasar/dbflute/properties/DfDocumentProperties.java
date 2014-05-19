@@ -820,6 +820,9 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
         final String url = schemaSyncCheckMap.get("url");
         if (Srl.is_NotNull_and_NotTrimmedEmpty(url)) {
+            // dispatch variable is supported
+            // but connecting after semicolon is unsupported for now
+            // (rare case especially here, and also we can already use escape)
             final String propTitle = "documentDefinitionMap#schemaSyncCheckMap$url";
             return resolveDispatchVariable(propTitle, url);
         } else {
@@ -860,6 +863,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     public String getSchemaSyncCheckDiffMapFile() {
         return SCHEMA_SYNC_CHECK_DIFF_MAP_FILE;
+    }
+
+    public boolean isSchemaSyncCheckSuppressCraftDiff() { // closet
+        return isProperty("isSuppressCraftDiff", false, getSchemaSyncCheckMap());
     }
 
     public String getSchemaSyncCheckResultFileName() { // closet

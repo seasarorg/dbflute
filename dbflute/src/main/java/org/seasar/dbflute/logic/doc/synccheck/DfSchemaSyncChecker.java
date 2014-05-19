@@ -141,7 +141,8 @@ public class DfSchemaSyncChecker {
     protected DataSource prepareTargetDataSource() {
         final DfDataSourceHandler handler = new DfDataSourceHandler();
         handler.setDriver(getDatabaseProperties().getDatabaseDriver()); // inherit
-        handler.setUrl(getDocumentProperties().getSchemaSyncCheckDatabaseUrl()); // may inherit
+        final String url = getDocumentProperties().getSchemaSyncCheckDatabaseUrl();
+        handler.setUrl(url); // may inherit
         final String user = getDocumentProperties().getSchemaSyncCheckDatabaseUser();
         if (Srl.is_Null_or_TrimmedEmpty(user)) { // just in case
             String msg = "The user for sync target schema was not found: " + user;
@@ -151,6 +152,9 @@ public class DfSchemaSyncChecker {
         handler.setPassword(getDocumentProperties().getSchemaSyncCheckDatabasePassword());
         handler.setConnectionProperties(getDatabaseProperties().getConnectionProperties()); // inherit
         handler.setAutoCommit(true);
+        _log.info("...Preparing data source for SchemaSyncCheck target:");
+        _log.info("  url  = " + url);
+        _log.info("  user = " + user);
         return new DfFittingDataSource(handler);
     }
 
@@ -190,7 +194,9 @@ public class DfSchemaSyncChecker {
         final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(dataSource, schemaXml,
                 historyFile);
         final String craftMetaDir = getSchemaSyncCheckCraftMetaDir();
-        serializer.enableCraftDiff(dataSource, craftMetaDir, DfCraftDiffAssertDirection.ROLLING_NEXT);
+        if (!getDocumentProperties().isSchemaSyncCheckSuppressCraftDiff()) {
+            serializer.enableCraftDiff(dataSource, craftMetaDir, DfCraftDiffAssertDirection.ROLLING_NEXT);
+        }
         return serializer;
     }
 
