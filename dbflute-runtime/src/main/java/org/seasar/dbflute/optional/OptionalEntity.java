@@ -59,6 +59,11 @@ public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
             }
         });
     }
+    protected static final OptionalObjectExceptionThrower NOWAY_THROWER = new OptionalObjectExceptionThrower() {
+        public void throwNotFoundException() {
+            throw new EntityAlreadyDeletedException("no way");
+        }
+    };
 
     // ===================================================================================
     //                                                                         Constructor
@@ -70,6 +75,18 @@ public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
     @SuppressWarnings("unchecked")
     public static <EMPTY> OptionalEntity<EMPTY> empty() {
         return (OptionalEntity<EMPTY>) EMPTY_INSTANCE;
+    }
+
+    public static <ENTITY> OptionalEntity<ENTITY> of(ENTITY entity) {
+        return new OptionalEntity<ENTITY>(entity, NOWAY_THROWER);
+    }
+
+    public static <ENTITY> OptionalEntity<ENTITY> ofNullable(ENTITY entity, OptionalObjectExceptionThrower thrower) {
+        if (entity != null) {
+            return of(entity);
+        } else {
+            return new OptionalEntity<ENTITY>(entity, thrower);
+        }
     }
 
     // ===================================================================================

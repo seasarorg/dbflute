@@ -30,6 +30,7 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType;
 import org.seasar.dbflute.dbmeta.PropertyGateway;
+import org.seasar.dbflute.dbmeta.PropertyMethodFinder;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
@@ -73,7 +74,8 @@ public class ColumnInfo {
     protected final List<String> _referrerPropList;
     protected final boolean _foreignKey;
     protected final ClassificationMeta _classificationMeta;
-    protected final PropertyGateway _gateway;
+    protected final PropertyGateway _propertyGateway;
+    protected final PropertyMethodFinder _propertyMethodFinder;
     protected final Method _readMethod;
     protected final Method _writeMethod;
 
@@ -84,12 +86,14 @@ public class ColumnInfo {
             String columnAlias, boolean notNull, String propertyName, Class<?> propertyType, boolean primary,
             boolean autoIncrement, String columnDbType, Integer columnSize, Integer decimalDigits, String defaultValue,
             boolean commonColumn, OptimisticLockType optimisticLockType, String columnComment,
-            List<String> foreignPropList, List<String> referrerPropList, ClassificationMeta classificationMeta) {
+            List<String> foreignPropList, List<String> referrerPropList, ClassificationMeta classificationMeta,
+            PropertyMethodFinder propertyMethodFinder) {
         assertObjectNotNull("dbmeta", dbmeta);
         assertObjectNotNull("columnDbName", columnDbName);
         assertObjectNotNull("columnSqlName", columnSqlName);
         assertObjectNotNull("propertyName", propertyName);
         assertObjectNotNull("propertyType", propertyType);
+        assertObjectNotNull("propertyMethodFinder", propertyMethodFinder);
         _dbmeta = dbmeta;
         _columnDbName = columnDbName;
         _columnSqlName = new ColumnSqlName(columnSqlName);
@@ -111,7 +115,8 @@ public class ColumnInfo {
         _referrerPropList = referrerPropList != null ? referrerPropList : EMPTY_LIST;
         _foreignKey = foreignPropList != null && !foreignPropList.isEmpty();
         _classificationMeta = classificationMeta;
-        _gateway = findPropertyGateway();
+        _propertyGateway = findPropertyGateway();
+        _propertyMethodFinder = propertyMethodFinder; // before finding
         _readMethod = findReadMethod();
         _writeMethod = findWriteMethod();
     }
@@ -127,7 +132,7 @@ public class ColumnInfo {
      * @return The property gateway for the column, cached in this instance. (NotNull)
      */
     public PropertyGateway getPropertyGateway() {
-        return _gateway;
+        return _propertyGateway;
     }
 
     // -----------------------------------------------------
@@ -141,7 +146,7 @@ public class ColumnInfo {
      */
     @SuppressWarnings("unchecked")
     public <PROPERTY> PROPERTY read(Entity entity) {
-        return (PROPERTY) _gateway.read(entity);
+        return (PROPERTY) _propertyGateway.read(entity);
     }
 
     /**
@@ -161,7 +166,7 @@ public class ColumnInfo {
      * @param value The written value. (NullAllowed: if null, null value is written)
      */
     public void write(Entity entity, Object value) {
-        _gateway.write(entity, value);
+        _propertyGateway.write(entity, value);
     }
 
     /**
@@ -197,32 +202,12 @@ public class ColumnInfo {
 
     protected Method findReadMethod() {
         final Class<? extends Entity> entityType = _dbmeta.getEntityType();
-        final String methodName = buildAccessorName("get");
-        final Method method = findMethod(entityType, methodName, new Class<?>[] {});
-        if (method == null) {
-            String msg = "Not found the method by the name: " + methodName;
-            throw new IllegalStateException(msg);
-        }
-        return method;
+        return _propertyMethodFinder.findReadMethod(entityType, _propertyName, _propertyType);
     }
 
     protected Method findWriteMethod() {
         final Class<? extends Entity> entityType = _dbmeta.getEntityType();
-        final String methodName = buildAccessorName("set");
-        final Method method = findMethod(entityType, methodName, new Class<?>[] { _propertyType });
-        if (method == null) {
-            String msg = "Not found the method by the name and type: " + methodName + ", " + _propertyType;
-            throw new IllegalStateException(msg);
-        }
-        return method;
-    }
-
-    protected String buildAccessorName(String prefix) {
-        return prefix + initCap(_propertyName);
-    }
-
-    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
-        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
+        return _propertyMethodFinder.findWriteMethod(entityType, _propertyName, _propertyType);
     }
 
     // ===================================================================================

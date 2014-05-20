@@ -114,14 +114,38 @@ public abstract class AbstractDBMeta implements DBMeta {
     // ===================================================================================
     //                                                                    Property Gateway
     //                                                                    ================
+    // -----------------------------------------------------
+    //                                       Column Property
+    //                                       ---------------
     protected void setupEpg(Map<String, PropertyGateway> propertyGatewayMap, PropertyGateway gateway,
             String propertyName) {
         propertyGatewayMap.put(propertyName, gateway); // the map should be plain map for performance
     }
 
+    public PropertyGateway findPropertyGateway(String propertyName) {
+        return null; // should be overridden
+    }
+
     protected <ENTITY extends Entity> PropertyGateway doFindEpg(Map<String, PropertyGateway> propertyGatewayMap,
             String propertyName) {
         return propertyGatewayMap.get(propertyName);
+    }
+
+    // -----------------------------------------------------
+    //                                      Foreign Property
+    //                                      ----------------
+    protected void setupEfpg(Map<String, PropertyGateway> propertyGatewayMap, PropertyGateway gateway,
+            String foreignPropertyName) {
+        propertyGatewayMap.put(foreignPropertyName, gateway); // the map should be plain map for performance
+    }
+
+    public PropertyGateway findForeignPropertyGateway(String propertyName) {
+        return null; // might be overridden
+    }
+
+    protected <ENTITY extends Entity> PropertyGateway doFindEfpg(Map<String, PropertyGateway> propertyGatewayMap,
+            String foreignPropertyName) {
+        return propertyGatewayMap.get(foreignPropertyName);
     }
 
     // -----------------------------------------------------
@@ -273,9 +297,55 @@ public abstract class AbstractDBMeta implements DBMeta {
         if (referrerListExp != null && referrerListExp.trim().length() > 0) {
             referrerPropList = splitListTrimmed(referrerListExp, delimiter);
         }
+        final PropertyMethodFinder propertyMethodFinder = createColumnPropertyMethodFinder();
         return new ColumnInfo(this, columnDbName, columnSqlName, columnSynonym, columnAlias, notNull, propertyName,
                 propertyType, primary, autoIncrement, columnDbType, columnSize, decimalDigits, defaultValue,
-                commonColumn, optimisticLockType, columnComment, foreignPropList, referrerPropList, classificationMeta);
+                commonColumn, optimisticLockType, columnComment, foreignPropList, referrerPropList, classificationMeta,
+                propertyMethodFinder);
+    }
+
+    protected PropertyMethodFinder createColumnPropertyMethodFinder() {
+        return new PropertyMethodFinder() {
+            public Method findReadMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
+                return findPropertyReadMethod(beanType, propertyName, propertyType);
+            }
+
+            public Method findWriteMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
+                return findPropertyWriteMethod(beanType, propertyName, propertyType);
+            }
+        };
+    }
+
+    protected Method findPropertyReadMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
+        final String methodName = buildPropertyGetterMethodName(propertyName);
+        final Method method = doFindPropertyMethod(beanType, methodName, new Class<?>[] {});
+        if (method == null) {
+            String msg = "Not found the method by the name: " + methodName;
+            throw new IllegalStateException(msg);
+        }
+        return method;
+    }
+
+    protected Method findPropertyWriteMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
+        final String methodName = buildPropertySetterMethodName(propertyName);
+        final Method method = doFindPropertyMethod(beanType, methodName, new Class<?>[] { propertyType });
+        if (method == null) {
+            String msg = "Not found the method by the name and type: " + methodName + ", " + propertyType;
+            throw new IllegalStateException(msg);
+        }
+        return method;
+    }
+
+    protected String buildPropertyGetterMethodName(String propertyName) {
+        return "get" + initCap(propertyName);
+    }
+
+    protected String buildPropertySetterMethodName(String propertyName) {
+        return "set" + initCap(propertyName);
+    }
+
+    protected Method doFindPropertyMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
+        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
     }
 
     /**
@@ -407,9 +477,22 @@ public abstract class AbstractDBMeta implements DBMeta {
             , String fixedCondition, List<String> dynamicParameterList, boolean fixedInline // fixed condition
             , String reversePropertyName) { // various info
         final Class<?> realPt = propertyType != null ? propertyType : foreignDbm.getEntityType(); // basically default, or specified Optional
+        final PropertyMethodFinder propertyMethodFinder = createForeignPropertyMethodFinder();
         return new ForeignInfo(constraintName, propertyName, localDbm, foreignDbm, localForeignColumnInfoMap,
                 relationNo, realPt, oneToOne, bizOneToOne, referrerAsOne, additionalFK, fixedCondition,
-                dynamicParameterList, fixedInline, reversePropertyName);
+                dynamicParameterList, fixedInline, reversePropertyName, propertyMethodFinder);
+    }
+
+    protected PropertyMethodFinder createForeignPropertyMethodFinder() {
+        return new PropertyMethodFinder() {
+            public Method findReadMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
+                return findPropertyReadMethod(beanType, propertyName, propertyType);
+            }
+
+            public Method findWriteMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
+                return findPropertyWriteMethod(beanType, propertyName, propertyType);
+            }
+        };
     }
 
     /**
@@ -521,8 +604,9 @@ public abstract class AbstractDBMeta implements DBMeta {
             final Class<?> listType = getReferrerPropertyListType();
             propertyType = listType != null ? listType : List.class;
         }
+        final PropertyMethodFinder propertyMethodFinder = createReferrerPropertyMethodFinder();
         return new ReferrerInfo(constraintName, propertyName, localDbm, referrerDbm, localReferrerColumnInfoMap,
-                propertyType, oneToOne, reversePropertyName);
+                propertyType, oneToOne, reversePropertyName, propertyMethodFinder);
     }
 
     /**
@@ -531,6 +615,18 @@ public abstract class AbstractDBMeta implements DBMeta {
      */
     protected Class<?> getReferrerPropertyListType() { // might be overridden
         return null; // as default (List)
+    }
+
+    protected PropertyMethodFinder createReferrerPropertyMethodFinder() {
+        return new PropertyMethodFinder() {
+            public Method findReadMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
+                return findPropertyReadMethod(beanType, propertyName, propertyType);
+            }
+
+            public Method findWriteMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
+                return findPropertyWriteMethod(beanType, propertyName, propertyType);
+            }
+        };
     }
 
     /**
@@ -591,7 +687,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     /**
      * Relation trace.
      */
-    protected static abstract class AbstractRelationTrace implements RelationTrace {
+    protected static abstract class AbstractRelationTrace implements RelationTrace { // #later remove this since Java8
 
         /** The list of relation. */
         protected List<RelationInfo> _relationList;

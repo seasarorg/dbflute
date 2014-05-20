@@ -581,8 +581,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
         return true;
     }
-    protected boolean xSV(Object value1, Object value2) {
-        return FunCustodial.isSameValue(value1, value2);
+    protected boolean xSV(Object v1, Object v2) {
+        return FunCustodial.isSameValue(v1, v2);
     }
 
     /**
@@ -590,15 +590,15 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * @return The hash-code from primary-key or columns.
      */
     public int hashCode() {
-        int result = 17;
-        result = xCH(result, getTableDbName());
+        int hs = 17;
+        hs = xCH(hs, getTableDbName());
 #foreach ($col in $table.equalsHashcodeColumnList)
-        result = xCH(result, get${col.JavaName}());
+        hs = xCH(hs, get${col.JavaName}());
 #end
-        return result;
+        return hs;
     }
-    protected int xCH(int result, Object value) {
-        return FunCustodial.calculateHashcode(result, value);
+    protected int xCH(int hs, Object vl) {
+        return FunCustodial.calculateHashcode(hs, vl);
     }
 
     /**
@@ -623,21 +623,21 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         StringBuilder sb = new StringBuilder();
         sb.append(toString());
 #if ($table.hasRelation())
-        String l = "\n  ";
+        String li = "\n  ";
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
         if (${foreignVariableName} != null)
-        { sb.append(l).append(xbRDS(${foreignVariableName}, "${fk.foreignPropertyName}")); }
+        { sb.append(li).append(xbRDS(${foreignVariableName}, "${fk.foreignPropertyName}")); }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
         if (${referrerVariableName} != null)
-        { sb.append(l).append(xbRDS(${referrerVariableName}, "${referrer.referrerPropertyNameAsOne}")); }
+        { sb.append(li).append(xbRDS(${referrerVariableName}, "${referrer.referrerPropertyNameAsOne}")); }
 #end
 #foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
-        if (${referrerVariableName} != null) { for (Entity e : ${referrerVariableName})
-        { if (e != null) { sb.append(l).append(xbRDS(e, "${referrer.referrerPropertyName}")); } } }
+        if (${referrerVariableName} != null) { for (Entity et : ${referrerVariableName})
+        { if (et != null) { sb.append(li).append(xbRDS(et, "${referrer.referrerPropertyName}")); } } }
 #end
 #end
         return sb.toString();
@@ -661,18 +661,18 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
     protected String buildColumnString() {
         StringBuilder sb = new StringBuilder();
-        String delimiter = ", ";
+        String dm = ", ";
 #foreach ($col in $table.columns)
 #if ($col.isJavaNativeUtilDate())
-        sb.append(delimiter).append(xfUD(get${col.javaName}()));
+        sb.append(dm).append(xfUD(get${col.javaName}()));
 #elseif ($col.isJavaNativeByteArray())
-        sb.append(delimiter).append(xfBA(get${col.javaName}()));
+        sb.append(dm).append(xfBA(get${col.javaName}()));
 #else
-        sb.append(delimiter).append(get${col.javaName}());
+        sb.append(dm).append(get${col.javaName}());
 #end
 #end
-        if (sb.length() > delimiter.length()) {
-            sb.delete(0, delimiter.length());
+        if (sb.length() > dm.length()) {
+            sb.delete(0, dm.length());
         }
         sb.insert(0, "{").append("}");
         return sb.toString();
@@ -697,22 +697,22 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     protected String buildRelationString() {
 #if ($table.hasRelation())
         StringBuilder sb = new StringBuilder();
-        String c = ",";
+        String cm = ",";
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
-        if (${foreignVariableName} != null) { sb.append(c).append("${fk.foreignPropertyName}"); }
+        if (${foreignVariableName} != null) { sb.append(cm).append("${fk.foreignPropertyName}"); }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
-        if (${referrerVariableName} != null) { sb.append(c).append("${referrer.referrerPropertyNameAsOne}"); }
+        if (${referrerVariableName} != null) { sb.append(cm).append("${referrer.referrerPropertyNameAsOne}"); }
 #end
 #foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
         if (${referrerVariableName} != null && !${referrerVariableName}.isEmpty())
-        { sb.append(c).append("${referrer.referrerPropertyName}"); }
+        { sb.append(cm).append("${referrer.referrerPropertyName}"); }
 #end
-        if (sb.length() > c.length()) {
-            sb.delete(0, c.length()).insert(0, "(").append(")");
+        if (sb.length() > cm.length()) {
+            sb.delete(0, cm.length()).insert(0, "(").append(")");
         }
         return sb.toString();
 #else

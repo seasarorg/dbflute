@@ -53,14 +53,17 @@ public class ${myClassName} extends AbstractDBMeta {
 ## These fields and methods should be defined before definitions of column info.
 ## And the map should be plain map for performance.
 ## - - - - - - - - - -/
+    // -----------------------------------------------------
+    //                                       Column Property
+    //                                       ---------------
     protected final Map<String, PropertyGateway> _epgMap = newHashMap();
     {
 #foreach ($col in $table.columns)
         setupEpg(_epgMap, new Epg${col.javaName}(), "${col.javaBeansRulePropertyName}");
 #end
     }
-    public PropertyGateway findPropertyGateway(String propertyName)
-    { return doFindEpg(_epgMap, propertyName); }
+    public PropertyGateway findPropertyGateway(String prop)
+    { return doFindEpg(_epgMap, prop); }
 #foreach ($col in $table.columns)
 #set ($setupperClassName = "Epg${col.javaName}")
 #if ($col.isCheckSelectedClassification() || $col.isForceClassificationSetting())
@@ -99,6 +102,43 @@ public class ${myClassName} extends AbstractDBMeta {
 #end
 #end
     }
+#end
+#if ($table.hasForeignKey() || $table.hasReferrerAsOne())
+
+    // -----------------------------------------------------
+    //                                      Foreign Property
+    //                                      ----------------
+    protected final Map<String, PropertyGateway> _efpgMap = newHashMap();
+#if ($table.hasForeignKey())
+    {
+#foreach ($fk in $table.foreignKeys)
+        setupEfpg(_efpgMap, new Efpg${fk.foreignJavaBeansRulePropertyNameInitCap}(), "${fk.foreignJavaBeansRulePropertyName}");
+#end
+    }
+    public PropertyGateway findForeignPropertyGateway(String prop)
+    { return doFindEfpg(_efpgMap, prop); }
+#foreach ($fk in $table.foreignKeys)
+#set ($setupperClassName = "Efpg${fk.foreignJavaBeansRulePropertyNameInitCap}")
+    public class ${setupperClassName} implements PropertyGateway {
+        public Object read(Entity et) { return ((${myExtendedObjectClassName})et).get${fk.foreignJavaBeansRulePropertyNameInitCap}(); }
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${fk.foreignJavaBeansRulePropertyNameInitCap}((${fk.foreignTable.extendedEntityClassName})vl); }
+    }
+#end
+#end
+#if ($table.hasReferrerAsOne())
+    {
+#foreach ($referrer in $table.referrerAsOneList)
+        setupEfpg(_efpgMap, new Efpg${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(), "${referrer.referrerJavaBeansRulePropertyNameAsOne}");
+#end
+    }
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($setupperClassName = "Efpg${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}")
+    public class ${setupperClassName} implements PropertyGateway {
+        public Object read(Entity et) { return ((${myExtendedObjectClassName})et).get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(); }
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}((${referrer.table.extendedEntityClassName})vl); }
+    }
+#end
+#end
 #end
 
     // ===================================================================================
@@ -174,6 +214,8 @@ public class ${myClassName} extends AbstractDBMeta {
     // ===================================================================================
     //                                                                       Relation Info
     //                                                                       =============
+    // canonot cache because it uses related DB meta instance while booting
+    // (instead, cached by super's collection)
     // -----------------------------------------------------
     //                                      Foreign Property
     //                                      ----------------
@@ -198,7 +240,6 @@ public class ${myClassName} extends AbstractDBMeta {
     }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
-#set ($genericsColumnInfoMap = "ColumnInfo, ColumnInfo")
     /**
      * ${referrer.referrerDispAsOneForJavaDoc}
      * @return The information object of foreign property(referrer-as-one). (NotNull)

@@ -39,10 +39,24 @@ public interface RelationInfo {
      */
     String getRelationPropertyName();
 
+    /**
+     * Get the DB meta of the local table. <br />
+     * For example, if the relation MEMBER and MEMBER_STATUS, this returns MEMBER's one.
+     * @return The DB meta singleton instance. (NotNull)
+     */
     DBMeta getLocalDBMeta();
 
+    /**
+     * Get the DB meta of the target table. <br />
+     * For example, if the relation MEMBER and MEMBER_STATUS, this returns MEMBER_STATUS's one.
+     * @return The DB meta singleton instance. (NotNull)
+     */
     DBMeta getTargetDBMeta();
 
+    /**
+     * Get the read-only map, key is a local column info, value is a target column info.
+     * @return The read-only map. (NotNull)
+     */
     Map<ColumnInfo, ColumnInfo> getLocalTargetColumnInfoMap();
 
     /**

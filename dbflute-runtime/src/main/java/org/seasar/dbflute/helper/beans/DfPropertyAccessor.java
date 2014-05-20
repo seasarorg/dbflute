@@ -22,8 +22,16 @@ import org.seasar.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
  */
 public interface DfPropertyAccessor {
 
+    /**
+     * Get the name of the property.
+     * @return The string expression of the property. (NotNull)
+     */
     String getPropertyName();
 
+    /**
+     * Get the type of the property 
+     * @return The class instance of the property. (NotNull)
+     */
     Class<?> getPropertyType();
 
     /**
@@ -40,7 +48,15 @@ public interface DfPropertyAccessor {
      */
     void setValue(Object target, Object value);
 
+    /**
+     * Is the property readable?
+     * @return The determination, true or false.
+     */
     boolean isReadable();
 
+    /**
+     * Is the property writable?
+     * @return The determination, true or false.
+     */
     boolean isWritable();
 }

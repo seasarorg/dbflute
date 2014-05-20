@@ -23,7 +23,6 @@ import java.util.Map.Entry;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
-import org.seasar.dbflute.helper.beans.DfPropertyAccessor;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -44,10 +43,19 @@ import org.seasar.dbflute.util.DfReflectionUtil;
 public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
     // ===================================================================================
-    //                                                                      Factory Method
-    //                                                                      ==============
-    public static TnRelationRowCreatorExtension createRelationRowCreator() {
-        return new TnRelationRowCreatorExtension();
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final TnRelationOptionalFactory _optionalFactory;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public TnRelationRowCreatorExtension(TnRelationOptionalFactory optionalFactory) {
+        _optionalFactory = optionalFactory;
+    }
+
+    public static TnRelationRowCreatorExtension createRelationRowCreator(TnRelationOptionalFactory optionalFactory) {
+        return new TnRelationRowCreatorExtension(optionalFactory);
     }
 
     // ===================================================================================
@@ -131,17 +139,16 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
         if (value != null) {
             res.incrementValidValueCount();
-            setValue(res, mapping, value);
+            doRegisterRelationValue(res, mapping, value);
         }
     }
 
-    protected void setValue(TnRelationRowCreationResource res, TnPropertyMapping mapping, Object value) {
+    protected void doRegisterRelationValue(TnRelationRowCreationResource res, TnPropertyMapping mapping, Object value) {
         final ColumnInfo columnInfo = mapping.getEntityColumnInfo();
         if (columnInfo != null) {
             columnInfo.write((Entity) res.getRow(), value);
         } else {
-            final DfPropertyAccessor accessor = mapping.getPropertyAccessor();
-            accessor.setValue(res.getRow(), value);
+            mapping.getPropertyAccessor().setValue(res.getRow(), value);
         }
     }
 
@@ -200,8 +207,9 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
                 relRowCache.addRelationRow(relationNoSuffix, relKey, relationRow);
             }
         }
+        relationRow = filterOptionalRelationRowIfNeeds(row, nextRpt, relationRow);
         if (relationRow != null) {
-            nextRpt.getPropertyDesc().setValue(row, relationRow);
+            nextRpt.getPropertyAccessor().setValue(row, relationRow);
         }
     }
 
@@ -276,5 +284,12 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         // and ConditionBean supports unlimited relation nest level
         // so this limit size is always used after hasConditionBean()
         return 2; // for Compatible (old parameter)
+    }
+
+    // ===================================================================================
+    //                                                                   Optional Handling
+    //                                                                   =================
+    public Object filterOptionalRelationRowIfNeeds(Object row, TnRelationPropertyType rpt, Object relationRow) {
+        return _optionalFactory.filterOptionalRelationRowIfNeeds(row, rpt, relationRow);
     }
 }

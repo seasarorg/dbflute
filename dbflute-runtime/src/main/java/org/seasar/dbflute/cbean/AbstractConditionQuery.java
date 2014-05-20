@@ -1733,7 +1733,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     public ConditionValue invokeValue(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         final DBMeta dbmeta = xgetLocalDBMeta();
-        final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
+        final String columnCapPropName = initCap(dbmeta.findColumnInfo(columnFlexibleName).getPropertyName());
         final String methodName = "get" + columnCapPropName;
         final Method method = xhelpGettingCQMethod(this, methodName, new Class<?>[] {});
         if (method == null) {
@@ -1952,7 +1952,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final ConditionQuery cq = container.getConditionQuery();
         final String ascDesc = isAsc ? "Asc" : "Desc";
         final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
-        final String columnCapPropName = initCap(dbmeta.findPropertyName(flexibleName));
+        final String columnCapPropName = initCap(dbmeta.findColumnInfo(flexibleName).getPropertyName());
         final String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
         final Method method = xhelpGettingCQMethod(cq, methodName, new Class<?>[] {});
         if (method == null) {

@@ -931,7 +931,7 @@ public class ConditionBeanExceptionThrower {
     }
 
     public void throwLikeSearchOptionNotFoundException(String colName, String value, DBMeta dbmeta) {
-        final String capPropName = initCap(dbmeta.findPropertyName(colName));
+        final String capPropName = initCap(dbmeta.findColumnInfo(colName).getPropertyName());
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The likeSearchOption was not found! (should not be null)");
         br.addItem("Advice");

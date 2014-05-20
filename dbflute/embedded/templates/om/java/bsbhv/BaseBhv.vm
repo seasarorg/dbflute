@@ -38,12 +38,6 @@ import ${glPackageExtendedEntity}.*;
 import ${myDBMetaPackageName}.*;
 import ${glPackageCB}.*;
 
-#set ($myExtendClassName = "")
-#if ($table.isWritable())
-  #set ($myExtendClassName = "AbstractBehaviorWritable")
-#else
-  #set ($myExtendClassName = "AbstractBehaviorReadable")
-#end
 /**
  * The behavior of ${table.basicInfoDispString}. <br />
  * <pre>
@@ -76,7 +70,7 @@ import ${glPackageCB}.*;
  * </pre>
  * @author ${database.classAuthor}
  */
-public abstract class ${myClassName} extends ${myExtendClassName} {
+public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     // ===================================================================================
     //                                                                          Definition

@@ -13,33 +13,22 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.beans;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+package org.seasar.dbflute.exception;
 
 /**
- * @author modified by jflute (originated in S2Dao)
+ * The exception of when the relation entity is not found.
+ * @author jflute
  */
-public interface DfPropertyDesc extends DfPropertyAccessor {
+public class RelationEntityNotFoundException extends RecordHasAlreadyBeenDeletedException {
 
-    DfBeanDesc getBeanDesc();
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
-    Method getReadMethod();
-
-    void setReadMethod(Method readMethod);
-
-    boolean hasReadMethod();
-
-    Method getWriteMethod();
-
-    void setWriteMethod(Method writeMethod);
-
-    boolean hasWriteMethod();
-
-    Field getField();
-
-    void setField(Field field);
-
-    Object convertIfNeed(Object value);
+    /**
+     * Constructor.
+     * @param msg The message of the exception. (NotNull)
+     */
+    public RelationEntityNotFoundException(String msg) {
+        super(msg);
+    }
 }

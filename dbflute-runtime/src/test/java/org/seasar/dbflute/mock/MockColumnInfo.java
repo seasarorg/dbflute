@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 
 import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType;
 import org.seasar.dbflute.dbmeta.PropertyGateway;
+import org.seasar.dbflute.dbmeta.PropertyMethodFinder;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 
 /**
@@ -28,7 +29,19 @@ public class MockColumnInfo extends ColumnInfo {
 
     public MockColumnInfo() {
         super(new MockDBMeta(), "mock", "mock", null, "mock", true, "mock", Integer.class, true, false, "INTEGER", 3,
-                0, null, false, OptimisticLockType.NONE, "mock", null, null, null);
+                0, null, false, OptimisticLockType.NONE, "mock", null, null, null, createPropertyMethodFinder());
+    }
+
+    protected static PropertyMethodFinder createPropertyMethodFinder() {
+        return new PropertyMethodFinder() {
+            public Method findWriteMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
+                return null;
+            }
+
+            public Method findReadMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
+                return null;
+            }
+        };
     }
 
     @Override

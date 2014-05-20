@@ -1538,7 +1538,7 @@ public class Table {
         return manyList != null && !manyList.isEmpty();
     }
 
-    protected boolean hasReferrerAsOne() {
+    public boolean hasReferrerAsOne() {
         final List<ForeignKey> oneList = getReferrerAsOneList();
         return oneList != null && !oneList.isEmpty();
     }

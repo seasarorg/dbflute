@@ -220,14 +220,19 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                 relRowCache.addRelationRow(relationNoSuffix, relKey, relationRow);
             }
         }
+        relationRow = filterOptionalRelationRowIfNeeds(row, rpt, relationRow);
         if (relationRow != null) {
-            rpt.getPropertyDesc().setValue(row, relationRow);
+            rpt.getPropertyAccessor().setValue(row, relationRow);
         }
     }
 
     protected String getFirstLevelRelationPath(TnRelationPropertyType rpt) {
         // here is on base so this suffix becomes relation path directly
         return rpt.getRelationNoSuffixPart();
+    }
+
+    protected Object filterOptionalRelationRowIfNeeds(Object row, TnRelationPropertyType rpt, Object relationRow) {
+        return _relationRowCreator.filterOptionalRelationRowIfNeeds(row, rpt, relationRow);
     }
 
     // ===================================================================================

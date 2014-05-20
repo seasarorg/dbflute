@@ -150,4 +150,8 @@ public class MockDBMeta extends AbstractDBMeta {
     public PropertyGateway findPropertyGateway(String propertyName) {
         return null;
     }
+
+    public PropertyGateway findForeignPropertyGateway(String foreignPropertyName) {
+        return null;
+    }
 }

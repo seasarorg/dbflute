@@ -28,7 +28,7 @@ import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.dbmeta.name.TableSqlName;
 
 /**
- * The interface of DB meta.
+ * The interface of DB meta for one table.
  * @author jflute
  */
 public interface DBMeta {
@@ -36,22 +36,22 @@ public interface DBMeta {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Map-string map mark. */
+    /** The mark of map string. */
     public static final String MAP_STRING_MAP_MARK = "map:";
 
-    /** Map-string list mark. */
+    /** The mark of list string. */
     public static final String MAP_STRING_LIST_MARK = "list:";
 
-    /** Map-string start brace. */
+    /** The mark of start brace. */
     public static final String MAP_STRING_START_BRACE = "@{";
 
-    /** Map-string end brace. */
+    /** The mark of end brace. */
     public static final String MAP_STRING_END_BRACE = "@}";
 
-    /** Map-string delimiter. */
+    /** The mark of delimiter. */
     public static final String MAP_STRING_DELIMITER = "@;";
 
-    /** Map-string equal. */
+    /** The mark of equal. */
     public static final String MAP_STRING_EQUAL = "@=";
 
     // ===================================================================================
@@ -73,6 +73,13 @@ public interface DBMeta {
      * @return The instance of the property gateway. (NullAllowed: if not found, returns null)
      */
     PropertyGateway findPropertyGateway(String propertyName);
+
+    /**
+     * Find the foreign property gateway of the entity for the relation. <br />
+     * @param foreignPropertyName The property name of the relation as case insensitive for performance. (NotNull)
+     * @return The instance of the property gateway. (NullAllowed: if not found, returns null)
+     */
+    PropertyGateway findForeignPropertyGateway(String foreignPropertyName);
 
     // ===================================================================================
     //                                                                          Table Info
@@ -252,7 +259,7 @@ public interface DBMeta {
     /**
      * Relation trace.
      */
-    public static interface RelationTrace {
+    public static interface RelationTrace { // #later remove this since Java8
 
         /**
          * Get the trace of relation.
@@ -375,7 +382,7 @@ public interface DBMeta {
      * @param flexibleName The flexible name of the object. (NotNull)
      * @return The determination, true or false.
      */
-    boolean hasFlexibleName(String flexibleName);
+    boolean hasFlexibleName(String flexibleName); // #later remove this since Java8
 
     /**
      * Find DB name by flexible name. {Target objects are TABLE and COLUMN}
@@ -383,7 +390,7 @@ public interface DBMeta {
      * @return The DB name of anything. (NotNull)
      * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the corresponding name was not found.
      */
-    String findDbName(String flexibleName);
+    String findDbName(String flexibleName); // #later remove this since Java8
 
     /**
      * Find property name(JavaBeansRule) by flexible name. {Target objects are TABLE and COLUMN}
@@ -391,7 +398,7 @@ public interface DBMeta {
      * @return The DB name of anything. (NotNull)
      * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the corresponding name was not found.
      */
-    String findPropertyName(String flexibleName);
+    String findPropertyName(String flexibleName); // #later remove this since Java8
 
     // ===================================================================================
     //                                                                           Type Name

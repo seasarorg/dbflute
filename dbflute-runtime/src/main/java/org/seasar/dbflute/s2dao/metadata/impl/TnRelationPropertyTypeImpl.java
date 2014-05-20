@@ -18,10 +18,13 @@ package org.seasar.dbflute.s2dao.metadata.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
+import org.seasar.dbflute.helper.beans.DfPropertyAccessor;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -45,12 +48,13 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
     protected final boolean _hasSimpleUniqueKey;
     protected final boolean _hasCompoundUniqueKey;
     protected final TnPropertyType _simpleUniquePropertyType;
+    protected final DfPropertyAccessor _propertyAccessor;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnRelationPropertyTypeImpl(DfPropertyDesc propertyDesc, int relationNo, String[] myKeys, String[] yourKeys,
-            TnBeanMetaData myBeanMetaData, TnBeanMetaData yourBeanMetaData) {
+    public TnRelationPropertyTypeImpl(final DfPropertyDesc propertyDesc, int relationNo, String[] myKeys,
+            String[] yourKeys, TnBeanMetaData myBeanMetaData, TnBeanMetaData yourBeanMetaData) {
         super(propertyDesc);
         _relationNo = relationNo;
         _relationNoSuffixPart = buildRelationNoSuffixPart(relationNo);
@@ -59,10 +63,12 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
         _myBeanMetaData = myBeanMetaData;
         _yourBeanMetaData = yourBeanMetaData;
         _uniquePropertyTypeList = deriveUniqueKeys(yourKeys, yourBeanMetaData);
+
         // save at this point for performance (suppose that many relation has the only one key)
         _hasSimpleUniqueKey = _uniquePropertyTypeList.size() == 1;
         _hasCompoundUniqueKey = _uniquePropertyTypeList.size() >= 2;
         _simpleUniquePropertyType = _hasSimpleUniqueKey ? _uniquePropertyTypeList.get(0) : null;
+        _propertyAccessor = createPropertyAccessor(propertyDesc, myBeanMetaData);
     }
 
     protected String buildRelationNoSuffixPart(int relationNo) {
@@ -88,6 +94,46 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
             }
         }
         return uniquePropertyTypeList;
+    }
+
+    protected DfPropertyAccessor createPropertyAccessor(final DfPropertyDesc propertyDesc, TnBeanMetaData myBeanMetaData) {
+        final DBMeta dbmeta = myBeanMetaData.getDBMeta();
+        final String propertyName = propertyDesc.getPropertyName();
+        final ForeignInfo foreignInfo = dbmeta.hasForeign(propertyName) ? dbmeta.findForeignInfo(propertyName) : null;
+        return new DfPropertyAccessor() {
+
+            public String getPropertyName() {
+                return foreignInfo != null ? foreignInfo.getForeignPropertyName() : propertyName;
+            }
+
+            public Class<?> getPropertyType() {
+                return foreignInfo != null ? foreignInfo.getPropertyType() : propertyDesc.getPropertyType();
+            }
+
+            public Object getValue(Object target) {
+                if (foreignInfo != null && target instanceof Entity) { // basically here
+                    return foreignInfo.read((Entity) target);
+                } else {
+                    return propertyDesc.getValue(target);
+                }
+            }
+
+            public void setValue(Object target, Object value) {
+                if (foreignInfo != null && target instanceof Entity && value instanceof Entity) { // basically here
+                    foreignInfo.write((Entity) target, (Entity) value);
+                } else {
+                    propertyDesc.setValue(target, value);
+                }
+            }
+
+            public boolean isReadable() {
+                return propertyDesc.isReadable();
+            }
+
+            public boolean isWritable() {
+                return propertyDesc.isWritable();
+            }
+        };
     }
 
     // ===================================================================================
@@ -157,5 +203,10 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
 
     public TnPropertyType getSimpleUniquePropertyType() {
         return _simpleUniquePropertyType;
+    }
+
+    @Override
+    public DfPropertyAccessor getPropertyAccessor() {
+        return _propertyAccessor;
     }
 }

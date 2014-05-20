@@ -27,6 +27,7 @@ import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.InternalMapContext.InvokePathProvider;
+import org.seasar.dbflute.s2dao.extension.TnRelationOptionalFactory;
 import org.seasar.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
 import org.seasar.dbflute.s2dao.extension.TnRowCreatorExtension;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
@@ -142,7 +143,12 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     }
 
     protected TnRelationRowCreatorExtension createRelationRowCreator(TnBeanMetaData bmd) {
-        return TnRelationRowCreatorExtension.createRelationRowCreator();
+        final TnRelationOptionalFactory optionalFactory = createRelationOptionalFactory();
+        return TnRelationRowCreatorExtension.createRelationRowCreator(optionalFactory);
+    }
+
+    protected TnRelationOptionalFactory createRelationOptionalFactory() {
+        return new TnRelationOptionalFactory();
     }
 
     // ===================================================================================

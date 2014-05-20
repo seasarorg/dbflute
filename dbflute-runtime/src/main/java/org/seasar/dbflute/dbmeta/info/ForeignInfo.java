@@ -24,6 +24,8 @@ import java.util.Map.Entry;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.PropertyGateway;
+import org.seasar.dbflute.dbmeta.PropertyMethodFinder;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -52,6 +54,8 @@ public class ForeignInfo implements RelationInfo {
     protected final List<String> _dynamicParameterList;
     protected final boolean _fixedInline;
     protected final String _reversePropertyName;
+    protected final PropertyGateway _propertyGateway;
+    protected final PropertyMethodFinder _propertyMethodFinder;
     protected final Method _readMethod;
     protected final Method _writeMethod;
 
@@ -63,12 +67,13 @@ public class ForeignInfo implements RelationInfo {
             , Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo, Class<?> propertyType // relation attribute
             , boolean oneToOne, boolean bizOneToOne, boolean referrerAsOne, boolean additionalFK // relation type
             , String fixedCondition, List<String> dynamicParameterList, boolean fixedInline // fixed condition
-            , String reversePropertyName) { // various info
+            , String reversePropertyName, PropertyMethodFinder propertyMethodFinder) { // various info
         assertObjectNotNull("constraintName", constraintName);
         assertObjectNotNull("foreignPropertyName", foreignPropertyName);
         assertObjectNotNull("localDBMeta", localDBMeta);
         assertObjectNotNull("foreignDBMeta", foreignDBMeta);
         assertObjectNotNull("localForeignColumnInfoMap", localForeignColumnInfoMap);
+        assertObjectNotNull("propertyMethodFinder", propertyMethodFinder);
         _constraintName = constraintName;
         _foreignPropertyName = foreignPropertyName;
         _localDBMeta = localDBMeta;
@@ -93,6 +98,8 @@ public class ForeignInfo implements RelationInfo {
             _dynamicParameterList = Collections.emptyList();
         }
         _reversePropertyName = reversePropertyName;
+        _propertyGateway = findPropertyGateway();
+        _propertyMethodFinder = propertyMethodFinder;
         _readMethod = findReadMethod();
         _writeMethod = findWriteMethod();
     }
@@ -167,7 +174,7 @@ public class ForeignInfo implements RelationInfo {
      */
     @SuppressWarnings("unchecked")
     public <PROPERTY extends Entity> PROPERTY read(Entity localEntity) {
-        return (PROPERTY) invokeMethod(getReadMethod(), localEntity, new Object[] {});
+        return (PROPERTY) _propertyGateway.read(localEntity);
     }
 
     /**
@@ -187,7 +194,7 @@ public class ForeignInfo implements RelationInfo {
      * @param foreignEntity The written instance of foreign entity. (NullAllowed: if null, null value is written)
      */
     public void write(Entity localEntity, Entity foreignEntity) {
-        invokeMethod(getWriteMethod(), localEntity, new Object[] { foreignEntity });
+        _propertyGateway.write(localEntity, foreignEntity);
     }
 
     /**
@@ -201,35 +208,23 @@ public class ForeignInfo implements RelationInfo {
     // -----------------------------------------------------
     //                                                Finder
     //                                                ------
-    protected Method findReadMethod() {
-        final Class<? extends Entity> localType = _localDBMeta.getEntityType();
-        final String methodName = buildAccessorName("get");
-        final Method method = findMethod(localType, methodName, new Class[] {});
-        if (method == null) {
-            String msg = "Not found the method by the name: " + methodName;
+    protected PropertyGateway findPropertyGateway() {
+        final PropertyGateway gateway = _localDBMeta.findForeignPropertyGateway(_foreignPropertyName);
+        if (gateway == null) { // no way
+            String msg = "Not found the foreign property gateway by the name: " + _foreignPropertyName;
             throw new IllegalStateException(msg);
         }
-        return method;
+        return gateway;
+    }
+
+    protected Method findReadMethod() {
+        final Class<? extends Entity> localType = _localDBMeta.getEntityType();
+        return _propertyMethodFinder.findReadMethod(localType, _foreignPropertyName, _propertyType);
     }
 
     protected Method findWriteMethod() {
         final Class<? extends Entity> localType = _localDBMeta.getEntityType();
-        final Class<? extends Entity> foreignType = _foreignDBMeta.getEntityType();
-        final String methodName = buildAccessorName("set");
-        final Method method = findMethod(localType, methodName, new Class[] { foreignType });
-        if (method == null) {
-            String msg = "Not found the method by the name and type: " + methodName + ", " + foreignType;
-            throw new IllegalStateException(msg);
-        }
-        return method;
-    }
-
-    protected String buildAccessorName(String prefix) {
-        return prefix + initCap(_foreignPropertyName);
-    }
-
-    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
-        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
+        return _propertyMethodFinder.findWriteMethod(localType, _foreignPropertyName, _propertyType);
     }
 
     // -----------------------------------------------------
@@ -325,9 +320,7 @@ public class ForeignInfo implements RelationInfo {
     }
 
     /**
-     * Get the DB meta of the local table. <br />
-     * For example, if the relation MEMBER and MEMBER_STATUS, this returns MEMBER's one.
-     * @return The DB meta singleton instance. (NotNull)
+     * {@inheritDoc}
      */
     public DBMeta getLocalDBMeta() {
         return _localDBMeta;

@@ -58,4 +58,13 @@ public interface TnRelationRowCreator {
     Map<String, Map<String, TnPropertyMapping>> createPropertyCache(Map<String, String> selectColumnMap,
             Map<String, Integer> selectIndexMap, TnRelationSelector relSelector, TnBeanMetaData baseBmd)
             throws SQLException;
+
+    /**
+     * Filter the relation row as optional object if it needs.
+     * @param row The base point row, which is previous relation row. (NotNull)
+     * @param rpt The property type for the relation. (NotNull)
+     * @param relationRow The row instance of relation entity. (NullAllowed)
+     * @return The filtered instance of relation entity. (NullAllowed)
+     */
+    Object filterOptionalRelationRowIfNeeds(Object row, TnRelationPropertyType rpt, Object relationRow);
 }

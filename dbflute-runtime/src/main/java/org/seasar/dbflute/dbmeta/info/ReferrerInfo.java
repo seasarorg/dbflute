@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.PropertyMethodFinder;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -45,6 +46,7 @@ public class ReferrerInfo implements RelationInfo {
     protected final Class<?> _propertyType;
     protected final boolean _oneToOne;
     protected final String _reversePropertyName;
+    protected final PropertyMethodFinder _propertyMethodFinder;
     protected final Method _readMethod;
     protected final Method _writeMethod;
 
@@ -55,12 +57,13 @@ public class ReferrerInfo implements RelationInfo {
             , DBMeta localDBMeta, DBMeta referrerDBMeta // DB meta
             , Map<ColumnInfo, ColumnInfo> localReferrerColumnInfoMap, Class<?> propertyType // relation attribute
             , boolean oneToOne // relation type
-            , String reversePropertyName) { // various info
+            , String reversePropertyName, PropertyMethodFinder propertyMethodFinder) { // various info
         assertObjectNotNull("constraintName", constraintName);
         assertObjectNotNull("referrerPropertyName", referrerPropertyName);
         assertObjectNotNull("localDBMeta", localDBMeta);
         assertObjectNotNull("referrerDBMeta", referrerDBMeta);
         assertObjectNotNull("localReferrerColumnInfoMap", localReferrerColumnInfoMap);
+        assertObjectNotNull("propertyMethodFinder", propertyMethodFinder);
         _constraintName = constraintName;
         _referrerPropertyName = referrerPropertyName;
         _localDBMeta = localDBMeta;
@@ -74,6 +77,10 @@ public class ReferrerInfo implements RelationInfo {
         _propertyType = propertyType;
         _oneToOne = oneToOne;
         _reversePropertyName = reversePropertyName;
+        // referrer property is not accessed in runtime so it doesn't need
+        // (and don't want DB meta to be fat)
+        //_propertyGateway = findPropertyGateway();
+        _propertyMethodFinder = propertyMethodFinder;
         _readMethod = findReadMethod();
         _writeMethod = findWriteMethod();
     }
@@ -184,32 +191,12 @@ public class ReferrerInfo implements RelationInfo {
     //                                                ------
     protected Method findReadMethod() {
         final Class<? extends Entity> localType = _localDBMeta.getEntityType();
-        final String methodName = buildAccessorName("get");
-        final Method method = findMethod(localType, methodName, new Class[] {});
-        if (method == null) {
-            String msg = "Not found the method by the name: " + methodName;
-            throw new IllegalStateException(msg);
-        }
-        return method;
+        return _propertyMethodFinder.findReadMethod(localType, _referrerPropertyName, _propertyType);
     }
 
     protected Method findWriteMethod() {
         final Class<? extends Entity> localType = _localDBMeta.getEntityType();
-        final String methodName = buildAccessorName("set");
-        final Method method = findMethod(localType, methodName, new Class[] { _propertyType });
-        if (method == null) {
-            String msg = "Not found the method by the name and type: " + methodName + ", " + _propertyType;
-            throw new IllegalStateException(msg);
-        }
-        return method;
-    }
-
-    protected String buildAccessorName(String prefix) {
-        return prefix + initCap(_referrerPropertyName);
-    }
-
-    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
-        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
+        return _propertyMethodFinder.findWriteMethod(localType, _referrerPropertyName, _propertyType);
     }
 
     // -----------------------------------------------------
@@ -305,9 +292,7 @@ public class ReferrerInfo implements RelationInfo {
     }
 
     /**
-     * Get the DB meta of the local table. <br />
-     * For example, if the relation MEMBER and MEMBER_STATUS, this returns MEMBER's one.
-     * @return The DB meta singleton instance. (NotNull)
+     * {@inheritDoc}
      */
     public DBMeta getLocalDBMeta() {
         return _localDBMeta;
@@ -315,7 +300,7 @@ public class ReferrerInfo implements RelationInfo {
 
     /**
      * Get the DB meta of the referrer table. <br />
-     * For example, if the relation MEMBER and MEMBER_STATUS, this returns MEMBER_STATUS's one.
+     * For example, if the relation MEMBER and PURCHASE, this returns PURCHASE's one.
      * @return The DB meta singleton instance. (NotNull)
      */
     public DBMeta getReferrerDBMeta() {

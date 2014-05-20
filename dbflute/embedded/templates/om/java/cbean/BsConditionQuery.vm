@@ -480,7 +480,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                                         Union Query
     //                                                                         ===========
-    protected void reflectRelationOnUnionQuery(ConditionQuery bqs, ConditionQuery uqs) {
+    public void reflectRelationOnUnionQuery(ConditionQuery bqs, ConditionQuery uqs) {
 #if ($table.hasForeignKeyOrReferrerAsOne())
         ${myConditionQueryClassName} bq = (${myConditionQueryClassName})bqs;
         ${myConditionQueryClassName} uq = (${myConditionQueryClassName})uqs;
