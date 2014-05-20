@@ -76,12 +76,12 @@ $database.checkProperties()
 #set ($glDBCurrent = "${glProjectPrefix}DBCurrent")
 #set ($glDBFluteConfig = "${glProjectPrefix}DBFluteConfig")
 #set ($glDBFluteInitializer = "${glProjectPrefix}DBFluteInitializer")
+#set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
 #set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
 #set ($glImplementedBehaviorSelector = "${glProjectPrefix}ImplementedBehaviorSelector")
 #set ($glImplementedCommonColumnAutoSetupper = "${glProjectPrefix}ImplementedCommonColumnAutoSetupper")
 #set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
 #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
-#set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
 
 ## ===================================================================================
 ##                                                                            Variable

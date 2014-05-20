@@ -1259,13 +1259,16 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 #end
 #if (!${col.isNotNull()} || ${col.isPrimaryKey()})
+#if (${col.isAvailableIsNull()})
 
     /**
      * IsNull {is null}. And OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      */
     public void set${tmpJavaName}_IsNull() { reg${tmpJavaName}(CK_ISN, DOBJ); }
+#end
 #if ($col.isMakeIsNullOrEmpty())
+#if (${col.isAvailableIsNullOrEmpty()})
 
     /**
      * IsNullOrEmpty {is null or empty}. And OnlyOnceRegistered. <br />
@@ -1273,12 +1276,15 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      */
     public void set${tmpJavaName}_IsNullOrEmpty() { reg${tmpJavaName}(CK_ISNOE, DOBJ); }
 #end
+#end
+#if (${col.isAvailableIsNotNull()})
 
     /**
      * IsNotNull {is not null}. And OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      */
     public void set${tmpJavaName}_IsNotNull() { reg${tmpJavaName}(CK_ISNN, DOBJ); }
+#end
 #end
 
     protected void reg${tmpJavaName}(ConditionKey ky, Object vl) { regQ(ky, vl, getCValue${tmpJavaName}(), "${col.name}"); }

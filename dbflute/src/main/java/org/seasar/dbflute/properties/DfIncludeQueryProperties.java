@@ -15,7 +15,10 @@
  */
 package org.seasar.dbflute.properties;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,8 +26,12 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.torque.engine.database.model.Column;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.util.Srl;
+import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
@@ -44,6 +51,69 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     protected static final String PROP_ORDER_BY = "OrderBy";
     protected static final String PROP_MYSELF = "Myself";
 
+    protected static final Set<String> _stringCKeySet = new LinkedHashSet<String>();
+    static {
+        _stringCKeySet.add("NotEqual");
+        _stringCKeySet.add("GreaterThan");
+        _stringCKeySet.add("GreaterEqual");
+        _stringCKeySet.add("LessThan");
+        _stringCKeySet.add("LessEqual");
+        _stringCKeySet.add("InScope");
+        _stringCKeySet.add("NotInScope");
+        _stringCKeySet.add("PrefixSearch");
+        _stringCKeySet.add("LikeSearch");
+        _stringCKeySet.add("NotLikeSearch");
+        _stringCKeySet.add("EmptyString");
+        _stringCKeySet.add("IsNull");
+        _stringCKeySet.add("IsNullOrEmpty");
+        _stringCKeySet.add("IsNotNull");
+    }
+
+    protected static final Set<String> _numberCKeySet = new LinkedHashSet<String>();
+    static {
+        _numberCKeySet.add("NotEqual");
+        _numberCKeySet.add("GreaterThan");
+        _numberCKeySet.add("GreaterEqual");
+        _numberCKeySet.add("LessThan");
+        _numberCKeySet.add("LessEqual");
+        _numberCKeySet.add("RangeOf");
+        _numberCKeySet.add("InScope");
+        _numberCKeySet.add("NotInScope");
+        _numberCKeySet.add("IsNull");
+        _numberCKeySet.add("IsNullOrEmpty");
+        _numberCKeySet.add("IsNotNull");
+    }
+
+    protected static final Set<String> _dateCKeySet = new LinkedHashSet<String>();
+    static {
+        _dateCKeySet.add("NotEqual");
+        _dateCKeySet.add("GreaterThan");
+        _dateCKeySet.add("GreaterEqual");
+        _dateCKeySet.add("LessThan");
+        _dateCKeySet.add("LessEqual");
+        _dateCKeySet.add("FromTo");
+        _dateCKeySet.add("DateFromTo");
+        _dateCKeySet.add("InScope");
+        _dateCKeySet.add("NotInScope");
+        _dateCKeySet.add("IsNull");
+        _dateCKeySet.add("IsNullOrEmpty");
+        _dateCKeySet.add("IsNotNull");
+    }
+
+    protected static final Set<String> _orderByCKeySet = new LinkedHashSet<String>();
+    static {
+        _orderByCKeySet.add("Asc");
+        _orderByCKeySet.add("Desc");
+    }
+
+    protected static final Map<String, Set<String>> _ckeySetMap = new LinkedHashMap<String, Set<String>>();
+    static {
+        _ckeySetMap.put("String", _stringCKeySet);
+        _ckeySetMap.put("Number", _numberCKeySet);
+        _ckeySetMap.put("Date", _dateCKeySet);
+        _ckeySetMap.put("OrderBy", _orderByCKeySet);
+    }
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -54,6 +124,81 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                   Include Query Map
     //                                                                   =================
+    // map:{
+    //     ; String = map:{
+    //         # [Include]
+    //         # String columns may not be needed
+    //         # to be set these condition-keys basically.
+    //         # *set UPDATE_USER for the test of geared cipher.
+    //         ; GreaterThan = map:{ MEMBER = list:{UPDATE_USER} }
+    //         ; LessThan = map:{ MEMBER = list:{UPDATE_USER} }
+    //         ; GreaterEqual = map:{}
+    //         ; LessEqual = map:{}
+    //
+    //         # [Exclude]
+    //         # Common columns of String type may not be needed
+    //         # to be set these condition-keys basically.
+    //         ; !NotEqual = map:{ $$ALL$$ = list:{ $$CommonColumn$$ } }
+    //         ; !GreaterThan = map:{ $$ALL$$ = list:{ $$CommonColumn$$ } }
+    //         ; !LessThan = map:{ $$ALL$$ = list:{ $$CommonColumn$$ } }
+    //         ; !GreaterEqual = map:{ $$ALL$$ = list:{ $$CommonColumn$$ } }
+    //         ; !LessEqual = map:{ $$ALL$$ = list:{ $$CommonColumn$$ } }
+    //         ; !InScope = map:{ $$ALL$$ = list:{ $$CommonColumn$$ } }
+    //         ; !NotInScope = map:{ $$ALL$$ = list:{ $$CommonColumn$$ } }
+    //         ; !PrefixSearch = map:{ $$ALL$$ = list:{ $$CommonColumn$$ } }
+    //         # for the test of geared cipher
+    //         #; !LikeSearch = map:{ $$ALL$$ = list:{ $$CommonColumn$$ } }
+    //         ; !NotLikeSearch = map:{ $$ALL$$ = list:{ $$CommonColumn$$ } }
+    //     }
+    //     ; Number = map:{
+    //         # [Include]
+    //         ; NotEqual = map:{}
+    //
+    //         # [Exclude]
+    //         # VersionNo column may not be needed
+    //         # to be set these condition-keys basically.
+    //         ; !GreaterThan = map:{ $$ALL$$ = list:{ $$VersionNo$$ } }
+    //         ; !LessThan = map:{ $$ALL$$ = list:{ $$VersionNo$$ } }
+    //         ; !GreaterEqual = map:{ $$ALL$$ = list:{ $$VersionNo$$ } }
+    //         ; !LessEqual = map:{ $$ALL$$ = list:{ $$VersionNo$$ } }
+    //         ; !InScope = map:{ $$ALL$$ = list:{ $$VersionNo$$ } }
+    //         ; !NotInScope = map:{ $$ALL$$ = list:{ $$VersionNo$$ } }
+    //     }
+    //     ; Date = map:{
+    //         # [Include]
+    //         # Date columns may not be needed
+    //         # to be set these condition-keys basically.
+    //         ; NotEqual = map:{}
+    //         ; InScope = map:{}
+    //         ; NotInScope = map:{}
+    //
+    //         # [Exclude]
+    //         # Common columns of Date type may not be needed
+    //         # to be set these condition-keys basically.
+    //         ; !GreaterThan = map:{ $$ALL$$ = list:{ $$CommonColumn$$ } }
+    //         ; !LessThan = map:{ $$ALL$$ = list:{ $$CommonColumn$$ } }
+    //         ; !GreaterEqual = map:{ $$ALL$$ = list:{ $$CommonColumn$$ } }
+    //         # for the test of column hints
+    //         ; !LessEqual = map:{ $$ALL$$ = list:{ prefix:REGISTER_ ; prefix:UPDATE_ } }
+    //         ; !FromTo = map:{ $$ALL$$ = list:{ $$CommonColumn$$ } }
+    //         ; !DateFromTo = map:{ $$ALL$$ = list:{ $$CommonColumn$$ } }
+    //     }
+    //     ; OrderBy = map:{
+    //         ; !Asc = map:{ $$ALL$$ = list:{ DESCRIPTION ; type:CLOB } }
+    //         ; !Desc = map:{ $$ALL$$ = list:{ suffix:_ORDER ; DESCRIPTION } }
+    //         ; %Desc = map:{ MEMBER_STATUS = list:{ DISPLAY_ORDER } }
+    //     }
+    //     ; Myself = map:{
+    //         ; !ScalarCondition = map:{ suffix:_STATUS = list:{} }
+    //         ; !MyselfDerived = map:{ prefix:PRODUCT_ST = list:{} ; suffix:_STATUS = list:{ dummy } }
+    //         ; !MyselfExists = map:{ suffix:_STATUS = list:{} ; SERVICE_RANK = list:{} }
+    //         ; !MyselfInScope = map:{ suffix:_STATUS = list:{} ; SERVICE_RANK = list:{ SERVICE_RANK_CODE } }
+    //     }
+    //     ; $MEMBER = map:{
+    //         ; BIRTHDATE(Date) = list:{ !GreaterThan ; !LessThan }
+    //         ; MEMBER_ACCOUNT(String) = list:{}
+    //     }
+    // }
     protected Map<String, Map<String, Map<String, List<String>>>> _includeQueryMap;
     protected final Map<String, Map<String, Map<String, List<String>>>> _excludeQueryMap = newLinkedHashMap();
     protected final Map<String, Map<String, Map<String, List<String>>>> _excludeReviveQueryMap = newLinkedHashMap();
@@ -62,42 +207,59 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         if (_includeQueryMap != null) {
             return _includeQueryMap;
         }
+        try {
+            _includeQueryMap = doGetIncludeQueryMap();
+        } catch (RuntimeException e) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Failed to parse includeQueryMap.dfprop.");
+            br.addItem("Advice");
+            br.addElement("Make sure your map!");
+            final String msg = br.buildExceptionMessage();
+            throw new DfIllegalPropertySettingException(msg, e);
+        }
+        return _includeQueryMap;
+    }
+
+    protected Map<String, Map<String, Map<String, List<String>>>> doGetIncludeQueryMap() {
         final Map<String, Map<String, Map<String, List<String>>>> resultMap = newLinkedHashMap();
         final Map<String, Object> targetMap = mapProp("torque.includeQueryMap", DEFAULT_EMPTY_MAP);
+        final Map<String, Map<String, Map<String, List<String>>>> columnDrivenTranslatedMap = extractColumnDrivenTranslatedMap(targetMap);
         for (Entry<String, Object> propEntry : targetMap.entrySet()) {
             final String propType = propEntry.getKey();
             final Object value = propEntry.getValue();
             if (!(value instanceof Map)) {
-                String msg = "The key[includeQueryMap] should have map value.";
-                msg = msg + " But the value is " + value + ": targetMap=" + targetMap;
+                String msg = "The key 'includeQueryMap' should have map value:";
+                msg = msg + " key=" + propType + " value=" + value + " targetMap=" + targetMap;
                 throw new DfIllegalPropertyTypeException(msg);
             }
-            final Map<String, Map<String, List<String>>> elementMap = newLinkedHashMap();
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> queryMap = (Map<String, Object>) value;
-            for (Entry<String, Object> queryEntry : queryMap.entrySet()) {
-                final String ckey = queryEntry.getKey();
-                final Object tableColumnObj = queryEntry.getValue();
-                if (ckey.startsWith("!")) { // means exclude
-                    final String filteredKey = ckey.substring("!".length());
-                    @SuppressWarnings("unchecked")
-                    final Map<String, List<String>> tableColumnMap = (Map<String, List<String>>) tableColumnObj;
-                    reflectExcludeQuery(propType, filteredKey, tableColumnMap);
-                } else if (ckey.startsWith("%")) { // means exclude-revive
-                    final String filteredKey = ckey.substring("%".length());
-                    @SuppressWarnings("unchecked")
-                    final Map<String, List<String>> tableColumnMap = (Map<String, List<String>>) tableColumnObj;
-                    reflectExcludeReviveQuery(propType, filteredKey, tableColumnMap);
-                } else { // means independent include
-                    @SuppressWarnings("unchecked")
-                    final Map<String, List<String>> tableColumnMap = (Map<String, List<String>>) tableColumnObj;
-                    elementMap.put(ckey, tableColumnMap);
-                }
+            if (propType.startsWith("$")) {
+                continue; // except column-driven
             }
-            resultMap.put(propType, elementMap);
+            @SuppressWarnings("unchecked")
+            final Map<String, Map<String, List<String>>> ckeyColumnMap = (Map<String, Map<String, List<String>>>) value;
+            mergeColumnDriven(columnDrivenTranslatedMap, propType, ckeyColumnMap);
+            resultMap.put(propType, prepareElementMap(propType, ckeyColumnMap));
         }
-        _includeQueryMap = resultMap;
-        return _includeQueryMap;
+        return resultMap;
+    }
+
+    protected Map<String, Map<String, List<String>>> prepareElementMap(String propType,
+            Map<String, Map<String, List<String>>> queryMap) {
+        final Map<String, Map<String, List<String>>> elementMap = newLinkedHashMap();
+        for (Entry<String, Map<String, List<String>>> entry : queryMap.entrySet()) {
+            final String ckey = entry.getKey();
+            final Map<String, List<String>> tableColumnMap = entry.getValue();
+            if (ckey.startsWith("!")) { // means exclude
+                final String filteredKey = ckey.substring("!".length());
+                reflectExcludeQuery(propType, filteredKey, tableColumnMap);
+            } else if (ckey.startsWith("%")) { // means exclude-revive
+                final String filteredKey = ckey.substring("%".length());
+                reflectExcludeReviveQuery(propType, filteredKey, tableColumnMap);
+            } else { // means independent include
+                elementMap.put(ckey, tableColumnMap);
+            }
+        }
+        return elementMap;
     }
 
     public Map<String, Map<String, Map<String, List<String>>>> getExcludeQueryMap() {
@@ -126,6 +288,128 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
             _excludeReviveQueryMap.put(javaType, elementMap);
         }
         elementMap.put(queryType, tableColumnMap);
+    }
+
+    // ===================================================================================
+    //                                                                       Column Driven
+    //                                                                       =============
+    protected void mergeColumnDriven(Map<String, Map<String, Map<String, List<String>>>> columnDrivenTargetMap,
+            String propType, Map<String, Map<String, List<String>>> ckeyColumnMap) {
+        final Map<String, Map<String, List<String>>> columnDrivenQueryMap = columnDrivenTargetMap.get(propType);
+        if (columnDrivenQueryMap == null || columnDrivenQueryMap.isEmpty()) {
+            return;
+        }
+        for (Entry<String, Map<String, List<String>>> entry : columnDrivenQueryMap.entrySet()) {
+            final String ckey = entry.getKey();
+            final Map<String, List<String>> fromCKeyMap = entry.getValue();
+            Map<String, List<String>> toCKeyMap = ckeyColumnMap.get(ckey);
+            if (toCKeyMap == null) {
+                toCKeyMap = newLinkedHashMap();
+                ckeyColumnMap.put(ckey, toCKeyMap);
+            }
+            for (Entry<String, List<String>> ckeyEntry : fromCKeyMap.entrySet()) {
+                final String tableName = ckeyEntry.getKey();
+                final List<String> fromColumnList = ckeyEntry.getValue();
+                final StringKeyMap<List<String>> flexibleMap = StringKeyMap.createAsCaseInsensitive();
+                flexibleMap.putAll(toCKeyMap);
+                List<String> toColumnList = flexibleMap.get(tableName);
+                if (toColumnList == null) {
+                    toColumnList = new ArrayList<String>();
+                    toCKeyMap.put(tableName, toColumnList);
+                }
+                for (String fromColumn : fromColumnList) {
+                    if (!Srl.containsElementIgnoreCase(toColumnList, fromColumn)) {
+                        toColumnList.add(fromColumn);
+                    }
+                }
+            }
+        }
+    }
+
+    protected Map<String, Map<String, Map<String, List<String>>>> extractColumnDrivenTranslatedMap(
+            Map<String, Object> plainMap) {
+        final Map<String, Map<String, List<String>>> interfaceMap = extractColumnDrivenInterfaceMap(plainMap);
+        final Map<String, Map<String, Map<String, List<String>>>> translatedMap = newLinkedHashMap();
+        for (Entry<String, Map<String, List<String>>> tableEntry : interfaceMap.entrySet()) {
+            final String tableName = tableEntry.getKey();
+            final Map<String, List<String>> columnTypeCKeyMap = tableEntry.getValue();
+            for (Entry<String, List<String>> columnTypeCKeyEntry : columnTypeCKeyMap.entrySet()) {
+                final String columnExp = columnTypeCKeyEntry.getKey();
+                final String columnName = Srl.substringFirstFront(columnExp, "(").trim();
+                final ScopeInfo scopeFirst = Srl.extractScopeFirst(columnExp, "(", ")");
+                if (scopeFirst == null) {
+                    String msg = "The column expression should be e.g. Member(Date) but: " + columnExp;
+                    throw new DfIllegalPropertySettingException(msg);
+                }
+                final String propType = scopeFirst.getContent().trim();
+                final List<String> ckeyList = columnTypeCKeyEntry.getValue();
+                Map<String, Map<String, List<String>>> ckeyColumnMap = translatedMap.get(propType);
+                if (ckeyColumnMap == null) {
+                    ckeyColumnMap = newLinkedHashMap();
+                    translatedMap.put(propType, ckeyColumnMap);
+                }
+                for (String ckey : ckeyList) {
+                    Map<String, List<String>> tableColumnMap = ckeyColumnMap.get(ckey);
+                    if (tableColumnMap == null) {
+                        tableColumnMap = newLinkedHashMap();
+                        ckeyColumnMap.put(ckey, tableColumnMap);
+                    }
+                    List<String> columnList = tableColumnMap.get(tableName);
+                    if (columnList == null) {
+                        columnList = new ArrayList<String>();
+                        tableColumnMap.put(tableName, columnList);
+                    }
+                    columnList.add(columnName);
+                }
+            }
+        }
+        return translatedMap;
+    }
+
+    protected Map<String, Map<String, List<String>>> extractColumnDrivenInterfaceMap(Map<String, Object> targetMap) {
+        // ; $MEMBER = map:{
+        //     ; BIRTHDATE(Date) = list:{ !GreaterThan ; !LessThan }
+        //     ; MEMBER_NAME(String) = list:{}
+        // }
+        final Map<String, Map<String, List<String>>> interfaceMap = newLinkedHashMap();
+        for (Entry<String, Object> propEntry : targetMap.entrySet()) {
+            final String propType = propEntry.getKey();
+            final Object value = propEntry.getValue();
+            if (!(value instanceof Map)) {
+                String msg = "The key 'includeQueryMap' should have map value:";
+                msg = msg + " key=" + propType + " value=" + value + " targetMap=" + targetMap;
+                throw new DfIllegalPropertyTypeException(msg);
+            }
+            if (!propType.startsWith("$")) {
+                continue;
+            }
+            final String tableName = Srl.substringFirstRear(propType, "$");
+            @SuppressWarnings("unchecked")
+            final Map<String, List<String>> columnCKeyMap = (Map<String, List<String>>) value;
+            Set<Entry<String, List<String>>> entrySet = columnCKeyMap.entrySet();
+            for (Entry<String, List<String>> entry : entrySet) {
+                final String columnExp = entry.getKey();
+                final List<String> ckeyList = entry.getValue();
+                if (!ckeyList.isEmpty()) {
+                    columnCKeyMap.put(columnExp, ckeyList);
+                } else {
+                    final ScopeInfo scopeFirst = Srl.extractScopeFirst(columnExp, "(", ")");
+                    if (scopeFirst == null) {
+                        String msg = "The column expression should be e.g. Member(Date) but: " + columnExp;
+                        throw new DfIllegalPropertySettingException(msg);
+                    }
+                    final String currentPropType = scopeFirst.getContent().trim();
+                    final Set<String> ckeySet = _ckeySetMap.get(currentPropType);
+                    final List<String> allCKeyList = new ArrayList<String>();
+                    for (String ckey : ckeySet) {
+                        allCKeyList.add("!" + ckey);
+                    }
+                    columnCKeyMap.put(columnExp, allCKeyList);
+                }
+            }
+            interfaceMap.put(tableName, columnCKeyMap);
+        }
+        return interfaceMap;
     }
 
     // ===================================================================================
@@ -178,6 +462,18 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return isAvailable(PROP_STRING, "EmptyString", column);
     }
 
+    public boolean isAvailableStringIsNull(Column column) {
+        return isAvailable(PROP_STRING, "IsNull", column);
+    }
+
+    public boolean isAvailableStringIsNullOrEmpty(Column column) {
+        return isAvailable(PROP_STRING, "IsNullOrEmpty", column);
+    }
+
+    public boolean isAvailableStringIsNotNull(Column column) {
+        return isAvailable(PROP_STRING, "IsNotNull", column);
+    }
+
     // -----------------------------------------------------
     //                                                Number
     //                                                ------
@@ -211,6 +507,18 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
 
     public boolean isAvailableNumberNotInScope(Column column) {
         return isAvailable(PROP_NUMBER, "NotInScope", column);
+    }
+
+    public boolean isAvailableNumberIsNull(Column column) {
+        return isAvailable(PROP_NUMBER, "IsNull", column);
+    }
+
+    public boolean isAvailableNumberIsNullOrEmpty(Column column) {
+        return isAvailable(PROP_NUMBER, "IsNullOrEmpty", column);
+    }
+
+    public boolean isAvailableNumberIsNotNull(Column column) {
+        return isAvailable(PROP_NUMBER, "IsNotNull", column);
     }
 
     // -----------------------------------------------------
@@ -252,6 +560,18 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return isAvailable(PROP_DATE, "NotInScope", column);
     }
 
+    public boolean isAvailableDateIsNull(Column column) {
+        return isAvailable(PROP_DATE, "IsNull", column);
+    }
+
+    public boolean isAvailableDateIsNullOrEmpty(Column column) {
+        return isAvailable(PROP_DATE, "IsNullOrEmpty", column);
+    }
+
+    public boolean isAvailableDateIsNotNull(Column column) {
+        return isAvailable(PROP_DATE, "IsNotNull", column);
+    }
+
     // -----------------------------------------------------
     //                                               OrderBy
     //                                               -------
@@ -264,8 +584,8 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     }
 
     // -----------------------------------------------------
-    //                                               Primary
-    //                                               -------
+    //                                                Myself
+    //                                                ------
     public boolean isAvailableMyselfScalarCondition(Column column) {
         return isAvailable(PROP_MYSELF, "ScalarCondition", column);
     }
@@ -372,13 +692,11 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     protected void assertQueryMap(String propType, String ckey,
             Map<String, Map<String, Map<String, List<String>>>> queryMap) {
         if (queryMap.get(propType) == null) {
-            String msg = "The propType[" + propType + "] should have the value of queryMap:";
-            msg = msg + " " + queryMap;
+            String msg = "The propType[" + propType + "] should have the value of queryMap: " + queryMap;
             throw new IllegalStateException(msg);
         }
         if (queryMap.get(propType).get(ckey) == null) {
-            String msg = "The conditionKey[" + ckey + "] should have the value of queryMap:";
-            msg = msg + " " + queryMap;
+            String msg = "The conditionKey[" + ckey + "] should have the value of queryMap: " + queryMap;
             throw new IllegalStateException(msg);
         }
     }

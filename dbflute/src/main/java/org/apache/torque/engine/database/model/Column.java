@@ -2018,6 +2018,48 @@ public class Column {
     }
 
     // -----------------------------------------------------
+    //                                      IsNull/IsNotNull
+    //                                      ----------------
+    public boolean isAvailableIsNull() {
+        final DfIncludeQueryProperties prop = getIncludeQueryProperties();
+        if (isJavaNativeStringObject()) {
+            return prop.isAvailableStringIsNull(this);
+        } else if (isJavaNativeNumberObject()) {
+            return prop.isAvailableNumberIsNull(this);
+        } else if (isJavaNativeDateObject()) {
+            return prop.isAvailableDateIsNull(this);
+        } else { // other types (cannot suppress it)
+            return true;
+        }
+    }
+
+    public boolean isAvailableIsNullOrEmpty() {
+        final DfIncludeQueryProperties prop = getIncludeQueryProperties();
+        if (isJavaNativeStringObject()) {
+            return prop.isAvailableStringIsNullOrEmpty(this);
+        } else if (isJavaNativeNumberObject()) {
+            return prop.isAvailableNumberIsNullOrEmpty(this);
+        } else if (isJavaNativeDateObject()) {
+            return prop.isAvailableDateIsNullOrEmpty(this);
+        } else { // other types (cannot suppress it)
+            return true;
+        }
+    }
+
+    public boolean isAvailableIsNotNull() {
+        final DfIncludeQueryProperties prop = getIncludeQueryProperties();
+        if (isJavaNativeStringObject()) {
+            return prop.isAvailableStringIsNotNull(this);
+        } else if (isJavaNativeNumberObject()) {
+            return prop.isAvailableNumberIsNotNull(this);
+        } else if (isJavaNativeDateObject()) {
+            return prop.isAvailableDateIsNotNull(this);
+        } else { // other types (cannot suppress it)
+            return true;
+        }
+    }
+
+    // -----------------------------------------------------
     //                                               OrderBy
     //                                               -------
     public boolean isAvailableOrderByAsc() {

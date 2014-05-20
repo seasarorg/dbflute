@@ -39,5 +39,5 @@ public interface SpecifyQuery<CB extends ConditionBean> {
      * and they are ignored if you call.
      * @param cb The condition-bean for specification. (NotNull)
      */
-    public void specify(CB cb);
+    void specify(CB cb);
 }
