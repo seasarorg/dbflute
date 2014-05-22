@@ -397,7 +397,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         if (derivedColumnDbName.contains(".")) {
             derivedColumnDbName = derivedColumnDbName.substring(derivedColumnDbName.lastIndexOf(".") + ".".length());
         }
-        final Class<?> derivedColumnType = _subQueryDBMeta.findColumnInfo(derivedColumnDbName).getPropertyType();
+        final Class<?> derivedColumnType = _subQueryDBMeta.findColumnInfo(derivedColumnDbName).getObjectNativeType();
         doAssertDerivedReferrerColumnType(function, derivedColumnDbName, derivedColumnType);
     }
 

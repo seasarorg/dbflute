@@ -143,12 +143,12 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     }
 
     protected TnRelationRowCreatorExtension createRelationRowCreator(TnBeanMetaData bmd) {
-        final TnRelationOptionalFactory optionalFactory = createRelationOptionalFactory();
+        final TnRelationOptionalFactory optionalFactory = createRelationOptionalFactory(bmd);
         return TnRelationRowCreatorExtension.createRelationRowCreator(optionalFactory);
     }
 
-    protected TnRelationOptionalFactory createRelationOptionalFactory() {
-        return new TnRelationOptionalFactory();
+    protected TnRelationOptionalFactory createRelationOptionalFactory(TnBeanMetaData bmd) {
+        return _beanMetaDataFactory.createRelationOptionalFactory(bmd.getBeanClass());
     }
 
     // ===================================================================================

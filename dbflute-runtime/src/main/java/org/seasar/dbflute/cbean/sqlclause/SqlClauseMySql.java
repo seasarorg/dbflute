@@ -307,9 +307,8 @@ public class SqlClauseMySql extends AbstractSqlClause {
     }
 
     protected void assertTextColumnType(String tableDbName, ColumnInfo columnInfo) {
-        if (!columnInfo.isPropertyTypeString()) {
-            String msg = "The text column should be String type:";
-            msg = msg + " column=" + columnInfo;
+        if (!columnInfo.isObjectNativeTypeString()) {
+            String msg = "The text column should be String type: column=" + columnInfo;
             throw new IllegalArgumentException(msg);
         }
     }

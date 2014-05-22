@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.cbean.coption;
 
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -623,11 +622,11 @@ public class FunctionFilterOption implements ParameterOption {
     }
 
     protected boolean isDateTypeColumn() {
-        return _targetColumnInfo != null && Date.class.isAssignableFrom(_targetColumnInfo.getPropertyType());
+        return _targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeDate();
     }
 
     protected boolean isJustDateTypeColumn() {
-        return _targetColumnInfo != null && Date.class.equals(_targetColumnInfo.getPropertyType());
+        return _targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeJustDate();
     }
 
     // ===================================================================================
@@ -702,7 +701,7 @@ public class FunctionFilterOption implements ParameterOption {
         if (columnInfo == null) { // basically not null but just in case
             return;
         }
-        if (!columnInfo.isPropertyTypeNumber()) {
+        if (!columnInfo.isObjectNativeTypeNumber()) {
             String msg = "The type of the calculation column should be Number: " + specifiedColumn;
             throw new IllegalArgumentException(msg);
         }

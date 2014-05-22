@@ -347,7 +347,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
                 }
                 final ColumnInfo columnInfo = calcSp.getResolvedSpecifiedColumnInfo();
                 if (columnInfo != null) { // basically true but checked just in case
-                    if (!columnInfo.isPropertyTypeNumber()) {
+                    if (!columnInfo.isObjectNativeTypeNumber()) {
                         // *simple message because other types may be supported at the future
                         String msg = "Not number column specified: " + columnInfo;
                         throw new ColumnQueryCalculationUnsupportedColumnTypeException(msg);

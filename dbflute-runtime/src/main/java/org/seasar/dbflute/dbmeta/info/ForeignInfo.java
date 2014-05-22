@@ -45,7 +45,8 @@ public class ForeignInfo implements RelationInfo {
     protected final Map<ColumnInfo, ColumnInfo> _localForeignColumnInfoMap;
     protected final Map<ColumnInfo, ColumnInfo> _foreignLocalColumnInfoMap;
     protected final int _relationNo;
-    protected final Class<?> _propertyType;
+    protected final Class<?> _objectNativeType; // always relation entity type, provided by DB meta 
+    protected final Class<?> _propertyAccessType; // same as entity type or might be optional
     protected final boolean _oneToOne;
     protected final boolean _bizOneToOne;
     protected final boolean _referrerAsOne;
@@ -64,15 +65,18 @@ public class ForeignInfo implements RelationInfo {
     //                                                                         ===========
     public ForeignInfo(String constraintName, String foreignPropertyName // name
             , DBMeta localDBMeta, DBMeta foreignDBMeta // DB meta
-            , Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo, Class<?> propertyType // relation attribute
+            , Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo // relation attribute
+            , Class<?> propertyAccessType // property info (object native type is provided by DB meta)
             , boolean oneToOne, boolean bizOneToOne, boolean referrerAsOne, boolean additionalFK // relation type
             , String fixedCondition, List<String> dynamicParameterList, boolean fixedInline // fixed condition
-            , String reversePropertyName, PropertyMethodFinder propertyMethodFinder) { // various info
+            , String reversePropertyName, PropertyMethodFinder propertyMethodFinder // various info
+    ) { // big constructor
         assertObjectNotNull("constraintName", constraintName);
         assertObjectNotNull("foreignPropertyName", foreignPropertyName);
         assertObjectNotNull("localDBMeta", localDBMeta);
         assertObjectNotNull("foreignDBMeta", foreignDBMeta);
         assertObjectNotNull("localForeignColumnInfoMap", localForeignColumnInfoMap);
+        assertObjectNotNull("propertyAccessType", propertyAccessType);
         assertObjectNotNull("propertyMethodFinder", propertyMethodFinder);
         _constraintName = constraintName;
         _foreignPropertyName = foreignPropertyName;
@@ -85,7 +89,8 @@ public class ForeignInfo implements RelationInfo {
         }
         _foreignLocalColumnInfoMap = Collections.unmodifiableMap(foreignLocalColumnInfoMap);
         _relationNo = relationNo;
-        _propertyType = propertyType;
+        _objectNativeType = foreignDBMeta.getEntityType();
+        _propertyAccessType = propertyAccessType;
         _oneToOne = oneToOne;
         _bizOneToOne = bizOneToOne;
         _referrerAsOne = referrerAsOne;
@@ -167,10 +172,11 @@ public class ForeignInfo implements RelationInfo {
     //                                                  Read
     //                                                  ----
     /**
-     * Read the value to the entity.
+     * Read the value to the entity by its gateway (means no reflection). <br />
+     * It returns plain value in entity as property access type.
      * @param localEntity The local entity of this column to read. (NotNull)
      * @param <PROPERTY> The type of property.
-     * @return The read instance of foreign entity. (NullAllowed)
+     * @return The read instance of foreign entity, might be optional. (NotNull: when optional, NullAllowed: when native type)
      */
     @SuppressWarnings("unchecked")
     public <PROPERTY extends Entity> PROPERTY read(Entity localEntity) {
@@ -181,7 +187,7 @@ public class ForeignInfo implements RelationInfo {
      * Get the read method for entity reflection.
      * @return The read method, cached in this instance. (NotNull)
      */
-    public Method getReadMethod() {
+    public Method getReadMethod() { // basically unused in DBFlute, use gateway instead
         return _readMethod;
     }
 
@@ -189,11 +195,12 @@ public class ForeignInfo implements RelationInfo {
     //                                                 Write
     //                                                 -----
     /**
-     * Write the value to the entity.
+     * Write the value to the entity by its gateway (means no reflection). <br />
+     * No converting to optional so check the property access type.
      * @param localEntity The local entity of this column to write. (NotNull)
-     * @param foreignEntity The written instance of foreign entity. (NullAllowed: if null, null value is written)
+     * @param foreignEntity The written instance of foreign entity, might be optional. (NullAllowed: if null, null written)
      */
-    public void write(Entity localEntity, Entity foreignEntity) {
+    public void write(Entity localEntity, Object foreignEntity) {
         _propertyGateway.write(localEntity, foreignEntity);
     }
 
@@ -201,7 +208,7 @@ public class ForeignInfo implements RelationInfo {
      * Get the write method for entity reflection.
      * @return The writer method, cached in this instance. (NotNull)
      */
-    public Method getWriteMethod() {
+    public Method getWriteMethod() { // basically unused in DBFlute, use gateway instead
         return _writeMethod;
     }
 
@@ -219,12 +226,12 @@ public class ForeignInfo implements RelationInfo {
 
     protected Method findReadMethod() {
         final Class<? extends Entity> localType = _localDBMeta.getEntityType();
-        return _propertyMethodFinder.findReadMethod(localType, _foreignPropertyName, _propertyType);
+        return _propertyMethodFinder.findReadMethod(localType, _foreignPropertyName, _propertyAccessType);
     }
 
     protected Method findWriteMethod() {
         final Class<? extends Entity> localType = _localDBMeta.getEntityType();
-        return _propertyMethodFinder.findWriteMethod(localType, _foreignPropertyName, _propertyType);
+        return _propertyMethodFinder.findWriteMethod(localType, _foreignPropertyName, _propertyAccessType);
     }
 
     // -----------------------------------------------------
@@ -362,8 +369,15 @@ public class ForeignInfo implements RelationInfo {
     /**
      * {@inheritDoc}
      */
-    public Class<?> getPropertyType() {
-        return _propertyType;
+    public Class<?> getObjectNativeType() {
+        return _objectNativeType;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Class<?> getPropertyAccessType() {
+        return _propertyAccessType;
     }
 
     /**

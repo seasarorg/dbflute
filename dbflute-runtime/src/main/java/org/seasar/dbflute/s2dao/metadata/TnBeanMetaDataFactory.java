@@ -17,6 +17,8 @@ package org.seasar.dbflute.s2dao.metadata;
 
 import java.sql.DatabaseMetaData;
 
+import org.seasar.dbflute.s2dao.extension.TnRelationOptionalFactory;
+
 /**
  * The factory of bean meta data.
  * @author modified by jflute (originated in S2Dao)
@@ -47,4 +49,11 @@ public interface TnBeanMetaDataFactory {
      * @return The created bean meta data (or cached instance). (NotNull)
      */
     TnBeanMetaData createBeanMetaData(DatabaseMetaData dbMetaData, Class<?> beanClass, int relationNestLevel);
+
+    /**
+     * Create the factory for relation optional object.
+     * @param beanClass The type of bean for base point entity. (NotNull)
+     * @return The instance of factory. (NotNull)
+     */
+    TnRelationOptionalFactory createRelationOptionalFactory(Class<?> beanClass);
 }

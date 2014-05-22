@@ -1810,7 +1810,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final boolean fromTo = Srl.equalsIgnoreCase(ckey, "FromTo", "DateFromTo");
         if (!noArg) {
             try {
-                value = columnInfo.toPropretyType(value); // convert type
+                value = columnInfo.convertToObjectNativeType(value); // convert type
             } catch (RuntimeException e) {
                 throwConditionInvokingValueConvertFailureException(colName, ckey, value, option, e);
             }
@@ -1821,7 +1821,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             typeList.add(Date.class);
             typeList.add(Date.class);
         } else if (rangeOf) {
-            final Class<?> propertyType = columnInfo.getPropertyType();
+            final Class<?> propertyType = columnInfo.getObjectNativeType();
             typeList.add(propertyType);
             typeList.add(propertyType);
         } else {
@@ -2364,7 +2364,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
                     throw new IllegalArgumentException(msg);
                 }
-                if (!columnInfo.isPropertyTypeString()) {
+                if (!columnInfo.isObjectNativeTypeString()) {
                     String msg = "The text column should be String type:";
                     msg = msg + " column=" + columnInfo;
                     throw new IllegalArgumentException(msg);

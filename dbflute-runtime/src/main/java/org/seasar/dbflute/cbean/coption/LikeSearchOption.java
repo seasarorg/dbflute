@@ -347,7 +347,7 @@ public class LikeSearchOption extends SimpleStringOption {
             String msg = "The argument 'compoundColumn' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        if (!compoundColumn.getColumnInfo().isPropertyTypeString()) {
+        if (!compoundColumn.getColumnInfo().isObjectNativeTypeString()) {
             String msg = "The type of the compound column should be String: " + compoundColumn;
             throw new IllegalArgumentException(msg);
         }

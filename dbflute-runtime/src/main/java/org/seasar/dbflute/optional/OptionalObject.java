@@ -19,28 +19,28 @@ import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The base class for optional object.
- * @param <VALUE> The type of wrapped value in the optional object.
+ * @param <OBJ> The type of wrapped object in the optional object.
  * @author jflute
  * @since 1.0.5F (2014/05/10 Saturday)
  */
-public abstract class OptionalObject<VALUE> {
+public abstract class OptionalObject<OBJ> {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The value for this optional object. (NullAllowed) */
-    protected final VALUE _value;
+    /** The wrapped object for this optional object. (NullAllowed) */
+    protected final OBJ _obj;
 
-    /** The exception thrower e.g. when value is not-found. (NotNull) */
+    /** The exception thrower e.g. when wrapped object is not found. (NotNull) */
     protected final OptionalObjectExceptionThrower _thrower;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OptionalObject(VALUE value, OptionalObjectExceptionThrower thrower) { // basically called by DBFlute
-        _value = value; // may be null
+    public OptionalObject(OBJ obj, OptionalObjectExceptionThrower thrower) { // basically called by DBFlute
+        _obj = obj; // may be null
         if (thrower == null) {
-            String msg = "The argument 'thrower' should not be null: value=" + value;
+            String msg = "The argument 'thrower' should not be null: obj=" + obj;
             throw new IllegalArgumentException(msg);
         }
         _thrower = thrower;
@@ -50,34 +50,34 @@ public abstract class OptionalObject<VALUE> {
     //                                                                     Object Handling
     //                                                                     ===============
     /**
-     * @return The value instance wrapped in this optional object. (NotNull)
+     * @return The object instance wrapped in this optional object. (NotNull)
      */
-    protected VALUE directlyGet() {
+    protected OBJ directlyGet() {
         if (!exists()) {
             _thrower.throwNotFoundException();
         }
-        return _value;
+        return _obj;
     }
 
     /**
-     * @param consumer The callback interface to consume the wrapped value. (NotNull)
+     * @param consumer The callback interface to consume the wrapped object. (NotNull)
      */
-    protected void callbackIfPresent(OptionalObjectConsumer<VALUE> consumer) {
+    protected void callbackIfPresent(OptionalObjectConsumer<OBJ> consumer) {
         if (consumer == null) {
             String msg = "The argument 'consumer' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         if (exists()) {
-            consumer.accept(_value);
+            consumer.accept(_obj);
         }
     }
 
     /**
-     * Is the object instance present? (existing?)
+     * Is the wrapped object present? (existing?)
      * @return The determination, true or false.
      */
     protected boolean exists() {
-        return _value != null;
+        return _obj != null;
     }
 
     /**
@@ -85,58 +85,58 @@ public abstract class OptionalObject<VALUE> {
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
     protected <RESULT> OptionalObject<RESULT> callbackMapping(
-            OptionalObjectFunction<? super VALUE, ? extends RESULT> mapper) {
+            OptionalObjectFunction<? super OBJ, ? extends RESULT> mapper) {
         if (mapper == null) {
             String msg = "The argument 'mapper' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        final RESULT result = exists() ? mapper.apply(_value) : null;
+        final RESULT result = exists() ? mapper.apply(_obj) : null;
         return createOptionalObject(result);
     }
 
     /**
      * @param other The other instance to be returned if null. (NullAllowed: if null, returns null when entity is null)
-     * @return The value instance wrapped in this optional object or specified value. (NullAllowed: if null specified)
+     * @return The object instance wrapped in this optional object or specified value. (NullAllowed: if null specified)
      */
-    protected VALUE directlyGetOrElse(VALUE other) {
-        return exists() ? _value : other;
+    protected OBJ directlyGetOrElse(OBJ other) {
+        return exists() ? _obj : other;
     }
 
     /**
      * @param consumer The callback interface to consume the wrapped value. (NotNull)
      */
-    protected void callbackRequired(OptionalObjectConsumer<VALUE> consumer) {
+    protected void callbackRequired(OptionalObjectConsumer<OBJ> consumer) {
         if (consumer == null) {
             String msg = "The argument 'consumer' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        if (_value == null) {
+        if (_obj == null) {
             _thrower.throwNotFoundException();
         }
-        consumer.accept(_value);
+        consumer.accept(_obj);
     }
 
     /**
      * @param <ARG> The type of value for optional object.
-     * @param value The plain value for the optional object. (NullAllowed: if null, return s empty optional)
+     * @param obj The plain object for the optional object. (NullAllowed: if null, return s empty optional)
      * @return The new-created instance of optional object. (NotNull)
      */
-    protected abstract <ARG> OptionalObject<ARG> createOptionalObject(ARG value);
+    protected abstract <ARG> OptionalObject<ARG> createOptionalObject(ARG obj);
 
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
     public int hashCode() {
-        return _value != null ? _value.hashCode() : 0;
+        return _obj != null ? _obj.hashCode() : 0;
     }
 
     @Override
     public boolean equals(Object obj) {
         if (getClass().isInstance(obj)) {
             final OptionalObject<?> other = (OptionalObject<?>) obj;
-            if (_value != null) {
-                return _value.equals(other.directlyGet());
+            if (_obj != null) {
+                return _obj.equals(other.directlyGet());
             } else { // null v.s. null?
                 return !other.exists();
             }
@@ -147,6 +147,6 @@ public abstract class OptionalObject<VALUE> {
     @Override
     public String toString() {
         final String title = DfTypeUtil.toClassTitle(this);
-        return title + ":{" + (_value != null ? _value.toString() : "null") + "}";
+        return title + ":{" + (_obj != null ? _obj.toString() : "null") + "}";
     }
 }

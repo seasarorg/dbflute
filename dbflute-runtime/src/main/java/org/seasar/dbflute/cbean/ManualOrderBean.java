@@ -852,7 +852,7 @@ public class ManualOrderBean implements HpCalculator {
         if (columnInfo == null) { // basically not null but just in case
             return;
         }
-        if (!columnInfo.isPropertyTypeNumber()) {
+        if (!columnInfo.isObjectNativeTypeNumber()) {
             String msg = "The type of the calculation column should be Number: " + specifiedColumn;
             throw new IllegalArgumentException(msg);
         }

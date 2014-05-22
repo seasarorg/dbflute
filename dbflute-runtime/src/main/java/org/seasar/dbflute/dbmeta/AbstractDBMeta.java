@@ -283,11 +283,15 @@ public abstract class AbstractDBMeta implements DBMeta {
         return columnInfo;
     }
 
-    protected ColumnInfo cci(String columnDbName, String columnSqlName, String columnSynonym, String columnAlias,
-            boolean notNull, String propertyName, Class<?> propertyType, boolean primary, boolean autoIncrement,
-            String columnDbType, Integer columnSize, Integer decimalDigits, String defaultValue, boolean commonColumn,
-            OptimisticLockType optimisticLockType, String columnComment, String foreignListExp, String referrerListExp,
-            ClassificationMeta classificationMeta) { // createColumnInfo()
+    protected ColumnInfo cci(String columnDbName, String columnSqlName, String columnSynonym, String columnAlias // column name
+            , Class<?> objectNativeType, String propertyName, Class<?> propertyAccessType // property info
+            , boolean primary, boolean autoIncrement, boolean notNull // column basic check
+            , String columnDbType, Integer columnSize, Integer decimalDigits, String defaultValue // column type
+            , boolean commonColumn, OptimisticLockType optimisticLockType, String columnComment // column others
+            , String foreignListExp, String referrerListExp // relation property
+            , ClassificationMeta classificationMeta // various info
+    ) { // createColumnInfo()
+        final Class<?> realPt = chooseColumnPropertyAccessType(objectNativeType, propertyName, propertyAccessType);
         final String delimiter = ",";
         List<String> foreignPropList = null;
         if (foreignListExp != null && foreignListExp.trim().length() > 0) {
@@ -298,25 +302,30 @@ public abstract class AbstractDBMeta implements DBMeta {
             referrerPropList = splitListTrimmed(referrerListExp, delimiter);
         }
         final PropertyMethodFinder propertyMethodFinder = createColumnPropertyMethodFinder();
-        return new ColumnInfo(this, columnDbName, columnSqlName, columnSynonym, columnAlias, notNull, propertyName,
-                propertyType, primary, autoIncrement, columnDbType, columnSize, decimalDigits, defaultValue,
-                commonColumn, optimisticLockType, columnComment, foreignPropList, referrerPropList, classificationMeta,
-                propertyMethodFinder);
+        return new ColumnInfo(this, columnDbName, columnSqlName, columnSynonym, columnAlias, objectNativeType,
+                propertyName, realPt, primary, autoIncrement, notNull, columnDbType, columnSize, decimalDigits,
+                defaultValue, commonColumn, optimisticLockType, columnComment, foreignPropList, referrerPropList,
+                classificationMeta, propertyMethodFinder);
+    }
+
+    protected Class<?> chooseColumnPropertyAccessType(Class<?> objectNativeType, String propertyName,
+            Class<?> propertyAccessType) {
+        return propertyAccessType != null ? propertyAccessType : objectNativeType;
     }
 
     protected PropertyMethodFinder createColumnPropertyMethodFinder() {
         return new PropertyMethodFinder() {
-            public Method findReadMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
-                return findPropertyReadMethod(beanType, propertyName, propertyType);
+            public Method findReadMethod(Class<?> beanType, String propertyName, Class<?> propertyAccessType) {
+                return findPropertyReadMethod(beanType, propertyName, propertyAccessType);
             }
 
-            public Method findWriteMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
-                return findPropertyWriteMethod(beanType, propertyName, propertyType);
+            public Method findWriteMethod(Class<?> beanType, String propertyName, Class<?> propertyAccessType) {
+                return findPropertyWriteMethod(beanType, propertyName, propertyAccessType);
             }
         };
     }
 
-    protected Method findPropertyReadMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
+    protected Method findPropertyReadMethod(Class<?> beanType, String propertyName, Class<?> propertyAccessType) {
         final String methodName = buildPropertyGetterMethodName(propertyName);
         final Method method = doFindPropertyMethod(beanType, methodName, new Class<?>[] {});
         if (method == null) {
@@ -469,28 +478,32 @@ public abstract class AbstractDBMeta implements DBMeta {
         return foreignInfo;
     }
 
-    // createForeignInfo()
-    protected ForeignInfo cfi(String constraintName, String propertyName // name
+    protected ForeignInfo cfi(String constraintName, String foreignPropertyName // relation name
             , DBMeta localDbm, DBMeta foreignDbm // DB meta
-            , Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo, Class<?> propertyType // relation attribute
+            , Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo, Class<?> propertyAccessType // relation attribute
             , boolean oneToOne, boolean bizOneToOne, boolean referrerAsOne, boolean additionalFK // relation type
             , String fixedCondition, List<String> dynamicParameterList, boolean fixedInline // fixed condition
-            , String reversePropertyName) { // various info
-        final Class<?> realPt = propertyType != null ? propertyType : foreignDbm.getEntityType(); // basically default, or specified Optional
+            , String reversePropertyName // various info
+    ) { // createForeignInfo()
+        final Class<?> realPt = chooseForeignPropertyAccessType(foreignDbm, propertyAccessType);
         final PropertyMethodFinder propertyMethodFinder = createForeignPropertyMethodFinder();
-        return new ForeignInfo(constraintName, propertyName, localDbm, foreignDbm, localForeignColumnInfoMap,
+        return new ForeignInfo(constraintName, foreignPropertyName, localDbm, foreignDbm, localForeignColumnInfoMap,
                 relationNo, realPt, oneToOne, bizOneToOne, referrerAsOne, additionalFK, fixedCondition,
                 dynamicParameterList, fixedInline, reversePropertyName, propertyMethodFinder);
     }
 
+    protected Class<?> chooseForeignPropertyAccessType(DBMeta foreignDbm, Class<?> specifiedType) {
+        return specifiedType != null ? specifiedType : foreignDbm.getEntityType(); // basically default, or specified Optional
+    }
+
     protected PropertyMethodFinder createForeignPropertyMethodFinder() {
         return new PropertyMethodFinder() {
-            public Method findReadMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
-                return findPropertyReadMethod(beanType, propertyName, propertyType);
+            public Method findReadMethod(Class<?> beanType, String propertyName, Class<?> propertyAccessType) {
+                return findPropertyReadMethod(beanType, propertyName, propertyAccessType);
             }
 
-            public Method findWriteMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
-                return findPropertyWriteMethod(beanType, propertyName, propertyType);
+            public Method findWriteMethod(Class<?> beanType, String propertyName, Class<?> propertyAccessType) {
+                return findPropertyWriteMethod(beanType, propertyName, propertyAccessType);
             }
         };
     }
@@ -592,21 +605,26 @@ public abstract class AbstractDBMeta implements DBMeta {
         return referrerInfo;
     }
 
-    // createReferrerInfo()
-    protected ReferrerInfo cri(String constraintName, String propertyName // name
+    protected ReferrerInfo cri(String constraintName, String referrerPropertyName // relation name
             , DBMeta localDbm, DBMeta referrerDbm // DB meta
             , Map<ColumnInfo, ColumnInfo> localReferrerColumnInfoMap // relation attribute
-            , boolean oneToOne, String reversePropertyName) { // relation type and various info
+            , boolean oneToOne, String reversePropertyName // relation type and various info
+    ) { // createReferrerInfo()
+        final Class<?> propertyAccessType = chooseReferrerPropertyAccessType(referrerDbm, oneToOne);
+        final PropertyMethodFinder propertyMethodFinder = createReferrerPropertyMethodFinder();
+        return new ReferrerInfo(constraintName, referrerPropertyName, localDbm, referrerDbm,
+                localReferrerColumnInfoMap, propertyAccessType, oneToOne, reversePropertyName, propertyMethodFinder);
+    }
+
+    protected Class<?> chooseReferrerPropertyAccessType(DBMeta referrerDbm, boolean oneToOne) {
         final Class<?> propertyType;
-        if (oneToOne) {
+        if (oneToOne) { // basically no way
             propertyType = referrerDbm.getEntityType();
         } else {
             final Class<?> listType = getReferrerPropertyListType();
             propertyType = listType != null ? listType : List.class;
         }
-        final PropertyMethodFinder propertyMethodFinder = createReferrerPropertyMethodFinder();
-        return new ReferrerInfo(constraintName, propertyName, localDbm, referrerDbm, localReferrerColumnInfoMap,
-                propertyType, oneToOne, reversePropertyName, propertyMethodFinder);
+        return propertyType;
     }
 
     /**
@@ -619,12 +637,12 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     protected PropertyMethodFinder createReferrerPropertyMethodFinder() {
         return new PropertyMethodFinder() {
-            public Method findReadMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
-                return findPropertyReadMethod(beanType, propertyName, propertyType);
+            public Method findReadMethod(Class<?> beanType, String propertyName, Class<?> propertyAccessType) {
+                return findPropertyReadMethod(beanType, propertyName, propertyAccessType);
             }
 
-            public Method findWriteMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
-                return findPropertyWriteMethod(beanType, propertyName, propertyType);
+            public Method findWriteMethod(Class<?> beanType, String propertyName, Class<?> propertyAccessType) {
+                return findPropertyWriteMethod(beanType, propertyName, propertyAccessType);
             }
         };
     }
@@ -922,23 +940,23 @@ public abstract class AbstractDBMeta implements DBMeta {
             final String columnName = columnInfo.getColumnDbName();
             final String propertyName = columnInfo.getPropertyName();
             final String uncapPropName = initUncap(propertyName);
-            final Class<?> propertyType = columnInfo.getPropertyType();
+            final Class<?> nativeType = columnInfo.getObjectNativeType();
             if (analyzer.init(columnName, uncapPropName, propertyName)) {
                 final Object value;
-                if (String.class.isAssignableFrom(propertyType)) {
-                    value = analyzer.analyzeString(propertyType);
-                } else if (Number.class.isAssignableFrom(propertyType)) {
-                    value = analyzer.analyzeNumber(propertyType);
-                } else if (Date.class.isAssignableFrom(propertyType)) {
-                    value = analyzer.analyzeDate(propertyType);
-                } else if (Boolean.class.isAssignableFrom(propertyType)) {
-                    value = analyzer.analyzeBoolean(propertyType);
-                } else if (byte[].class.isAssignableFrom(propertyType)) {
-                    value = analyzer.analyzeBinary(propertyType);
-                } else if (UUID.class.isAssignableFrom(propertyType)) {
-                    value = analyzer.analyzeUUID(propertyType);
+                if (String.class.isAssignableFrom(nativeType)) {
+                    value = analyzer.analyzeString(nativeType);
+                } else if (Number.class.isAssignableFrom(nativeType)) {
+                    value = analyzer.analyzeNumber(nativeType);
+                } else if (Date.class.isAssignableFrom(nativeType)) {
+                    value = analyzer.analyzeDate(nativeType);
+                } else if (Boolean.class.isAssignableFrom(nativeType)) {
+                    value = analyzer.analyzeBoolean(nativeType);
+                } else if (byte[].class.isAssignableFrom(nativeType)) {
+                    value = analyzer.analyzeBinary(nativeType);
+                } else if (UUID.class.isAssignableFrom(nativeType)) {
+                    value = analyzer.analyzeUUID(nativeType);
                 } else {
-                    value = analyzer.analyzeOther(propertyType);
+                    value = analyzer.analyzeOther(nativeType);
                 }
                 columnInfo.write(entity, value);
             }

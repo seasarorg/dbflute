@@ -163,9 +163,10 @@ public class ScalarCondition extends AbstractSubQuery {
     }
 
     protected void assertScalarConditionColumnType(String function, String derivedColumnDbName) {
-        final Class<?> deriveColumnType = _subQueryDBMeta.findColumnInfo(derivedColumnDbName).getPropertyType();
         if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
-            if (!Number.class.isAssignableFrom(deriveColumnType)) {
+            final ColumnInfo columnInfo = _subQueryDBMeta.findColumnInfo(derivedColumnDbName);
+            final Class<?> deriveColumnType = columnInfo.getObjectNativeType();
+            if (!columnInfo.isObjectNativeTypeNumber()) {
                 throwScalarConditionUnmatchedColumnTypeException(function, derivedColumnDbName, deriveColumnType);
             }
         }

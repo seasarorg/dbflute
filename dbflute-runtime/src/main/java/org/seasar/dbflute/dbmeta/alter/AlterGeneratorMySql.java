@@ -119,7 +119,7 @@ public class AlterGeneratorMySql extends AbstractAlterGenerator {
         } else {
             final String defaultValue = columnInfo.getDefaultValue();
             if (defaultValue != null) {
-                if (columnInfo.isPropertyTypeString()) {
+                if (columnInfo.isObjectNativeTypeString()) {
                     sb.append(" DEFAULT '").append(defaultValue).append("'");
                 } else {
                     sb.append(" DEFAULT ").append(defaultValue);
@@ -132,11 +132,11 @@ public class AlterGeneratorMySql extends AbstractAlterGenerator {
     }
 
     protected boolean needsColumnSize(ColumnInfo columnInfo) {
-        final boolean decimalType = BigDecimal.class.isAssignableFrom(columnInfo.getPropertyType());
-        if (columnInfo.isPropertyTypeNumber() && !decimalType) {
+        final boolean decimalType = BigDecimal.class.isAssignableFrom(columnInfo.getObjectNativeType());
+        if (columnInfo.isObjectNativeTypeNumber() && !decimalType) {
             return false;
         }
-        if (columnInfo.isPropertyTypeDate()) {
+        if (columnInfo.isObjectNativeTypeDate()) {
             return false;
         }
         if (columnInfo.getColumnDbType().toLowerCase().endsWith("text")) {

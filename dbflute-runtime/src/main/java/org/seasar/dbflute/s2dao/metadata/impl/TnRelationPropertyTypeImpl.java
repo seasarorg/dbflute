@@ -107,7 +107,7 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
             }
 
             public Class<?> getPropertyType() {
-                return foreignInfo != null ? foreignInfo.getPropertyType() : propertyDesc.getPropertyType();
+                return foreignInfo != null ? foreignInfo.getPropertyAccessType() : propertyDesc.getPropertyType();
             }
 
             public Object getValue(Object target) {
@@ -119,8 +119,8 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
             }
 
             public void setValue(Object target, Object value) {
-                if (foreignInfo != null && target instanceof Entity && value instanceof Entity) { // basically here
-                    foreignInfo.write((Entity) target, (Entity) value);
+                if (foreignInfo != null && target instanceof Entity) { // basically here
+                    foreignInfo.write((Entity) target, value);
                 } else {
                     propertyDesc.setValue(target, value);
                 }

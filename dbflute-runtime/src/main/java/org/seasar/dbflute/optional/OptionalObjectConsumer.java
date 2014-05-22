@@ -27,11 +27,11 @@ package org.seasar.dbflute.optional;
  *     ... = member.getMemberName();
  * });
  * </pre>
- * @param <VALUE> The type of value in optional object.
+ * @param <OBJ> The type of wrapped object in optional object.
  * @author jflute
  * @since 1.0.5F (2014/05/10 Saturday)
  */
-public interface OptionalObjectConsumer<VALUE> {
+public interface OptionalObjectConsumer<OBJ> {
 
     /**
      * Accept the value in the optional object.
@@ -42,7 +42,7 @@ public interface OptionalObjectConsumer<VALUE> {
      * when caller is <span style="color: #DD4747">required()</span>:
      *   called if value exists, or exception if not present
      * </pre>
-     * @param value The value in the optional object. (NotNull)
+     * @param obj The wrapped object in the optional object. (NotNull)
      */
-    void accept(VALUE value);
+    void accept(OBJ obj);
 }

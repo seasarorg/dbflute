@@ -60,11 +60,20 @@ public interface RelationInfo {
     Map<ColumnInfo, ColumnInfo> getLocalTargetColumnInfoMap();
 
     /**
-     * Get the property type of the relation in entity. <br />
-     * e.g. Entity or Optional if many-to-one and one-to-one, Java or Scala List if one-to-many
-     * @return The class instance for the relation property. (NotNull)
+     * Get the native type mapped to object for the column. (NOT property access type) <br />
+     * It returns basically relation entity type even if the property type is optional. <br />
+     * And also there is the other method that returns property access type.
+     * @return The class type for the relation entity. (NotNull)
      */
-    Class<?> getPropertyType();
+    Class<?> getObjectNativeType();
+
+    /**
+     * Get the type of property access for the relation. <br />
+     * It is defined at getter/setter in entity. (e.g. Entity or Optional) <br />
+     * And also there is the other method that always returns object native type.
+     * @return The class type to access the property, e.g. Entity or Optional. (NotNull)
+     */
+    Class<?> getPropertyAccessType();
 
     /**
      * Does the relation is one-to-one?

@@ -154,21 +154,21 @@ public abstract class GreatWallOfOracleType implements ValueType {
         for (int i = 0; i < attrs.length; i++) {
             final Object attr = attrs[i];
             final ColumnInfo columnInfo = columnInfoList.get(i);
-            final Class<?> propertyType = columnInfo.getPropertyType();
+            final Class<?> nativeType = columnInfo.getObjectNativeType();
             if (attr == null) {
-                if (List.class.isAssignableFrom(propertyType)) {
+                if (List.class.isAssignableFrom(nativeType)) {
                     columnInfo.write(entity, DfCollectionUtil.newArrayList());
                 }
                 continue;
             }
             final Object mappedValue;
-            if (List.class.isAssignableFrom(propertyType)) {
+            if (List.class.isAssignableFrom(nativeType)) {
                 final Class<?> elementType = columnInfo.getGenericType();
                 mappedValue = mappingOracleArrayToList(attr, elementType);
-            } else if (Entity.class.isAssignableFrom(propertyType)) {
-                mappedValue = mappingOracleStructToEntity(attr, propertyType);
+            } else if (Entity.class.isAssignableFrom(nativeType)) {
+                mappedValue = mappingOracleStructToEntity(attr, nativeType);
             } else {
-                mappedValue = adjustScalarToPropertyValue(attr, propertyType);
+                mappedValue = adjustScalarToPropertyValue(attr, nativeType);
             }
             columnInfo.write(entity, mappedValue);
         }
@@ -290,11 +290,11 @@ public abstract class GreatWallOfOracleType implements ValueType {
                 // (but property type is Object because Sql2Entity does not support this)
                 final List<?> nested = ((List<?>) propertyValue);
                 final String arrayTypeName = columnInfo.getColumnDbType();
-                final Class<?> propertyType = columnInfo.getPropertyType();
-                Class<?> elementType = propertyType;
-                if (List.class.isAssignableFrom(propertyType)) {
+                final Class<?> nativeType = columnInfo.getObjectNativeType();
+                Class<?> elementType = nativeType;
+                if (List.class.isAssignableFrom(nativeType)) {
                     elementType = columnInfo.getGenericType();
-                } else if (Object.class.equals(propertyType) && DfCollectionUtil.hasValidElement(nested)) {
+                } else if (Object.class.equals(nativeType) && DfCollectionUtil.hasValidElement(nested)) {
                     final Class<?> firstElementType = DfCollectionUtil.findFirstElementType(nested);
                     if (firstElementType != null) {
                         elementType = nested.iterator().next().getClass();

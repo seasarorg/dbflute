@@ -41,4 +41,14 @@ public interface PropertyMethodFinder {
      * @return The found method. (NullAllowed: when not found)
      */
     Method findWriteMethod(Class<?> beanType, String propertyName, Class<?> propertyType);
+
+    // not use, converting to optional is implemented in row creators
+    ///**
+    // * Convert the value to property access type.
+    // * @param propertyName The name of property. (NotNull)
+    // * @param propertyAccessType The class type to access the property. (NotNull)
+    // * @param value The value to be converted to property type, e.g. native type or optional. (NullAllowed: if null, returns null)
+    // * @return The converted value or plain value. (NullAllowed: when the value is null)
+    // */
+    //Object convertToPropertyAccessType(String propertyName, Class<?> propertyAccessType, Object value);
 }

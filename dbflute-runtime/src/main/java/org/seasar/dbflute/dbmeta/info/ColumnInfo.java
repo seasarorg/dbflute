@@ -58,11 +58,12 @@ public class ColumnInfo {
     protected final ColumnSqlName _columnSqlName;
     protected final String _columnSynonym;
     protected final String _columnAlias;
-    protected final boolean _notNull;
     protected final String _propertyName;
-    protected final Class<?> _propertyType;
+    protected final Class<?> _objectNativeType;
+    protected final Class<?> _propertyAccessType;
     protected final boolean _primary;
     protected final boolean _autoIncrement;
+    protected final boolean _notNull;
     protected final String _columnDbType;
     protected final Integer _columnSize;
     protected final Integer _decimalDigits;
@@ -82,28 +83,33 @@ public class ColumnInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnSqlName, String columnSynonym,
-            String columnAlias, boolean notNull, String propertyName, Class<?> propertyType, boolean primary,
-            boolean autoIncrement, String columnDbType, Integer columnSize, Integer decimalDigits, String defaultValue,
-            boolean commonColumn, OptimisticLockType optimisticLockType, String columnComment,
-            List<String> foreignPropList, List<String> referrerPropList, ClassificationMeta classificationMeta,
-            PropertyMethodFinder propertyMethodFinder) {
+    public ColumnInfo(DBMeta dbmeta // DB meta
+            , String columnDbName, String columnSqlName, String columnSynonym, String columnAlias // column name
+            , Class<?> objectNativeType, String propertyName, Class<?> propertyAccessType // property info
+            , boolean primary, boolean autoIncrement, boolean notNull // column basic check
+            , String columnDbType, Integer columnSize, Integer decimalDigits, String defaultValue // column type
+            , boolean commonColumn, OptimisticLockType optimisticLockType, String columnComment // column others
+            , List<String> foreignPropList, List<String> referrerPropList // relation property
+            , ClassificationMeta classificationMeta, PropertyMethodFinder propertyMethodFinder // various info
+    ) { // big constructor
         assertObjectNotNull("dbmeta", dbmeta);
         assertObjectNotNull("columnDbName", columnDbName);
         assertObjectNotNull("columnSqlName", columnSqlName);
+        assertObjectNotNull("objectNativeType", objectNativeType);
         assertObjectNotNull("propertyName", propertyName);
-        assertObjectNotNull("propertyType", propertyType);
+        assertObjectNotNull("propertyAccessType", propertyAccessType);
         assertObjectNotNull("propertyMethodFinder", propertyMethodFinder);
         _dbmeta = dbmeta;
         _columnDbName = columnDbName;
         _columnSqlName = new ColumnSqlName(columnSqlName);
         _columnSynonym = columnSynonym;
         _columnAlias = columnAlias;
-        _notNull = notNull;
+        _objectNativeType = objectNativeType;
         _propertyName = propertyName;
-        _propertyType = propertyType;
+        _propertyAccessType = propertyAccessType;
         _primary = primary;
         _autoIncrement = autoIncrement;
+        _notNull = notNull;
         _columnSize = columnSize;
         _columnDbType = columnDbType;
         _decimalDigits = decimalDigits;
@@ -139,9 +145,10 @@ public class ColumnInfo {
     //                                                  Read
     //                                                  ----
     /**
-     * Read the value from the entity by its gateway (means no reflection).
-     * @param entity The target entity of this column to read. (NotNull)
+     * Read the value from the entity by its gateway (means no reflection). <br />
+     * It returns plain value in entity as property access type.
      * @param <PROPERTY> The type of the property.
+     * @param entity The target entity of this column to read. (NotNull)
      * @return The read value. (NullAllowed)
      */
     @SuppressWarnings("unchecked")
@@ -153,7 +160,7 @@ public class ColumnInfo {
      * Get the read method for entity reflection.
      * @return The read method, cached in this instance. (NotNull)
      */
-    public Method getReadMethod() {
+    public Method getReadMethod() { // basically unused in DBFlute, use gateway instead
         return _readMethod;
     }
 
@@ -161,7 +168,8 @@ public class ColumnInfo {
     //                                                 Write
     //                                                 -----
     /**
-     * Write the value to the entity by its gateway (means no reflection).
+     * Write the value to the entity by its gateway (means no reflection). <br />
+     * It contains the basic conversion, but no converting to optional so check the property access type.
      * @param entity The target entity of this column to write. (NotNull)
      * @param value The written value. (NullAllowed: if null, null value is written)
      */
@@ -173,7 +181,7 @@ public class ColumnInfo {
      * Get the write method for entity reflection.
      * @return The writer method, cached in this instance. (NotNull)
      */
-    public Method getWriteMethod() {
+    public Method getWriteMethod() { // basically unused in DBFlute, use gateway instead
         return _writeMethod;
     }
 
@@ -202,72 +210,82 @@ public class ColumnInfo {
 
     protected Method findReadMethod() {
         final Class<? extends Entity> entityType = _dbmeta.getEntityType();
-        return _propertyMethodFinder.findReadMethod(entityType, _propertyName, _propertyType);
+        return _propertyMethodFinder.findReadMethod(entityType, _propertyName, _propertyAccessType);
     }
 
     protected Method findWriteMethod() {
         final Class<? extends Entity> entityType = _dbmeta.getEntityType();
-        return _propertyMethodFinder.findWriteMethod(entityType, _propertyName, _propertyType);
+        return _propertyMethodFinder.findWriteMethod(entityType, _propertyName, _propertyAccessType);
     }
 
     // ===================================================================================
     //                                                                        Convert Type
     //                                                                        ============
     /**
-     * Convert the value to property type.
-     * @param value The conversion target value. (NullAllowed)
-     * @param <VALUE> The type of property value.
-     * @return The converted value as property type. (NullAllowed)
+     * Convert the value to object native type. <br />
+     * @param <VALUE> The type of column value.
+     * @param value The conversion target value. (NullAllowed: if null, returns null)
+     * @return The converted value as object native type. (NullAllowed: when the value is null)
      */
     @SuppressWarnings("unchecked")
-    public <VALUE> VALUE toPropretyType(Object value) {
-        if (value == null) {
-            return null;
-        }
+    public <VALUE> VALUE convertToObjectNativeType(Object value) {
         final VALUE result;
         if (value instanceof List<?>) {
             final List<?> valueList = (List<?>) value;
             final List<Object> resultList = new ArrayList<Object>();
             for (Object obj : valueList) {
-                resultList.add(doConvertToPropretyType(obj));
+                resultList.add(doConvertToObjectNativeType(obj));
             }
             result = (VALUE) resultList;
         } else {
-            result = (VALUE) doConvertToPropretyType(value);
+            result = (VALUE) doConvertToObjectNativeType(value);
         }
         return result;
     }
 
-    protected Object doConvertToPropretyType(Object value) {
+    protected <VALUE> VALUE doConvertToObjectNativeType(Object value) {
         if (value != null && value instanceof Classification) {
             value = ((Classification) value).code();
         }
         if (value == null) {
             return null;
         }
+        final Class<?> nativeType = _objectNativeType;
         final Object converted;
-        if (Number.class.isAssignableFrom(_propertyType)) {
-            converted = DfTypeUtil.toNumber(value, _propertyType);
-        } else if (Timestamp.class.isAssignableFrom(_propertyType)) {
+        if (Number.class.isAssignableFrom(nativeType)) {
+            converted = DfTypeUtil.toNumber(value, nativeType);
+        } else if (Timestamp.class.isAssignableFrom(nativeType)) {
             converted = DfTypeUtil.toTimestamp(value);
-        } else if (Time.class.isAssignableFrom(_propertyType)) {
+        } else if (Time.class.isAssignableFrom(nativeType)) {
             converted = DfTypeUtil.toTime(value);
-        } else if (Date.class.isAssignableFrom(_propertyType)) {
+        } else if (Date.class.isAssignableFrom(nativeType)) {
             converted = DfTypeUtil.toDate(value);
-        } else if (Boolean.class.isAssignableFrom(_propertyType)) {
+        } else if (Boolean.class.isAssignableFrom(nativeType)) {
             converted = DfTypeUtil.toBoolean(value);
-        } else if (byte[].class.isAssignableFrom(_propertyType)) {
+        } else if (byte[].class.isAssignableFrom(nativeType)) {
             if (value instanceof Serializable) {
                 converted = DfTypeUtil.toBinary((Serializable) value);
             } else {
                 converted = value; // no change
             }
-        } else if (UUID.class.isAssignableFrom(_propertyType)) {
+        } else if (UUID.class.isAssignableFrom(nativeType)) {
             converted = DfTypeUtil.toUUID(value);
         } else {
             converted = value;
         }
-        return converted;
+        @SuppressWarnings("unchecked")
+        final VALUE result = (VALUE) converted;
+        return result;
+    }
+
+    /**
+     * @param <VALUE> The type of property value.
+     * @param value The conversion target value. (NullAllowed)
+     * @return The converted value as property type. (NullAllowed)
+     * @deprecated use convertToObjectNativeType()
+     */
+    public <VALUE> VALUE toPropretyType(Object value) {
+        return convertToObjectNativeType(value);
     }
 
     // ===================================================================================
@@ -364,7 +382,7 @@ public class ColumnInfo {
             }
             sb.append(")");
         }
-        sb.append(", ").append(_propertyType.getName());
+        sb.append(", ").append(_objectNativeType.getName());
         sb.append("}");
         return sb.toString();
     }
@@ -416,11 +434,45 @@ public class ColumnInfo {
     }
 
     /**
-     * Is the column not null?
+     * Get the native type mapped to object for the column. (NOT property access type) <br />
+     * e.g. String even if optional is defined at getter/setter in entity. <br />
+     * Also there is the other method that returns property access type.
+     * @return The class type of property for the column. (NotNull)
+     */
+    public Class<?> getObjectNativeType() {
+        return _objectNativeType;
+    }
+
+    /**
+     * Is the object native type String? (assignable from)
      * @return The determination, true or false.
      */
-    public boolean isNotNull() {
-        return _notNull;
+    public boolean isObjectNativeTypeString() {
+        return String.class.isAssignableFrom(_objectNativeType);
+    }
+
+    /**
+     * Is the object native type Number? (assignable from)
+     * @return The determination, true or false.
+     */
+    public boolean isObjectNativeTypeNumber() {
+        return Number.class.isAssignableFrom(_objectNativeType);
+    }
+
+    /**
+     * Is the object native type Date? (assignable from)
+     * @return The determination, true or false.
+     */
+    public boolean isObjectNativeTypeDate() {
+        return Date.class.isAssignableFrom(_objectNativeType);
+    }
+
+    /**
+     * Is the object native type just (equals) Date? (assignable from)
+     * @return The determination, true or false.
+     */
+    public boolean isObjectNativeTypeJustDate() {
+        return Date.class.equals(_objectNativeType);
     }
 
     /**
@@ -432,35 +484,50 @@ public class ColumnInfo {
     }
 
     /**
-     * Get the type of property for the column.
-     * @return The type of property for the column. (NotNull)
+     * Get the type of property access for the column. <br />
+     * It is defined at getter/setter in entity. (e.g. String or Optional) <br />
+     * Also there is the other method that always returns object native type.
+     * @return The class type to access the property. (NotNull)
+     */
+    public Class<?> getPropertyAccessType() {
+        return _propertyAccessType;
+    }
+
+    /**
+     * Get the type of property for the column. (NOT property access type) <br />
+     * e.g. String even if optional is defined at getter/setter in entity.
+     * @return The class type of property for the column. (NotNull)
+     * @deprecated Use object native type
      */
     public Class<?> getPropertyType() {
-        return _propertyType;
+        return getObjectNativeType();
     }
 
     /**
      * Is the property type String? (assignable from)
      * @return The determination, true or false.
+     * @deprecated Use object native type
      */
     public boolean isPropertyTypeString() {
-        return String.class.isAssignableFrom(getPropertyType());
+        return isObjectNativeTypeString();
     }
 
     /**
      * Is the property type Number? (assignable from)
      * @return The determination, true or false.
+     * @deprecated Use object native type
      */
     public boolean isPropertyTypeNumber() {
-        return Number.class.isAssignableFrom(getPropertyType());
+        return isObjectNativeTypeNumber();
     }
 
     /**
      * Is the property type Date? (assignable from)
      * @return The determination, true or false.
+     * @deprecated Use object native type
      */
     public boolean isPropertyTypeDate() {
-        return Date.class.isAssignableFrom(getPropertyType());
+        return isObjectNativeTypeDate();
     }
 
     /**
@@ -477,6 +544,14 @@ public class ColumnInfo {
      */
     public boolean isAutoIncrement() {
         return _autoIncrement;
+    }
+
+    /**
+     * Is the column not null?
+     * @return The determination, true or false.
+     */
+    public boolean isNotNull() {
+        return _notNull;
     }
 
     /**

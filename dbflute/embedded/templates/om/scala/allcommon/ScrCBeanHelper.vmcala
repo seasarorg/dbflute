@@ -1,0 +1,180 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.SpecifyQuery;
+import org.seasar.dbflute.cbean.ckey.ConditionKey;
+import org.seasar.dbflute.cbean.chelper.HpCalculator;
+import org.seasar.dbflute.cbean.chelper.HpColQyHandler;
+
+/**
+ * @author jflute
+ * @param <CB> The type of condition-bean.
+ */
+class ScrHpColQyOperand[CB <: ConditionBean](handler: HpColQyHandler[CB]) {
+
+    // ===================================================================================
+    //                                                                          Comparison
+    //                                                                          ==========
+    /**
+     * Equal(=).
+     * <pre>
+     * <span style="color: #3F7E5E">// where FOO = BAR</span>
+     * cb.<span style="color: #DD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #DD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *     }
+     * }).<span style="color: #DD4747">equal</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #DD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *     }
+     * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
+     * </pre>
+     * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @return The calculator for right column. (NotNull)
+     */
+    def equal(rightSpecifyQuery: (CB) => Unit): HpCalculator = {
+        return handler.handle(toSpecifyQuery(rightSpecifyQuery), ConditionKey.CK_EQUAL.getOperand());
+    }
+
+    /**
+     * NotEqual(&lt;&gt;).
+     * <pre>
+     * <span style="color: #3F7E5E">// where FOO &lt;&gt; BAR</span>
+     * cb.<span style="color: #DD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #DD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *     }
+     * }).<span style="color: #DD4747">notEqual</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #DD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *     }
+     * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
+     * </pre>
+     * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @return The calculator for right column. (NotNull)
+     */
+    def notEqual(rightSpecifyQuery: (CB) => Unit): HpCalculator = {
+        return handler.handle(toSpecifyQuery(rightSpecifyQuery), ConditionKey.CK_NOT_EQUAL_STANDARD.getOperand());
+    }
+
+    /**
+     * GreaterThan(&gt;).
+     * <pre>
+     * <span style="color: #3F7E5E">// where FOO &gt; BAR</span>
+     * cb.<span style="color: #DD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #DD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *     }
+     * }).<span style="color: #DD4747">greaterThan</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #DD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *     }
+     * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
+     * </pre>
+     * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @return The calculator for right column. (NotNull)
+     */
+    def greaterThan(rightSpecifyQuery: (CB) => Unit): HpCalculator = {
+        return handler.handle(toSpecifyQuery(rightSpecifyQuery), ConditionKey.CK_GREATER_THAN.getOperand());
+    }
+
+    /**
+     * LessThan(&lt;).
+     * <pre>
+     * <span style="color: #3F7E5E">// where FOO &lt; BAR</span>
+     * cb.<span style="color: #DD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #DD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *     }
+     * }).<span style="color: #DD4747">lessThan</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #DD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *     }
+     * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
+     * </pre>
+     * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @return The calculator for right column. (NotNull)
+     */
+    def lessThan(rightSpecifyQuery: (CB) => Unit): HpCalculator = {
+        return handler.handle(toSpecifyQuery(rightSpecifyQuery), ConditionKey.CK_LESS_THAN.getOperand());
+    }
+
+    /**
+     * GreaterEqual(&gt;=).
+     * <pre>
+     * <span style="color: #3F7E5E">// where FOO &gt;= BAR</span>
+     * cb.<span style="color: #DD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #DD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *     }
+     * }).<span style="color: #DD4747">greaterEqual</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #DD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *     }
+     * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
+     * </pre>
+     * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @return The calculator for right column. (NotNull)
+     */
+    def greaterEqual(rightSpecifyQuery: (CB) => Unit): HpCalculator = {
+        return handler.handle(toSpecifyQuery(rightSpecifyQuery), ConditionKey.CK_GREATER_EQUAL.getOperand());
+    }
+
+    /**
+     * LessThan(&lt;=).
+     * <pre>
+     * <span style="color: #3F7E5E">// where FOO &lt;= BAR</span>
+     * cb.<span style="color: #DD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #DD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *     }
+     * }).<span style="color: #DD4747">lessEqual</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #DD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *     }
+     * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
+     * </pre>
+     * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @return The calculator for right column. (NotNull)
+     */
+    def lessEqual(rightSpecifyQuery: (CB) => Unit): HpCalculator = {
+        return handler.handle(toSpecifyQuery(rightSpecifyQuery), ConditionKey.CK_LESS_EQUAL.getOperand());
+    }
+
+    protected def toSpecifyQuery(rightSpecifyQuery: (CB) => Unit): SpecifyQuery[CB] = {
+        return new SpecifyQuery[CB]() {
+            def specify(cb: CB): Unit = {
+                rightSpecifyQuery(cb);
+            }
+        };
+    }
+}
+
+/**
+ * @author jflute
+ * @param <CB> The type of condition-bean.
+ */
+trait ScrHpColQyHandler[CB <: ConditionBean] {
+
+    /**
+     * @param rightSp The specification for right column. (NotNull)
+     * @param operand The operand for column comparison. (NotNull)
+     * @return The calculator for right column. (NotNull)
+     */
+    def handle(rightSp: SpecifyQuery[CB], operand: String): HpCalculator;
+}

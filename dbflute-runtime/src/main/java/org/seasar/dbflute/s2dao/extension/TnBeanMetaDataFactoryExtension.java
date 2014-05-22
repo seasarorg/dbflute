@@ -280,6 +280,13 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     }
 
     // ===================================================================================
+    //                                                           Relation Optional Factory
+    //                                                           =========================
+    public TnRelationOptionalFactory createRelationOptionalFactory(Class<?> beanClass) {
+        return new TnRelationOptionalFactory();
+    }
+
+    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected boolean isDBFluteEntity(Class<?> beanClass) {

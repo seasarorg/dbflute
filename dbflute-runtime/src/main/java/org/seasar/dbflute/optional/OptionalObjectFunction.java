@@ -23,17 +23,17 @@ package org.seasar.dbflute.optional;
  *     return new MemberWebBean(member);
  * });
  * </pre>
- * @param <VALUE> The type of value in optional object.
+ * @param <OBJ> The type of wrapped object in optional object.
  * @param <RESULT> The type of result of mapping.
  * @author jflute
  * @since 1.0.5F (2014/05/10 Saturday)
  */
-public interface OptionalObjectFunction<VALUE, RESULT> {
+public interface OptionalObjectFunction<OBJ, RESULT> {
 
     /**
      * Apply the object in the optional object.
-     * @param value The value instance in the optional object. (NotNull)
+     * @param obj The wrapped object in the optional object. (NotNull)
      * @return The result of mapping. (NullAllowed: if null, map() returns empty optional object)
      */
-    RESULT apply(VALUE value);
+    RESULT apply(OBJ obj);
 }

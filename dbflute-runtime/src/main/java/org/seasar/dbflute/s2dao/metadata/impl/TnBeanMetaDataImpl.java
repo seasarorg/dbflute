@@ -198,19 +198,27 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
     public TnPropertyType getPropertyTypeByColumnName(String columnName) {
         final TnPropertyType propertyType = _columnPropertyTypeMap.get(columnName);
         if (propertyType == null) {
-            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-            br.addNotice("The column was not found in the table.");
-            br.addItem("Column");
-            br.addElement(_tableName + "." + columnName);
-            br.addItem("Mapping");
-            final Set<Entry<String, TnPropertyType>> entrySet = _columnPropertyTypeMap.entrySet();
-            for (Entry<String, TnPropertyType> entry : entrySet) {
-                br.addElement(entry.getKey() + ": " + entry.getValue());
-            }
-            final String msg = br.buildExceptionMessage();
-            throw new IllegalStateException(msg);
+            throwBeanMetaPropertyTypeByColumnNameNotFoundException(columnName);
         }
         return propertyType;
+    }
+
+    protected void throwBeanMetaPropertyTypeByColumnNameNotFoundException(String columnName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The column was not found in the table.");
+        br.addItem("Bean Class");
+        br.addElement(_beanClass);
+        br.addItem("Column");
+        br.addElement(_tableName + "." + columnName);
+        br.addItem("DBMeta");
+        br.addElement(_dbmeta);
+        br.addItem("Mapping");
+        final Set<Entry<String, TnPropertyType>> entrySet = _columnPropertyTypeMap.entrySet();
+        for (Entry<String, TnPropertyType> entry : entrySet) {
+            br.addElement(entry.getKey() + ": " + entry.getValue());
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
     }
 
     public TnPropertyType getPropertyTypeByAliasName(String alias) {

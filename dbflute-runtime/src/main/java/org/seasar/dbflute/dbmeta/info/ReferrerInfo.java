@@ -43,7 +43,8 @@ public class ReferrerInfo implements RelationInfo {
     protected final DBMeta _referrerDBMeta;
     protected final Map<ColumnInfo, ColumnInfo> _localReferrerColumnInfoMap;
     protected final Map<ColumnInfo, ColumnInfo> _referrerLocalColumnInfoMap;
-    protected final Class<?> _propertyType;
+    protected final Class<?> _objectNativeType; // always entity type, provided by DB meta
+    protected final Class<?> _propertyAccessType; // basically list type
     protected final boolean _oneToOne;
     protected final String _reversePropertyName;
     protected final PropertyMethodFinder _propertyMethodFinder;
@@ -55,14 +56,17 @@ public class ReferrerInfo implements RelationInfo {
     //                                                                         ===========
     public ReferrerInfo(String constraintName, String referrerPropertyName // name
             , DBMeta localDBMeta, DBMeta referrerDBMeta // DB meta
-            , Map<ColumnInfo, ColumnInfo> localReferrerColumnInfoMap, Class<?> propertyType // relation attribute
+            , Map<ColumnInfo, ColumnInfo> localReferrerColumnInfoMap // relation attribute
+            , Class<?> propertyAccessType // property info (object native type is provided by DB meta)
             , boolean oneToOne // relation type
-            , String reversePropertyName, PropertyMethodFinder propertyMethodFinder) { // various info
+            , String reversePropertyName, PropertyMethodFinder propertyMethodFinder // various info
+    ) { // big constructor
         assertObjectNotNull("constraintName", constraintName);
         assertObjectNotNull("referrerPropertyName", referrerPropertyName);
         assertObjectNotNull("localDBMeta", localDBMeta);
         assertObjectNotNull("referrerDBMeta", referrerDBMeta);
         assertObjectNotNull("localReferrerColumnInfoMap", localReferrerColumnInfoMap);
+        assertObjectNotNull("propertyAccessType", propertyAccessType);
         assertObjectNotNull("propertyMethodFinder", propertyMethodFinder);
         _constraintName = constraintName;
         _referrerPropertyName = referrerPropertyName;
@@ -74,7 +78,8 @@ public class ReferrerInfo implements RelationInfo {
             referrerLocalColumnInfoMap.put(entry.getValue(), entry.getKey());
         }
         _referrerLocalColumnInfoMap = Collections.unmodifiableMap(referrerLocalColumnInfoMap);
-        _propertyType = propertyType;
+        _objectNativeType = referrerDBMeta.getEntityType();
+        _propertyAccessType = propertyAccessType;
         _oneToOne = oneToOne;
         _reversePropertyName = reversePropertyName;
         // referrer property is not accessed in runtime so it doesn't need
@@ -148,7 +153,8 @@ public class ReferrerInfo implements RelationInfo {
     //                                                  Read
     //                                                  ----
     /**
-     * Read the value to the entity.
+     * Read the value to the entity. <br />
+     * It returns plain value in entity as property access type.
      * @param localEntity The local entity of this column to read. (NotNull)
      * @param <PROPERTY> The type of property
      * @return The read instance of referrer entity. (NullAllowed)
@@ -170,9 +176,10 @@ public class ReferrerInfo implements RelationInfo {
     //                                                 Write
     //                                                 -----
     /**
-     * Write the value to the entity.
+     * Write the value to the entity. <br />
+     * No converting to anything so check the property access type.
      * @param localEntity The local entity of this column to write. (NotNull)
-     * @param referrerEntityList The written list of referrer entity. (NullAllowed: if null, null value is written)
+     * @param referrerEntityList The written list of referrer entity. (NullAllowed: if null, null written)
      */
     public void write(Entity localEntity, List<? extends Entity> referrerEntityList) {
         invokeMethod(getWriteMethod(), localEntity, new Object[] { referrerEntityList });
@@ -191,12 +198,12 @@ public class ReferrerInfo implements RelationInfo {
     //                                                ------
     protected Method findReadMethod() {
         final Class<? extends Entity> localType = _localDBMeta.getEntityType();
-        return _propertyMethodFinder.findReadMethod(localType, _referrerPropertyName, _propertyType);
+        return _propertyMethodFinder.findReadMethod(localType, _referrerPropertyName, _propertyAccessType);
     }
 
     protected Method findWriteMethod() {
         final Class<? extends Entity> localType = _localDBMeta.getEntityType();
-        return _propertyMethodFinder.findWriteMethod(localType, _referrerPropertyName, _propertyType);
+        return _propertyMethodFinder.findWriteMethod(localType, _referrerPropertyName, _propertyAccessType);
     }
 
     // -----------------------------------------------------
@@ -326,8 +333,15 @@ public class ReferrerInfo implements RelationInfo {
     /**
      * {@inheritDoc}
      */
-    public Class<?> getPropertyType() {
-        return _propertyType;
+    public Class<?> getObjectNativeType() {
+        return _objectNativeType;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Class<?> getPropertyAccessType() {
+        return _propertyAccessType;
     }
 
     /**
