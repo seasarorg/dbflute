@@ -16,6 +16,9 @@
 ${database.allClassCopyright}package ${glPackageBaseBhv};
 #set ($myClassName = "${myBaseBhvClassName}")
 
+import scala.collection.JavaConverters._;
+
+import java.util.Collection;
 import java.util.List;
 
 import org.seasar.dbflute._;
@@ -309,8 +312,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @return The result bean of selected list. (NotNull: if no data, returns empty list)
      * @exception DangerousResultSizeException When the result size is over the specified safety size.
      */
-    def selectList(cb: ${myConditionBeanClassName}): ListResultBean[${myExtendedObjectClassName}] = {
-        return doSelectList(cb, classOf[${myExtendedObjectClassName}]);
+    def selectList(cb: ${myConditionBeanClassName}): scala.collection.immutable.List[${myExtendedObjectClassName}] = {
+        val javaList = doSelectList(cb, classOf[${myExtendedObjectClassName}]);
+        return toScalaList(javaList);
     }
 
     protected def doSelectList[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY]): ListResultBean[ENTITY] = {
@@ -322,7 +326,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     @Override
     protected def doReadList(cb: ConditionBean): ListResultBean[_ <: Entity] = {
-        return selectList(downcast(cb));
+        return doSelectList(downcast(cb), classOf[${myExtendedObjectClassName}]); // use do method for ListResultBean
     }
 
     // ===================================================================================
@@ -514,8 +518,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param setupper The callback to set up referrer condition-bean for loading referrer. (NotNull)
      * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
      */
-    def load${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], setupper: ${table.loadReferrerConditionSetupperName}[${referrerCBClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
-        xassLRArg(${myEntityListVariableName}, setupper);
+    def load${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], setupper: ${table.loadReferrerConditionSetupperName}[${referrerCBClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
+        xassLRArg(${myEntityListVariableName}.asJava, setupper); // #pending easy convert for now
         return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]().xinit(setupper));
     }
 
@@ -552,44 +556,16 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      */
     def load${referrer.referrerPropertyNameInitCap}(${myEntityVariableName}: ${myExtendedObjectClassName}, setupper: ${table.loadReferrerConditionSetupperName}[${referrerCBClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
         xassLRArg(${myEntityVariableName}, setupper);
-        return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), new LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]().xinit(setupper));
+        return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(scala.collection.immutable.List.apply(${myEntityVariableName}), new LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]().xinit(setupper));
     }
 
-#if ($table.isAvailableLoadReferrerByOldOption())
-    /**
-     * {Refer to overload method that has an argument of the list of entity.} #beforejava8
-     * @param ${myEntityVariableName} The entity of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param loadReferrerOption The option of load-referrer. (NotNull)
-     * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
-     */
-    def load${referrer.referrerPropertyNameInitCap}(${myEntityVariableName}: ${myExtendedObjectClassName}, loadReferrerOption: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
-        xassLRArg(${myEntityVariableName}, loadReferrerOption);
-        return load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), loadReferrerOption);
-    }
-
-#end
 #if ($referrer.isSimpleKeyFK())
 #set ($referrerColumn = ${referrer.localColumnAsOne})
 #set ($localColumn = ${referrer.foreignColumnAsOne})
 #set ($keyJavaNative = "${referrerColumn.javaNative}")
-#if ($table.isAvailableLoadReferrerByOldOption())
-    /**
-     * {Refer to overload method that has an argument of condition-bean setupper.} #beforejava8
-     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param loadReferrerOption The option of load-referrer. (NotNull)
-     * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
-     */
-    @SuppressWarnings("unchecked")
-    def load${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], loadReferrerOption: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
-        xassLRArg(${myEntityListVariableName}, loadReferrerOption);
-        if (${myEntityListVariableName}.isEmpty()) { return (NestedReferrerLoader[${referrerEntityClassName}])EMPTY_LOADER; }
-        return doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}, loadReferrerOption);
-    }
-
-#end
-    protected def doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
+    protected def doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], option: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
         val referrerBhv: ${referrerBhvClassName} = xgetBSFLR().select(classOf[${referrerBhvClassName}]);
-        return helpLoadReferrerInternally(${myEntityListVariableName}, option, new InternalLoadReferrerCallback[${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}]() {
+        return helpLoadReferrerInternally(${myEntityListVariableName}.asJava, option, new InternalLoadReferrerCallback[${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}]() {
             def getPKVal(et: ${myExtendedObjectClassName}): ${keyJavaNative} =
 #if ($referrer.canImplicitConversion())
             { if (et.get${localColumn.javaName}() == null) { return null; }
@@ -606,13 +582,13 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
             { return et.get${localColumn.javaName}(); }
 #end
             def setRfLs(et: ${myExtendedObjectClassName}, ls: List[${referrerEntityClassName}]): Unit =
-            { et.set${referrer.referrerPropertyNameInitCap}(ls); }
+            { et.set${referrer.referrerPropertyNameInitCap}(toScalaList(ls)); }
             def newMyCB(): ${referrerCBClassName} = { return referrerBhv.newMyConditionBean(); }
             def qyFKIn(cb: ${referrerCBClassName}, ls: List[${keyJavaNative}]): Unit =
             { cb.query().set${referrerColumn.javaName}_InScope(ls); }
             def qyOdFKAsc(cb: ${referrerCBClassName}): Unit = { cb.query().addOrderBy_${referrerColumn.javaName}_Asc(); }
             def spFKCol(cb: ${referrerCBClassName}): Unit = { cb.specify().column${referrerColumn.javaName}(); }
-            def selRfLs(cb: ${referrerCBClassName}): List[${referrerEntityClassName}] = { return referrerBhv.selectList(cb); }
+            def selRfLs(cb: ${referrerCBClassName}): List[${referrerEntityClassName}] = { return referrerBhv.selectList(cb).asJava; }
             def getFKVal(re: ${referrerEntityClassName}): ${keyJavaNative} = { return re.get${referrerColumn.javaName}(); }
             def setlcEt(re: ${referrerEntityClassName}, le: ${myExtendedObjectClassName}): Unit =
             { re.set${referrer.foreignPropertyNameInitCap}(le); }
@@ -622,24 +598,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
 #else
 #set ($keyJavaNative = "java.util.Map<String, Object>")
-#if ($table.isAvailableLoadReferrerByOldOption())
-    /**
-     * {Refer to overload method that has an argument of condition-bean setupper.} #beforejava8
-     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param loadReferrerOption The option of load-referrer. (NotNull)
-     * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
-     */
-    @SuppressWarnings("unchecked")
-    def load${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], loadReferrerOption: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
-        xassLRArg(${myEntityListVariableName}, loadReferrerOption);
-        if (${myEntityListVariableName}.isEmpty()) { return (NestedReferrerLoader[${referrerEntityClassName}])EMPTY_LOADER; }
-        return doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}, loadReferrerOption);
-    }
-
-#end
-    protected def doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
+    protected def doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], option: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
         val referrerBhv: ${referrerBhvClassName} = xgetBSFLR().select(classOf[${referrerBhvClassName}]);
-        return helpLoadReferrerInternally(${myEntityListVariableName}, option, new InternalLoadReferrerCallback[${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}]() {
+        return helpLoadReferrerInternally(${myEntityListVariableName}.asJava, option, new InternalLoadReferrerCallback[${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}]() {
             def getPKVal(et: ${myExtendedObjectClassName}): ${keyJavaNative} = {
                 val primaryKeyMap: ${keyJavaNative} = new java.util.LinkedHashMap();
 #foreach ($col in $referrer.foreignColumnList)
@@ -647,7 +608,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 #end
                 return primaryKeyMap;
             }
-            def setRfLs(et: ${myExtendedObjectClassName}, ls: List[${referrerEntityClassName}]): Unit = { et.set${referrer.referrerPropertyNameInitCap}(ls); }
+            def setRfLs(et: ${myExtendedObjectClassName}, ls: List[${referrerEntityClassName}]): Unit = { et.set${referrer.referrerPropertyNameInitCap}(toScalaList(ls)); }
             def newMyCB(): ${referrerCBClassName} = { return referrerBhv.newMyConditionBean(); }
             def qyFKIn(cb: ${referrerCBClassName}, ls: List[${keyJavaNative}]): Unit = {
                 val aliasName: String = cb.getSqlClause().getBasePointAliasName();
@@ -680,7 +641,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
                 cb.specify().column${col.javaName}();
 #end
             }
-            def selRfLs(cb: ${referrerCBClassName}): List[${referrerEntityClassName}] = { return referrerBhv.selectList(cb); }
+            def selRfLs(cb: ${referrerCBClassName}): List[${referrerEntityClassName}] = { return referrerBhv.selectList(cb).asJava; }
             def getFKVal(re: ${referrerEntityClassName}): ${keyJavaNative} = {
                 val foreignKeyMap: ${keyJavaNative} = new java.util.LinkedHashMap<String,  Object>();
 #foreach ($col in $referrer.localColumnList)
@@ -707,8 +668,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
      * @return The list of foreign table. (NotNull, EmptyAllowed, NotNullElement)
      */
-    def pullout${foreignKey.foreignPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): List[${foreignEntityClassName}] = {
-        return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback[${myExtendedObjectClassName}, ${foreignEntityClassName}]() {
+    def pullout${foreignKey.foreignPropertyNameInitCap}(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}]): scala.collection.immutable.List[${foreignEntityClassName}] = {
+        return toScalaList(helpPulloutInternally(${myEntityListVariableName}.asJava, new InternalPulloutCallback[${myExtendedObjectClassName}, ${foreignEntityClassName}]() {
             def getFr(et: ${myExtendedObjectClassName}): ${foreignEntityClassName} = { return et.get${foreignKey.foreignPropertyNameInitCap}(); }
             def hasRf(): Boolean = { return ${foreignKey.canBeReferrer()}; }
 #if ($foreignKey.canBeReferrer())
@@ -717,13 +678,13 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
             { if (!ls.isEmpty()) { et.set${foreignKey.referrerPropertyNameInitCapAsOne}(ls.get(0)); } }
 #else
             def setRfLs(et: ${foreignEntityClassName}, ls: List[${myExtendedObjectClassName}]): Unit =
-            { et.set${foreignKey.referrerPropertyNameInitCap}(ls); }
+            { et.set${foreignKey.referrerPropertyNameInitCap}(toScalaList(ls)); }
 #end
 #else
             def setRfLs(et: ${foreignEntityClassName}, ls: List[${myExtendedObjectClassName}]): Unit =
             { throw new UnsupportedOperationException(); }
 #end
-        });
+        }));
     }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
@@ -1149,9 +1110,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNullAllowed: when auto-increment)
      * @return The array of inserted count. (NotNull, EmptyAllowed)
      */
-    def batchInsert(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): Array[Int] = {
+    def batchInsert(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}]): Array[Int] = {
         val op: InsertOption[${myConditionBeanClassName}] = createInsertUpdateOption();
-        return doBatchInsert(${myEntityListVariableName}, op);
+        return doBatchInsert(${myEntityListVariableName}.asJava, op);
     }
 
     protected def doBatchInsert(${myEntityListVariableName}: List[${myExtendedObjectClassName}], op: InsertOption[${myConditionBeanClassName}]): Array[Int] = {
@@ -1173,8 +1134,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     @Override
     protected def doLumpCreate(ls: List[Entity], op: InsertOption[_ <: ConditionBean]): Array[Int] = {
-        if (op == null) { return batchInsert(downcast(ls)); }
-        else { return varyingBatchInsert(downcast(ls), downcast(op)); }
+        if (op == null) { return batchInsert(toScalaList(downcast(ls))); }
+        else { return varyingBatchInsert(toScalaList(downcast(ls)), downcast(op)); }
     }
 
     /**
@@ -1209,9 +1170,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
-    def batchUpdate(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): Array[Int] = {
+    def batchUpdate(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}]): Array[Int] = {
         val op: UpdateOption[${myConditionBeanClassName}] = createPlainUpdateOption();
-        return doBatchUpdate(${myEntityListVariableName}, op);
+        return doBatchUpdate(${myEntityListVariableName}.asJava, op);
     }
 
     protected def doBatchUpdate(${myEntityListVariableName}: List[${myExtendedObjectClassName}], op: UpdateOption[${myConditionBeanClassName}]): Array[Int] = {
@@ -1233,8 +1194,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     @Override
     protected def doLumpModify(ls: List[Entity], op: UpdateOption[_ <: ConditionBean]): Array[Int] = {
-        if (op == null) { return batchUpdate(downcast(ls)); }
-        else { return varyingBatchUpdate(downcast(ls), downcast(op)); }
+        if (op == null) { return batchUpdate(toScalaList(downcast(ls))); }
+        else { return varyingBatchUpdate(toScalaList(downcast(ls)), downcast(op)); }
     }
 
     /**
@@ -1273,8 +1234,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
-    def batchUpdate(${myEntityListVariableName}: List[${myExtendedObjectClassName}], updateColumnSpec: SpecifyQuery[${myConditionBeanClassName}]): Array[Int] = {
-        return doBatchUpdate(${myEntityListVariableName}, createSpecifiedUpdateOption(updateColumnSpec));
+    def batchUpdate(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], updateColumnSpec: SpecifyQuery[${myConditionBeanClassName}]): Array[Int] = {
+        return doBatchUpdate(${myEntityListVariableName}.asJava, createSpecifiedUpdateOption(updateColumnSpec));
     }
 #if ($table.hasOptimisticLock())
 
@@ -1302,9 +1263,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @return The array of updated count. (NotNull, EmptyAllowed)
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
-    def batchUpdateNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): Array[Int] = {
+    def batchUpdateNonstrict(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}]): Array[Int] = {
         val option: UpdateOption[${myConditionBeanClassName}] = createPlainUpdateOption();
-        return doBatchUpdateNonstrict(${myEntityListVariableName}, option);
+        return doBatchUpdateNonstrict(${myEntityListVariableName}.asJava, option);
     }
 
     protected def doBatchUpdateNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}], op: UpdateOption[${myConditionBeanClassName}]): Array[Int] = {
@@ -1340,16 +1301,16 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @return The array of updated count. (NotNull, EmptyAllowed)
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
-    def batchUpdateNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}], updateColumnSpec: SpecifyQuery[${myConditionBeanClassName}]): Array[Int] = {
-        return doBatchUpdateNonstrict(${myEntityListVariableName}, createSpecifiedUpdateOption(updateColumnSpec));
+    def batchUpdateNonstrict(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], updateColumnSpec: SpecifyQuery[${myConditionBeanClassName}]): Array[Int] = {
+        return doBatchUpdateNonstrict(${myEntityListVariableName}.asJava, createSpecifiedUpdateOption(updateColumnSpec));
     }
 #end
 
     @Override
     protected def doLumpModifyNonstrict(ls: List[Entity], op: UpdateOption[_ <: ConditionBean]): Array[Int] = {
 #if ($table.hasOptimisticLock())
-        if (op == null) { return batchUpdateNonstrict(downcast(ls)); }
-        else { return varyingBatchUpdateNonstrict(downcast(ls), downcast(op)); }
+        if (op == null) { return batchUpdateNonstrict(toScalaList(downcast(ls))); }
+        else { return varyingBatchUpdateNonstrict(toScalaList(downcast(ls)), downcast(op)); }
 #else
         return doLumpModify(ls, op);
 #end
@@ -1370,8 +1331,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
-    def batchDelete(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): Array[Int] = {
-        return doBatchDelete(${myEntityListVariableName}, null);
+    def batchDelete(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}]): Array[Int] = {
+        return doBatchDelete(${myEntityListVariableName}.asJava, null);
     }
 
     protected def doBatchDelete(${myEntityListVariableName}: List[${myExtendedObjectClassName}], op: DeleteOption[${myConditionBeanClassName}]): Array[Int] = {
@@ -1382,8 +1343,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     @Override
     protected def doLumpRemove(ls: List[Entity], op: DeleteOption[_ <: ConditionBean]): Array[Int] = {
-        if (op == null) { return batchDelete(downcast(ls)); }
-        else { return varyingBatchDelete(downcast(ls), downcast(op)); }
+        if (op == null) { return batchDelete(toScalaList(downcast(ls))); }
+        else { return varyingBatchDelete(toScalaList(downcast(ls)), downcast(op)); }
     }
 #if ($table.hasOptimisticLock())
 
@@ -1394,8 +1355,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @return The array of deleted count. (NotNull, EmptyAllowed)
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
-    def batchDeleteNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): Array[Int] = {
-        return doBatchDeleteNonstrict(${myEntityListVariableName}, null);
+    def batchDeleteNonstrict(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}]): Array[Int] = {
+        return doBatchDeleteNonstrict(${myEntityListVariableName}.asJava, null);
     }
 
     protected def doBatchDeleteNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}], op: DeleteOption[${myConditionBeanClassName}]): Array[Int] = {
@@ -1408,8 +1369,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     @Override
     protected def doLumpRemoveNonstrict(ls: List[Entity], op: DeleteOption[_ <: ConditionBean]): Array[Int] = {
 #if ($table.hasOptimisticLock())
-        if (op == null) { return batchDeleteNonstrict(downcast(ls)); }
-        else { return varyingBatchDeleteNonstrict(downcast(ls), downcast(op)); }
+        if (op == null) { return batchDeleteNonstrict(toScalaList(downcast(ls))); }
+        else { return varyingBatchDeleteNonstrict(toScalaList(downcast(ls)), downcast(op)); }
 #else
         return doLumpRemove(ls, op);
 #end
@@ -1724,9 +1685,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param option The option of insert for varying requests. (NotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
      */
-    def varyingBatchInsert(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: InsertOption[${myConditionBeanClassName}]): Array[Int] = {
+    def varyingBatchInsert(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], option: InsertOption[${myConditionBeanClassName}]): Array[Int] = {
         assertInsertOptionNotNull(option);
-        return doBatchInsert(${myEntityListVariableName}, option);
+        return doBatchInsert(${myEntityListVariableName}.asJava, option);
     }
 
     /**
@@ -1738,9 +1699,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param option The option of update for varying requests. (NotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
      */
-    def varyingBatchUpdate(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: UpdateOption[${myConditionBeanClassName}]): Array[Int] = {
+    def varyingBatchUpdate(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], option: UpdateOption[${myConditionBeanClassName}]): Array[Int] = {
         assertUpdateOptionNotNull(option);
-        return doBatchUpdate(${myEntityListVariableName}, option);
+        return doBatchUpdate(${myEntityListVariableName}.asJava, option);
     }
 #if ($table.hasOptimisticLock())
 
@@ -1753,9 +1714,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param option The option of update for varying requests. (NotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
      */
-    def varyingBatchUpdateNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: UpdateOption[${myConditionBeanClassName}]): Array[Int] = {
+    def varyingBatchUpdateNonstrict(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], option: UpdateOption[${myConditionBeanClassName}]): Array[Int] = {
         assertUpdateOptionNotNull(option);
-        return doBatchUpdateNonstrict(${myEntityListVariableName}, option);
+        return doBatchUpdateNonstrict(${myEntityListVariableName}.asJava, option);
     }
 #end
 
@@ -1767,9 +1728,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param option The option of delete for varying requests. (NotNull)
      * @return The array of deleted count. (NotNull, EmptyAllowed)
      */
-    def varyingBatchDelete(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: DeleteOption[${myConditionBeanClassName}]): Array[Int] = {
+    def varyingBatchDelete(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], option: DeleteOption[${myConditionBeanClassName}]): Array[Int] = {
         assertDeleteOptionNotNull(option);
-        return doBatchDelete(${myEntityListVariableName}, option);
+        return doBatchDelete(${myEntityListVariableName}.asJava, option);
     }
 #if ($table.hasOptimisticLock())
 
@@ -1781,9 +1742,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param option The option of delete for varying requests. (NotNull)
      * @return The array of deleted count. (NotNull, EmptyAllowed)
      */
-    def varyingBatchDeleteNonstrict(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: DeleteOption[${myConditionBeanClassName}]): Array[Int] = {
+    def varyingBatchDeleteNonstrict(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], option: DeleteOption[${myConditionBeanClassName}]): Array[Int] = {
         assertDeleteOptionNotNull(option);
-        return doBatchDeleteNonstrict(${myEntityListVariableName}, option);
+        return doBatchDeleteNonstrict(${myEntityListVariableName}.asJava, option);
     }
 #end
 
@@ -2032,32 +1993,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 #end
 #end
 #end
-#if ($database.isMakeFlatExpansion())
-
-    // ===================================================================================
-    //                                                                           Hierarchy
-    //                                                                           =========
-    /**
-     * Create the basic request of hierarchy of ${myExtendedObjectClassName}..
-     * @param sourceList The list of source. (NotNull)
-     * @param <SOURCE> The type of source.
-     * @return Hierarchy request of ${myExtendedObjectClassName}. (NotNull)
-     */
-    def createHierarchyBasicRequest[SOURCE](sourceList: List[SOURCE]): ${glHierarchyBasicRequest}[${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace] = {
-        ${glHierarchyBasicRequest}<${myExtendedObjectClassName},  ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace> request = new ${glHierarchyBasicRequest}<${myExtendedObjectClassName},  ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace>(classOf[${myExtendedObjectClassName}]);val request: ${glHierarchyBasicRequest}[${myExtendedObjectClassName},  ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace] = new ${glHierarchyBasicRequest}<${myExtendedObjectClassName},  ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace>(${myExtendedObjectClassName}.class);
-        request.registerSourceList(sourceList);
-        return request;
-    }
-
-    /**
-     * Arrange hierarchy.
-     * @param request Hierarchy request of ${myExtendedObjectClassName}. (NotNull)
-     * @return The list of ${myExtendedObjectClassName}. (NotNull)
-     */
-    def arrangeHierarchy(request: ${glHierarchyRequest}[${myExtendedObjectClassName}]): List[${myExtendedObjectClassName}] = {
-        return new ${glHierarchyArranger}[${myExtendedObjectClassName}]().arrangeHierarchy(request);
-    }
-#end
 
     // ===================================================================================
     //                                                                Optimistic Lock Info
@@ -2118,4 +2053,12 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return sp.asInstanceOf[QueryInsertSetupper[${myExtendedObjectClassName}, ${myConditionBeanClassName}]];
     }
 #end
+
+    // ===================================================================================
+    //                                                                        Scala Helper
+    //                                                                        ============
+    protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): scala.collection.immutable.List[ENTITY] = {
+         // #pending easy convert for now
+        return scala.collection.immutable.List.fromArray(javaList.toArray()).asInstanceOf[scala.collection.immutable.List[ENTITY]];
+    }
 }

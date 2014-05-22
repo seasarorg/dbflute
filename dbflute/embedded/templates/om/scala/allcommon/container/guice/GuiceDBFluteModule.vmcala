@@ -73,8 +73,8 @@ class ${glDBFluteModule}(dataSource: DataSource) extends AbstractModule {
     }
 
     protected def setupBehavior(ker: BehaviorCommandInvoker, tor: BehaviorSelector, per: CommonColumnAutoSetupper): Unit = {
-        // unknown compile error 'illegal cyclic reference' if directly create the behaviors
-        // so use reflection here
+        // #avoided unknown compile error 'illegal cyclic reference'
+        // if directly create the behaviors so use reflection here
 #foreach ($table in $database.behaviorTableList)
         {
             val bhv: ${table.baseBehaviorExtendsClassName} = Class.forName("${table.extendedBehaviorFullClassName}").newInstance().asInstanceOf[${table.baseBehaviorExtendsClassName}];

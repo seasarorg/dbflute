@@ -82,7 +82,7 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
         return _grammarJava.buildPropertyGetterCall(propertyName);
     }
 
-    public String getClassTypeLiteral(String className) {
+    public String buildClassTypeLiteral(String className) {
         return "classOf[" + className + "]";
     }
 

@@ -373,10 +373,10 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * </pre>
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
      */
-    def exists${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
+    def exists${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
         assertObjectNotNull("subQuery", subQuery);
         val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); subQuery(cb); } finally { unlock(); }
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerExistsReferrer(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
@@ -412,10 +412,10 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * </pre>
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
      */
-    def notExists${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
+    def notExists${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
         assertObjectNotNull("subQuery", subQuery);
         val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); subQuery(cb); } finally { unlock(); }
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotExistsReferrer(cb.query(), "${col.name}", "${referrer.FirstLocalColumnName}", pp, "${relationPropertyName}");
     }
@@ -434,10 +434,10 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
-    def inScope${fk.foreignPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
+    def inScope${fk.foreignPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
         assertObjectNotNull("subQuery", subQuery);
         val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); subQuery(cb); } finally { unlock(); }
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
     }
@@ -465,10 +465,10 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
-    def inScope${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
+    def inScope${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
         assertObjectNotNull("subQuery", subQuery);
         val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); subQuery(cb); } finally { unlock(); }
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
@@ -487,10 +487,10 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
-    def notInScope${fk.foreignPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
+    def notInScope${fk.foreignPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
         assertObjectNotNull("subQuery", subQuery);
         val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); subQuery(cb); } finally { unlock(); }
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
     }
@@ -518,10 +518,10 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
-    def notInScope${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
+    def notInScope${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
         assertObjectNotNull("subQuery", subQuery);
         val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); subQuery(cb); } finally { unlock(); }
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
@@ -856,10 +856,10 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * </pre>
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
      */
-    def exists${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
+    def exists${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
         assertObjectNotNull("subQuery", subQuery);
         val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); subQuery(cb); } finally { unlock(); }
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerExistsReferrer(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
@@ -895,10 +895,10 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * </pre>
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
      */
-    def notExists${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
+    def notExists${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
         assertObjectNotNull("subQuery", subQuery);
         val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); subQuery(cb); } finally { unlock(); }
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotExistsReferrer(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
@@ -917,10 +917,10 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
-    def inScope${fk.foreignPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
+    def inScope${fk.foreignPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
         assertObjectNotNull("subQuery", subQuery);
         val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); subQuery(cb); } finally { unlock(); }
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
     }
@@ -948,10 +948,10 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
-    def inScope${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
+    def inScope${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
         assertObjectNotNull("subQuery", subQuery);
         val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); subQuery(cb); } finally { unlock(); }
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
@@ -970,10 +970,10 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
-    def notInScope${fk.foreignPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
+    def notInScope${fk.foreignPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
         assertObjectNotNull("subQuery", subQuery);
         val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); subQuery(cb); } finally { unlock(); }
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotInScopeRelation(cb.query(), "${col.name}", "${col.foreignKey.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
     }
@@ -1001,10 +1001,10 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
-    def notInScope${relationPropertyNameInitCap}(subQuery: SubQuery[${relatedCBClassName}]): Unit = {
+    def notInScope${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
         assertObjectNotNull("subQuery", subQuery);
         val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); subQuery(cb); } finally { unlock(); }
         val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
@@ -1449,10 +1449,10 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * Prepare for MyselfExists (SubQuery).
      * @param subQuery The implementation of sub query. (NotNull)
      */
-    def myselfExists(subQuery: SubQuery[${myConditionBeanClassName}]): Unit = {
+    def myselfExists(subQuery: (${myConditionBeanClassName}) => Unit): Unit = {
         assertObjectNotNull("subQuery", subQuery);
         val cb: ${myConditionBeanClassName} = new ${myConditionBeanClassName}(); cb.xsetupForMyselfExists(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); subQuery(cb); } finally { unlock(); }
         val pp: String = keepMyselfExists(cb.query());
         registerMyselfExists(cb.query(), pp);
     }
@@ -1467,10 +1467,10 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * Prepare for MyselfInScope (SubQuery).
      * @param subQuery The implementation of sub query. (NotNull)
      */
-    def myselfInScope(subQuery: SubQuery[${myConditionBeanClassName}]): Unit = {
+    def myselfInScope(subQuery: (${myConditionBeanClassName}) => Unit): Unit = {
         assertObjectNotNull("subQuery", subQuery);
         val cb: ${myConditionBeanClassName} = new ${myConditionBeanClassName}(); cb.xsetupForMyselfInScope(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); subQuery(cb); } finally { unlock(); }
         val pp: String = keepMyselfInScope(cb.query());
         registerMyselfInScope(cb.query(), pp);
     }

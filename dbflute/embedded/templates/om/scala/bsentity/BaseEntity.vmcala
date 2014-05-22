@@ -20,8 +20,6 @@ import scala.collection.JavaConverters._
 
 import java.lang.Long;
 import java.io.Serializable;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Set;
 #if ($table.hasUtilDateColumn())
 import java.util.Date;
@@ -422,13 +420,13 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
     /** ${referrer.referrerSimpleDisp}. */
-    protected var $referrerVariableName: List[${referrerEntityClassName}] = null;
+    protected var $referrerVariableName: scala.collection.immutable.List[${referrerEntityClassName}] = null;
 
     /**
      * ${referrer.referrerDispForJavaDoc}
      * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: even if no loading, returns empty list)
      */
-    def get${referrer.referrerJavaBeansRulePropertyNameInitCap}(): List[${referrerEntityClassName}] = {
+    def get${referrer.referrerJavaBeansRulePropertyNameInitCap}(): scala.collection.immutable.List[${referrerEntityClassName}] = {
         if (${referrerVariableName} == null) { ${referrerVariableName} = newReferrerList(); }
         return ${referrerVariableName};
     }
@@ -437,7 +435,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
      * ${referrer.referrerDispForJavaDoc}
      * @param ${referrer.referrerPropertyName} The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NullAllowed)
      */
-    def set${referrer.referrerJavaBeansRulePropertyNameInitCap}(${referrer.referrerPropertyName}: List[${referrerEntityClassName}]): Unit = {
+    def set${referrer.referrerJavaBeansRulePropertyNameInitCap}(${referrer.referrerPropertyName}: scala.collection.immutable.List[${referrerEntityClassName}]): Unit = {
         ${referrerVariableName} = ${referrer.referrerPropertyName};
     }
 
@@ -489,11 +487,8 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
 
 #end
 #end
-##
-## it uses List and ArrayList to be able to specify detail import clause
-##
-    protected def newReferrerList[ELEMENT](): List[ELEMENT] = {
-        return new ArrayList[ELEMENT]();
+    protected def newReferrerList[ELEMENT](): scala.collection.immutable.List[ELEMENT] = {
+        return scala.collection.immutable.List(); // #pending actually fixed empty list
     }
 
     // ===================================================================================
@@ -633,21 +628,21 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
         val sb: StringBuilder = new StringBuilder();
         sb.append(toString());
 #if ($table.hasRelation())
-        val l: String = "\n  ";
+        val li: String = "\n  ";
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
         if (${foreignVariableName} != null)
-        { sb.append(l).append(xbRDS(${foreignVariableName}, "${fk.foreignPropertyName}")); }
+        { sb.append(li).append(xbRDS(${foreignVariableName}, "${fk.foreignPropertyName}")); }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
         if (${referrerVariableName} != null)
-        { sb.append(l).append(xbRDS(${referrerVariableName}, "${referrer.referrerPropertyNameAsOne}")); }
+        { sb.append(li).append(xbRDS(${referrerVariableName}, "${referrer.referrerPropertyNameAsOne}")); }
 #end
 #foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
         if (${referrerVariableName} != null) {
-            ${referrerVariableName}.asScala.foreach(e => { if (e != null) { sb.append(l).append(xbRDS(e, "${referrer.referrerPropertyName}")) } });
+            ${referrerVariableName}.foreach(et => { if (et != null) { sb.append(li).append(xbRDS(et, "${referrer.referrerPropertyName}")) } });
         }
 #end
 #end
@@ -672,18 +667,18 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
     }
     protected def buildColumnString(): String = {
         val sb: StringBuilder = new StringBuilder();
-        val delimiter: String = ", ";
+        val dm: String = ", ";
 #foreach ($col in $table.columns)
 #if ($col.isJavaNativeUtilDate())
-        sb.append(delimiter).append(xfUD(get${col.javaName}()));
+        sb.append(dm).append(xfUD(get${col.javaName}()));
 #elseif ($col.isJavaNativeByteArray())
-        sb.append(delimiter).append(xfBA(get${col.javaName}()));
+        sb.append(dm).append(xfBA(get${col.javaName}()));
 #else
-        sb.append(delimiter).append(get${col.javaName}());
+        sb.append(dm).append(get${col.javaName}());
 #end
 #end
-        if (sb.length() > delimiter.length()) {
-            sb.delete(0, delimiter.length());
+        if (sb.length() > dm.length()) {
+            sb.delete(0, dm.length());
         }
         sb.insert(0, "{").append("}");
         return sb.toString();
@@ -708,22 +703,22 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
     protected def buildRelationString(): String = {
 #if ($table.hasRelation())
         val sb: StringBuilder = new StringBuilder();
-        val c: String = ",  ";
+        val cm: String = ",  ";
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
-        if (${foreignVariableName} != null) { sb.append(c).append("${fk.foreignPropertyName}"); }
+        if (${foreignVariableName} != null) { sb.append(cm).append("${fk.foreignPropertyName}"); }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
-        if (${referrerVariableName} != null) { sb.append(c).append("${referrer.referrerPropertyNameAsOne}"); }
+        if (${referrerVariableName} != null) { sb.append(cm).append("${referrer.referrerPropertyNameAsOne}"); }
 #end
 #foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
-        if (${referrerVariableName} != null && !${referrerVariableName}.isEmpty())
-        { sb.append(c).append("${referrer.referrerPropertyName}"); }
+        if (${referrerVariableName} != null && !${referrerVariableName}.isEmpty)
+        { sb.append(cm).append("${referrer.referrerPropertyName}"); }
 #end
-        if (sb.length() > c.length()) {
-            sb.delete(0, c.length()).insert(0, "(").append(")");
+        if (sb.length() > cm.length()) {
+            sb.delete(0, cm.length()).insert(0, "(").append(")");
         }
         return sb.toString();
 #else

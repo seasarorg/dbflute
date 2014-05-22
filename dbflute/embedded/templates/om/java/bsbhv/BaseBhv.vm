@@ -29,6 +29,9 @@ import org.seasar.dbflute.dbmeta.hierarchy.HierarchyRequest;
 #end
 import org.seasar.dbflute.exception.*;
 import org.seasar.dbflute.optional.*;
+#if ($database.isRelationOptionalEntityOriginalClass())
+import ${database.relationOptionalEntityClassName};
+#end
 import org.seasar.dbflute.outsidesql.executor.*;
 #if ($table.hasPrimaryKeyForcedClassificationSetting())
 import ${glPackageBaseCommon}.${glCDef};
@@ -617,7 +620,11 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
             public List<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb) { return referrerBhv.selectList(cb); }
             public ${keyJavaNative} getFKVal(${referrerEntityClassName} re) { return re.get${referrerColumn.javaName}(); }
             public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} le)
+#if ($referrer.isForeignPropertyOptionalEntity())
+            { re.set${referrer.foreignPropertyNameInitCap}(${database.relationOptionalEntitySimpleName}.of(le)); }
+#else
             { re.set${referrer.foreignPropertyNameInitCap}(le); }
+#end
             public String getRfPrNm() { return "${referrer.referrerPropertyName}"; }
         });
     }
@@ -691,7 +698,12 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #end
                 return foreignKeyMap;
             }
-            public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} le) { re.set${referrer.foreignPropertyNameInitCap}(le); }
+            public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} le)
+#if ($referrer.isForeignPropertyOptionalEntity())
+            { re.set${referrer.foreignPropertyNameInitCap}(${database.relationOptionalEntitySimpleName}.of(le)); }
+#else
+            { re.set${referrer.foreignPropertyNameInitCap}(le); }
+#end
             public String getRfPrNm() { return "${referrer.referrerPropertyName}"; }
         });
     }
@@ -702,24 +714,33 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     // ===================================================================================
     //                                                                   Pull out Relation
     //                                                                   =================
-#foreach ($foreignKey in $table.foreignKeys)
-#set ($foreignEntityClassName = "${foreignKey.foreignTableExtendedEntityClassName}")
+#foreach ($fk in $table.foreignKeys)
+#set ($foreignEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
     /**
      * Pull out the list of foreign table '${foreignEntityClassName}'.
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
      * @return The list of foreign table. (NotNull, EmptyAllowed, NotNullElement)
      */
-    public List<${foreignEntityClassName}> pullout${foreignKey.foreignPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+    public List<${foreignEntityClassName}> pullout${fk.foreignPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}>() {
-            public ${foreignEntityClassName} getFr(${myExtendedObjectClassName} et) { return et.get${foreignKey.foreignPropertyNameInitCap}(); }
-            public boolean hasRf() { return ${foreignKey.canBeReferrer()}; }
-#if ($foreignKey.canBeReferrer())
-#if ($foreignKey.isOneToOne())
+            public ${foreignEntityClassName} getFr(${myExtendedObjectClassName} et)
+#if ($fk.isForeignPropertyOptionalEntity())
+            { return et.get${fk.foreignPropertyNameInitCap}().get(); }
+#else
+            { return et.get${fk.foreignPropertyNameInitCap}(); }
+#end
+            public boolean hasRf() { return ${fk.canBeReferrer()}; }
+#if ($fk.canBeReferrer())
+#if ($fk.isOneToOne())
             public void setRfLs(${foreignEntityClassName} et, List<${myExtendedObjectClassName}> ls)
-            { if (!ls.isEmpty()) { et.set${foreignKey.referrerPropertyNameInitCapAsOne}(ls.get(0)); } }
+#if ($fk.isReferrerPropertyOptionalEntityAsOne())
+            { if (!ls.isEmpty()) { et.set${fk.referrerPropertyNameInitCapAsOne}(${database.relationOptionalEntitySimpleName}.of(ls.get(0))); } }
+#else
+            { if (!ls.isEmpty()) { et.set${fk.referrerPropertyNameInitCapAsOne}(ls.get(0)); } }
+#end
 #else
             public void setRfLs(${foreignEntityClassName} et, List<${myExtendedObjectClassName}> ls)
-            { et.set${foreignKey.referrerPropertyNameInitCap}(ls); }
+            { et.set${fk.referrerPropertyNameInitCap}(ls); }
 #end
 #else
             public void setRfLs(${foreignEntityClassName} et, List<${myExtendedObjectClassName}> ls)
@@ -738,10 +759,19 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      */
     public List<${referrerEntityClassName}> pullout${referrer.referrerPropertyNameInitCapAsOne}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${referrerEntityClassName}>() {
-            public ${referrerEntityClassName} getFr(${myExtendedObjectClassName} et) { return et.get${referrer.referrerPropertyNameInitCapAsOne}(); }
+            public ${referrerEntityClassName} getFr(${myExtendedObjectClassName} et)
+#if ($referrer.isReferrerPropertyOptionalEntityAsOne())
+            { return et.get${referrer.referrerPropertyNameInitCapAsOne}().get(); }
+#else
+            { return et.get${referrer.referrerPropertyNameInitCapAsOne}(); }
+#end
             public boolean hasRf() { return ${referrer.canBeReferrer()}; }
             public void setRfLs(${referrerEntityClassName} et, List<${myExtendedObjectClassName}> ls)
+#if ($referrer.isForeignPropertyOptionalEntity())
+            { if (!ls.isEmpty()) { et.set${referrer.foreignPropertyNameInitCap}(${database.relationOptionalEntitySimpleName}.of(ls.get(0))); } }
+#else
             { if (!ls.isEmpty()) { et.set${referrer.foreignPropertyNameInitCap}(ls.get(0)); } }
+#end
         });
     }
 #end

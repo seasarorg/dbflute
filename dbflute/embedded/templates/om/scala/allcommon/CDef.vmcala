@@ -166,8 +166,8 @@ object ${glCDef} {
          * Get the list of all classification elements. (returns new copied list)
          * @return The list of all classification elements. (NotNull)
          */
-        def listAll(): List[${classificationName}] = {
-            return new ArrayList[${classificationName}](_nameValueMap.values());
+        def listAll(): scala.collection.immutable.List[${classificationName}] = {
+            return toScalaList(_nameValueMap.values());
         }
 #foreach ($group in $classificationTop.groupList)
 
@@ -179,8 +179,8 @@ object ${glCDef} {
          * ${group.buildElementDisp()}
          * @return The list of classification elements in the group. (NotNull)
          */
-        def listOf${group.groupNameInitCap}(): List[${classificationName}] = {
-            return new ArrayList[${classificationName}](Arrays.asList(${group.buildCDefArgExp()}));
+        def listOf${group.groupNameInitCap}(): scala.collection.immutable.List[${classificationName}] = {
+            return toScalaList(Arrays.asList(${group.buildCDefArgExp()}));
         }
 #end
 
@@ -189,11 +189,11 @@ object ${glCDef} {
          * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns empty list)
          * @return The list of classification elements in the group. (NotNull)
          */
-        def groupOf(groupName: String): List[${classificationName}] = {
+        def groupOf(groupName: String): scala.collection.immutable.List[${classificationName}] = {
 #foreach ($group in $classificationTop.groupList)
             if ("${group.groupName}".equals(groupName)) { return listOf${group.groupNameInitCap}(); }
 #end
-            return new ArrayList[${classificationName}](4);
+            return scala.collection.immutable.List[${classificationName}]();
         }
     }
 
@@ -228,8 +228,8 @@ object ${glCDef} {
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
-        private def toClassificationList(clsList: List[_]): List[Classification] = {
-            return clsList.asInstanceOf[List[Classification]];
+        private def toClassificationList(clsList: scala.collection.immutable.List[Classification]): List[Classification] = {
+            return clsList.asJava;
         }
 
         def codeType(): ClassificationCodeType = {
@@ -252,5 +252,13 @@ object ${glCDef} {
 #end
         case object ${classificationName} extends DefMeta("${classificationName}");
 #end
+    }
+
+    // ===================================================================================
+    //                                                                        Scala Helper
+    //                                                                        ============
+    protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): scala.collection.immutable.List[ENTITY] = {
+         // #pending easy convert for now
+        return scala.collection.immutable.List.fromArray(javaList.toArray()).asInstanceOf[scala.collection.immutable.List[ENTITY]];
     }
 }

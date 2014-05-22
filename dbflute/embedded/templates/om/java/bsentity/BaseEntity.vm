@@ -28,6 +28,9 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 #if (!$table.hasAllCommonColumn() || $table.hasRelation())
 import org.seasar.dbflute.Entity;
 #end
+#if ($table.hasOptionalRelation())
+import ${database.relationOptionalEntityClassName};
+#end
 #if ($table.hasAllCommonColumn())
 import ${glPackageBaseCommon}.${glEntityDefinedCommonColumn};
 #end
@@ -343,7 +346,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     //                                                                    ================
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignTable = $fk.foreignTable)
-#set ($foreignEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
+#set ($foreignEntityClassName = "${fk.foreignPropertyEntityDefinitionType}")
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
     /** ${fk.foreignSimpleDisp}. */
     protected ${foreignEntityClassName} ${foreignVariableName};
@@ -378,7 +381,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerTable = $referrer.table)
-#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+#set ($referrerEntityClassName = "${referrer.referrerPropertyEntityDefinitionTypeAsOne}")
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
     /** ${referrer.referrerSimpleDispAsOne}. */
     protected ${referrerEntityClassName} ${referrerVariableName};
@@ -643,8 +646,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         return sb.toString();
     }
 #if ($table.hasRelation())
-    protected String xbRDS(Entity e, String name) { // buildRelationDisplayString()
-        return e.buildDisplayString(name, true, true);
+    protected String xbRDS(Entity et, String name) { // buildRelationDisplayString()
+        return et.buildDisplayString(name, true, true);
+    }
+#end
+#if ($table.hasOptionalRelation())
+    protected <ET extends Entity> String xbRDS(${database.relationOptionalEntityClassName}<ET> et, String name) { // buildRelationDisplayString()
+        return et.get().buildDisplayString(name, true, true);
     }
 #end
 

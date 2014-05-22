@@ -75,7 +75,7 @@ public class DfLanguageGrammarPhp implements DfLanguageGrammar {
         throw new UnsupportedOperationException("Unsupported at Php");
     }
 
-    public String getClassTypeLiteral(String className) {
+    public String buildClassTypeLiteral(String className) {
         throw new UnsupportedOperationException("Unsupported at Php");
     }
 

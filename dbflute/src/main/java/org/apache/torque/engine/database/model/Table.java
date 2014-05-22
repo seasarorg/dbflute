@@ -1361,6 +1361,32 @@ public class Table {
         return false;
     }
 
+    public boolean hasOptionalRelation() {
+        final List<ForeignKey> fkList = getForeignKeyList();
+        for (ForeignKey fk : fkList) {
+            if (fk.isForeignPropertyOptionalEntity()) {
+                return true;
+            }
+        }
+        final List<ForeignKey> referrerList = getReferrerAsOneList();
+        for (ForeignKey referrer : referrerList) {
+            if (referrer.isReferrerPropertyOptionalEntityAsOne()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasReverseOptionalRelation() {
+        final List<ForeignKey> referrerList = getReferrerList();
+        for (ForeignKey referrer : referrerList) {
+            if (referrer.isForeignPropertyOptionalEntity()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // ===================================================================================
     //                                                                      Relation Index
     //                                                                      ==============

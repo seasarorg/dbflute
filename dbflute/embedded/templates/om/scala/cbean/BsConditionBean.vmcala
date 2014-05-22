@@ -38,6 +38,7 @@ import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommon}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommon}.${glImplementedInvokerAssistant};
 import ${glPackageBaseCommon}.${glImplementedSqlClauseCreator};
+import ${glPackageBaseCommon}.ScrHpColQyOperand;
 import ${glPackageCB}._
 import ${glPackageCQ}._
 #if ($table.hasForeignKeyOrReferrerAsOne())
@@ -480,10 +481,12 @@ class ${myClassName} extends AbstractConditionBean {
      * @param leftSpecifyQuery The specify-query for left column. (NotNull)
      * @return The object for setting up operand and right column. (NotNull)
      */
-    def columnQuery(leftSpecifyQuery: SpecifyQuery[${myConditionBeanClassName}]): HpColQyOperand[${myConditionBeanClassName}] = {
-        return new HpColQyOperand[${myConditionBeanClassName}](new HpColQyHandler[${myConditionBeanClassName}]() {
+    def columnQuery(leftSpecifyQuery: (${myConditionBeanClassName}) => Unit): ScrHpColQyOperand[${myConditionBeanClassName}] = {
+        return new ScrHpColQyOperand[${myConditionBeanClassName}](new HpColQyHandler[${myConditionBeanClassName}]() {
             def handle(rightSp: SpecifyQuery[${myConditionBeanClassName}], operand: String): HpCalculator = {
-                return xcolqy(xcreateColumnQueryCB(), xcreateColumnQueryCB(), leftSpecifyQuery, rightSp, operand);
+                return xcolqy(xcreateColumnQueryCB(), xcreateColumnQueryCB(), new SpecifyQuery[${myConditionBeanClassName}]() {
+                    def specify(cb: ${myConditionBeanClassName}): Unit = { leftSpecifyQuery(cb); }
+                }, rightSp, operand);
             }
         });
     }
@@ -530,8 +533,10 @@ class ${myClassName} extends AbstractConditionBean {
      * </pre>
      * @param orQuery The query for or-condition. (NotNull)
      */
-    def orScopeQuery(orQuery: OrQuery[${myConditionBeanClassName}]): Unit = {
-        xorSQ(this.asInstanceOf[${myConditionBeanClassName}], orQuery);
+    def orScopeQuery(orQuery: (${myConditionBeanClassName}) => Unit): Unit = {
+        xorSQ(this.asInstanceOf[${myConditionBeanClassName}], new OrQuery[${myConditionBeanClassName}]{
+            def query(orCB: ${myConditionBeanClassName}): Unit = { orQuery(orCB); }
+        });
     }
 
     /**
@@ -553,8 +558,10 @@ class ${myClassName} extends AbstractConditionBean {
      * </pre>
      * @param andQuery The query for and-condition. (NotNull)
      */
-    def orScopeQueryAndPart(andQuery: AndQuery[${myConditionBeanClassName}]): Unit = {
-        xorSQAP(this.asInstanceOf[${myConditionBeanClassName}], andQuery);
+    def orScopeQueryAndPart(andQuery: (${myConditionBeanClassName}) => Unit): Unit = {
+        xorSQAP(this.asInstanceOf[${myConditionBeanClassName}], new AndQuery[${myConditionBeanClassName}] {
+            def query(cb: ${myConditionBeanClassName}): Unit = { andQuery(cb); }
+        });
     }
 #if ($table.isCursorSelectOptionAllowed())
 

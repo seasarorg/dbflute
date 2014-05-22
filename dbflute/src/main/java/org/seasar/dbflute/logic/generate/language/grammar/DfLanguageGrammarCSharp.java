@@ -90,7 +90,7 @@ public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
         return propertyName;
     }
 
-    public String getClassTypeLiteral(String className) {
+    public String buildClassTypeLiteral(String className) {
         return "typeof(" + className + ")";
     }
 

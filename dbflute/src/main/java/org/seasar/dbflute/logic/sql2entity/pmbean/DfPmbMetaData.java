@@ -1015,7 +1015,7 @@ public class DfPmbMetaData {
     public String getProcedureParameterOracleArrayElementJavaNativeTypeLiteral(String propertyName) {
         final String javaNative = getProcedureParameterOracleArrayElementJavaNative(propertyName);
         final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency().getLanguageGrammar();
-        return grammarInfo.getClassTypeLiteral(Srl.substringFirstFrontIgnoreCase(javaNative, "<"));
+        return grammarInfo.buildClassTypeLiteral(Srl.substringFirstFrontIgnoreCase(javaNative, "<"));
     }
 
     public String getProcedureParameterOracleStructTypeName(String propertyName) {
@@ -1039,7 +1039,7 @@ public class DfPmbMetaData {
     public String getProcedureParameterOracleStructEntityTypeTypeLiteral(String propertyName) {
         final String entityType = getProcedureParameterOracleStructEntityType(propertyName);
         final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency().getLanguageGrammar();
-        return grammarInfo.getClassTypeLiteral(Srl.substringFirstFrontIgnoreCase(entityType, "<"));
+        return grammarInfo.buildClassTypeLiteral(Srl.substringFirstFrontIgnoreCase(entityType, "<"));
     }
 
     // -----------------------------------------------------

@@ -144,6 +144,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.generate.column.DfColumnListToStringUtil;
 import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
@@ -396,6 +397,63 @@ public class ForeignKey implements Constraint {
     public String getForeignPropertyNameInitCap() {
         final String foreignPropertyName = getForeignPropertyName();
         return foreignPropertyName.substring(0, 1).toUpperCase() + foreignPropertyName.substring(1);
+    }
+
+    // -----------------------------------------------------
+    //                              Relation Optional Entity
+    //                              ------------------------
+    public boolean isForeignPropertyOptionalEntity() {
+        return getRelationOptionalEntityClassName() != null;
+    }
+
+    public String getForeignPropertyEntityDefinitionType() {
+        final String extendedEntityClassName = getForeignTableExtendedEntityClassName();
+        final String propertyAccessType = getRelationOptionalEntityClassName();
+        return doGetForeignPropertyEntityDefinitionType(extendedEntityClassName, propertyAccessType);
+    }
+
+    public boolean isReferrerPropertyOptionalEntityAsOne() {
+        return getRelationOptionalEntityClassName() != null;
+    }
+
+    public String getReferrerPropertyEntityDefinitionTypeAsOne() {
+        final String extendedEntityClassName = getReferrerTableExtendedEntityClassName();
+        final String propertyAccessType = getRelationOptionalEntityClassName();
+        return doGetForeignPropertyEntityDefinitionType(extendedEntityClassName, propertyAccessType);
+    }
+
+    protected String doGetForeignPropertyEntityDefinitionType(String extendedEntityClassName, String propertyAccessType) {
+        if (propertyAccessType != null) {
+            final String simpleName = Srl.substringLastRear(propertyAccessType, "."); // needs import definition
+            final DfLanguageGrammar grammar = getBasicProperties().getLanguageDependency().getLanguageGrammar();
+            return simpleName + grammar.buildGenericOneClassHint(extendedEntityClassName);
+        }
+        return extendedEntityClassName;
+    }
+
+    protected String getRelationOptionalEntityClassName() {
+        return getTable().getDatabase().getRelationOptionalEntityClassName();
+    }
+
+    // -----------------------------------------------------
+    //                                  Property Access Type
+    //                                  --------------------
+    public String getForeignPropertyAccessTypeMetaLiteral() {
+        return doGetRelationPropertyAccessTypeMetaLiteral();
+    }
+
+    public String getReferrerPropertyAccessTypeMetaLiteralAsOne() {
+        return doGetRelationPropertyAccessTypeMetaLiteral();
+    }
+
+    protected String doGetRelationPropertyAccessTypeMetaLiteral() {
+        if (getRelationOptionalEntityClassName() != null) {
+            final String className = getLittleAdjustmentProperties().getRelationOptionalEntityClass();
+            final DfLanguageGrammar grammar = getBasicProperties().getLanguageDependency().getLanguageGrammar();
+            return grammar.buildClassTypeLiteral(className);
+        } else {
+            return "null"; // means that it uses default type (relation entity type)
+        }
     }
 
     // -----------------------------------------------------

@@ -1532,7 +1532,11 @@ public class Column {
         final String javaNative = getJavaNative();
         final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency().getLanguageGrammar();
         final String pureNative = Srl.substringFirstFront(javaNative, "<"); // for example, List<String>
-        return grammarInfo.getClassTypeLiteral(pureNative);
+        return grammarInfo.buildClassTypeLiteral(pureNative);
+    }
+
+    public String getPropertyAccessTypeLiteral() {
+        return "null"; // means same as java native type for now
     }
 
     public String getJavaNativeRemovedPackage() { // for SchemaHTML

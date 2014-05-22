@@ -167,6 +167,7 @@ import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbGenerationHandler;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
+import org.seasar.dbflute.optional.OptionalEntity;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -2035,6 +2036,23 @@ public class Database {
 
     public boolean isCompatibleBatchUpdateDefaultEveryColumn() {
         return getLittleAdjustmentProperties().isCompatibleBatchUpdateDefaultEveryColumn();
+    }
+
+    public boolean isRelationOptionalEntityOriginalClass() {
+        final String className = getRelationOptionalEntityClassName();
+        return className != null && !className.equals(OptionalEntity.class.getName());
+    }
+
+    public String getRelationOptionalEntityClassName() {
+        if (!getLittleAdjustmentProperties().isAvailableRelationPlainEntity()) {
+            return getLittleAdjustmentProperties().getRelationOptionalEntityClass();
+        }
+        return null;
+    }
+
+    public String getRelationOptionalEntitySimpleName() {
+        final String className = getRelationOptionalEntityClassName();
+        return className != null ? Srl.substringLastRear(className, ".") : null;
     }
 
     // ===================================================================================

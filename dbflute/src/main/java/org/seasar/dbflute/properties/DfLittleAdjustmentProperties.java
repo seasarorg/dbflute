@@ -28,6 +28,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.generate.language.framework.DfLanguageFramework;
+import org.seasar.dbflute.optional.OptionalEntity;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -188,6 +189,15 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //    }
     //    return _entityOptionalPropertyClassSimpleName;
     //}
+
+    public boolean isAvailableRelationPlainEntity() {
+        return isProperty("isAvailableRelationPlainEntity", isCompatibleBeforeJava8());
+    }
+
+    public String getRelationOptionalEntityClass() { // closet
+        // you should also override TnRelationOptionalFactory if you change this
+        return getProperty("relationOptionalEntityClass", OptionalEntity.class.getName());
+    }
 
     // ===================================================================================
     //                                                                      ConditionQuery

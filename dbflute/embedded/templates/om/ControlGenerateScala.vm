@@ -76,12 +76,13 @@ $database.checkProperties()
 #set ($glDBCurrent = "${glProjectPrefix}DBCurrent")
 #set ($glDBFluteConfig = "${glProjectPrefix}DBFluteConfig")
 #set ($glDBFluteInitializer = "${glProjectPrefix}DBFluteInitializer")
+#set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
 #set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
 #set ($glImplementedBehaviorSelector = "${glProjectPrefix}ImplementedBehaviorSelector")
 #set ($glImplementedCommonColumnAutoSetupper = "${glProjectPrefix}ImplementedCommonColumnAutoSetupper")
 #set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
 #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
-#set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
+#set ($glScrCBeanHelper = "${glProjectPrefix}ScrCBeanHelper")
 
 ## ===================================================================================
 ##                                                                            Variable
@@ -166,6 +167,10 @@ $generator.parse("om/${glResourceDirectory}/allcommon/ImplementedInvokerAssistan
 $database.info("    parse('ImplementedSqlClauseCreator');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glImplementedSqlClauseCreator}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/ImplementedSqlClauseCreator.${glTemplateFileExtension}",$path ,"" ,"")
+
+$database.info("    parse('ScrCBeanHelper');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glScrCBeanHelper}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/ScrCBeanHelper.${glTemplateFileExtension}",$path ,"" ,"")
 
 $database.info("}")
 

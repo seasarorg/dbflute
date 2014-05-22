@@ -89,7 +89,7 @@ public class DfLanguageGrammarJava implements DfLanguageGrammar {
         return "get" + Srl.initCap(propertyName) + "()";
     }
 
-    public String getClassTypeLiteral(String className) {
+    public String buildClassTypeLiteral(String className) {
         return className + ".class";
     }
 
