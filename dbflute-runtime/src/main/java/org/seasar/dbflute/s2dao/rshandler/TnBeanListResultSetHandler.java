@@ -207,21 +207,23 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         final TnRelationKey relKey = relRowCache.createRelationKey(rs, rpt // basic resource
                 , selectColumnMap, selectIndexMap // select resource
                 , relationNoSuffix); // indicates relation location
-        if (relKey == null) {
-            return; // treated as no data if the relation key has no data
-        }
-        Object relationRow = relRowCache.getRelationRow(relationNoSuffix, relKey);
-        if (relationRow == null) { // when no cache
-            relationRow = createRelationRow(rs, rpt // basic resource
-                    , selectColumnMap, selectIndexMap // select resource
-                    , relKey, relPropCache, relRowCache, relSelector); // relation resource
-            if (relationRow != null) { // is new created relation row
-                adjustCreatedRow(relationRow, rpt.getYourBeanMetaData());
-                relRowCache.addRelationRow(relationNoSuffix, relKey, relationRow);
+        Object relationRow = null;
+        if (relKey != null) {
+            relationRow = relRowCache.getRelationRow(relationNoSuffix, relKey);
+            if (relationRow == null) { // when no cache
+                relationRow = createRelationRow(rs, rpt // basic resource
+                        , selectColumnMap, selectIndexMap // select resource
+                        , relKey, relPropCache, relRowCache, relSelector); // relation resource
+                if (relationRow != null) { // is new created relation row
+                    adjustCreatedRow(relationRow, rpt.getYourBeanMetaData());
+                    relRowCache.addRelationRow(relationNoSuffix, relKey, relationRow);
+                }
             }
         }
+        // if exists, optional or plain value
+        // if null, empty optional or nothing
         relationRow = filterOptionalRelationRowIfNeeds(row, rpt, relationRow);
-        if (relationRow != null) {
+        if (relationRow != null) { // exists or empty optional
             rpt.getPropertyAccessor().setValue(row, relationRow);
         }
     }

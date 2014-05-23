@@ -16,28 +16,17 @@
 package org.seasar.dbflute.helper.beans.exception;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class DfBeanIllegalPropertyException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    private Class<?> targetClass;
-
-    private String propertyName;
-
-    public DfBeanIllegalPropertyException(Class<?> targetClass, String propertyName, Throwable cause) {
-        super("The property was illegal: class=" + targetClass.getName() + " property=" + propertyName, cause);
-        this.targetClass = targetClass;
-        this.propertyName = propertyName;
+    public DfBeanIllegalPropertyException(String msg) {
+        super(msg);
     }
 
-    public Class<?> getTargetClass() {
-        return targetClass;
-    }
-
-    public String getPropertyName() {
-        return propertyName;
+    public DfBeanIllegalPropertyException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 }

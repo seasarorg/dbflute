@@ -58,10 +58,10 @@ public class ValueAndTypeSetupper {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected List<String> _nameList;
-    protected String _expression; // for logging only
-    protected String _specifiedSql; // for logging only
-    protected CommentType _commentType; // for logging only
+    protected final List<String> _nameList;
+    protected final String _expression; // for logging only
+    protected final String _specifiedSql; // for logging only
+    protected final CommentType _commentType; // for logging only
 
     public enum CommentType {
         BIND("bind variable comment", "Bind Variable Comment") // bind
@@ -96,10 +96,10 @@ public class ValueAndTypeSetupper {
      * @param commentType The type of comment for logging only. (NotNull)
      */
     public ValueAndTypeSetupper(List<String> nameList, String expression, String specifiedSql, CommentType commentType) {
-        this._nameList = nameList;
-        this._expression = expression;
-        this._specifiedSql = specifiedSql;
-        this._commentType = commentType;
+        _nameList = nameList;
+        _expression = expression;
+        _specifiedSql = specifiedSql;
+        _commentType = commentType;
     }
 
     // ===================================================================================
@@ -120,7 +120,7 @@ public class ValueAndTypeSetupper {
                 break;
             }
             final String currentName = _nameList.get(pos);
-            final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(clazz);
+            final DfBeanDesc beanDesc = getBeanDesc(clazz);
             if (hasLikeSearchProperty(beanDesc, currentName, value)) {
                 final LikeSearchOption currentOption = getLikeSearchOption(beanDesc, currentName, value);
                 if (currentOption != null) { // if exists, override option
@@ -172,6 +172,10 @@ public class ValueAndTypeSetupper {
         valueAndType.setTargetValue(value);
         valueAndType.setTargetType(clazz);
         valueAndType.setLikeSearchOption(likeSearchOption);
+    }
+
+    protected DfBeanDesc getBeanDesc(Class<?> clazz) {
+        return DfBeanDescFactory.getBeanDesc(clazz);
     }
 
     // -----------------------------------------------------

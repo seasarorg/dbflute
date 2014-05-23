@@ -64,6 +64,16 @@ public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
             throw new EntityAlreadyDeletedException("no way");
         }
     };
+    protected static final OptionalEntity<Object> RELATION_EMPTY_INSTANCE;
+    static {
+        RELATION_EMPTY_INSTANCE = new OptionalEntity<Object>(null, new OptionalObjectExceptionThrower() {
+            public void throwNotFoundException() {
+                // TODO jflute
+                String msg = "The empty optional so the value is null.";
+                throw new EntityAlreadyDeletedException(msg);
+            }
+        });
+    }
 
     // ===================================================================================
     //                                                                         Constructor
@@ -87,6 +97,11 @@ public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
         } else {
             return new OptionalEntity<ENTITY>(entity, thrower);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <EMPTY> OptionalEntity<EMPTY> relationEmpty() {
+        return (OptionalEntity<EMPTY>) RELATION_EMPTY_INSTANCE;
     }
 
     // ===================================================================================

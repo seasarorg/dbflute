@@ -30,9 +30,10 @@ public interface TnRelationPropertyTypeFactoryBuilder {
      * @param dbMetaData The meta data of database. (NotNull)
      * @param relationNestLevel The nest level of relation. (NotMinus) 
      * @param stopRelationCreation Does it stop nest relation of the relation?
+     * @param optionalEntityType The class type of optional entity for relation. (NotNull)
      * @return The created factory. (NotNull)
      */
     TnRelationPropertyTypeFactory build(Class<?> localBeanClass, TnBeanMetaData localBeanMetaData,
             TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData dbMetaData, int relationNestLevel,
-            boolean stopRelationCreation);
+            boolean stopRelationCreation, Class<?> optionalEntityType);
 }

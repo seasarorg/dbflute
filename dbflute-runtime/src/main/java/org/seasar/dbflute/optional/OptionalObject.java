@@ -15,8 +15,6 @@
  */
 package org.seasar.dbflute.optional;
 
-import org.seasar.dbflute.util.DfTypeUtil;
-
 /**
  * The base class for optional object.
  * @param <OBJ> The type of wrapped object in the optional object.
@@ -146,7 +144,6 @@ public abstract class OptionalObject<OBJ> {
 
     @Override
     public String toString() {
-        final String title = DfTypeUtil.toClassTitle(this);
-        return title + ":{" + (_obj != null ? _obj.toString() : "null") + "}";
+        return "opt:{" + (_obj != null ? _obj.toString() : "null") + "}";
     }
 }

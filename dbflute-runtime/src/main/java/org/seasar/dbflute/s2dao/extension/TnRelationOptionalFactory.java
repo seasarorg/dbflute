@@ -53,12 +53,13 @@ public class TnRelationOptionalFactory {
      * @return The filtered instance of relation entity. (NullAllowed)
      */
     public Object filterOptionalRelationRowIfNeeds(Object row, TnRelationPropertyType rpt, Object relationRow) {
+        final Class<?> optionalType = getOptionalEntityType();
         final DfPropertyDesc pd = rpt.getPropertyDesc();
-        if (OptionalEntity.class.isAssignableFrom(pd.getPropertyType())) {
+        if (optionalType.isAssignableFrom(pd.getPropertyType())) {
             if (relationRow == null) {
                 return createOptionalNullEntity(row, rpt);
             }
-            if (!(relationRow instanceof OptionalEntity)) {
+            if (!optionalType.isInstance(relationRow)) {
                 return createOptionalPresentEntity(relationRow);
             }
         }
@@ -178,5 +179,16 @@ public class TnRelationOptionalFactory {
      */
     protected OptionalEntity<Object> createOptionalPresentEntity(Object relationRow) {
         return OptionalEntity.of(relationRow);
+    }
+
+    // ===================================================================================
+    //                                                                 OptionalEntity Type
+    //                                                                 ===================
+    /**
+     * Get the type of optional entity for relation.
+     * @return The class type of optional entity. (NotNull)
+     */
+    public Class<?> getOptionalEntityType() {
+        return OptionalEntity.class;
     }
 }

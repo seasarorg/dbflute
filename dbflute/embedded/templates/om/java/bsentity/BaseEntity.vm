@@ -361,7 +361,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
             ${foreignVariableName} = ${fk.relationalNullObjectProviderForeignExp};
         }
 #end
+#if ($fk.isForeignPropertyOptionalEntity())
+        if (${foreignVariableName} != null) { return ${foreignVariableName}; } else { return ${database.relationOptionalEntityClassName}.relationEmpty(); }
+#else
         return ${foreignVariableName};
+#end
     }
 
     /**
@@ -396,7 +400,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
             ${referrerVariableName} = ${referrer.relationalNullObjectProviderReferrerExp};
         }
 #end
+#if ($referrer.isReferrerPropertyOptionalEntityAsOne())
+        if (${referrerVariableName} != null) { return ${referrerVariableName}; } else { return ${database.relationOptionalEntityClassName}.relationEmpty(); }
+#else
         return ${referrerVariableName};
+#end
     }
 
     /**

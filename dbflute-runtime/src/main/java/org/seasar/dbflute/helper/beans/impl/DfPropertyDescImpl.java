@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.sql.Time;
 import java.sql.Timestamp;
 
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
@@ -35,32 +36,27 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Object[] EMPTY_ARGS = new Object[0];
+    protected static final Object[] EMPTY_ARGS = new Object[0];
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private final String _propertyName;
-    private final Class<?> _propertyType;
-    private Method _readMethod;
-    private Method _writeMethod;
-    private Field _field;
-    private final DfBeanDesc _beanDesc;
-    private Constructor<?> _stringConstructor;
-    private Method _valueOfMethod;
-    private boolean _readable;
-    private boolean _writable;
+    protected final DfBeanDesc _beanDesc;
+    protected final String _propertyName;
+    protected final Class<?> _propertyType;
+    protected Method _readMethod;
+    protected Method _writeMethod;
+    protected Field _field;
+    protected Constructor<?> _stringConstructor;
+    protected Method _valueOfMethod;
+    protected boolean _readable;
+    protected boolean _writable;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPropertyDescImpl(String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
-            DfBeanDesc beanDesc) {
-        this(propertyName, propertyType, readMethod, writeMethod, null, beanDesc);
-    }
-
-    public DfPropertyDescImpl(String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
-            Field field, DfBeanDesc beanDesc) {
+    public DfPropertyDescImpl(DfBeanDesc beanDesc, String propertyName, Class<?> propertyType, Method readMethod,
+            Method writeMethod, Field field) {
         if (propertyName == null) {
             String msg = "The argument 'propertyName' should not be null!";
             throw new IllegalArgumentException(msg);
@@ -69,17 +65,17 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
             String msg = "The argument 'propertyType' should not be null!";
             throw new IllegalArgumentException(msg);
         }
+        _beanDesc = beanDesc;
         _propertyName = propertyName;
         _propertyType = propertyType;
         setReadMethod(readMethod);
         setWriteMethod(writeMethod);
         setField(field);
-        _beanDesc = beanDesc;
         setupStringConstructor();
         setupValueOfMethod();
     }
 
-    private void setupStringConstructor() {
+    protected void setupStringConstructor() {
         final Constructor<?>[] cons = _propertyType.getConstructors();
         for (int i = 0; i < cons.length; ++i) {
             final Constructor<?> con = cons[i];
@@ -90,7 +86,7 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
         }
     }
 
-    private void setupValueOfMethod() {
+    protected void setupValueOfMethod() {
         final Method[] methods = _propertyType.getMethods();
         for (int i = 0; i < methods.length; ++i) {
             final Method method = methods[i];
@@ -123,6 +119,13 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
         return _propertyType;
     }
 
+    public final Class<?> getGenericType() {
+        if (_readMethod != null) {
+            return DfReflectionUtil.getGenericType(_readMethod.getGenericReturnType());
+        }
+        return null;
+    }
+
     // ===================================================================================
     //                                                                              Method
     //                                                                              ======
@@ -131,7 +134,7 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     }
 
     public final void setReadMethod(Method readMethod) {
-        this._readMethod = readMethod;
+        _readMethod = readMethod;
         if (readMethod != null) {
             _readable = true;
         }
@@ -146,7 +149,7 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     }
 
     public final void setWriteMethod(Method writeMethod) {
-        this._writeMethod = writeMethod;
+        _writeMethod = writeMethod;
         if (writeMethod != null) {
             _writable = true;
         }
@@ -164,7 +167,7 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     }
 
     public void setField(Field field) {
-        this._field = field;
+        _field = field;
         if (field != null && DfReflectionUtil.isPublic(field.getModifiers())) {
             _readable = true;
             _writable = true;
@@ -178,41 +181,107 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
      * {@inheritDoc}
      */
     public final Object getValue(Object target) {
+        if (!_readable) {
+            throwPropertyNotReadableException(target);
+        }
         try {
-            if (!_readable) {
-                final Class<?> beanClass = _beanDesc.getBeanClass();
-                String msg = DfTypeUtil.toClassTitle(beanClass) + "." + _propertyName + " is not readable.";
-                throw new IllegalStateException(msg);
-            }
             if (hasReadMethod()) {
                 return DfReflectionUtil.invoke(_readMethod, target, EMPTY_ARGS);
             } else {
                 return DfReflectionUtil.getValue(_field, target);
             }
         } catch (RuntimeException e) {
-            throw new DfBeanIllegalPropertyException(_beanDesc.getBeanClass(), _propertyName, e);
+            throwPropertyReadFailureException(target, e);
+            return null; // unreachable
         }
+    }
+
+    protected void throwPropertyNotReadableException(Object target) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The property is not readable.");
+        setupExceptionBasicInfo(br);
+        br.addItem("Target Object");
+        br.addElement(target != null ? target.getClass() : null);
+        br.addElement(target);
+        final String msg = br.buildExceptionMessage();
+        throw new DfBeanIllegalPropertyException(msg);
+    }
+
+    protected void throwPropertyReadFailureException(Object target, RuntimeException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to read the property.");
+        setupExceptionBasicInfo(br);
+        br.addItem("Target Object");
+        br.addElement(target != null ? target.getClass() : null);
+        br.addElement(target);
+        final String msg = br.buildExceptionMessage();
+        throw new DfBeanIllegalPropertyException(msg, e);
     }
 
     /**
      * {@inheritDoc}
      */
     public final void setValue(Object target, Object value) {
+        if (!_writable) {
+            throwPropertyNotWritableException(target, value);
+        }
         try {
             value = convertIfNeed(value);
-            if (!_writable) {
-                final Class<?> beanClass = _beanDesc.getBeanClass();
-                String msg = DfTypeUtil.toClassTitle(beanClass) + "." + _propertyName + " is not writable.";
-                throw new IllegalStateException(msg);
-            }
             if (hasWriteMethod()) {
                 DfReflectionUtil.invoke(_writeMethod, target, new Object[] { value });
             } else {
                 DfReflectionUtil.setValue(_field, target, value);
             }
         } catch (RuntimeException e) {
-            throw new DfBeanIllegalPropertyException(_beanDesc.getBeanClass(), _propertyName, e);
+            throwPropertyWriteFailureException(target, value, e);
         }
+    }
+
+    protected void throwPropertyNotWritableException(Object target, Object value) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The property is not writable.");
+        setupExceptionBasicInfo(br);
+        br.addItem("Target Object");
+        br.addElement(target != null ? target.getClass() : null);
+        br.addElement(target);
+        br.addItem("Wrote Object");
+        br.addElement(value != null ? value.getClass() : null);
+        br.addElement(value);
+        final String msg = br.buildExceptionMessage();
+        throw new DfBeanIllegalPropertyException(msg);
+    }
+
+    protected void throwPropertyWriteFailureException(Object target, Object value, RuntimeException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to write the property.");
+        setupExceptionBasicInfo(br);
+        br.addItem("Target Object");
+        br.addElement(target != null ? target.getClass() : null);
+        br.addElement(target);
+        br.addItem("Wrote Object");
+        br.addElement(value != null ? value.getClass() : null);
+        br.addElement(value);
+        final String msg = br.buildExceptionMessage();
+        throw new DfBeanIllegalPropertyException(msg, e);
+    }
+
+    protected void setupExceptionBasicInfo(ExceptionMessageBuilder br) {
+        br.addItem("Bean Class");
+        br.addElement(_beanDesc.getBeanClass());
+        br.addElement("property count: " + _beanDesc.getPropertyDescSize());
+        br.addElement("property list: " + _beanDesc.getProppertyNameList());
+        br.addItem("Property");
+        br.addElement(_propertyName);
+        br.addElement(_propertyType);
+        br.addElement("hash: " + Integer.toHexString(hashCode()));
+        br.addItem("Readable?");
+        br.addElement(_readable);
+        br.addElement(_readMethod);
+        br.addItem("Writable?");
+        br.addElement(_writable);
+        br.addElement(_writeMethod);
+        br.addItem("Field?");
+        br.addElement(_field);
     }
 
     // ===================================================================================
@@ -248,15 +317,15 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
         return arg;
     }
 
-    private Object convertPrimitiveWrapper(Object arg) {
+    protected Object convertPrimitiveWrapper(Object arg) {
         return DfTypeUtil.toWrapper(arg, _propertyType);
     }
 
-    private Object convertNumber(Object arg) {
+    protected Object convertNumber(Object arg) {
         return DfTypeUtil.toNumber(arg, _propertyType);
     }
 
-    private Object convertDate(Object arg) {
+    protected Object convertDate(Object arg) {
         if (_propertyType == java.util.Date.class) {
             return DfTypeUtil.toDate(arg);
         } else if (_propertyType == Timestamp.class) {
@@ -269,7 +338,7 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
         return arg;
     }
 
-    private Object convertWithString(Object arg) {
+    protected Object convertWithString(Object arg) {
         if (_stringConstructor != null) {
             return DfReflectionUtil.newInstance(_stringConstructor, new Object[] { arg });
         }

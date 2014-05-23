@@ -22,15 +22,14 @@ import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.impl.DfBeanDescImpl;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class DfBeanDescFactory {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Map<Class<?>, DfBeanDesc> beanDescCache = new ConcurrentHashMap<Class<?>, DfBeanDesc>(1024);
+    protected static final Map<Class<?>, DfBeanDesc> beanDescCache = new ConcurrentHashMap<Class<?>, DfBeanDesc>(1024);
 
     // ===================================================================================
     //                                                                         Constructor

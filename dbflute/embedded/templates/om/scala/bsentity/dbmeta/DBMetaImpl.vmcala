@@ -235,7 +235,7 @@ object ${myClassName} extends AbstractDBMeta {
         mp.put(column${col.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.column${yourCol.javaBeansRulePropertyNameInitCap}());
 #end
 #end
-        return cfi("${fk.name}", "${fk.foreignJavaBeansRulePropertyName}", this, ${fk.foreignTableDBMetaClassName}, mp, ${table.resolveForeignIndex($fk)}, ${fk.relationPropertyAccessTypeMetaLiteral}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()}, false, ${fk.isAdditionalForeignKey()}, ${fk.fixedConditionArg}, ${fk.dynamicFixedConditionDBMetaSetupList}, ${fk.isFixedInline()}, ${fk.foreignReverseRelationPropertyNameArg});
+        return cfi("${fk.name}", "${fk.foreignJavaBeansRulePropertyName}", this, ${fk.foreignTableDBMetaClassName}, mp, ${table.resolveForeignIndex($fk)}, ${fk.foreignPropertyAccessTypeMetaLiteral}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()}, false, ${fk.isAdditionalForeignKey()}, ${fk.fixedConditionArg}, ${fk.dynamicFixedConditionDBMetaSetupList}, ${fk.isFixedInline()}, ${fk.foreignReverseRelationPropertyNameArg});
     }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
@@ -252,7 +252,7 @@ object ${myClassName} extends AbstractDBMeta {
         mp.put(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.column${yourCol.javaBeansRulePropertyNameInitCap}());
 #end
 #end
-        return cfi("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}, mp, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.relationPropertyAccessTypeMetaLiteral}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()}, true, ${referrer.isAdditionalForeignKey()}, ${referrer.fixedConditionArg}, ${referrer.dynamicFixedConditionDBMetaSetupList}, ${referrer.isFixedInline()}, ${referrer.referrerReverseRelationPropertyNameArg});
+        return cfi("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}, mp, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.referrerPropertyAccessTypeMetaLiteralAsOne}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()}, true, ${referrer.isAdditionalForeignKey()}, ${referrer.fixedConditionArg}, ${referrer.dynamicFixedConditionDBMetaSetupList}, ${referrer.isFixedInline()}, ${referrer.referrerReverseRelationPropertyNameArg});
     }
 #end
 

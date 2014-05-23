@@ -15,19 +15,16 @@
  */
 package org.seasar.dbflute.helper.beans;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.seasar.dbflute.helper.beans.exception.DfBeanConstructorNotFoundException;
 import org.seasar.dbflute.helper.beans.exception.DfBeanFieldNotFoundException;
 import org.seasar.dbflute.helper.beans.exception.DfBeanMethodNotFoundException;
 import org.seasar.dbflute.helper.beans.exception.DfBeanPropertyNotFoundException;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public interface DfBeanDesc {
 
@@ -38,13 +35,6 @@ public interface DfBeanDesc {
      * @return The class for bean. (NotNull)
      */
     Class<?> getBeanClass();
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    Constructor<?> getSuitableConstructor(Object[] args) throws DfBeanConstructorNotFoundException;
-
-    Constructor<?> getConstructor(Class<?>[] paramTypes);
 
     // ===================================================================================
     //                                                                            Property
@@ -80,15 +70,4 @@ public interface DfBeanDesc {
     Method[] getMethods(String methodName) throws DfBeanMethodNotFoundException;
 
     boolean hasMethod(String methodName);
-
-    String[] getMethodNames();
-
-    // ===================================================================================
-    //                                                                          Reflection
-    //                                                                          ==========
-    Object newInstance(Object[] args) throws DfBeanConstructorNotFoundException;
-
-    Object invoke(Object target, String methodName, Object[] args) throws DfBeanMethodNotFoundException;
-
-    Object getFieldValue(String fieldName, Object target) throws DfBeanFieldNotFoundException;
 }

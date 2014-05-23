@@ -42,9 +42,12 @@ import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnModifiedPropertySupport;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
+import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
+import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactoryBuilder;
 import org.seasar.dbflute.s2dao.metadata.impl.TnBeanMetaDataFactoryImpl;
 import org.seasar.dbflute.s2dao.metadata.impl.TnBeanMetaDataImpl;
 import org.seasar.dbflute.s2dao.metadata.impl.TnDBMetaBeanAnnotationReader;
+import org.seasar.dbflute.s2dao.metadata.impl.TnRelationPropertyTypeFactoryBuilderImpl;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -67,6 +70,9 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
 
     /** Is internal debug enabled? */
     protected boolean _internalDebug;
+
+    /** The cached instance of relation optional factory. (NotNull) */
+    protected final TnRelationOptionalFactory _relationOptionalFactory = createRelationOptionalFactory();
 
     // ===================================================================================
     //                                                                  Override for Cache
@@ -264,6 +270,26 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     }
 
     // ===================================================================================
+    //                                                                       Property Type
+    //                                                                       =============
+    protected TnRelationPropertyTypeFactory createRelationPropertyTypeFactory(Class<?> beanClass,
+            TnBeanMetaDataImpl localBeanMetaData, TnBeanAnnotationReader beanAnnotationReader,
+            DatabaseMetaData dbMetaData, int relationNestLevel, boolean stopRelationCreation) {
+        // DBFlute needs local BeanMetaData for relation property type
+        final TnRelationPropertyTypeFactoryBuilder builder = createRelationPropertyTypeFactoryBuilder();
+        return builder.build(beanClass, localBeanMetaData, beanAnnotationReader, dbMetaData, relationNestLevel,
+                stopRelationCreation, getRelationOptionalEntityType());
+    }
+
+    protected TnRelationPropertyTypeFactoryBuilder createRelationPropertyTypeFactoryBuilder() {
+        return new TnRelationPropertyTypeFactoryBuilderImpl(this); // is already customized for DBFlute
+    }
+
+    protected Class<?> getRelationOptionalEntityType() {
+        return _relationOptionalFactory.getOptionalEntityType();
+    }
+
+    // ===================================================================================
     //                                                                 Relation Next Level
     //                                                                 ===================
     /**
@@ -282,7 +308,11 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     // ===================================================================================
     //                                                           Relation Optional Factory
     //                                                           =========================
-    public TnRelationOptionalFactory createRelationOptionalFactory(Class<?> beanClass) {
+    public TnRelationOptionalFactory getRelationOptionalFactory() {
+        return _relationOptionalFactory;
+    }
+
+    protected TnRelationOptionalFactory createRelationOptionalFactory() {
         return new TnRelationOptionalFactory();
     }
 

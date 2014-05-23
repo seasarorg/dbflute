@@ -51,9 +51,9 @@ public interface TnBeanMetaDataFactory {
     TnBeanMetaData createBeanMetaData(DatabaseMetaData dbMetaData, Class<?> beanClass, int relationNestLevel);
 
     /**
-     * Create the factory for relation optional object.
-     * @param beanClass The type of bean for base point entity. (NotNull)
+     * Get the factory for relation optional object. <br />
+     * Basically always return the same instance.
      * @return The instance of factory. (NotNull)
      */
-    TnRelationOptionalFactory createRelationOptionalFactory(Class<?> beanClass);
+    TnRelationOptionalFactory getRelationOptionalFactory();
 }

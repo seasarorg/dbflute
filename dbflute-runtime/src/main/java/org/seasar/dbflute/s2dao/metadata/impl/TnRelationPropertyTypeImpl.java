@@ -110,6 +110,10 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
                 return foreignInfo != null ? foreignInfo.getPropertyAccessType() : propertyDesc.getPropertyType();
             }
 
+            public Class<?> getGenericType() {
+                return propertyDesc.getGenericType();
+            }
+
             public Object getValue(Object target) {
                 if (foreignInfo != null && target instanceof Entity) { // basically here
                     return foreignInfo.read((Entity) target);

@@ -29,22 +29,28 @@ public interface DfPropertyAccessor {
     String getPropertyName();
 
     /**
-     * Get the type of the property 
-     * @return The class instance of the property. (NotNull)
+     * Get the type of the property.
+     * @return The class type of the property. (NotNull)
      */
     Class<?> getPropertyType();
 
     /**
+     * Get the (first) generic type of the property type if it exists.
+     * @return The class type for the generic type. (NullAllowed: when no generic or unknown)
+     */
+    Class<?> getGenericType();
+
+    /**
      * @param target The target instance. (NullAllowed)
      * @return The value of the property. (NullAllowed)
-     * @throws DfBeanIllegalPropertyException When the property of bean is illegal. (basically has a cause)
+     * @throws DfBeanIllegalPropertyException When the property of bean is illegal to get value.
      */
     Object getValue(Object target);
 
     /**
      * @param target The target instance. (NullAllowed)
      * @param value The value of the property. (NullAllowed)
-     * @throws DfBeanIllegalPropertyException When the property of bean is illegal. (basically has a cause)
+     * @throws DfBeanIllegalPropertyException When the property of bean is illegal to set value.
      */
     void setValue(Object target, Object value);
 

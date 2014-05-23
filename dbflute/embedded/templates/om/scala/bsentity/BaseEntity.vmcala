@@ -286,7 +286,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
 #if ($classificationElement.isDeprecated())
     @Deprecated
 #end
-    def is${col.javaName}${classificationElement.name}(): Boolean = {
+    def is${col.javaName}_${classificationElement.name}(): Boolean = {
         val cdef: ${glCDef}.${col.classificationName} = get${col.javaName}As${col.classificationName}();
         return if (cdef != null) { cdef.equals(${glCDef}.${col.classificationName}.${classificationElement.name}) } else { false };
     }
@@ -362,7 +362,11 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
             ${foreignVariableName} = ${fk.relationalNullObjectProviderForeignExp};
         }
 #end
+#if ($fk.isForeignPropertyOptionalEntity())
+        return if (${foreignVariableName} != null) { ${foreignVariableName}; } else { ${database.relationOptionalEntityClassName}.relationEmpty(); }
+#else
         return ${foreignVariableName};
+#end
     }
 
     /**
@@ -397,7 +401,11 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
             ${referrerVariableName} = ${referrer.relationalNullObjectProviderReferrerExp};
         }
 #end
+#if ($referrer.isReferrerPropertyOptionalEntityAsOne())
+        return if (${referrerVariableName} != null) { ${referrerVariableName}; } else { ${database.relationOptionalEntityClassName}.relationEmpty(); }
+#else
         return ${referrerVariableName};
+#end
     }
 
     /**
@@ -657,7 +665,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
     }
 #end
 #if ($table.hasOptionalRelation())
-    protected def xbRDS[ET extends Entity](et: ${database.relationOptionalEntityClassName}[ET], name String): String = {
+    protected def xbRDS[ET <: Entity](et: ${database.relationOptionalEntityClassName}[ET], name String): String = {
         return et.get().buildDisplayString(name, true, true);
     }
 #end

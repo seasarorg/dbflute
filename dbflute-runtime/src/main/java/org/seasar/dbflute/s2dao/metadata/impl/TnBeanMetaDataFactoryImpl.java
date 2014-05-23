@@ -32,7 +32,6 @@ import org.seasar.dbflute.s2dao.metadata.TnModifiedPropertySupport;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyTypeFactory;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyTypeFactoryBuilder;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
-import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactoryBuilder;
 
 /**
  * The implementation as S2Dao of factory of bean meta data. <br />
@@ -164,18 +163,9 @@ public abstract class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory
         return new TnPropertyTypeFactoryBuilderImpl(); // is already customized for DBFlute (no use dynamic meta data)
     }
 
-    protected TnRelationPropertyTypeFactory createRelationPropertyTypeFactory(Class<?> beanClass,
+    protected abstract TnRelationPropertyTypeFactory createRelationPropertyTypeFactory(Class<?> beanClass,
             TnBeanMetaDataImpl localBeanMetaData, TnBeanAnnotationReader beanAnnotationReader,
-            DatabaseMetaData dbMetaData, int relationNestLevel, boolean stopRelationCreation) {
-        // DBFlute needs local BeanMetaData for relation property type
-        final TnRelationPropertyTypeFactoryBuilder builder = createRelationPropertyTypeFactoryBuilder();
-        return builder.build(beanClass, localBeanMetaData, beanAnnotationReader, dbMetaData, relationNestLevel,
-                stopRelationCreation);
-    }
-
-    protected TnRelationPropertyTypeFactoryBuilder createRelationPropertyTypeFactoryBuilder() {
-        return new TnRelationPropertyTypeFactoryBuilderImpl(this); // is already customized for DBFlute
-    }
+            DatabaseMetaData dbMetaData, int relationNestLevel, boolean stopRelationCreation);
 
     // ===================================================================================
     //                                                                 Relation Next Level

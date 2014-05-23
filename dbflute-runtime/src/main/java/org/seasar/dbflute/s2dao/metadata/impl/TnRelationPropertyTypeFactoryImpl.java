@@ -50,13 +50,15 @@ public class TnRelationPropertyTypeFactoryImpl implements TnRelationPropertyType
     protected final DatabaseMetaData _dbMetaData;
     protected final int _relationNestLevel;
     protected final boolean _stopRelationCreation;
+    protected final Class<?> _optionalEntityType;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnRelationPropertyTypeFactoryImpl(Class<?> localBeanClass, TnBeanMetaData localBeanMetaData,
             TnBeanAnnotationReader beanAnnotationReader, TnBeanMetaDataFactory beanMetaDataFactory,
-            DatabaseMetaData dbMetaData, int relationNestLevel, boolean stopRelationCreation) {
+            DatabaseMetaData dbMetaData, int relationNestLevel, boolean stopRelationCreation,
+            Class<?> optionalEntityType) {
         _localBeanClass = localBeanClass;
         _localBeanMetaData = localBeanMetaData;
         _beanAnnotationReader = beanAnnotationReader;
@@ -64,6 +66,7 @@ public class TnRelationPropertyTypeFactoryImpl implements TnRelationPropertyType
         _dbMetaData = dbMetaData;
         _relationNestLevel = relationNestLevel;
         _stopRelationCreation = stopRelationCreation;
+        _optionalEntityType = optionalEntityType;
     }
 
     // ===================================================================================
@@ -116,8 +119,20 @@ public class TnRelationPropertyTypeFactoryImpl implements TnRelationPropertyType
             myKeys = new String[0];
             yourKeys = new String[0];
         }
-        final TnBeanMetaData relationBeanMetaData = createRelationBeanMetaData(propertyDesc.getPropertyType());
+        final Class<?> propertyType = chooseAnalyzedPropertyType(propertyDesc);
+        final TnBeanMetaData relationBeanMetaData = createRelationBeanMetaData(propertyType);
         return createRelationPropertyType(propertyDesc, myKeys, yourKeys, relno, relationBeanMetaData);
+    }
+
+    protected Class<?> chooseAnalyzedPropertyType(DfPropertyDesc propertyDesc) {
+        final Class<?> propertyType = propertyDesc.getPropertyType();
+        if (_optionalEntityType.isAssignableFrom(propertyType)) {
+            final Class<?> genericType = propertyDesc.getGenericType();
+            if (genericType != null) {
+                return genericType;
+            }
+        }
+        return propertyType;
     }
 
     protected TnRelationPropertyType createRelationPropertyType(DfPropertyDesc propertyDesc, String[] myKeys,

@@ -193,23 +193,28 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             return;
         }
         final TnRelationKey relKey = res.prepareRelationKey(); // also saves it in resource
-        if (relKey == null) { // the relation key has no data
-            return; // treated as no data
-        }
-        final TnRelationPropertyType nextRpt = res.getRelationPropertyType();
-        final TnRelationRowCache relRowCache = res.getRelRowCache();
-        final String relationNoSuffix = res.getRelationNoSuffix();
-        Object relationRow = relRowCache.getRelationRow(relationNoSuffix, relKey);
-        if (relationRow == null) { // when no cache
-            relationRow = createRelationRow(res);
-            if (relationRow != null) { // is new created relation row
-                adjustCreatedRow(relationRow, nextRpt);
-                relRowCache.addRelationRow(relationNoSuffix, relKey, relationRow);
+        final TnRelationPropertyType rpt = res.getRelationPropertyType();
+        Object relationRow = null;
+        if (relKey != null) {
+            final TnRelationRowCache relRowCache = res.getRelRowCache();
+            final String relationNoSuffix = res.getRelationNoSuffix();
+            relationRow = relRowCache.getRelationRow(relationNoSuffix, relKey);
+            if (relationRow == null) {
+                relationRow = relRowCache.getRelationRow(relationNoSuffix, relKey);
+                if (relationRow == null) { // when no cache
+                    relationRow = createRelationRow(res);
+                    if (relationRow != null) { // is new created relation row
+                        adjustCreatedRow(relationRow, rpt);
+                        relRowCache.addRelationRow(relationNoSuffix, relKey, relationRow);
+                    }
+                }
             }
         }
-        relationRow = filterOptionalRelationRowIfNeeds(row, nextRpt, relationRow);
-        if (relationRow != null) {
-            nextRpt.getPropertyAccessor().setValue(row, relationRow);
+        // if exists, optional or plain value
+        // if null, empty optional or nothing
+        relationRow = filterOptionalRelationRowIfNeeds(row, rpt, relationRow);
+        if (relationRow != null) { // exists or empty optional
+            rpt.getPropertyAccessor().setValue(row, relationRow);
         }
     }
 

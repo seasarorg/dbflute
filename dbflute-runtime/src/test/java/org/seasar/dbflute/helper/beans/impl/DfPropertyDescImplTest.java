@@ -42,8 +42,6 @@ public class DfPropertyDescImplTest extends PlainTestCase {
         } catch (DfBeanIllegalPropertyException e) {
             // OK
             log(e.getMessage());
-            log(e.getCause().getMessage());
-            assertEquals(IllegalStateException.class, e.getCause().getClass());
         }
     }
 
@@ -62,8 +60,6 @@ public class DfPropertyDescImplTest extends PlainTestCase {
         } catch (DfBeanIllegalPropertyException e) {
             // OK
             log(e.getMessage());
-            log(e.getCause().getMessage());
-            assertEquals(IllegalStateException.class, e.getCause().getClass());
         }
     }
 
