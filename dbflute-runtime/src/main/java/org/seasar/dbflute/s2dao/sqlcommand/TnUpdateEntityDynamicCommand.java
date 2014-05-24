@@ -61,11 +61,7 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
     //                                                                             Execute
     //                                                                             =======
     public Object execute(Object[] args) {
-        if (args == null || args.length == 0) {
-            String msg = "The argument 'args' should not be null or empty.";
-            throw new IllegalArgumentException(msg);
-        }
-        final Object bean = args[0];
+        final Object bean = extractBeanFromArgsChecked(args);
         final UpdateOption<ConditionBean> option = extractUpdateOptionChecked(args);
         prepareStatementConfigOnThreadIfExists(option);
 
@@ -76,7 +72,7 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
             }
             return getNonUpdateReturn();
         }
-        final String sql = filterExecutedSql(createUpdateSql(propertyTypes, option));
+        final String sql = filterExecutedSql(createUpdateSql(bean, propertyTypes, option));
         return doExecute(bean, propertyTypes, sql, option);
     }
 
@@ -110,7 +106,7 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
     //                                                                       Update Column
     //                                                                       =============
     protected TnPropertyType[] createUpdatePropertyTypes(Object bean, UpdateOption<ConditionBean> option) {
-        final Set<?> modifiedSet = getModifiedPropertyNames(bean);
+        final Set<String> modifiedSet = getModifiedPropertyNames(bean);
         final List<TnPropertyType> typeList = new ArrayList<TnPropertyType>();
         final String timestampProp = _beanMetaData.getTimestampPropertyName();
         final String versionNoProp = _beanMetaData.getVersionNoPropertyName();
@@ -129,7 +125,7 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         return typeList.toArray(new TnPropertyType[typeList.size()]);
     }
 
-    protected Set<?> getModifiedPropertyNames(Object bean) {
+    protected Set<String> getModifiedPropertyNames(Object bean) {
         return _beanMetaData.getModifiedPropertyNames(bean);
     }
 
@@ -158,28 +154,31 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
     //                                                                          Update SQL
     //                                                                          ==========
     /**
-     * Create update SQL. The update is by the primary keys.
+     * Create update SQL. The update is by the primary keys or unique keys.
+     * @param bean The bean of the entity to update. (NotNull)
      * @param propertyTypes The types of property for update. (NotNull)
      * @param option An option of update. (NullAllowed)
      * @return The update SQL. (NotNull)
      */
-    protected String createUpdateSql(TnPropertyType[] propertyTypes, UpdateOption<ConditionBean> option) {
+    protected String createUpdateSql(Object bean, TnPropertyType[] propertyTypes, UpdateOption<ConditionBean> option) {
+        checkPrimaryKey();
         final String tableDbName = _targetDBMeta.getTableDbName();
-        if (_beanMetaData.getPrimaryKeySize() == 0) {
-            String msg = "The table '" + tableDbName + "' should have primary key.";
-            throw new IllegalStateException(msg);
-        }
+        final Set<String> uniqueDrivenPropSet = extractUniqueDrivenPropSet(bean);
         final StringBuilder sb = new StringBuilder(96);
         sb.append("update ").append(_targetDBMeta.getTableSqlName()).append(" set ");
         final String versionNoPropertyName = _beanMetaData.getVersionNoPropertyName();
-        for (int i = 0; i < propertyTypes.length; i++) {
-            final TnPropertyType pt = propertyTypes[i];
+        int columnCount = 0;
+        for (TnPropertyType pt : propertyTypes) {
             final String columnDbName = pt.getColumnDbName();
             final ColumnSqlName columnSqlName = pt.getColumnSqlName();
             final String propertyName = pt.getPropertyName();
-            if (i > 0) {
+            if (uniqueDrivenPropSet != null && uniqueDrivenPropSet.contains(propertyName)) {
+                continue;
+            }
+            if (columnCount > 0) {
                 sb.append(", ");
             }
+            ++columnCount;
             if (propertyName.equalsIgnoreCase(versionNoPropertyName)) {
                 if (!isVersionNoAutoIncrementOnMemory()) {
                     setupVersionNoAutoIncrementOnQuery(sb, columnSqlName);
@@ -196,19 +195,8 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
             }
             sb.append(valueExp);
         }
-        sb.append(ln()).append(" where ");
-        for (int i = 0; i < _beanMetaData.getPrimaryKeySize(); i++) { // never zero loop
-            sb.append(_beanMetaData.getPrimaryKeySqlName(i)).append(" = ? and ");
-        }
-        sb.setLength(sb.length() - 5); // for deleting extra ' and '
-        if (_optimisticLockHandling && _beanMetaData.hasVersionNoPropertyType()) {
-            final TnPropertyType pt = _beanMetaData.getVersionNoPropertyType();
-            sb.append(" and ").append(pt.getColumnSqlName()).append(" = ?");
-        }
-        if (_optimisticLockHandling && _beanMetaData.hasTimestampPropertyType()) {
-            final TnPropertyType pt = _beanMetaData.getTimestampPropertyType();
-            sb.append(" and ").append(pt.getColumnSqlName()).append(" = ?");
-        }
+        sb.append(ln());
+        setupUpdateWhere(sb, uniqueDrivenPropSet, _optimisticLockHandling);
         return sb.toString();
     }
 
@@ -221,12 +209,16 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
     //                                                                             =======
     protected TnUpdateEntityHandler createUpdateEntityHandler(TnPropertyType[] boundPropTypes, String sql,
             UpdateOption<ConditionBean> option) {
-        final TnUpdateEntityHandler handler = new TnUpdateEntityHandler(_dataSource, _statementFactory, sql,
-                _beanMetaData, boundPropTypes);
+        final TnUpdateEntityHandler handler = newUpdateEntityHandler(boundPropTypes, sql, option);
         handler.setOptimisticLockHandling(_optimisticLockHandling); // [DBFlute-0.8.0]
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
         handler.setUpdateOption(option);
         return handler;
+    }
+
+    protected TnUpdateEntityHandler newUpdateEntityHandler(TnPropertyType[] boundPropTypes, String sql,
+            UpdateOption<ConditionBean> option) {
+        return new TnUpdateEntityHandler(_dataSource, _statementFactory, sql, _beanMetaData, boundPropTypes);
     }
 
     // ===================================================================================
@@ -260,7 +252,7 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
     }
 
     public void setOptimisticLockHandling(boolean optimisticLockHandling) {
-        this._optimisticLockHandling = optimisticLockHandling;
+        _optimisticLockHandling = optimisticLockHandling;
     }
 
     protected boolean isVersionNoAutoIncrementOnMemory() {
@@ -268,6 +260,6 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
     }
 
     public void setVersionNoAutoIncrementOnMemory(boolean versionNoAutoIncrementOnMemory) {
-        this._versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
+        _versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
     }
 }

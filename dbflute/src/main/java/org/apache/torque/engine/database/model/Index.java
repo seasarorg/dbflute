@@ -135,6 +135,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.torque.engine.EngineException;
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.logic.generate.column.DfColumnListToStringBuilder;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.xml.sax.Attributes;
 
 /**
@@ -259,12 +263,70 @@ public class Index implements Constraint {
     }
 
     // ===================================================================================
+    //                                                                     Column Handling
+    //                                                                     ===============
+    public List<Column> getColumnList() {
+        final List<Column> columnList = new ArrayList<Column>();
+        for (String columnName : _indexColumnMap.values()) {
+            final Table table = getTable();
+            final Column column = table.getColumn(columnName);
+            if (column == null) { // basically no way but...
+                // Oracle's materialized view has internal unique index
+                // so this column variable can be null
+                columnList.clear();
+                return columnList;
+            }
+            columnList.add(column);
+        }
+        return columnList;
+    }
+
+    public String getConnectedJavaName() {
+        final List<Column> columnList = getColumnList();
+        final StringBuilder sb = new StringBuilder();
+        for (Column column : columnList) {
+            sb.append(column.getJavaName());
+        }
+        return sb.toString();
+    }
+
+    public String getArgsString() {
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        return DfColumnListToStringBuilder.getColumnArgsString(getColumnList(), lang.getLanguageGrammar());
+    }
+
+    public String getArgsJavaDocString() {
+        final String ln = getBasicProperties().getSourceCodeLineSeparator();
+        return DfColumnListToStringBuilder.getColumnArgsJavaDocString(getColumnList(), "unique key", ln);
+    }
+
+    public String getArgsConditionSetupString() {
+        return DfColumnListToStringBuilder.getColumnArgsConditionSetupString(getColumnList());
+    }
+
+    public String getArgsAssertString() {
+        return DfColumnListToStringBuilder.getColumnArgsAssertString(getColumnList());
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     /**
      * String representation of the index. This is an xml representation.
      * @return a xml representation
      */
+    @Override
     public String toString() {
         StringBuffer result = new StringBuffer();
         result.append(" <index name=\"").append(getName()).append("\"");

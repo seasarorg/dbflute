@@ -66,13 +66,81 @@ public interface Entity {
      */
     boolean hasPrimaryKeyValue();
 
+    /**
+     * Get the properties of specified unique columns as unique-driven.
+     * @return The set of property name for specified unique columns. (NotNull)
+     */
+    Set<String> uniqueDrivenProperties();
+
+    /**
+     * Entity unique-driven properties. (basically for Framework)
+     */
+    public static class EntityUniqueDrivenProperties implements Serializable {
+
+        /** Serial version UID. (Default) */
+        private static final long serialVersionUID = 1L;
+
+        /** The set of property names. */
+        protected final Set<String> _propertyNameSet = new LinkedHashSet<String>(2);
+
+        /**
+         * Add property name. (according to Java Beans rule)
+         * @param propertyName The string for name. (NotNull)
+         */
+        public void addPropertyName(String propertyName) {
+            _propertyNameSet.add(propertyName);
+        }
+
+        /**
+         * Get the set of properties.
+         * @return The set of properties. (NotNull)
+         */
+        public Set<String> getPropertyNames() {
+            return _propertyNameSet;
+        }
+
+        /**
+         * Is the set of properties empty?
+         * @return The determination, true or false.
+         */
+        public boolean isEmpty() {
+            return _propertyNameSet.isEmpty();
+        }
+
+        /**
+         * Clear the set of properties.
+         */
+        public void clear() {
+            _propertyNameSet.clear();
+        }
+
+        /**
+         * Remove property name from the set. (according to Java Beans rule)
+         * @param propertyName The string for name. (NotNull)
+         */
+        public void remove(String propertyName) {
+            _propertyNameSet.remove(propertyName);
+        }
+
+        /**
+         * Accept specified properties. (after clearing this properties)
+         * @param properties The properties as copy-resource. (NotNull)
+         */
+        public void accept(EntityModifiedProperties properties) {
+            clear();
+            for (String propertyName : properties.getPropertyNames()) {
+                addPropertyName(propertyName);
+            }
+        }
+    }
+
     // ===================================================================================
     //                                                                 Modified Properties
     //                                                                 ===================
     /**
      * Get the set of modified properties. (basically for Framework) <br />
      * The properties needs to be according to Java Beans rule.
-     * @return The set instance that contains names of modified property. (NotNull)
+     * @return The set of property name for modified columns. (NotNull)
      */
     Set<String> modifiedProperties();
 
@@ -115,7 +183,7 @@ public interface Entity {
         }
 
         /**
-         * Is empty?
+         * Is the set of properties empty?
          * @return The determination, true or false.
          */
         public boolean isEmpty() {

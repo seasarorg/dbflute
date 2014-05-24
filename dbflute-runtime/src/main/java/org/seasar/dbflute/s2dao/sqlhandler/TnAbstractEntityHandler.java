@@ -22,10 +22,12 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.DBDef;
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.DeleteOption;
 import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.bhv.UpdateOption;
@@ -172,16 +174,21 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
     protected void setupUpdateBindVariables(Object bean) {
         final List<Object> varList = new ArrayList<Object>();
         final List<ValueType> varValueTypeList = new ArrayList<ValueType>();
+        final Set<String> uniqueDrivenPropSet = extractUniqueDrivenPropSet(bean); // might be null
         final TnBeanMetaData bmd = getBeanMetaData();
         final String timestampPropertyName = bmd.getTimestampPropertyName();
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
         for (int i = 0; i < _boundPropTypes.length; ++i) {
             final TnPropertyType pt = _boundPropTypes[i];
-            if (pt.getPropertyName().equalsIgnoreCase(timestampPropertyName)) {
+            final String propertyName = pt.getPropertyName();
+            if (uniqueDrivenPropSet != null && uniqueDrivenPropSet.contains(propertyName)) {
+                continue;
+            }
+            if (propertyName.equalsIgnoreCase(timestampPropertyName)) {
                 final Timestamp timestamp = ResourceContext.getAccessTimestamp();
                 addNewTimestamp(timestamp);
                 varList.add(timestamp);
-            } else if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName)) {
+            } else if (propertyName.equalsIgnoreCase(versionNoPropertyName)) {
                 if (!_versionNoAutoIncrementOnMemory) { // means OnQuery
                     continue; // because of 'VERSION_NO = VERSION_NO + 1'
                 }
@@ -197,7 +204,7 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
             }
             varValueTypeList.add(pt.getValueType());
         }
-        addAutoUpdateWhereBindVariables(varList, varValueTypeList, bean);
+        doSetupUpdateWhereBindVariables(varList, varValueTypeList, bean, uniqueDrivenPropSet);
         _bindVariables = varList.toArray();
         _bindVariableValueTypes = (ValueType[]) varValueTypeList.toArray(new ValueType[varValueTypeList.size()]);
     }
@@ -205,31 +212,51 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
     protected void setupDeleteBindVariables(Object bean) {
         final List<Object> varList = new ArrayList<Object>();
         final List<ValueType> varValueTypeList = new ArrayList<ValueType>();
-        addAutoUpdateWhereBindVariables(varList, varValueTypeList, bean);
+        final Set<String> uniqueDrivenPropertySet = extractUniqueDrivenPropSet(bean); // might be null
+        doSetupUpdateWhereBindVariables(varList, varValueTypeList, bean, uniqueDrivenPropertySet);
         _bindVariables = varList.toArray();
         _bindVariableValueTypes = (ValueType[]) varValueTypeList.toArray(new ValueType[varValueTypeList.size()]);
     }
 
-    protected void addAutoUpdateWhereBindVariables(List<Object> varList, List<ValueType> varValueTypeList, Object bean) {
+    protected Set<String> extractUniqueDrivenPropSet(Object bean) {
+        if (bean instanceof Entity) {
+            final Set<String> propSet = ((Entity) bean).uniqueDrivenProperties();
+            if (propSet != null && !propSet.isEmpty()) {
+                return propSet;
+            }
+        }
+        return null;
+    }
+
+    protected void doSetupUpdateWhereBindVariables(List<Object> varList, List<ValueType> varValueTypeList, Object bean,
+            Set<String> uniqueDrivenPropSet) {
         final TnBeanMetaData bmd = getBeanMetaData();
-        for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
-            final TnPropertyType pt = bmd.getPropertyTypeByColumnName(bmd.getPrimaryKeyDbName(i));
-            final DfPropertyDesc pd = pt.getPropertyDesc();
-            varList.add(pd.getValue(bean));
-            varValueTypeList.add(pt.getValueType());
+        if (uniqueDrivenPropSet != null && !uniqueDrivenPropSet.isEmpty()) {
+            for (String uniqueProp : uniqueDrivenPropSet) {
+                final TnPropertyType pt = bmd.getPropertyType(uniqueProp);
+                doRegisterUpdateWhereBindVariable(varList, varValueTypeList, bean, pt);
+            }
+        } else {
+            for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
+                final TnPropertyType pt = bmd.getPropertyTypeByColumnName(bmd.getPrimaryKeyDbName(i));
+                doRegisterUpdateWhereBindVariable(varList, varValueTypeList, bean, pt);
+            }
         }
         if (_optimisticLockHandling && bmd.hasVersionNoPropertyType()) {
             final TnPropertyType pt = bmd.getVersionNoPropertyType();
-            final DfPropertyDesc pd = pt.getPropertyDesc();
-            varList.add(pd.getValue(bean));
-            varValueTypeList.add(pt.getValueType());
+            doRegisterUpdateWhereBindVariable(varList, varValueTypeList, bean, pt);
         }
         if (_optimisticLockHandling && bmd.hasTimestampPropertyType()) {
             final TnPropertyType pt = bmd.getTimestampPropertyType();
-            final DfPropertyDesc pd = pt.getPropertyDesc();
-            varList.add(pd.getValue(bean));
-            varValueTypeList.add(pt.getValueType());
+            doRegisterUpdateWhereBindVariable(varList, varValueTypeList, bean, pt);
         }
+    }
+
+    protected void doRegisterUpdateWhereBindVariable(List<Object> varList, List<ValueType> varValueTypeList,
+            Object bean, TnPropertyType pt) {
+        final DfPropertyDesc pd = pt.getPropertyDesc();
+        varList.add(pd.getValue(bean));
+        varValueTypeList.add(pt.getValueType());
     }
 
     // ===================================================================================

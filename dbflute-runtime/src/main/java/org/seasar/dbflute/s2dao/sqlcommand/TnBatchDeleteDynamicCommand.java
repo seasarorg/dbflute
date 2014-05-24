@@ -15,27 +15,24 @@
  */
 package org.seasar.dbflute.s2dao.sqlcommand;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.bhv.InsertOption;
+import org.seasar.dbflute.bhv.DeleteOption;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
-import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
-import org.seasar.dbflute.s2dao.sqlhandler.TnBatchInsertHandler;
+import org.seasar.dbflute.s2dao.sqlhandler.TnBatchDeleteHandler;
 
 /**
  * @author modified by jflute (originated in S2Dao)
  */
-public class TnBatchInsertDynamicCommand extends TnInsertEntityDynamicCommand {
+public class TnBatchDeleteDynamicCommand extends TnDeleteEntityDynamicCommand {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnBatchInsertDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+    public TnBatchDeleteDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
     }
 
@@ -43,38 +40,26 @@ public class TnBatchInsertDynamicCommand extends TnInsertEntityDynamicCommand {
     //                                                                             Execute
     //                                                                             =======
     @Override
-    protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql,
-            InsertOption<ConditionBean> option) {
+    protected Object doExecute(Object bean, String sql, DeleteOption<ConditionBean> option) {
         final List<?> beanList = extractBeanListFromBeanChecked(bean);
-        final TnBatchInsertHandler handler = createBatchInsertHandler(propertyTypes, sql, option);
-        // because the variable is set when exception occurs if batch 
-        //handler.setExceptionMessageSqlArgs(new Object[] { ... });
+        final TnBatchDeleteHandler handler = createBatchDeleteHandler(sql, option);
+        // because the variable is set when exception occurs if batch
+        //handler.setExceptionMessageSqlArgs(new Object[] { beanList });
         return handler.executeBatch(beanList);
-    }
-
-    // ===================================================================================
-    //                                                                       Insert Column
-    //                                                                       =============
-    // Batch Update does not use modified properties here
-    // (modified properties are converted to specified columns before here)
-    @Override
-    protected Set<?> getModifiedPropertyNames(Object bean) {
-        return Collections.EMPTY_SET;
-    }
-
-    @Override
-    protected boolean isModifiedProperty(Set<?> modifiedSet, TnPropertyType pt) {
-        return true; // as default (all columns are updated)
     }
 
     // ===================================================================================
     //                                                                             Handler
     //                                                                             =======
-    protected TnBatchInsertHandler createBatchInsertHandler(TnPropertyType[] boundPropTypes, String sql,
-            InsertOption<ConditionBean> option) {
-        final TnBatchInsertHandler handler = new TnBatchInsertHandler(_dataSource, _statementFactory, sql,
-                _beanMetaData, boundPropTypes);
-        handler.setInsertOption(option);
+    protected TnBatchDeleteHandler createBatchDeleteHandler(String sql, DeleteOption<ConditionBean> option) {
+        final TnBatchDeleteHandler handler = newBatchDeleteHandler(sql);
+        handler.setOptimisticLockHandling(_optimisticLockHandling); // [DBFlute-0.8.0]
+        handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
+        handler.setDeleteOption(option);
         return handler;
+    }
+
+    protected TnBatchDeleteHandler newBatchDeleteHandler(String sql) {
+        return new TnBatchDeleteHandler(_dataSource, _statementFactory, sql, _beanMetaData);
     }
 }

@@ -29,4 +29,8 @@ public interface DfLanguageImplStyle {
     boolean isIfCommentExpressionCheckEnabled();
 
     boolean isTypedParameterBeanEnabled();
+
+    String adjustConditionBeanLocalCQCall(String cb);
+
+    String adjustConditionQuerySetMethodCall(String basicSetMethod);
 }

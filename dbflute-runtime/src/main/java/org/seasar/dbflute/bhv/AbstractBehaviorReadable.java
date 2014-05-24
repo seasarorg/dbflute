@@ -60,7 +60,6 @@ import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
-import org.seasar.dbflute.exception.EntityPrimaryKeyNotFoundException;
 import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
@@ -128,10 +127,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     protected abstract Entity doReadEntity(ConditionBean cb);
 
-    protected <ENTITY> OptionalEntity<ENTITY> createOptionalEntity(ENTITY entity, final ConditionBean cb) {
+    protected <ENTITY> OptionalEntity<ENTITY> createOptionalEntity(ENTITY entity, final Object... searchKey) {
         return new OptionalEntity<ENTITY>(entity, new OptionalObjectExceptionThrower() {
             public void throwNotFoundException() {
-                throwSelectEntityAlreadyDeletedException(cb);
+                throwSelectEntityAlreadyDeletedException(searchKey);
             }
         });
     }
@@ -1466,41 +1465,27 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     /**
-     * Assert that the entity has primary-key value. e.g. insert(), update()
+     * Assert that the entity has primary-key value. e.g. insert(), update(), delete()
      * @param entity Entity. (NotNull)
      */
     protected void assertEntityNotNullAndHasPrimaryKeyValue(Entity entity) {
         assertEntityNotNull(entity);
-        if (!entity.hasPrimaryKeyValue()) {
-            throwEntityPrimaryKeyNotFoundException(entity);
+        final Set<String> uniqueDrivenPropSet = entity.uniqueDrivenProperties();
+        if (uniqueDrivenPropSet.isEmpty()) { // PK, basically here
+            if (!entity.hasPrimaryKeyValue()) {
+                createBhvExThrower().throwEntityPrimaryKeyNotFoundException(entity);
+            }
+        } else { // unique-driven
+            for (String prop : uniqueDrivenPropSet) {
+                final ColumnInfo columnInfo = getDBMeta().findColumnInfo(prop);
+                if (columnInfo != null) {
+                    final Object value = columnInfo.read(entity);
+                    if (value == null) {
+                        createBhvExThrower().throwEntityUniqueKeyNotFoundException(entity);
+                    }
+                }
+            }
         }
-    }
-
-    protected void throwEntityPrimaryKeyNotFoundException(Entity entity) {
-        final String classTitle = DfTypeUtil.toClassTitle(entity);
-        final String behaviorName = Srl.substringLastRear(entity.getDBMeta().getBehaviorTypeName(), ".");
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The primary-key value in the entity was not found.");
-        br.addItem("Advice");
-        br.addElement("An entity should have its primary-key value when e.g. insert(), update().");
-        br.addElement("For example:");
-        br.addElement("  (x):");
-        br.addElement("    " + classTitle + " entity = new " + classTitle + "();");
-        br.addElement("    entity.setFooName(...);");
-        br.addElement("    entity.setFooDate(...);");
-        br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
-        br.addElement("  (o):");
-        br.addElement("    " + classTitle + " entity = new " + classTitle + "();");
-        br.addElement("    entity.setFooId(...); // *Point");
-        br.addElement("    entity.setFooName(...);");
-        br.addElement("    entity.setFooDate(...);");
-        br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
-        br.addElement("Or if your process is insert(), you might expect identity.");
-        br.addElement("Confirm the primary-key's identity setting.");
-        br.addItem("Entity");
-        br.addElement(entity);
-        final String msg = br.buildExceptionMessage();
-        throw new EntityPrimaryKeyNotFoundException(msg);
     }
 
     // -----------------------------------------------------

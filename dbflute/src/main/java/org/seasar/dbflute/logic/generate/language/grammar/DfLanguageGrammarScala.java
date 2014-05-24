@@ -83,7 +83,13 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
     }
 
     public String buildClassTypeLiteral(String className) {
-        return "classOf[" + className + "]";
+        String exp = className;
+        if (className.equals("Option") || className.contains("Optional")) { // patch
+            if (!className.contains("[")) {
+                exp = className + "[_]";
+            }
+        }
+        return "classOf[" + exp + "]";
     }
 
     public String buildGenericListClassName(String element) {

@@ -100,10 +100,26 @@ public class ${myClassName} extends AbstractConditionBean {
     //                                                                 PrimaryKey Handling
     //                                                                 ===================
 #if ($table.hasPrimaryKey())
+    /**
+     * Accept the query condition of primary key as equal.
+     * ${table.primaryKeyArgsJavaDocString}
+     */
     public void acceptPrimaryKey(${table.primaryKeyArgsString}) {
         ${table.primaryKeyArgsAssertString}
         ${myClassName} cb = this;
         ${table.primaryKeyArgsConditionSetupString}
+    }
+
+#end
+#foreach ($uq in $table.keyableUniqueList)
+    /**
+     * Accept the query condition of unique key as equal.
+     * ${uq.argsJavaDocString}
+     */
+    public void acceptUniqueOf${uq.connectedJavaName}(${uq.argsString}) {
+        ${uq.argsAssertString}
+        ${myClassName} cb = this;
+        ${uq.argsConditionSetupString}
     }
 
 #end

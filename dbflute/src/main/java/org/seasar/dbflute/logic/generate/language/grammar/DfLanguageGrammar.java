@@ -95,7 +95,7 @@ public interface DfLanguageGrammar {
      * @return The type literal of the class. (NotNull)
      */
     String buildClassTypeLiteral(String className);
-
+    
     /**
      * @param element The element type for list generic. (NotNull)
      * @return The definition of 'List&lt;element&gt;'. (NotNull)

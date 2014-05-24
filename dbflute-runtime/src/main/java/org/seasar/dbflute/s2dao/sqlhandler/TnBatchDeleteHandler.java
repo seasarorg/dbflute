@@ -27,11 +27,16 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 public class TnBatchDeleteHandler extends TnAbstractBatchHandler {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final TnPropertyType[] EMPTY_PROPS = new TnPropertyType[0];
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnBatchDeleteHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
-            TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
-        super(dataSource, statementFactory, sql, beanMetaData, boundPropTypes);
+            TnBeanMetaData beanMetaData) {
+        super(dataSource, statementFactory, sql, beanMetaData, EMPTY_PROPS);
     }
 
     // ===================================================================================

@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.mock;
 
+import java.util.Collections;
 import java.util.Set;
 
 import org.seasar.dbflute.Entity;
@@ -51,8 +52,12 @@ public class MockEntity implements Entity {
         return _memberId != null;
     }
 
+    public Set<String> uniqueDrivenProperties() {
+        return Collections.emptySet();
+    }
+
     public Set<String> modifiedProperties() {
-        return null;
+        return Collections.emptySet();
     }
 
     public void clearModifiedInfo() {

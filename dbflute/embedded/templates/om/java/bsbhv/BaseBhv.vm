@@ -260,16 +260,29 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     /**
      * Select the entity by the primary-key value.
      * ${table.primaryKeyArgsJavaDocString}
+#if ($table.isAvailableSelectEntityPlainReturn())
      * @return The entity selected by the PK. (NullAllowed: if no data, it returns null)
+#else
+     * @return The optional entity selected by the PK. (NotNull: if no data, empty entity)
+     * @exception EntityAlreadyDeletedException When get() of return value is called and the value is null, which means entity has already been deleted (point is not found).
+#end
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
-    public ${myExtendedObjectClassName} selectByPKValue(${table.primaryKeyArgsString}) {
-        return doSelectByPKValue(${table.primaryKeyArgsCallingString}, ${myExtendedObjectClassName}.class);
+    public ${table.filterSelectEntityOptionalReturnIfNeeds($myExtendedObjectClassName)} selectByPK${table.selectByPKSuffix}(${table.primaryKeyArgsString}) {
+#if ($table.isAvailableSelectEntityPlainReturn())
+        return doSelectByPK(${table.primaryKeyArgsCallingString}, ${myExtendedObjectClassName}.class);
+#else
+        return doSelectOptionalByPK(${table.primaryKeyArgsCallingString}, ${myExtendedObjectClassName}.class);
+#end
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectByPKValue(${table.primaryKeyArgsString}, Class<ENTITY> entityType) {
+    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectByPK(${table.primaryKeyArgsString}, Class<ENTITY> entityType) {
         return doSelectEntity(buildPKCB(${table.primaryKeyArgsCallingString}), entityType);
+    }
+
+    protected <ENTITY extends ${myExtendedObjectClassName}> OptionalEntity<ENTITY> doSelectOptionalByPK(${table.primaryKeyArgsString}, Class<ENTITY> entityType) {
+        return createOptionalEntity(doSelectByPK(${table.primaryKeyArgsCallingString}, entityType), ${table.primaryKeyArgsCallingString});
     }
 
     /**

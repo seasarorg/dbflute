@@ -27,6 +27,8 @@ import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityDuplicatedException;
+import org.seasar.dbflute.exception.EntityPrimaryKeyNotFoundException;
+import org.seasar.dbflute.exception.EntityUniqueKeyNotFoundException;
 import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.NonQueryDeleteNotAllowedException;
 import org.seasar.dbflute.exception.NonQueryUpdateNotAllowedException;
@@ -36,6 +38,7 @@ import org.seasar.dbflute.exception.SelectEntityConditionNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.resource.DBFluteSystem;
+import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -84,7 +87,23 @@ public class BehaviorExceptionThrower {
     }
 
     protected void setupSearchKeyElement(ExceptionMessageBuilder br, Object searchKey) {
-        if (searchKey != null && searchKey instanceof ConditionBean) {
+        if (searchKey instanceof Object[]) {
+            final Object[] ary = (Object[]) searchKey;
+            if (ary.length == 1) {
+                searchKey = ary[0];
+            } else {
+                final StringBuilder sb = new StringBuilder();
+                for (Object obj : ary) {
+                    if (sb.length() > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(obj);
+                }
+                sb.insert(0, "{").append("}");
+                searchKey = sb.toString();
+            }
+        }
+        if (searchKey instanceof ConditionBean) {
             final ConditionBean cb = (ConditionBean) searchKey;
             setupInvalidQueryElement(br, cb);
             setupDisplaySqlElement(br, cb);
@@ -207,6 +226,62 @@ public class BehaviorExceptionThrower {
     // ===================================================================================
     //                                                                              Update
     //                                                                              ======
+    public void throwEntityPrimaryKeyNotFoundException(Entity entity) {
+        final String classTitle = DfTypeUtil.toClassTitle(entity);
+        final String behaviorName = Srl.substringLastRear(entity.getDBMeta().getBehaviorTypeName(), ".");
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The primary-key value in the entity was not found.");
+        br.addItem("Advice");
+        br.addElement("An entity should have its primary-key value");
+        br.addElement("when e.g. insert(), update().");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    " + classTitle + " entity = new " + classTitle + "();");
+        br.addElement("    entity.setFooName(...);");
+        br.addElement("    entity.setFooDate(...);");
+        br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
+        br.addElement("  (o):");
+        br.addElement("    " + classTitle + " entity = new " + classTitle + "();");
+        br.addElement("    entity.setFooId(...); // *Point");
+        br.addElement("    entity.setFooName(...);");
+        br.addElement("    entity.setFooDate(...);");
+        br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
+        br.addElement("Or if your process is insert(), you might expect identity.");
+        br.addElement("Confirm the primary-key's identity setting.");
+        br.addItem("Entity");
+        br.addElement(entity);
+        final String msg = br.buildExceptionMessage();
+        throw new EntityPrimaryKeyNotFoundException(msg);
+    }
+
+    public void throwEntityUniqueKeyNotFoundException(Entity entity) {
+        final String classTitle = DfTypeUtil.toClassTitle(entity);
+        final String behaviorName = Srl.substringLastRear(entity.getDBMeta().getBehaviorTypeName(), ".");
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The unique-key value in the entity was not found.");
+        br.addItem("Advice");
+        br.addElement("An entity should have its unique-key value");
+        br.addElement("when e.g. update(), delete() if you call uniqueByXxx().");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    " + classTitle + " entity = new " + classTitle + "();");
+        br.addElement("    entity.setFooName(...);");
+        br.addElement("    entity.setFooDate(...);");
+        br.addElement("    entity.uniqueByFooAccount(...);");
+        br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
+        br.addElement("  (o):");
+        br.addElement("    " + classTitle + " entity = new " + classTitle + "();");
+        br.addElement("    entity.setFooAccount(...); // *Point");
+        br.addElement("    entity.setFooName(...);");
+        br.addElement("    entity.setFooDate(...);");
+        br.addElement("    entity.uniqueByFooAccount(...);");
+        br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
+        br.addItem("Entity");
+        br.addElement(entity);
+        final String msg = br.buildExceptionMessage();
+        throw new EntityUniqueKeyNotFoundException(msg);
+    }
+
     public <ENTITY extends Entity> void throwUpdateEntityAlreadyDeletedException(ENTITY entity) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("The updated entity was not found! it has already been deleted.");

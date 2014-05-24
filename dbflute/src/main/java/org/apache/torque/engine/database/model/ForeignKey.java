@@ -142,7 +142,7 @@ import org.seasar.dbflute.exception.DfFixedConditionOptionConstraintFailureExcep
 import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.logic.generate.column.DfColumnListToStringUtil;
+import org.seasar.dbflute.logic.generate.column.DfColumnListToStringBuilder;
 import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
@@ -798,7 +798,7 @@ public class ForeignKey implements Constraint {
      * @return Generated string.
      */
     public String getLocalColumnNameCommaString() { // same as 
-        return DfColumnListToStringUtil.getColumnNameCommaString(getLocalColumnList());
+        return DfColumnListToStringBuilder.getColumnNameCommaString(getLocalColumnList());
     }
 
     /**
@@ -806,7 +806,7 @@ public class ForeignKey implements Constraint {
      * @return Generated string.
      */
     public String getLocalColumnGetterCommaString() {
-        return DfColumnListToStringUtil.getColumnGetterCommaString(getLocalColumnList());
+        return DfColumnListToStringBuilder.getColumnGetterCommaString(getLocalColumnList());
     }
 
     /**
@@ -825,7 +825,7 @@ public class ForeignKey implements Constraint {
      * @return Generated string.
      */
     public String getForeignColumnNameCommaString() {
-        return DfColumnListToStringUtil.getColumnNameCommaString(getForeignColumnList());
+        return DfColumnListToStringBuilder.getColumnNameCommaString(getForeignColumnList());
     }
 
     /**
@@ -833,7 +833,7 @@ public class ForeignKey implements Constraint {
      * @return Generated string.
      */
     public String getForeignColumnGetterCommaString() {
-        return DfColumnListToStringUtil.getColumnGetterCommaString(getForeignColumnList());
+        return DfColumnListToStringBuilder.getColumnGetterCommaString(getForeignColumnList());
     }
 
     /**

@@ -51,13 +51,7 @@ public class TnBatchUpdateDynamicCommand extends TnUpdateEntityDynamicCommand {
     @Override
     protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql,
             UpdateOption<ConditionBean> option) {
-        final List<?> beanList;
-        if (bean instanceof List<?>) {
-            beanList = (List<?>) bean;
-        } else {
-            String msg = "The argument 'args[0]' should be list: " + bean;
-            throw new IllegalArgumentException(msg);
-        }
+        final List<?> beanList = extractBeanListFromBeanChecked(bean);
         final TnBatchUpdateHandler handler = createBatchUpdateHandler(propertyTypes, sql, option);
         // because the variable is set when exception occurs if batch
         //handler.setExceptionMessageSqlArgs(new Object[] { beanList });
@@ -70,8 +64,8 @@ public class TnBatchUpdateDynamicCommand extends TnUpdateEntityDynamicCommand {
     // Batch Update does not use modified properties here
     // (modified properties are converted to specified columns before here)
     @Override
-    protected Set<?> getModifiedPropertyNames(Object bean) {
-        return Collections.EMPTY_SET;
+    protected Set<String> getModifiedPropertyNames(Object bean) {
+        return Collections.emptySet();
     }
 
     @Override

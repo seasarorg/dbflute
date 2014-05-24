@@ -20,30 +20,30 @@ import java.util.List;
 
 import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
+import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.seasar.dbflute.properties.DfBasicProperties;
 
 /**
  * @author jflute
  */
-public class DfColumnListToStringUtil {
+public class DfColumnListToStringBuilder {
 
     public static String getColumnArgsString(List<Column> columnList, DfLanguageGrammar grammar) {
         validateColumnList(columnList);
-
         final StringBuilder sb = new StringBuilder();
-        for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
-            final Column pk = (Column) ite.next();
+        for (Column column : columnList) {
             final String javaNative;
-            if (pk.isForceClassificationSetting()) {
+            if (column.isForceClassificationSetting()) {
                 final DfBasicProperties prop = getBasicProperties();
                 final String projectPrefix = prop.getProjectPrefix();
-                final String classificationName = pk.getClassificationName();
+                final String classificationName = column.getClassificationName();
                 javaNative = projectPrefix + "CDef." + classificationName;
             } else {
-                javaNative = pk.getJavaNative();
+                javaNative = column.getJavaNative();
             }
-            final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
+            final String uncapitalisedJavaName = column.getUncapitalisedJavaName();
             if (sb.length() > 0) {
                 sb.append(", ");
             }
@@ -52,18 +52,17 @@ public class DfColumnListToStringUtil {
         return sb.toString();
     }
 
-    public static String getColumnArgsJavaDocString(List<Column> columnList, String ln) {
+    public static String getColumnArgsJavaDocString(List<Column> columnList, String title, String ln) {
         validateColumnList(columnList);
-
         final StringBuilder sb = new StringBuilder();
-        for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
-            final Column pk = (Column) ite.next();
-            final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
+        for (Column column : columnList) {
+            final String uncapitalisedJavaName = column.getUncapitalisedJavaName();
             if (sb.length() > 0) {
                 sb.append(ln).append("     * ");
             }
-            sb.append("@param ").append(uncapitalisedJavaName);
-            sb.append(" The one of primary key. (NotNull)");
+            sb.append("@param ").append(uncapitalisedJavaName).append(" ");
+            sb.append(column.getAliasExpression()).append(": ");
+            sb.append(column.getColumnDefinitionLineDisp()).append(". (NotNull)");
         }
         return sb.toString();
     }
@@ -129,35 +128,28 @@ public class DfColumnListToStringUtil {
     }
 
     public static String getColumnArgsConditionSetupString(List<Column> columnList) {
-        return doGetColumnArgsConditionSetupString(columnList, false);
+        return doGetColumnArgsConditionSetupString(columnList);
     }
 
-    public static String getColumnArgsConditionSetupStringCSharp(List<Column> columnList) {
-        return doGetColumnArgsConditionSetupString(columnList, true);
-    }
-
-    private static String doGetColumnArgsConditionSetupString(List<Column> columnList, boolean csharp) {
+    private static String doGetColumnArgsConditionSetupString(List<Column> columnList) {
         validateColumnList(columnList);
-
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final DfLanguageImplStyle implStyle = lang.getLanguageImplStyle();
+        final String query = implStyle.adjustConditionBeanLocalCQCall("cb");
         final StringBuilder sb = new StringBuilder();
-        for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
-            Column pk = (Column) ite.next();
-            final String javaName = pk.getJavaName();
-            final String variable = pk.getUncapitalisedJavaName();
+        for (Column column : columnList) {
+            final String javaName = column.getJavaName();
+            final String variable = column.getUncapitalisedJavaName();
             final String setter;
-            if (pk.isForceClassificationSetting()) {
-                final String cls = pk.getClassificationName();
-                if (csharp) {
-                    setter = "cb.Query().Set" + javaName + "_Equal_As" + cls + "(" + variable + ");";
-                } else {
-                    setter = "cb.query().set" + javaName + "_Equal_As" + cls + "(" + variable + ");";
-                }
+            if (column.isForceClassificationSetting()) {
+                final String cls = column.getClassificationName();
+                final String basic = "set" + javaName + "_Equal_As" + cls + "(" + variable + ")";
+                final String adjusted = implStyle.adjustConditionQuerySetMethodCall(basic);
+                setter = query + "." + adjusted + ";";
             } else {
-                if (csharp) {
-                    setter = "cb.Query().Set" + javaName + "_Equal(" + variable + ");";
-                } else {
-                    setter = "cb.query().set" + javaName + "_Equal(" + variable + ");";
-                }
+                final String basic = "set" + javaName + "_Equal(" + variable + ");";
+                final String adjusted = implStyle.adjustConditionQuerySetMethodCall(basic);
+                setter = query + "." + adjusted + ";";
             }
             sb.append(setter);
         }
@@ -166,11 +158,9 @@ public class DfColumnListToStringUtil {
 
     public static String getColumnNameCommaString(List<Column> columnList) {
         validateColumnList(columnList);
-
         String result = "";
-        for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
-            final Column col = (Column) ite.next();
-            final String name = col.getName();
+        for (Column column : columnList) {
+            final String name = column.getName();
             if ("".equals(result)) {
                 result = name;
             } else {
@@ -182,11 +172,9 @@ public class DfColumnListToStringUtil {
 
     public static String getColumnJavaNameCommaString(List<Column> columnList) {
         validateColumnList(columnList);
-
         String result = "";
-        for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
-            final Column col = (Column) ite.next();
-            final String name = col.getJavaName();
+        for (Column column : columnList) {
+            final String name = column.getJavaName();
             if ("".equals(result)) {
                 result = name;
             } else {
@@ -198,11 +186,9 @@ public class DfColumnListToStringUtil {
 
     public static String getColumnUncapitalisedJavaNameCommaString(List<Column> columnList) {
         validateColumnList(columnList);
-
         String result = "";
-        for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
-            final Column col = (Column) ite.next();
-            final String name = col.getUncapitalisedJavaName();
+        for (Column column : columnList) {
+            final String name = column.getUncapitalisedJavaName();
             if ("".equals(result)) {
                 result = name;
             } else {
@@ -214,11 +200,9 @@ public class DfColumnListToStringUtil {
 
     public static String getColumnGetterCommaString(List<Column> columnList) {
         validateColumnList(columnList);
-
         String result = "";
-        for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
-            final Column col = (Column) ite.next();
-            final String javaName = col.getJavaName();
+        for (Column column : columnList) {
+            final String javaName = column.getJavaName();
             final String getterString = "get" + javaName + "()";
             if ("".equals(result)) {
                 result = getterString;
@@ -231,11 +215,9 @@ public class DfColumnListToStringUtil {
 
     public static String getColumnOrderByString(List<Column> columnList, String sortString) {
         validateColumnList(columnList);
-
         final StringBuilder sb = new StringBuilder();
-        for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
-            final Column pk = (Column) ite.next();
-            final String name = pk.getName();
+        for (Column column : columnList) {
+            final String name = column.getName();
             if ("".equals(sb.toString())) {
                 sb.append(name).append(" ").append(sortString);
             } else {
@@ -247,11 +229,9 @@ public class DfColumnListToStringUtil {
 
     public static String getColumnDispValueString(List<Column> columnList, String getterPrefix) {
         validateColumnList(columnList);
-
         String result = "";
-        for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
-            Column pk = (Column) ite.next();
-            final String javaName = pk.getJavaName();
+        for (Column column : columnList) {
+            final String javaName = column.getJavaName();
             final String getterString = getterPrefix + javaName + "()";
             if ("".equals(result)) {
                 result = getterString;
@@ -262,11 +242,11 @@ public class DfColumnListToStringUtil {
         return result;
     }
 
-    private static DfBasicProperties getBasicProperties() {
+    protected static DfBasicProperties getBasicProperties() {
         return DfBuildProperties.getInstance().getBasicProperties();
     }
 
-    private static void validateColumnList(List<Column> columnList) {
+    protected static void validateColumnList(List<Column> columnList) {
         if (columnList == null) {
             String msg = "The columnList is null.";
             throw new IllegalStateException(msg);

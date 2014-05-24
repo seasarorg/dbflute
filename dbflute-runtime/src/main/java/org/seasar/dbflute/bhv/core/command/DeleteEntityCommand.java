@@ -19,9 +19,8 @@ import org.seasar.dbflute.bhv.DeleteOption;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlcommand.TnDeleteEntityStaticCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnDeleteEntityDynamicCommand;
 
 /**
  * @author jflute
@@ -70,18 +69,20 @@ public class DeleteEntityCommand extends AbstractEntityCommand {
 
     protected SqlExecution createDeleteEntitySqlExecution(TnBeanMetaData bmd) {
         final String[] propertyNames = getPersistentPropertyNames(bmd);
-        return createDeleteEntityStaticCommand(bmd, propertyNames);
+        return createDeleteEntityDynamicCommand(bmd, propertyNames);
     }
 
-    protected TnDeleteEntityStaticCommand createDeleteEntityStaticCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        final DBMeta dbmata = findDBMeta();
-        final boolean opt = isOptimisticLockHandling();
-        return newDeleteEntityStaticCommand(bmd, propertyNames, dbmata, opt);
+    protected TnDeleteEntityDynamicCommand createDeleteEntityDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
+        final TnDeleteEntityDynamicCommand cmd = newDeleteEntityDynamicCommand();
+        cmd.setBeanMetaData(bmd);
+        cmd.setTargetDBMeta(findDBMeta());
+        cmd.setPropertyNames(propertyNames);
+        cmd.setOptimisticLockHandling(isOptimisticLockHandling());
+        return cmd;
     }
 
-    protected TnDeleteEntityStaticCommand newDeleteEntityStaticCommand(TnBeanMetaData bmd, String[] propertyNames,
-            DBMeta dbmata, final boolean opt) {
-        return new TnDeleteEntityStaticCommand(_dataSource, _statementFactory, bmd, dbmata, propertyNames, opt);
+    protected TnDeleteEntityDynamicCommand newDeleteEntityDynamicCommand() {
+        return new TnDeleteEntityDynamicCommand(_dataSource, _statementFactory);
     }
 
     protected boolean isOptimisticLockHandling() {

@@ -32,4 +32,12 @@ public class DfLanguageImplStyleScala implements DfLanguageImplStyle {
     public boolean isTypedParameterBeanEnabled() {
         return true;
     }
+
+    public String adjustConditionBeanLocalCQCall(String cb) {
+        return cb + ".query()";
+    }
+
+    public String adjustConditionQuerySetMethodCall(String basicSetMethod) {
+        return basicSetMethod;
+    }
 }

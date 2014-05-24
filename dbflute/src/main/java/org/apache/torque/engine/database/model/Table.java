@@ -149,7 +149,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
-import org.seasar.dbflute.logic.generate.column.DfColumnListToStringUtil;
+import org.seasar.dbflute.logic.generate.column.DfColumnListToStringBuilder;
 import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
@@ -873,7 +873,7 @@ public class Table {
      */
     public String getPrimaryKeyArgsString() {
         final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
-        return DfColumnListToStringUtil.getColumnArgsString(getPrimaryKey(), lang.getLanguageGrammar());
+        return DfColumnListToStringBuilder.getColumnArgsString(getPrimaryKey(), lang.getLanguageGrammar());
     }
 
     /**
@@ -882,7 +882,7 @@ public class Table {
      */
     public String getPrimaryKeyArgsJavaDocString() {
         final String ln = getBasicProperties().getSourceCodeLineSeparator();
-        return DfColumnListToStringUtil.getColumnArgsJavaDocString(getPrimaryKey(), ln);
+        return DfColumnListToStringBuilder.getColumnArgsJavaDocString(getPrimaryKey(), "primary key", ln);
     }
 
     /**
@@ -890,7 +890,7 @@ public class Table {
      * @return The value of primaryKeyArgsAssertString. (NotNull)
      */
     public String getPrimaryKeyArgsAssertString() {
-        return DfColumnListToStringUtil.getColumnArgsAssertString(getPrimaryKey());
+        return DfColumnListToStringBuilder.getColumnArgsAssertString(getPrimaryKey());
     }
 
     /**
@@ -898,7 +898,7 @@ public class Table {
      * @return The value of primaryKeyArgsAssertStringCSharp. (NotNull)
      */
     public String getPrimaryKeyArgsAssertStringCSharp() {
-        return DfColumnListToStringUtil.getColumnArgsAssertStringCSharp(getPrimaryKey());
+        return DfColumnListToStringBuilder.getColumnArgsAssertStringCSharp(getPrimaryKey());
     }
 
     /**
@@ -906,7 +906,7 @@ public class Table {
      * @return The value of primaryKeyArgsSetupString. (NotNull)
      */
     public String getPrimaryKeyArgsSetupString() {
-        return DfColumnListToStringUtil.getColumnArgsSetupString(null, getPrimaryKey());
+        return DfColumnListToStringBuilder.getColumnArgsSetupString(null, getPrimaryKey());
     }
 
     /**
@@ -915,7 +915,7 @@ public class Table {
      * @return The value of primaryKeyArgsSetupString. (NotNull)
      */
     public String getPrimaryKeyArgsSetupString(String beanName) {
-        return DfColumnListToStringUtil.getColumnArgsSetupString(beanName, getPrimaryKey());
+        return DfColumnListToStringBuilder.getColumnArgsSetupString(beanName, getPrimaryKey());
     }
 
     /**
@@ -923,7 +923,7 @@ public class Table {
      * @return The value of primaryKeyArgsSetupStringCSharp. (NotNull)
      */
     public String getPrimaryKeyArgsSetupStringCSharp() {
-        return DfColumnListToStringUtil.getColumnArgsSetupStringCSharp(null, getPrimaryKey());
+        return DfColumnListToStringBuilder.getColumnArgsSetupStringCSharp(null, getPrimaryKey());
     }
 
     /**
@@ -932,7 +932,7 @@ public class Table {
      * @return The value of primaryKeyArgsSetupStringCSharp. (NotNull)
      */
     public String getPrimaryKeyArgsSetupStringCSharp(String beanName) {
-        return DfColumnListToStringUtil.getColumnArgsSetupStringCSharp(beanName, getPrimaryKey());
+        return DfColumnListToStringBuilder.getColumnArgsSetupStringCSharp(beanName, getPrimaryKey());
     }
 
     /**
@@ -940,15 +940,15 @@ public class Table {
      * @return The value of primaryKeyArgsConditionSetupString. (NotNull)
      */
     public String getPrimaryKeyArgsConditionSetupString() {
-        return DfColumnListToStringUtil.getColumnArgsConditionSetupString(getPrimaryKey());
+        return DfColumnListToStringBuilder.getColumnArgsConditionSetupString(getPrimaryKey());
     }
 
     /**
      * Returns primaryKeyArgsConditionSetupStringCSharp. [cb.Query().SetRcvlcqNo_Equal(rcvlcqNo);cb.Query()...;]
      * @return The value of primaryKeyArgsConditionSetupStringCSharp. (NotNull)
      */
-    public String getPrimaryKeyArgsConditionSetupStringCSharp() {
-        return DfColumnListToStringUtil.getColumnArgsConditionSetupStringCSharp(getPrimaryKey());
+    public String getPrimaryKeyArgsConditionSetupStringCSharp() { // for compatible
+        return DfColumnListToStringBuilder.getColumnArgsConditionSetupString(getPrimaryKey());
     }
 
     /**
@@ -967,7 +967,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyOrderByAscString() {
-        return DfColumnListToStringUtil.getColumnOrderByString(getPrimaryKey(), "asc");
+        return DfColumnListToStringBuilder.getColumnOrderByString(getPrimaryKey(), "asc");
     }
 
     /**
@@ -975,7 +975,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyOrderByDescString() {
-        return DfColumnListToStringUtil.getColumnOrderByString(getPrimaryKey(), "desc");
+        return DfColumnListToStringBuilder.getColumnOrderByString(getPrimaryKey(), "desc");
     }
 
     // -----------------------------------------------------
@@ -986,7 +986,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyDispValueString() {
-        return DfColumnListToStringUtil.getColumnDispValueString(getPrimaryKey(), "get");
+        return DfColumnListToStringBuilder.getColumnDispValueString(getPrimaryKey(), "get");
     }
 
     /**
@@ -994,7 +994,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyDispValueStringByGetterInitCap() {
-        return DfColumnListToStringUtil.getColumnDispValueString(getPrimaryKey(), "Get");
+        return DfColumnListToStringBuilder.getColumnDispValueString(getPrimaryKey(), "Get");
     }
 
     // -----------------------------------------------------
@@ -1005,7 +1005,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyNameCommaString() {
-        return DfColumnListToStringUtil.getColumnNameCommaString(getPrimaryKey());
+        return DfColumnListToStringBuilder.getColumnNameCommaString(getPrimaryKey());
     }
 
     /**
@@ -1013,7 +1013,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyUncapitalisedJavaNameCommaString() {
-        return DfColumnListToStringUtil.getColumnUncapitalisedJavaNameCommaString(getPrimaryKey());
+        return DfColumnListToStringBuilder.getColumnUncapitalisedJavaNameCommaString(getPrimaryKey());
     }
 
     /**
@@ -1021,7 +1021,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyJavaNameCommaString() {
-        return DfColumnListToStringUtil.getColumnJavaNameCommaString(getPrimaryKey());
+        return DfColumnListToStringBuilder.getColumnJavaNameCommaString(getPrimaryKey());
     }
 
     /**
@@ -1029,7 +1029,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyGetterCommaString() {
-        return DfColumnListToStringUtil.getColumnGetterCommaString(getPrimaryKey());
+        return DfColumnListToStringBuilder.getColumnGetterCommaString(getPrimaryKey());
     }
 
     // -----------------------------------------------------
@@ -1758,8 +1758,8 @@ public class Table {
      * @return An array containing all the UKs
      */
     public Unique[] getUnices() {
-        int size = _unices.size();
-        Unique[] tbls = new Unique[size];
+        final int size = _unices.size();
+        final Unique[] tbls = new Unique[size];
         for (int i = 0; i < size; i++) {
             tbls[i] = (Unique) _unices.get(i);
         }
@@ -1768,6 +1768,28 @@ public class Table {
 
     public List<Unique> getUniqueList() {
         return _unices;
+    }
+
+    public boolean hasUnique() {
+        return !_unices.isEmpty();
+    }
+
+    public List<Unique> getKeyableUniqueList() {
+        final List<Unique> uniqueList = new ArrayList<Unique>();
+        final Set<String> uniqueNameSet = new HashSet<String>();
+        for (Unique unique : _unices) {
+            final List<Column> columnList = unique.getColumnList();
+            if (columnList.isEmpty()) {
+                continue;
+            }
+            final String connectedJavaName = unique.getConnectedJavaName();
+            if (uniqueNameSet.contains(connectedJavaName)) {
+                continue;
+            }
+            uniqueNameSet.add(connectedJavaName);
+            uniqueList.add(unique);
+        }
+        return uniqueList;
     }
 
     public List<Unique> getOnlyOneColumnUniqueList() {
@@ -1843,7 +1865,7 @@ public class Table {
             final Map<Integer, String> indexColumnMap = unique.getIndexColumnMap();
             final String columnName = indexColumnMap.values().iterator().next();
             final Column column = getColumn(columnName);
-            if (column == null) { // basically no way
+            if (column == null) { // basically no way but...
                 // Oracle's materialized view has internal unique index
                 // so this column variable can be null
                 continue;
@@ -3146,6 +3168,11 @@ public class Table {
         return !modifier.isEmpty() ? modifier + " " : "";
     }
 
+    public String getSelectByPKSuffix() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isCompatibleSelectByPKOldStyle() ? "Value" : "";
+    }
+
     // ===================================================================================
     //                                                                   Entity Adjustment
     //                                                                   =================
@@ -3333,7 +3360,7 @@ public class Table {
     }
 
     // ===================================================================================
-    //                                                                            Flex DTO
+    //                                                                            FLEX DTO
     //                                                                            ========
     public boolean isFlexDtoBindable() {
         return getProperties().getFlexDtoProperties().isBindable(getTableDbName());

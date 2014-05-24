@@ -50,11 +50,7 @@ public class TnInsertEntityDynamicCommand extends TnAbstractEntityDynamicCommand
     //                                                                             Execute
     //                                                                             =======
     public Object execute(Object[] args) {
-        if (args == null || args.length == 0) {
-            String msg = "The argument 'args' should not be null or empty.";
-            throw new IllegalArgumentException(msg);
-        }
-        final Object bean = args[0];
+        final Object bean = extractBeanFromArgsChecked(args);
         final InsertOption<ConditionBean> option = extractInsertOptionChecked(args);
         prepareStatementConfigOnThreadIfExists(option);
 

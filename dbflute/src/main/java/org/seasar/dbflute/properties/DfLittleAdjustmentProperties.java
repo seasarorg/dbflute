@@ -900,6 +900,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isCompatibleBatchUpdateDefaultEveryColumn", false);
     }
 
+    public boolean isCompatibleSelectByPKOldStyle() { // closet
+        return isProperty("isCompatibleSelectByPKOldStyle", isCompatibleBeforeJava8());
+    }
+
     public boolean isCompatibleBeforeJava8() { // closet
         return isProperty("isCompatibleBeforeJava8", true); // #later false from DBFlute-1.1
     }

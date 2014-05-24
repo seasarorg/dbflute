@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.logic.generate.language.implstyle;
 
+import org.seasar.dbflute.util.Srl;
+
 /**
  * @author jflute
  * @since 1.0.5F (2014/05/04 Sunday)
@@ -31,5 +33,13 @@ public class DfLanguageImplStyleCSharp implements DfLanguageImplStyle {
 
     public boolean isTypedParameterBeanEnabled() {
         return false;
+    }
+
+    public String adjustConditionBeanLocalCQCall(String cb) {
+        return cb + ".Query()";
+    }
+
+    public String adjustConditionQuerySetMethodCall(String basicSetMethod) {
+        return Srl.initCap(basicSetMethod);
     }
 }

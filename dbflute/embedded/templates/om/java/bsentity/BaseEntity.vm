@@ -121,6 +121,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     // -----------------------------------------------------
     //                                              Internal
     //                                              --------
+    /** The unique-driven properties for this entity. (NotNull) */
+    protected final EntityUniqueDrivenProperties __uniqueDrivenProperties = newUniqueDrivenProperties();
+
     /** The modified properties for this entity. (NotNull) */
     protected final EntityModifiedProperties __modifiedProperties = newModifiedProperties();
 #if ($table.hasAllCommonColumn())
@@ -174,6 +177,32 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         if (get${col.javaName}() == null) { return false; }
 #end
         return ${table.hasPrimaryKey()};
+    }
+#foreach ($uq in $table.keyableUniqueList)
+
+    /**
+     * To be unique by the unique column. <br />
+     * You can update the entity by the key when entity update (NOT batch update).
+     * ${uq.argsJavaDocString}
+     */
+    public void uniqueBy${uq.connectedJavaName}(${uq.argsString}) {
+        __uniqueDrivenProperties.clear();
+#foreach ($col in $uq.columnList)
+        __uniqueDrivenProperties.addPropertyName("${col.javaBeansRulePropertyName}");
+        _${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
+#end
+    }
+#end
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<String> uniqueDrivenProperties() {
+        return __uniqueDrivenProperties.getPropertyNames();
+    }
+
+    protected EntityUniqueDrivenProperties newUniqueDrivenProperties() {
+        return new EntityUniqueDrivenProperties();
     }
 
 #if ($table.hasClassification())

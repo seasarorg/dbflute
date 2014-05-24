@@ -78,6 +78,10 @@ public class InstanceKeyEntity implements Entity {
         return _actualEntity.hasPrimaryKeyValue();
     }
 
+    public Set<String> uniqueDrivenProperties() {
+        return _actualEntity.uniqueDrivenProperties();
+    }
+
     public Set<String> modifiedProperties() {
         return _actualEntity.modifiedProperties();
     }

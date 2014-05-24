@@ -32,4 +32,12 @@ public class DfLanguageImplStylePhp implements DfLanguageImplStyle {
     public boolean isTypedParameterBeanEnabled() {
         return false;
     }
+
+    public String adjustConditionBeanLocalCQCall(String cb) {
+        return cb + ".query()";
+    }
+
+    public String adjustConditionQuerySetMethodCall(String basicSetMethod) {
+        return basicSetMethod;
+    }
 }
