@@ -659,8 +659,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         final Entity entity = getDBMeta().newEntity();
         getDBMeta().acceptPrimaryKeyMap(entity, primaryKeyMap);
         final Map<String, Object> filteredMap = getDBMeta().extractPrimaryKeyMap(entity);
-        final Set<Entry<String, Object>> entrySet = filteredMap.entrySet();
-        for (Entry<String, Object> entry : entrySet) {
+        for (Entry<String, Object> entry : filteredMap.entrySet()) {
             localCQ().invokeQuery(entry.getKey(), "equal", entry.getValue());
         }
     }

@@ -1775,11 +1775,15 @@ public class Table {
     }
 
     public List<Unique> getKeyableUniqueList() {
+        final Integer limit = getLittleAdjustmentProperties().getKeyableUniqueColumnLimit();
         final List<Unique> uniqueList = new ArrayList<Unique>();
         final Set<String> uniqueNameSet = new HashSet<String>();
         for (Unique unique : _unices) {
             final List<Column> columnList = unique.getColumnList();
             if (columnList.isEmpty()) {
+                continue;
+            }
+            if (limit >= 0 && columnList.size() > limit) {
                 continue;
             }
             final String connectedJavaName = unique.getConnectedJavaName();
@@ -3173,11 +3177,23 @@ public class Table {
         return prop.isCompatibleSelectByPKOldStyle() ? "Value" : "";
     }
 
+    public boolean isCompatibleSelectByPKWithDeletedCheck() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isCompatibleSelectByPKWithDeletedCheck();
+    }
+
     // ===================================================================================
     //                                                                   Entity Adjustment
     //                                                                   =================
     public boolean isMakeEntityChaseRelation() {
         return getLittleAdjustmentProperties().isMakeEntityChaseRelation();
+    }
+
+    // ===================================================================================
+    //                                                            ConditionBean Adjustment
+    //                                                            ========================
+    public boolean isMakeConditionBeanCBDrivenLoadReferrer() {
+        return getLittleAdjustmentProperties().isMakeConditionBeanCBDrivenLoadReferrer();
     }
 
     // ===================================================================================

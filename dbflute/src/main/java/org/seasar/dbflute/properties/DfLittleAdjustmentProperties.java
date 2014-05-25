@@ -199,6 +199,21 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return getProperty("relationOptionalEntityClass", OptionalEntity.class.getName());
     }
 
+    // -----------------------------------------------------
+    //                                            Unique Key
+    //                                            ----------
+    public Integer getKeyableUniqueColumnLimit() { // closet
+        final String defaultValue = "3"; // because too many columns may be inconvenient as key
+        return Integer.valueOf(getProperty("keyableUniqueColumnLimit", defaultValue)); // if minus, no limit
+    }
+
+    // ===================================================================================
+    //                                                                       ConditionBean
+    //                                                                       =============
+    public boolean isMakeConditionBeanCBDrivenLoadReferrer() {
+        return isProperty("isMakeConditionBeanCBDrivenLoadReferrer", false);
+    }
+
     // ===================================================================================
     //                                                                      ConditionQuery
     //                                                                      ==============
@@ -902,6 +917,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public boolean isCompatibleSelectByPKOldStyle() { // closet
         return isProperty("isCompatibleSelectByPKOldStyle", isCompatibleBeforeJava8());
+    }
+
+    public boolean isCompatibleSelectByPKWithDeletedCheck() { // closet
+        return isProperty("isCompatibleSelectByPKWithDeletedCheck", isCompatibleBeforeJava8());
     }
 
     public boolean isCompatibleBeforeJava8() { // closet

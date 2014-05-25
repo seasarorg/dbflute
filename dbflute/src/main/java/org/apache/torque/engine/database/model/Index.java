@@ -308,6 +308,10 @@ public class Index implements Constraint {
         return DfColumnListToStringBuilder.getColumnArgsAssertString(getColumnList());
     }
 
+    public String getArgsCallingString() {
+        return DfColumnListToStringBuilder.getColumnUncapitalisedJavaNameCommaString(getColumnList());
+    }
+
     // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
