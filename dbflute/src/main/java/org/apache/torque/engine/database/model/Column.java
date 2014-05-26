@@ -701,23 +701,13 @@ public class Column {
             plugDelimiterIfNeeds(sb);
             sb.append("ID");
         }
-        if (hasTopColumnUnique()) {
+        if (isUnique()) {
             plugDelimiterIfNeeds(sb);
-            sb.append("UQ");
-        } else {
-            if (isUnique()) {
-                plugDelimiterIfNeeds(sb);
-                sb.append("UQ+");
-            }
+            buildIndexMark(sb, "UQ");
         }
         if (hasTopColumnIndex()) {
             plugDelimiterIfNeeds(sb);
-            sb.append("IX");
-        } else {
-            if (hasIndex()) {
-                plugDelimiterIfNeeds(sb);
-                sb.append("IX+");
-            }
+            buildIndexMark(sb, "IX");
         }
         if (isNotNull()) {
             plugDelimiterIfNeeds(sb);
@@ -753,7 +743,7 @@ public class Column {
         return sb.toString();
     }
 
-    private void plugDelimiterIfNeeds(StringBuilder sb) {
+    protected void plugDelimiterIfNeeds(StringBuilder sb) {
         if (sb.length() != 0) {
             sb.append(", ");
         }
@@ -1244,14 +1234,29 @@ public class Column {
     public String getUniqueKeyMarkForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
         if (isUnique()) {
-            sb.append("o");
-            if (hasTwoOrMoreColumnUnique()) {
-                sb.append("<span class=\"flgplus\">+</span>");
-            }
+            buildIndexMark(sb, "o");
         } else {
             sb.append("&nbsp;");
         }
         return sb.toString();
+    }
+
+    protected void buildIndexMark(StringBuilder sb, String mark) {
+        final String plus = "<span class=\"flgplus\">+</span>";
+        final String alsoOnly = "<span class=\"flgplus\">*</span>";
+        if (hasTwoOrMoreColumnUnique()) { // compound index
+            if (hasTopColumnUnique()) { // top column
+                if (hasOnlyOneColumnUnique()) { // also simple index
+                    sb.append(mark).append(alsoOnly);
+                } else {
+                    sb.append(mark).append(plus);
+                }
+            } else { // sub columns
+                sb.append(plus).append(mark);
+            }
+        } else { // simple index
+            sb.append(mark);
+        }
     }
 
     public String getUniqueKeyTitleForSchemaHtml() {
@@ -1340,10 +1345,7 @@ public class Column {
     public String getIndexMarkForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
         if (hasIndex()) {
-            sb.append("o");
-            if (hasTwoOrMoreColumnIndex()) {
-                sb.append("<span class=\"flgplus\">+</span>");
-            }
+            buildIndexMark(sb, "o");
         } else {
             sb.append("&nbsp;");
         }
