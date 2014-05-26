@@ -16,6 +16,8 @@
 package org.seasar.dbflute.optional;
 
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
+import org.seasar.dbflute.exception.NonSetupSelectRelationAccessException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 
 /**
  * The entity as optional object, which has entity instance in it. <br />
@@ -68,7 +70,34 @@ public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
     static {
         RELATION_EMPTY_INSTANCE = new OptionalEntity<Object>(null, new OptionalObjectExceptionThrower() {
             public void throwNotFoundException() {
-                // TODO jflute
+                // TODO jflute exception message for relation
+                final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+                br.addNotice("NON-setupSelect relation was accessed.");
+                br.addItem("Advice");
+                br.addElement("Confirm your access to the relation.");
+                br.addElement("Call setupSelect or fix your access.");
+                br.addElement("For example:");
+                br.addElement("  (x):");
+                br.addElement("    MemberCB cb = new MemberCB()");
+                br.addElement("    cb.setupSelect_MemberStatus();");
+                br.addElement("    List<Member> memberList = memberBhv.selectList(cb);");
+                br.addElement("    for (Member member : memberList) {");
+                br.addElement("        ... = member.getMemberSecurityAsOne().required(...); // *NG");
+                br.addElement("    }");
+                br.addElement("  (o):");
+                br.addElement("    MemberCB cb = new MemberCB()");
+                br.addElement("    cb.setupSelect_MemberStatus();");
+                br.addElement("    List<Member> memberList = memberBhv.selectList(cb);");
+                br.addElement("    for (Member member : memberList) {");
+                br.addElement("        ... = member.getMemberStatus().required(...); // OK");
+                br.addElement("    }");
+                br.addElement("  (o):");
+                br.addElement("    MemberCB cb = new MemberCB()");
+                br.addElement("    cb.setupSelect_MemberSecurityAsOne(); // OK");
+                br.addElement("    List<Member> memberList = memberBhv.selectList(cb);");
+                br.addElement("    for (Member member : memberList) {");
+                br.addElement("        ... = member.getMemberSecurityAsOne().required(...);");
+                br.addElement("    }");
                 String msg = "The empty optional so the value is null.";
                 throw new EntityAlreadyDeletedException(msg);
             }
@@ -99,9 +128,48 @@ public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public static <EMPTY> OptionalEntity<EMPTY> relationEmpty() {
-        return (OptionalEntity<EMPTY>) RELATION_EMPTY_INSTANCE;
+    public static <EMPTY> OptionalEntity<EMPTY> relationEmpty(final Object entity, final String relation) {
+        return new OptionalEntity<EMPTY>(null, new OptionalObjectExceptionThrower() {
+            public void throwNotFoundException() {
+                throwNonSetupSelectRelationAccessException(entity, relation);
+            }
+        });
+    }
+
+    protected static void throwNonSetupSelectRelationAccessException(Object entity, String relation) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("NON-setupSelect relation was accessed.");
+        br.addItem("Advice");
+        br.addElement("Confirm your access to the relation.");
+        br.addElement("Call setupSelect or fix your access.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    MemberCB cb = new MemberCB()");
+        br.addElement("    cb.setupSelect_MemberStatus();");
+        br.addElement("    List<Member> memberList = memberBhv.selectList(cb);");
+        br.addElement("    for (Member member : memberList) {");
+        br.addElement("        ... = member.getMemberSecurityAsOne().required(...); // *NG");
+        br.addElement("    }");
+        br.addElement("  (o): (fix access mistake)");
+        br.addElement("    MemberCB cb = new MemberCB()");
+        br.addElement("    cb.setupSelect_MemberStatus();");
+        br.addElement("    List<Member> memberList = memberBhv.selectList(cb);");
+        br.addElement("    for (Member member : memberList) {");
+        br.addElement("        ... = member.getMemberStatus().required(...); // OK");
+        br.addElement("    }");
+        br.addElement("  (o): (fix setupSelect mistake)");
+        br.addElement("    MemberCB cb = new MemberCB()");
+        br.addElement("    cb.setupSelect_MemberSecurityAsOne(); // OK");
+        br.addElement("    List<Member> memberList = memberBhv.selectList(cb);");
+        br.addElement("    for (Member member : memberList) {");
+        br.addElement("        ... = member.getMemberSecurityAsOne().required(...);");
+        br.addElement("    }");
+        if (entity != null) { // just in case
+            br.addItem("Your Relation");
+            br.addElement(entity.getClass().getSimpleName() + "." + relation);
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new NonSetupSelectRelationAccessException(msg);
     }
 
     // ===================================================================================
