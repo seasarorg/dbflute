@@ -1786,11 +1786,11 @@ public class Table {
             if (limit >= 0 && columnList.size() > limit) {
                 continue;
             }
-            final String connectedJavaName = unique.getConnectedJavaName();
-            if (uniqueNameSet.contains(connectedJavaName)) {
+            final String javaNameIdentity = unique.getConnectedJavaName();
+            if (uniqueNameSet.contains(javaNameIdentity)) {
                 continue;
             }
-            uniqueNameSet.add(connectedJavaName);
+            uniqueNameSet.add(javaNameIdentity);
             uniqueList.add(unique);
         }
         return uniqueList;
@@ -3190,10 +3190,11 @@ public class Table {
     }
 
     // ===================================================================================
-    //                                                            ConditionBean Adjustment
-    //                                                            ========================
-    public boolean isMakeConditionBeanCBDrivenLoadReferrer() {
-        return getLittleAdjustmentProperties().isMakeConditionBeanCBDrivenLoadReferrer();
+    //                                                           ConditionQuery Adjustment
+    //                                                           =========================
+    public boolean isCompatibleOrScopeQueryPurposeNoCheck() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isCompatibleOrScopeQueryPurposeNoCheck();
     }
 
     // ===================================================================================

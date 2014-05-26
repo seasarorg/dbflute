@@ -116,7 +116,7 @@ public class ${myClassName} extends AbstractConditionBean {
      * Accept the query condition of unique key as equal.
      * ${uq.argsJavaDocString}
      */
-    public void acceptUniqueOf${uq.connectedJavaName}(${uq.argsString}) {
+    public void acceptUniqueOf${uq.javaNameKeyword}(${uq.argsString}) {
         ${uq.argsAssertString}
         ${myClassName} cb = this;
         ${uq.argsConditionSetupString}
@@ -729,6 +729,13 @@ public class ${myClassName} extends AbstractConditionBean {
     public void orScopeQuery(OrQuery<${myConditionBeanClassName}> orQuery) {
         xorSQ((${myConditionBeanClassName})this, orQuery);
     }
+#if ($table.isCompatibleOrScopeQueryPurposeNoCheck())
+
+    @Override
+    protected HpCBPurpose xhandleOrSQPurposeChange() {
+        return null; // means no check
+    }
+#end
 
     /**
      * Set up the and-part of or-scope. <br />
@@ -760,57 +767,6 @@ public class ${myClassName} extends AbstractConditionBean {
     public void customizeCursorSelect(CursorSelectOption cursorSelectOption) {
         _cursorSelectOption = cursorSelectOption;
     }
-#end
-#if ($table.isMakeConditionBeanCBDrivenLoadReferrer())
-#if (${table.hasPrimaryKey()} && $table.hasReferrerAsMany())
-
-    // ===================================================================================
-    //                                                                       Load Referrer
-    //                                                                       =============
-    protected final Map<String, HpCBDrivenLRefCBSetupper> _cbdrivenLoadReferrerMap = new LinkedHashMap<String, HpCBDrivenLRefCBSetupper>(4);
-    public Map<String, HpCBDrivenLRefCBSetupper> xgetCBDrivenLoadReferrerMap() {
-        ## making now
-        return _cbdrivenLoadReferrerMap;
-    }
-
-#foreach ($referrer in $table.referrerAsManyList)
-#set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-    public void load${referrer.referrerPropertyNameInitCap}(HpCBDrivenLRefCBSetupper<${referrerCBClassName}> setupper) {
-        _cbdrivenLoadReferrerMap.put("${referrer.referrerPropertyName}", setupper);
-    }
-
-#end
-#end
-#if ($table.hasForeignKeyOrReferrerAsOne())
-    // ===================================================================================
-    //                                                                   Pull out Relation
-    //                                                                   =================
-    ## needs check setupSelect
-    protected final Map<String, ConditionBean> _cbdrivenPulloutMap = new LinkedHashMap<String, ConditionBean>(2);
-    public Map<String, ConditionBean> xgetCBDrivenPulloutMap() {
-        return _cbdrivenPulloutMap;
-    }
-
-#foreach ($fk in $table.foreignKeys)
-#set ($foreignEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
-    protected ${fk.foreignTableExtendedConditionBeanClassName} _pullout${fk.foreignPropertyNameInitCap}CB;
-    public ${fk.foreignTableExtendedConditionBeanClassName} pullout${fk.foreignPropertyNameInitCap}() {
-        String key = "${fk.foreignPropertyName}"; ConditionBean cb = _cbdrivenPulloutMap.get(key);
-        if (cb == null) { cb = new ${fk.foreignTableExtendedConditionBeanClassName}(); _cbdrivenPulloutMap.put(key, cb); }
-        return cb;
-    }
-
-#end
-#foreach ($referrer in $table.referrerAsOneList)
-    protected ${referrer.referrerTableExtendedConditionBeanClassName} _pullout${referrer.referrerPropertyNameInitCapAsOne}CB;
-    public ${referrer.referrerTableExtendedConditionBeanClassName} pullout${referrer.referrerPropertyNameInitCapAsOne}() {
-        String key = "${referrer.referrerPropertyNameAsOne}"; ConditionBean cb = _cbdrivenPulloutMap.get(key);
-        if (cb == null) { cb = new ${referrer.referrerTableExtendedConditionBeanClassName}(); _cbdrivenPulloutMap.put(key, cb); }
-        return cb;
-    }
-
-#end
-#end
 #end
     // ===================================================================================
     //                                                                          DisplaySQL

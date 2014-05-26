@@ -56,6 +56,8 @@ public enum HpCBPurpose {
     , COLUMN_QUERY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
             .noSpecifyDerivedReferrerTwoOrMore().noQuery()) // ColumnQuery
 
+    , OR_SCOPE_QUERY(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // OrScopeQuery
+
     , DREAM_CRUISE(new HpSpec().noSetupSelect().noSpecifyColumnWithDerivedReferrer()
             .noSpecifyDerivedReferrerTwoOrMore().noQuery()) // DreamCruise
 

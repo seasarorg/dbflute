@@ -598,10 +598,24 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     protected <CB extends ConditionBean> void xdoOrSQ(CB cb, OrQuery<CB> orQuery) {
         getSqlClause().makeOrScopeQueryEffective();
+        final HpCBPurpose originalPurpose = xhandleOrSQPurposeChange();
         try {
             orQuery.query(cb);
         } finally {
+            xhandleOrSQPurposeClose(originalPurpose);
             getSqlClause().closeOrScopeQuery();
+        }
+    }
+
+    protected HpCBPurpose xhandleOrSQPurposeChange() { // might be overridden before Java8
+        final HpCBPurpose originalPurpose = getPurpose();
+        xsetupForOrScopeQuery();
+        return originalPurpose;
+    }
+
+    protected void xhandleOrSQPurposeClose(HpCBPurpose originalPurpose) {
+        if (originalPurpose != null) { // because it might be overridden before Java8
+            xchangePurposeSqlClause(originalPurpose, null);
         }
     }
 
@@ -1428,6 +1442,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
         // inherits a parent query to synchronize real name
         // (and also for suppressing query check) 
         xprepareSyncQyCall(mainCB);
+    }
+
+    public void xsetupForOrScopeQuery() {
+        xchangePurposeSqlClause(HpCBPurpose.OR_SCOPE_QUERY, null);
     }
 
     public void xsetupForDreamCruise(ConditionBean mainCB) {

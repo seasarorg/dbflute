@@ -210,9 +210,21 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                       ConditionBean
     //                                                                       =============
-    public boolean isMakeConditionBeanCBDrivenLoadReferrer() {
-        return isProperty("isMakeConditionBeanCBDrivenLoadReferrer", false);
-    }
+    // it's phantom
+    // cb.loadPurchaseList(purchaseCB -> {
+    //     purchaseCB.setupSelect_Product();
+    //     purchaseCB.query()...
+    //     purchaseCB.loadPurchaseDetailList(detailCB -> {
+    //         detailCB.setupSelect_Foo();
+    //         detailCB.setupSelect_BarAsOne();
+    //         detailCB.query()...
+    //         detailCB.pulloutBarAsOne().loadPurchase()...
+    //     });
+    // });
+    // DBFlute gives importance to easy-to-trace DB access by jflute (2014/05/26)
+    //public boolean isMakeConditionBeanCBDrivenLoadReferrer() {
+    //    return isProperty("isMakeConditionBeanCBDrivenLoadReferrer", false);
+    //}
 
     // ===================================================================================
     //                                                                      ConditionQuery
@@ -921,6 +933,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public boolean isCompatibleSelectByPKWithDeletedCheck() { // closet
         return isProperty("isCompatibleSelectByPKWithDeletedCheck", isCompatibleBeforeJava8());
+    }
+
+    public boolean isCompatibleOrScopeQueryPurposeNoCheck() { // closet
+        return isProperty("isCompatibleOrScopeQueryPurposeNoCheck", isCompatibleBeforeJava8());
     }
 
     public boolean isCompatibleBeforeJava8() { // closet
