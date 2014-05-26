@@ -163,7 +163,8 @@ public class Column {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final DfColumnExtractor _columnHandler = new DfColumnExtractor();
+    protected static final DfColumnExtractor _columnHandler = new DfColumnExtractor();
+    protected static final String SPAN_CLASS_FLGPLUS_SPAN = "<span class=\"flgplus\">+</span>";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -171,44 +172,44 @@ public class Column {
     // -----------------------------------------------------
     //                                                 Table
     //                                                 -----
-    private Table _table;
+    protected Table _table;
 
     // -----------------------------------------------------
     //                                     Column Definition
     //                                     -----------------
-    private String _name;
-    private String _synonym;
-    private String _dbType;
-    private String _columnSize;
-    private boolean _notNull;
-    private boolean _autoIncrement;
-    private String _defaultValue;
-    private String _plainComment;
+    protected String _name;
+    protected String _synonym;
+    protected String _dbType;
+    protected String _columnSize;
+    protected boolean _notNull;
+    protected boolean _autoIncrement;
+    protected String _defaultValue;
+    protected String _plainComment;
 
     // -----------------------------------------------------
     //                                           Primary Key
     //                                           -----------
-    private boolean _isPrimaryKey;
-    private String _primaryKeyName;
-    private boolean _additionalPrimaryKey;
+    protected boolean _isPrimaryKey;
+    protected String _primaryKeyName;
+    protected boolean _additionalPrimaryKey;
 
     // -----------------------------------------------------
     //                                           Foreign Key
     //                                           -----------
-    private List<ForeignKey> _referrerList;
+    protected List<ForeignKey> _referrerList;
 
     // -----------------------------------------------------
     //                                       Java Definition
     //                                       ---------------
-    private String _javaName;
-    private String _jdbcType;
+    protected String _javaName;
+    protected String _jdbcType;
 
     // -----------------------------------------------------
     //                                 Sql2Entity Definition
     //                                 ---------------------
-    private Table _sql2EntityRelatedTable;
-    private Column _sql2EntityRelatedColumn;
-    private String _sql2EntityForcedJavaNative;
+    protected Table _sql2EntityRelatedTable;
+    protected Column _sql2EntityRelatedColumn;
+    protected String _sql2EntityForcedJavaNative;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -703,7 +704,7 @@ public class Column {
         }
         if (isUnique()) {
             plugDelimiterIfNeeds(sb);
-            buildIndexMark(sb, "UQ");
+            buildUniqueKeyMark(sb, "UQ");
         }
         if (hasTopColumnIndex()) {
             plugDelimiterIfNeeds(sb);
@@ -785,7 +786,7 @@ public class Column {
         if (isPrimaryKey()) {
             sb.append("o");
             if (isTwoOrMoreColumnPrimaryKey()) {
-                sb.append("<span class=\"flgplus\">+</span>");
+                sb.append(SPAN_CLASS_FLGPLUS_SPAN);
             }
         } else {
             sb.append("&nbsp;");
@@ -1234,24 +1235,19 @@ public class Column {
     public String getUniqueKeyMarkForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
         if (isUnique()) {
-            buildIndexMark(sb, "o");
+            buildUniqueKeyMark(sb, "o");
         } else {
             sb.append("&nbsp;");
         }
         return sb.toString();
     }
 
-    protected void buildIndexMark(StringBuilder sb, String mark) {
-        final String plus = "<span class=\"flgplus\">+</span>";
-        final String alsoOnly = "<span class=\"flgplus\">*</span>";
+    protected void buildUniqueKeyMark(StringBuilder sb, String mark) {
+        final String plus = SPAN_CLASS_FLGPLUS_SPAN;
         if (hasTwoOrMoreColumnUnique()) { // compound index
             if (hasTopColumnUnique()) { // top column
-                if (hasOnlyOneColumnUnique()) { // also simple index
-                    sb.append(mark).append(alsoOnly);
-                } else {
-                    sb.append(mark).append(plus);
-                }
-            } else { // sub columns
+                sb.append(mark).append(plus);
+            } else { // sub column
                 sb.append(plus).append(mark);
             }
         } else { // simple index
@@ -1350,6 +1346,19 @@ public class Column {
             sb.append("&nbsp;");
         }
         return sb.toString();
+    }
+
+    protected void buildIndexMark(StringBuilder sb, String mark) {
+        final String plus = SPAN_CLASS_FLGPLUS_SPAN;
+        if (hasTwoOrMoreColumnIndex()) { // compound index
+            if (hasTopColumnIndex()) { // top column
+                sb.append(mark).append(plus);
+            } else { // sub column
+                sb.append(plus).append(mark);
+            }
+        } else { // simple index
+            sb.append(mark);
+        }
     }
 
     public String getIndexTitleForSchemaHtml() {
