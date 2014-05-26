@@ -319,17 +319,17 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
-    public OptionalEntity<${myExtendedObjectClassName}> selectByUniqueOf${uq.connectedJavaName}(${uq.argsString}) {
-        return doSelectByUniqueOf${uq.connectedJavaName}(${uq.argsCallingString}, ${myExtendedObjectClassName}.class);
+    public OptionalEntity<${myExtendedObjectClassName}> selectByUniqueOf${uq.javaNameKeyword}(${uq.argsString}) {
+        return doSelectByUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString}, ${myExtendedObjectClassName}.class);
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> OptionalEntity<ENTITY> doSelectByUniqueOf${uq.connectedJavaName}(${uq.argsString}, Class<ENTITY> entityType) {
-        return createOptionalEntity(doSelectEntity(xprepareCBAsUniqueOf${uq.connectedJavaName}(${uq.argsCallingString}), entityType), ${uq.argsCallingString});
+    protected <ENTITY extends ${myExtendedObjectClassName}> OptionalEntity<ENTITY> doSelectByUniqueOf${uq.javaNameKeyword}(${uq.argsString}, Class<ENTITY> entityType) {
+        return createOptionalEntity(doSelectEntity(xprepareCBAsUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString}), entityType), ${uq.argsCallingString});
     }
 
-    protected ${myConditionBeanClassName} xprepareCBAsUniqueOf${uq.connectedJavaName}(${uq.argsString}) {
+    protected ${myConditionBeanClassName} xprepareCBAsUniqueOf${uq.javaNameKeyword}(${uq.argsString}) {
         ${uq.argsAssertString}
-        ${myConditionBeanClassName} cb = newMyConditionBean(); cb.acceptUniqueOf${uq.connectedJavaName}(${uq.argsCallingString});
+        ${myConditionBeanClassName} cb = newMyConditionBean(); cb.acceptUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString});
         return cb;
     }
 #end

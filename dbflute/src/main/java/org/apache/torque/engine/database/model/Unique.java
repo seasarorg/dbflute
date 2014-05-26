@@ -127,6 +127,7 @@ package org.apache.torque.engine.database.model;
  * <http://www.apache.org/>.
  */
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -171,6 +172,30 @@ public class Unique extends Index {
         }
         result.append(" </unique>\n");
         return result.toString();
+    }
+
+    // ===================================================================================
+    //                                                                     Column Handling
+    //                                                                     ===============
+    @Override
+    public String getJavaNameKeyword() {
+        final String name;
+        if (getTable().getUniqueList().size() > 1) {
+            final List<Column> columnList = getColumnList();
+            final StringBuilder sb = new StringBuilder();
+            for (Column column : columnList) {
+                sb.append(column.getJavaName());
+            }
+            // e.g. selectByUniqueOfMemberAccount(...)
+            name = sb.toString();
+        } else { // only-one unique key
+            // no name here
+            // table rarely has plural unique constraint and second or more UQ is rarely added
+            // so only-one unique key is special handling, has simple method
+            // e.g. selectByUniqueOf(...)
+            name = "";
+        }
+        return name;
     }
 
     // ===================================================================================

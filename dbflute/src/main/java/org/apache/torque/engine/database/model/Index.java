@@ -290,6 +290,10 @@ public class Index implements Constraint {
         return sb.toString();
     }
 
+    public String getJavaNameKeyword() { // overridden by unique
+        return getConnectedJavaName();
+    }
+
     public String getArgsString() {
         final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
         return DfColumnListToStringBuilder.getColumnArgsString(getColumnList(), lang.getLanguageGrammar());

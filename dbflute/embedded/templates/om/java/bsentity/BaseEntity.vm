@@ -185,7 +185,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * You can update the entity by the key when entity update (NOT batch update).
      * ${uq.argsJavaDocString}
      */
-    public void uniqueBy${uq.connectedJavaName}(${uq.argsString}) {
+    public void uniqueBy${uq.javaNameKeyword}(${uq.argsString}) {
         __uniqueDrivenProperties.clear();
 #foreach ($col in $uq.columnList)
         __uniqueDrivenProperties.addPropertyName("${col.javaBeansRulePropertyName}");
@@ -391,7 +391,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         }
 #end
 #if ($fk.isForeignPropertyOptionalEntity())
-        if (${foreignVariableName} != null) { return ${foreignVariableName}; } else { return ${database.relationOptionalEntityClassName}.relationEmpty(); }
+        if (${foreignVariableName} != null) { return ${foreignVariableName}; } else { return ${database.relationOptionalEntityClassName}.relationEmpty(this, "${fk.foreignJavaBeansRulePropertyName}"); }
 #else
         return ${foreignVariableName};
 #end
@@ -430,7 +430,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         }
 #end
 #if ($referrer.isReferrerPropertyOptionalEntityAsOne())
-        if (${referrerVariableName} != null) { return ${referrerVariableName}; } else { return ${database.relationOptionalEntityClassName}.relationEmpty(); }
+        if (${referrerVariableName} != null) { return ${referrerVariableName}; } else { return ${database.relationOptionalEntityClassName}.relationEmpty(this, "${referrer.referrerJavaBeansRulePropertyNameAsOne}"); }
 #else
         return ${referrerVariableName};
 #end
