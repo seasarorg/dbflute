@@ -47,7 +47,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
  * @author jflute
  * @since 1.0.5F (2014/05/05 Monday)
  */
-public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
+public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
 
     // ===================================================================================
     //                                                                          Definition
@@ -66,60 +66,43 @@ public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
             throw new EntityAlreadyDeletedException("no way");
         }
     };
-    protected static final OptionalEntity<Object> RELATION_EMPTY_INSTANCE;
-    static {
-        RELATION_EMPTY_INSTANCE = new OptionalEntity<Object>(null, new OptionalObjectExceptionThrower() {
-            public void throwNotFoundException() {
-                // TODO jflute exception message for relation
-                final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-                br.addNotice("NON-setupSelect relation was accessed.");
-                br.addItem("Advice");
-                br.addElement("Confirm your access to the relation.");
-                br.addElement("Call setupSelect or fix your access.");
-                br.addElement("For example:");
-                br.addElement("  (x):");
-                br.addElement("    MemberCB cb = new MemberCB()");
-                br.addElement("    cb.setupSelect_MemberStatus();");
-                br.addElement("    List<Member> memberList = memberBhv.selectList(cb);");
-                br.addElement("    for (Member member : memberList) {");
-                br.addElement("        ... = member.getMemberSecurityAsOne().required(...); // *NG");
-                br.addElement("    }");
-                br.addElement("  (o):");
-                br.addElement("    MemberCB cb = new MemberCB()");
-                br.addElement("    cb.setupSelect_MemberStatus();");
-                br.addElement("    List<Member> memberList = memberBhv.selectList(cb);");
-                br.addElement("    for (Member member : memberList) {");
-                br.addElement("        ... = member.getMemberStatus().required(...); // OK");
-                br.addElement("    }");
-                br.addElement("  (o):");
-                br.addElement("    MemberCB cb = new MemberCB()");
-                br.addElement("    cb.setupSelect_MemberSecurityAsOne(); // OK");
-                br.addElement("    List<Member> memberList = memberBhv.selectList(cb);");
-                br.addElement("    for (Member member : memberList) {");
-                br.addElement("        ... = member.getMemberSecurityAsOne().required(...);");
-                br.addElement("    }");
-                String msg = "The empty optional so the value is null.";
-                throw new EntityAlreadyDeletedException(msg);
-            }
-        });
-    }
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    /**
+     * @param entity The wrapped instance of entity. (NullAllowed)
+     * @param thrower The exception thrower when illegal access. (NotNull)
+     */
     public OptionalEntity(ENTITY entity, OptionalObjectExceptionThrower thrower) { // basically called by DBFlute
         super(entity, thrower);
     }
 
+    /**
+     * @return The fixed instance as empty. (NotNull)
+     */
     @SuppressWarnings("unchecked")
     public static <EMPTY> OptionalEntity<EMPTY> empty() {
         return (OptionalEntity<EMPTY>) EMPTY_INSTANCE;
     }
 
+    /**
+     * @param entity The wrapped entity for the optional object. (NotNull)
+     * @return The new-created instance as existing optional object. (NotNull)
+     */
     public static <ENTITY> OptionalEntity<ENTITY> of(ENTITY entity) {
+        if (entity == null) {
+            String msg = "The argument 'entity' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
         return new OptionalEntity<ENTITY>(entity, NOWAY_THROWER);
     }
 
+    /**
+     * @param entity The wrapped instance or entity. (NullAllowed)
+     * @param thrower The exception thrower when illegal access. (NotNull)
+     * @return The new-created instance as existing or empty optional object. (NotNull)
+     */
     public static <ENTITY> OptionalEntity<ENTITY> ofNullable(ENTITY entity, OptionalObjectExceptionThrower thrower) {
         if (entity != null) {
             return of(entity);
@@ -128,7 +111,20 @@ public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
         }
     }
 
+    /**
+     * @param entity The base entity of the relation for exception message. (NotNull)
+     * @param relation The property name of the relation for exception message. (NotNull)
+     * @return The new-created instance as existing or empty optional object. (NotNull)
+     */
     public static <EMPTY> OptionalEntity<EMPTY> relationEmpty(final Object entity, final String relation) {
+        if (entity == null) {
+            String msg = "The argument 'entity' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (relation == null) {
+            String msg = "The argument 'relation' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
         return new OptionalEntity<EMPTY>(null, new OptionalObjectExceptionThrower() {
             public void throwNotFoundException() {
                 throwNonSetupSelectRelationAccessException(entity, relation);
@@ -164,10 +160,8 @@ public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
         br.addElement("    for (Member member : memberList) {");
         br.addElement("        ... = member.getMemberSecurityAsOne().required(...);");
         br.addElement("    }");
-        if (entity != null) { // just in case
-            br.addItem("Your Relation");
-            br.addElement(entity.getClass().getSimpleName() + "." + relation);
-        }
+        br.addItem("Your Relation");
+        br.addElement(entity.getClass().getSimpleName() + "." + relation);
         final String msg = br.buildExceptionMessage();
         throw new NonSetupSelectRelationAccessException(msg);
     }
@@ -237,12 +231,38 @@ public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
     }
 
     /**
+     * Filter the entity by the predicate.
+     * <pre>
+     * MemberCB cb = new MemberCB();
+     * cb.query().set...
+     * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
+     * OptionalEntity&lt;Member&gt; filtered = entity.<span style="color: #DD4747">filter</span>(member -&gt; {
+     *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
+     *     return member.getMemberId() % 2 == 0;
+     * });
+     * </pre>
+     * @param predicate The callback to predicate whether the entity is remained. (NotNull)
+     * @return The filtered optional entity, might be empty. (NotNull)
+     */
+    public OptionalEntity<ENTITY> filter(OptionalObjectPredicate<ENTITY> predicate) {
+        return (OptionalEntity<ENTITY>) callbackFilter(predicate);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected <ARG> OptionalObject<ARG> createOptionalFilteredObject(ARG obj) {
+        return new OptionalObject<ARG>(obj, _thrower);
+    }
+
+    /**
      * Apply the mapping of entity to result object.
      * <pre>
      * MemberCB cb = new MemberCB();
      * cb.query().set...
      * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
-     * OptionalEntity&lt;MemberWebBean&gt; bean = entity.<span style="color: #DD4747">map</span>(member -&gt; {
+     * OptionalObject&lt;MemberWebBean&gt; bean = entity.<span style="color: #DD4747">map</span>(member -&gt; {
      *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
      *     return new MemberWebBean(member);
      * });
@@ -250,9 +270,40 @@ public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
      * @param mapper The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    public <RESULT> OptionalEntity<RESULT> map(OptionalObjectFunction<? super ENTITY, ? extends RESULT> mapper) {
-        return (OptionalEntity<RESULT>) callbackMapping(mapper); // downcast allowed because factory is overridden
+    public <RESULT> OptionalObject<RESULT> map(OptionalObjectFunction<? super ENTITY, ? extends RESULT> mapper) {
+        return (OptionalObject<RESULT>) callbackMapping(mapper); // downcast allowed because factory is overridden
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected <ARG> OptionalObject<ARG> createOptionalMappedObject(ARG obj) {
+        return new OptionalObject<ARG>(obj, _thrower);
+    }
+
+    // almost no needed
+    ///**
+    // * Apply the flat-mapping of entity to result object.
+    // * <pre>
+    // * MemberCB cb = new MemberCB();
+    // * cb.query().set...
+    // * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
+    // * OptionalObject&lt;MemberWebBean&gt; bean = entity.<span style="color: #DD4747">map</span>(member -&gt; {
+    // *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
+    // *     if (member.getMemberId() % 2 == 0) {
+    // *         return OptionalObject.of(new MemberWebBean(member));
+    // *     } else {
+    // *         return OptionalObject.empty();
+    // *     }
+    // * });
+    // * </pre>
+    // * @param mapper The callback interface to apply. (NotNull)
+    // * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
+    // */
+    //public <RESULT> OptionalObject<RESULT> flatMap(OptionalObjectFunction<? super ENTITY, OptionalObject<RESULT>> mapper) {
+    //    return callbackFlatMapping(mapper);
+    //}
 
     // absolutely no needed
     //public ENTITY orElse(ENTITY other) {
@@ -289,13 +340,5 @@ public class OptionalEntity<ENTITY> extends OptionalObject<ENTITY> {
      */
     public void required(OptionalObjectConsumer<ENTITY> consumer) {
         callbackRequired(consumer);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected <OBJECT> OptionalEntity<OBJECT> createOptionalObject(OBJECT value) {
-        return new OptionalEntity<OBJECT>(value, _thrower);
     }
 }

@@ -116,8 +116,7 @@ public class DfAdditionalForeignKeyInitializer {
 
             // check same foreign key existence
             if (localTable.existsForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix)) {
-                String msg = "The foreign key has already set up: ";
-                _log.info(msg + foreignKeyName + "(" + fixedSuffix + ")");
+                _log.info("The foreign key has already set up: " + foreignKeyName + "(" + fixedSuffix + ")");
                 continue;
             }
 

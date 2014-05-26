@@ -15,135 +15,172 @@
  */
 package org.seasar.dbflute.optional;
 
+import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
+
 /**
- * The base class for optional object.
- * @param <OBJ> The type of wrapped object in the optional object.
+ * @param <OBJ> The type of object.
  * @author jflute
- * @since 1.0.5F (2014/05/10 Saturday)
+ * @since 1.0.5F (2014/05/05 Monday)
  */
-public abstract class OptionalObject<OBJ> {
+public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    /** The wrapped object for this optional object. (NullAllowed) */
-    protected final OBJ _obj;
-
-    /** The exception thrower e.g. when wrapped object is not found. (NotNull) */
-    protected final OptionalObjectExceptionThrower _thrower;
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final OptionalObject<Object> EMPTY_INSTANCE;
+    static {
+        EMPTY_INSTANCE = new OptionalObject<Object>(null, new OptionalObjectExceptionThrower() {
+            public void throwNotFoundException() {
+                String msg = "The empty optional so the value is null.";
+                throw new EntityAlreadyDeletedException(msg);
+            }
+        });
+    }
+    protected static final OptionalObjectExceptionThrower NOWAY_THROWER = new OptionalObjectExceptionThrower() {
+        public void throwNotFoundException() {
+            throw new EntityAlreadyDeletedException("no way");
+        }
+    };
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OptionalObject(OBJ obj, OptionalObjectExceptionThrower thrower) { // basically called by DBFlute
-        _obj = obj; // may be null
-        if (thrower == null) {
-            String msg = "The argument 'thrower' should not be null: obj=" + obj;
+    /**
+     * @param object The wrapped instance of object. (NullAllowed)
+     * @param thrower The exception thrower when illegal access. (NotNull)
+     */
+    public OptionalObject(OBJ object, OptionalObjectExceptionThrower thrower) { // basically called by DBFlute
+        super(object, thrower);
+    }
+
+    /**
+     * @return The fixed instance as empty. (NotNull)
+     */
+    @SuppressWarnings("unchecked")
+    public static <EMPTY> OptionalObject<EMPTY> empty() {
+        return (OptionalObject<EMPTY>) EMPTY_INSTANCE;
+    }
+
+    /**
+     * @param object The wrapped object for the optional object. (NotNull)
+     * @return The new-created instance as existing optional object. (NotNull)
+     */
+    public static <ENTITY> OptionalObject<ENTITY> of(ENTITY object) {
+        if (object == null) {
+            String msg = "The argument 'object' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        _thrower = thrower;
+        return new OptionalObject<ENTITY>(object, NOWAY_THROWER);
+    }
+
+    /**
+     * @param object The wrapped instance or object. (NullAllowed)
+     * @param thrower The exception thrower when illegal access. (NotNull)
+     * @return The new-created instance as existing or empty optional object. (NotNull)
+     */
+    public static <ENTITY> OptionalObject<ENTITY> ofNullable(ENTITY object, OptionalObjectExceptionThrower thrower) {
+        if (object != null) {
+            return of(object);
+        } else {
+            return new OptionalObject<ENTITY>(object, thrower);
+        }
     }
 
     // ===================================================================================
     //                                                                     Object Handling
     //                                                                     ===============
     /**
+     * Get the object or exception if null.
      * @return The object instance wrapped in this optional object. (NotNull)
+     * @exception EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
      */
-    protected OBJ directlyGet() {
-        if (!exists()) {
-            _thrower.throwNotFoundException();
-        }
-        return _obj;
+    public OBJ get() {
+        return directlyGet();
     }
 
     /**
-     * @param consumer The callback interface to consume the wrapped object. (NotNull)
+     * Handle the object in the optional object if the object is present. <br />
+     * You should call this if null object handling is unnecessary (do nothing if null). <br />
+     * If exception is preferred when null object, use required().
+     * @param consumer The callback interface to consume the optional value. (NotNull)
      */
-    protected void callbackIfPresent(OptionalObjectConsumer<OBJ> consumer) {
-        if (consumer == null) {
-            String msg = "The argument 'consumer' should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        if (exists()) {
-            consumer.accept(_obj);
-        }
+    public void ifPresent(OptionalObjectConsumer<OBJ> consumer) {
+        callbackIfPresent(consumer);
     }
 
     /**
-     * Is the wrapped object present? (existing?)
+     * Is the object instance present? (existing?)
      * @return The determination, true or false.
      */
-    protected boolean exists() {
-        return _obj != null;
+    public boolean isPresent() {
+        return exists();
     }
 
     /**
+     * Filter the object by the predicate.
+     * @param predicate The callback to predicate whether the object is remained. (NotNull)
+     * @return The filtered optional object, might be empty. (NotNull)
+     */
+    public OptionalObject<OBJ> filter(OptionalObjectPredicate<OBJ> predicate) {
+        return (OptionalObject<OBJ>) callbackFilter(predicate);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected <ARG> OptionalObject<ARG> createOptionalFilteredObject(ARG obj) {
+        return new OptionalObject<ARG>(obj, _thrower);
+    }
+
+    /**
+     * Apply the mapping of object to result object.
      * @param mapper The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    protected <RESULT> OptionalObject<RESULT> callbackMapping(
-            OptionalObjectFunction<? super OBJ, ? extends RESULT> mapper) {
-        if (mapper == null) {
-            String msg = "The argument 'mapper' should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        final RESULT result = exists() ? mapper.apply(_obj) : null;
-        return createOptionalObject(result);
+    public <RESULT> OptionalObject<RESULT> map(OptionalObjectFunction<? super OBJ, ? extends RESULT> mapper) {
+        return (OptionalObject<RESULT>) callbackMapping(mapper); // downcast allowed because factory is overridden
     }
 
     /**
-     * @param other The other instance to be returned if null. (NullAllowed: if null, returns null when entity is null)
-     * @return The object instance wrapped in this optional object or specified value. (NullAllowed: if null specified)
+     * {@inheritDoc}
      */
-    protected OBJ directlyGetOrElse(OBJ other) {
-        return exists() ? _obj : other;
+    @Override
+    protected <ARG> OptionalObject<ARG> createOptionalMappedObject(ARG obj) {
+        return new OptionalObject<ARG>(obj, _thrower);
     }
 
     /**
-     * @param consumer The callback interface to consume the wrapped value. (NotNull)
+     * Apply the flat-mapping of object to result object.
+     * @param mapper The callback interface to apply. (NotNull)
+     * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    protected void callbackRequired(OptionalObjectConsumer<OBJ> consumer) {
-        if (consumer == null) {
-            String msg = "The argument 'consumer' should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        if (_obj == null) {
-            _thrower.throwNotFoundException();
-        }
-        consumer.accept(_obj);
+    public <RESULT> OptionalObject<RESULT> flatMap(OptionalObjectFunction<? super OBJ, OptionalObject<RESULT>> mapper) {
+        return callbackFlatMapping(mapper);
     }
 
     /**
-     * @param <ARG> The type of value for optional object.
-     * @param obj The plain object for the optional object. (NullAllowed: if null, return s empty optional)
-     * @return The new-created instance of optional object. (NotNull)
+     * @param other The object instance to be returned when the optional is empty. (NullAllowed)
+     * @return The wrapped instance or specified other object. (NullAllowed:)
      */
-    protected abstract <ARG> OptionalObject<ARG> createOptionalObject(ARG obj);
-
-    // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    @Override
-    public int hashCode() {
-        return _obj != null ? _obj.hashCode() : 0;
+    public OBJ orElse(OBJ other) {
+        return directlyGetOrElse(other);
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (getClass().isInstance(obj)) {
-            final OptionalObject<?> other = (OptionalObject<?>) obj;
-            if (_obj != null) {
-                return _obj.equals(other.directlyGet());
-            } else { // null v.s. null?
-                return !other.exists();
-            }
-        }
-        return false;
+    /**
+     * Get the object instance or null if not present.
+     * @return The object instance wrapped in this optional object or null. (NullAllowed: if not present)
+     */
+    public OBJ orElseNull() {
+        return directlyGetOrElse(null);
     }
 
-    @Override
-    public String toString() {
-        return "opt:{" + (_obj != null ? _obj.toString() : "null") + "}";
+    /**
+     * Handle the object in the optional object or exception if not present.
+     * @param consumer The callback interface to consume the optional value. (NotNull)
+     * @exception EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
+     */
+    public void required(OptionalObjectConsumer<OBJ> consumer) {
+        callbackRequired(consumer);
     }
 }
