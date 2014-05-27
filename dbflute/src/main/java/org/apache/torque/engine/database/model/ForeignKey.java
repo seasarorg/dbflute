@@ -183,6 +183,8 @@ public class ForeignKey implements Constraint {
     protected boolean _fixedInline;
     protected boolean _fixedReferrer;
     protected String _comment;
+    protected boolean _suppressJoin;
+    protected boolean _suppressSubQuery;
     protected String _foreignPropertyNamePrefix;
     protected boolean _implicitReverseForeignKey;
 
@@ -1462,6 +1464,73 @@ public class ForeignKey implements Constraint {
         return true;
     }
 
+    // -----------------------------------------------------
+    //                                              SubQuery
+    //                                              --------
+    public boolean isExistsReferrerSupported() {
+        if (!isMakeConditionQueryExistsReferrerToOne() && isOneToOne()) {
+            return false;
+        }
+        if (isCompoundFKImplicitReverseForeignKey()) {
+            return false; // too complex so unsupported
+        }
+        if (isSuppressSubQuery()) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isInScopeRelationAllowedForeignKey() {
+        if (!isMakeConditionQueryInScopeRelationToOne()) {
+            return false; // suppress InScopeRelation for many-to-one
+        }
+        return isSimpleKeyFK() && !hasFixedCondition();
+    }
+
+    public boolean isInScopeRelationAsReferrerSupported() {
+        if (!isMakeConditionQueryInScopeRelationToOne() && isOneToOne()) {
+            return false;
+        }
+        if (isCompoundFKImplicitReverseForeignKey()) {
+            return false; // too complex so unsupported
+        }
+        if (isSuppressSubQuery()) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isDerivedReferrerSupported() {
+        if (isOneToOne()) {
+            return false;
+        }
+        if (isCompoundFKImplicitReverseForeignKey()) {
+            return false; // too complex so unsupported
+        }
+        if (isSuppressSubQuery()) {
+            return false;
+        }
+        final List<Column> localColumnList = getLocalColumnList();
+        for (Column column : localColumnList) {
+            if (!(column.isJavaNativeStringObject() || column.isJavaNativeNumberObject())) {
+                return false; // only string or number is supported
+            }
+        }
+        return true;
+    }
+
+    protected boolean isMakeConditionQueryExistsReferrerToOne() {
+        return getLittleAdjustmentProperties().isMakeConditionQueryExistsReferrerToOne();
+    }
+
+    protected boolean isMakeConditionQueryInScopeRelationToOne() {
+        return getLittleAdjustmentProperties().isMakeConditionQueryInScopeRelationToOne();
+    }
+
+    protected boolean isCompoundFKImplicitReverseForeignKey() {
+        return isCompoundFK() && isImplicitReverseForeignKey();
+    }
+
     // ===================================================================================
     //                                                                             Display
     //                                                                             =======
@@ -1828,6 +1897,22 @@ public class ForeignKey implements Constraint {
 
     public void setComment(String comment) {
         _comment = comment;
+    }
+
+    public boolean isSuppressJoin() {
+        return _suppressJoin;
+    }
+
+    public void setSuppressJoin(boolean suppressJoin) {
+        _suppressJoin = suppressJoin;
+    }
+
+    public boolean isSuppressSubQuery() {
+        return _suppressSubQuery;
+    }
+
+    public void setSuppressSubQuery(boolean suppressSubQuery) {
+        _suppressSubQuery = suppressSubQuery;
     }
 
     public void setForeignPropertyNamePrefix(String propertyNamePrefix) {

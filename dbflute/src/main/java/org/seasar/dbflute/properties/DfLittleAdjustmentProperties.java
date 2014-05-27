@@ -203,7 +203,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                            Unique Key
     //                                            ----------
     public Integer getKeyableUniqueColumnLimit() { // closet
-        final String defaultValue = "3"; // because too many columns may be inconvenient as key
+        final String defaultValue = "9"; // too many columns may be inconvenient as key
         return Integer.valueOf(getProperty("keyableUniqueColumnLimit", defaultValue)); // if minus, no limit
     }
 

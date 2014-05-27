@@ -354,7 +354,7 @@ public class ${myClassName} extends AbstractConditionBean {
     // ===================================================================================
     //                                                                         SetupSelect
     //                                                                         ===========
-#foreach ($fk in $table.foreignKeys)
+#foreach ($fk in $table.joinableForeignKeyList)
 #set ($tmpPropertyName = "${fk.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
 #set ($nestSelectSetuppperClassName = "${fk.foreignTableNestSelectSetupperClassName}")
@@ -401,7 +401,7 @@ public class ${myClassName} extends AbstractConditionBean {
         return _nss${tmpPropertyNameInitCap};
     }
 #end
-#foreach ($referrer in $table.referrerAsOneList)
+#foreach ($referrer in $table.joinableReferrerAsOneList)
 #set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
@@ -524,7 +524,7 @@ public class ${myClassName} extends AbstractConditionBean {
         }
         @Override
         protected String getTableDbName() { return "$table.tableDbName"; }
-#foreach ($fk in $table.foreignKeys)
+#foreach ($fk in $table.joinableForeignKeyList)
 #set ($tmpPropertyName = "${fk.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
 #set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
@@ -583,7 +583,7 @@ public class ${myClassName} extends AbstractConditionBean {
             return _${tmpPropertyName};
         }
 #end
-#foreach ($referrer in $table.referrerAsOneList)
+#foreach ($referrer in $table.joinableReferrerAsOneList)
 #set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
@@ -611,7 +611,6 @@ public class ${myClassName} extends AbstractConditionBean {
         }
 #end
 #foreach ($referrer in $table.derivedReferrerReferrers)
-#if (!${referrer.isOneToOne()})
 #set ($tmpPropertyName = "${referrer.referrerPropertyName}")
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
@@ -637,7 +636,6 @@ public class ${myClassName} extends AbstractConditionBean {
                 public void setup(String fn, SubQuery<${tmpCBClassName}> sq, ${tmpLocalCQClassName} cq, String al, DerivedReferrerOption op) {
                     cq.xsderive${referrer.referrerPropertyNameInitCap}(fn, sq, al, op); } }, _dbmetaProvider);
         }
-#end
 #end
 #if ($table.hasSinglePrimaryKey())
 #if ($table.isAvailableMyselfMyselfDerived())
@@ -768,6 +766,7 @@ public class ${myClassName} extends AbstractConditionBean {
         _cursorSelectOption = cursorSelectOption;
     }
 #end
+
     // ===================================================================================
     //                                                                          DisplaySQL
     //                                                                          ==========

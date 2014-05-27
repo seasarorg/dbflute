@@ -164,7 +164,8 @@ public class Column {
     //                                                                          Definition
     //                                                                          ==========
     protected static final DfColumnExtractor _columnHandler = new DfColumnExtractor();
-    protected static final String SPAN_CLASS_FLGPLUS_SPAN = "<span class=\"flgplus\">+</span>";
+    protected static final String INDEX_PLUS = "+";
+    protected static final String HTML_INDEX_PLUS = "<span class=\"flgplus\">+</span>";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -704,11 +705,11 @@ public class Column {
         }
         if (isUnique()) {
             plugDelimiterIfNeeds(sb);
-            buildUniqueKeyMark(sb, "UQ");
+            buildUniqueKeyMark(sb, "UQ", false);
         }
         if (hasTopColumnIndex()) {
             plugDelimiterIfNeeds(sb);
-            buildIndexMark(sb, "IX");
+            buildIndexMark(sb, "IX", false);
         }
         if (isNotNull()) {
             plugDelimiterIfNeeds(sb);
@@ -786,7 +787,7 @@ public class Column {
         if (isPrimaryKey()) {
             sb.append("o");
             if (isTwoOrMoreColumnPrimaryKey()) {
-                sb.append(SPAN_CLASS_FLGPLUS_SPAN);
+                sb.append(HTML_INDEX_PLUS);
             }
         } else {
             sb.append("&nbsp;");
@@ -894,7 +895,7 @@ public class Column {
      * @return Foreign key. (NullAllowed)
      */
     public ForeignKey getForeignKey() {
-        return _table.getForeignKey(this._name);
+        return _table.getForeignKey(_name);
     }
 
     public List<ForeignKey> getForeignKeyList() {
@@ -965,10 +966,7 @@ public class Column {
     }
 
     public boolean isInScopeRelationAllowedForeignKey() {
-        if (!isMakeConditionQueryInScopeRelationToOne()) {
-            return false; // suppress InScopeRelation for many-to-one
-        }
-        return isSingleKeyForeignKey() && !getForeignKey().hasFixedCondition();
+        return isForeignKey() && getForeignKey().isInScopeRelationAllowedForeignKey();
     }
 
     public String getRelatedColumnName() {
@@ -1030,6 +1028,34 @@ public class Column {
         return getReferrerList();
     }
 
+    public List<ForeignKey> getReferrerAsManyList() {
+        return getReferrerAsWhatList(false);
+    }
+
+    public List<ForeignKey> getReferrerAsOneList() {
+        return getReferrerAsWhatList(true);
+    }
+
+    protected List<ForeignKey> getReferrerAsWhatList(boolean oneToOne) {
+        final List<ForeignKey> referrerList = getReferrerList();
+        if (referrerList == null || referrerList.isEmpty()) {
+            return referrerList;
+        }
+        List<ForeignKey> referrerListAsWhat = DfCollectionUtil.newArrayList();
+        for (ForeignKey key : referrerList) {
+            if (oneToOne) {
+                if (key.isOneToOne()) {
+                    referrerListAsWhat.add(key);
+                }
+            } else {
+                if (!key.isOneToOne()) {
+                    referrerListAsWhat.add(key);
+                }
+            }
+        }
+        return referrerListAsWhat;
+    }
+
     // -----------------------------------------------------
     //                                               Arrange
     //                                               -------
@@ -1065,7 +1091,7 @@ public class Column {
 
     protected List<ForeignKey> _existsReferrerReferrers;
 
-    public List<ForeignKey> getExistsReferrerReferrers() {
+    public List<ForeignKey> getExistsReferrerReferrers() { // not contains compound key
         if (_existsReferrerReferrers != null) {
             return _existsReferrerReferrers;
         }
@@ -1073,10 +1099,9 @@ public class Column {
         if (!hasReferrer()) {
             return _existsReferrerReferrers;
         }
-        final List<ForeignKey> singleKeyReferrers = getSingleKeyReferrers();
-        final boolean toOne = isMakeConditionQueryExistsReferrerToOne();
-        for (ForeignKey referrer : singleKeyReferrers) {
-            if (!toOne && referrer.isOneToOne()) {
+        // compound referrer is handled by other process
+        for (ForeignKey referrer : getSingleKeyReferrers()) {
+            if (!referrer.isExistsReferrerSupported()) {
                 continue;
             }
             _existsReferrerReferrers.add(referrer);
@@ -1086,7 +1111,7 @@ public class Column {
 
     protected List<ForeignKey> _inScopeRelationReferrers;
 
-    public List<ForeignKey> getInScopeRelationReferrers() {
+    public List<ForeignKey> getInScopeRelationReferrers() { // not contains compound key
         if (_inScopeRelationReferrers != null) {
             return _inScopeRelationReferrers;
         }
@@ -1094,10 +1119,9 @@ public class Column {
         if (!hasReferrer()) {
             return _inScopeRelationReferrers;
         }
-        final List<ForeignKey> singleKeyReferrers = getSingleKeyReferrers();
-        final boolean toOne = isMakeConditionQueryInScopeRelationToOne();
-        for (ForeignKey referrer : singleKeyReferrers) {
-            if (!toOne && referrer.isOneToOne()) {
+        // in-scope relation of compound referrer is unsupported
+        for (ForeignKey referrer : getSingleKeyReferrers()) {
+            if (!referrer.isInScopeRelationAsReferrerSupported()) {
                 continue;
             }
             _inScopeRelationReferrers.add(referrer);
@@ -1105,12 +1129,24 @@ public class Column {
         return _inScopeRelationReferrers;
     }
 
-    protected boolean isMakeConditionQueryExistsReferrerToOne() {
-        return getLittleAdjustmentProperties().isMakeConditionQueryExistsReferrerToOne();
-    }
+    protected List<ForeignKey> _derivedReferrerReferrers;
 
-    protected boolean isMakeConditionQueryInScopeRelationToOne() {
-        return getLittleAdjustmentProperties().isMakeConditionQueryInScopeRelationToOne();
+    public List<ForeignKey> getDerivedReferrerReferrers() { // not contains compound key
+        if (_derivedReferrerReferrers != null) {
+            return _derivedReferrerReferrers;
+        }
+        _derivedReferrerReferrers = new ArrayList<ForeignKey>(5);
+        if (!hasReferrer()) {
+            return _derivedReferrerReferrers;
+        }
+        // compound referrer is handled by other process
+        for (ForeignKey referrer : getSingleKeyReferrers()) {
+            if (!referrer.isDerivedReferrerSupported()) {
+                continue;
+            }
+            _derivedReferrerReferrers.add(referrer);
+        }
+        return _derivedReferrerReferrers;
     }
 
     // -----------------------------------------------------
@@ -1235,15 +1271,15 @@ public class Column {
     public String getUniqueKeyMarkForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
         if (isUnique()) {
-            buildUniqueKeyMark(sb, "o");
+            buildUniqueKeyMark(sb, "o", true);
         } else {
             sb.append("&nbsp;");
         }
         return sb.toString();
     }
 
-    protected void buildUniqueKeyMark(StringBuilder sb, String mark) {
-        final String plus = SPAN_CLASS_FLGPLUS_SPAN;
+    protected void buildUniqueKeyMark(StringBuilder sb, String mark, boolean html) {
+        final String plus = html ? HTML_INDEX_PLUS : INDEX_PLUS;
         if (hasTwoOrMoreColumnUnique()) { // compound index
             if (hasTopColumnUnique()) { // top column
                 sb.append(mark).append(plus);
@@ -1341,15 +1377,15 @@ public class Column {
     public String getIndexMarkForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
         if (hasIndex()) {
-            buildIndexMark(sb, "o");
+            buildIndexMark(sb, "o", true);
         } else {
             sb.append("&nbsp;");
         }
         return sb.toString();
     }
 
-    protected void buildIndexMark(StringBuilder sb, String mark) {
-        final String plus = SPAN_CLASS_FLGPLUS_SPAN;
+    protected void buildIndexMark(StringBuilder sb, String mark, boolean html) {
+        final String plus = html ? HTML_INDEX_PLUS : INDEX_PLUS;
         if (hasTwoOrMoreColumnIndex()) { // compound index
             if (hasTopColumnIndex()) { // top column
                 sb.append(mark).append(plus);

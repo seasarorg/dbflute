@@ -42,6 +42,8 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
     public static final String KEY_FIXED_INLINE = "fixedInline";
     public static final String KEY_FIXED_REFERRER = "fixedReferrer";
     public static final String KEY_COMMENT = "comment";
+    public static final String KEY_SUPPRESS_JOIN = "suppressJoin";
+    public static final String KEY_SUPPRESS_SUBQUERY = "suppressSubQuery";
 
     // ===================================================================================
     //                                                                         Constructor
@@ -201,6 +203,14 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
 
     public String findFixedReferrer(String foreignKeyName) {
         return doFindAttributeValue(foreignKeyName, KEY_FIXED_REFERRER);
+    }
+
+    public String findSuppressJoin(String foreignKeyName) {
+        return doFindAttributeValue(foreignKeyName, KEY_SUPPRESS_JOIN);
+    }
+
+    public String findSuppressSubQuery(String foreignKeyName) {
+        return doFindAttributeValue(foreignKeyName, KEY_SUPPRESS_SUBQUERY);
     }
 
     public String findComment(String foreignKeyName) {

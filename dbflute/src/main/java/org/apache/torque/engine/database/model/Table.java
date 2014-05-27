@@ -1119,6 +1119,18 @@ public class Table {
         return _foreignKeyMap.values().toArray(new ForeignKey[_foreignKeyMap.size()]);
     }
 
+    public List<ForeignKey> getJoinableForeignKeyList() {
+        final List<ForeignKey> foreignKeyList = getForeignKeyList();
+        final List<ForeignKey> filteredList = new ArrayList<ForeignKey>();
+        for (ForeignKey fk : foreignKeyList) {
+            if (fk.isSuppressJoin()) {
+                continue;
+            }
+            filteredList.add(fk);
+        }
+        return filteredList;
+    }
+
     /**
      * Return the first foreign key that includes column in it's list
      * of local columns.  Eg. Foreign key (a,b,c) references table(x,y,z)
@@ -1286,6 +1298,23 @@ public class Table {
 
     protected boolean doExistsForeignKey(String foreignTableName, List<String> localColumnNameList,
             List<String> foreignColumnNameList, String fixedSuffix, boolean compareSuffix) {
+        final ForeignKey fk = doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList,
+                fixedSuffix, compareSuffix);
+        return fk != null;
+    }
+
+    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList,
+            List<String> foreignColumnNameList) {
+        return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, null, false);
+    }
+
+    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList,
+            List<String> foreignColumnNameList, String fixedSuffix) {
+        return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, true);
+    }
+
+    protected ForeignKey doFindExistingForeignKey(String foreignTableName, List<String> localColumnNameList,
+            List<String> foreignColumnNameList, String fixedSuffix, boolean compareSuffix) {
         final StringSet localColumnNameSet = StringSet.createAsFlexibleOrdered();
         localColumnNameSet.addAll(localColumnNameList);
         final StringSet foreignColumnNameSet = StringSet.createAsFlexibleOrdered();
@@ -1308,9 +1337,9 @@ public class Table {
             if (!foreignColumnNameSet.equalsUnderCharOption(currentForeignColumnNameSet)) {
                 continue;
             }
-            return true;
+            return fk;
         }
-        return false;
+        return null;
     }
 
     public boolean hasForeignKey() {
@@ -1468,21 +1497,6 @@ public class Table {
         return hasForeignKey() || hasReferrerAsOne();
     }
 
-    public boolean hasCompoundKeyReferrer() {
-        return doHasCompoundKeyReferrer(getPrimaryKey()) || doHasCompoundKeyReferrer(getUniqueColumnList());
-    }
-
-    protected boolean doHasCompoundKeyReferrer(List<Column> columnList) {
-        for (Column col : columnList) {
-            for (ForeignKey referrer : col.getReferrers()) {
-                if (!referrer.isSimpleKeyFK()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     // ===================================================================================
     //                                                                            Referrer
     //                                                                            ========
@@ -1513,6 +1527,18 @@ public class Table {
 
     public List<ForeignKey> getReferrerAsOneList() {
         return getReferrerAsWhatList(true);
+    }
+
+    public List<ForeignKey> getJoinableReferrerAsOneList() {
+        final List<ForeignKey> referrerList = getReferrerAsOneList();
+        final List<ForeignKey> filteredList = new ArrayList<ForeignKey>();
+        for (ForeignKey fk : referrerList) {
+            if (fk.isSuppressJoin()) {
+                continue;
+            }
+            filteredList.add(fk);
+        }
+        return filteredList;
     }
 
     protected List<ForeignKey> getReferrerAsWhatList(boolean oneToOne) {
@@ -1596,13 +1622,33 @@ public class Table {
         return _singleKeyReferrers;
     }
 
-    protected List<ForeignKey> _derivedReferrerReferrers;
+    protected List<ForeignKey> _compoundKeyReferrers;
 
-    public boolean hasDerivedReferrerReferrer() {
-        return !getDerivedReferrerReferrers().isEmpty();
+    public boolean hasCompoundKeyReferrer() {
+        return !getCompoundKeyReferrers().isEmpty();
     }
 
-    public List<ForeignKey> getDerivedReferrerReferrers() {
+    public List<ForeignKey> getCompoundKeyReferrers() {
+        if (_compoundKeyReferrers != null) {
+            return _compoundKeyReferrers;
+        }
+        _compoundKeyReferrers = new ArrayList<ForeignKey>(5);
+        if (!hasReferrer()) {
+            return _compoundKeyReferrers;
+        }
+        final List<ForeignKey> referrerList = getReferrers();
+        for (ForeignKey referrer : referrerList) {
+            if (!referrer.isCompoundFK()) {
+                continue;
+            }
+            _compoundKeyReferrers.add(referrer);
+        }
+        return _compoundKeyReferrers;
+    }
+
+    protected List<ForeignKey> _derivedReferrerReferrers;
+
+    public List<ForeignKey> getDerivedReferrerReferrers() { // contains compound key
         if (_derivedReferrerReferrers != null) {
             return _derivedReferrerReferrers;
         }
@@ -1610,17 +1656,9 @@ public class Table {
         if (!hasReferrer()) {
             return _derivedReferrerReferrers;
         }
-        final List<ForeignKey> referrerList = getReferrers();
-        fkloop: //
-        for (ForeignKey referrer : referrerList) {
-            if (referrer.isCompoundFK() && referrer.isImplicitReverseForeignKey()) {
-                continue; // too complex so unsupported
-            }
-            final List<Column> localColumnList = referrer.getLocalColumnList();
-            for (Column column : localColumnList) {
-                if (!(column.isJavaNativeStringObject() || column.isJavaNativeNumberObject())) {
-                    continue fkloop;
-                }
+        for (ForeignKey referrer : getReferrers()) {
+            if (!referrer.isDerivedReferrerSupported()) {
+                continue;
             }
             _derivedReferrerReferrers.add(referrer);
         }
@@ -1679,6 +1717,28 @@ public class Table {
             }
             fkList.add(referrer);
         }
+    }
+
+    public List<ForeignKey> getCompoundKeyExistsReferrerReferrers() {
+        final List<ForeignKey> filteredList = new ArrayList<ForeignKey>();
+        for (ForeignKey referrer : getCompoundKeyReferrers()) {
+            if (!referrer.isExistsReferrerSupported()) {
+                continue;
+            }
+            filteredList.add(referrer);
+        }
+        return filteredList;
+    }
+
+    public List<ForeignKey> getCompoundKeyDerivedReferrerReferrers() {
+        final List<ForeignKey> filteredList = new ArrayList<ForeignKey>();
+        for (ForeignKey referrer : getCompoundKeyReferrers()) {
+            if (!referrer.isDerivedReferrerSupported()) {
+                continue;
+            }
+            filteredList.add(referrer);
+        }
+        return filteredList;
     }
 
     // -----------------------------------------------------
@@ -1785,6 +1845,11 @@ public class Table {
             }
             if (limit >= 0 && columnList.size() > limit) {
                 continue;
+            }
+            for (Column column : columnList) {
+                if (column.isOptimisticLock()) {
+                    continue; // just in case
+                }
             }
             final String javaNameIdentity = unique.getConnectedJavaName();
             if (uniqueNameSet.contains(javaNameIdentity)) {

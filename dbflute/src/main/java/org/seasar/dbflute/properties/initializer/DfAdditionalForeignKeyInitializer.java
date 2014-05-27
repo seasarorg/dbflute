@@ -17,7 +17,6 @@ package org.seasar.dbflute.properties.initializer;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -68,8 +67,7 @@ public class DfAdditionalForeignKeyInitializer {
         _log.info("...Initializing additional foreign keys.");
 
         final Map<String, Map<String, String>> additionalForeignKeyMap = getAdditionalForeignKeyMap();
-        final Set<String> foreignKeyNameKeySet = additionalForeignKeyMap.keySet();
-        for (String foreignKeyName : foreignKeyNameKeySet) {
+        for (String foreignKeyName : additionalForeignKeyMap.keySet()) {
             final String foreignTableName = getForeignTableName(foreignKeyName);
             assertForeignTable(foreignKeyName, foreignTableName);
             final List<String> foreignColumnNameList = getForeignColumnNameList(foreignKeyName, foreignTableName);
@@ -143,9 +141,11 @@ public class DfAdditionalForeignKeyInitializer {
         final List<String> localColumnNameList = getLocalColumnNameList(foreignKeyName, foreignTableName,
                 foreignColumnNameList, localTableName, true);
         assertLocalTableColumn(foreignKeyName, localTableName, localColumnNameList);
-        if (table.existsForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix)) {
-            String msg = "The foreign key has already set up: ";
-            _log.info(msg + foreignKeyName + "(" + fixedSuffix + ")");
+        final ForeignKey existingFK = table.findExistingForeignKey(foreignTableName, localColumnNameList,
+                foreignColumnNameList, fixedSuffix);
+        if (existingFK != null) {
+            _log.info("The foreign key has already set up: " + foreignKeyName + "(" + fixedSuffix + ")");
+            reflectOptionToExistingFKIfNeeds(foreignKeyName, fixedSuffix, existingFK);
             return;
         }
         setupForeignKeyToTable(foreignKeyName, foreignTableName, foreignColumnNameList, fixedCondition, table,
@@ -159,6 +159,7 @@ public class DfAdditionalForeignKeyInitializer {
         // set up foreign key instance
         final ForeignKey fk = createAdditionalForeignKey(foreignKeyName, foreignTableName, localColumnNameList,
                 foreignColumnNameList, fixedCondition, fixedSuffix, fixedInline, fixedReferrer, comment);
+        reflectOptionToExistingFKIfNeeds(foreignKeyName, fixedSuffix, fk);
         table.addForeignKey(fk);
 
         // set up referrer instance
@@ -181,6 +182,20 @@ public class DfAdditionalForeignKeyInitializer {
         // Sorry, I forgot the detail of the reason...
         if (fk.hasFixedCondition() && !isSuppressImplicitReverseFK(foreignKeyName)) {
             processImplicitReverseForeignKey(table, foreignTable, localColumnNameList, foreignColumnNameList);
+        }
+    }
+
+    protected void reflectOptionToExistingFKIfNeeds(String foreignKeyName, final String fixedSuffix,
+            final ForeignKey existingFK) {
+        final String suppressJoin = getSuppressJoin(foreignKeyName);
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(suppressJoin)) {
+            _log.info("...Refecting suppress join to the FK: " + foreignKeyName + "(" + fixedSuffix + ")");
+            existingFK.setSuppressJoin(suppressJoin.equalsIgnoreCase("true"));
+        }
+        final String suppressSubQuery = getSuppressSubQuery(foreignKeyName);
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(suppressSubQuery)) {
+            _log.info("...Refecting suppress sub-query to the FK: " + foreignKeyName + "(" + fixedSuffix + ")");
+            existingFK.setSuppressSubQuery(suppressSubQuery.equalsIgnoreCase("true"));
         }
     }
 
@@ -445,6 +460,14 @@ public class DfAdditionalForeignKeyInitializer {
 
     protected String getComment(String foreignKeyName) {
         return getProperties().findComment(foreignKeyName);
+    }
+
+    protected String getSuppressJoin(String foreignKeyName) {
+        return getProperties().findSuppressJoin(foreignKeyName);
+    }
+
+    protected String getSuppressSubQuery(String foreignKeyName) {
+        return getProperties().findSuppressSubQuery(foreignKeyName);
     }
 
     protected boolean isSuppressImplicitReverseFK(String foreignKeyName) {
