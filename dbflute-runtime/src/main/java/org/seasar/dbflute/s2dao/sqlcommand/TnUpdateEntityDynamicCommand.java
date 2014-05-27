@@ -27,6 +27,8 @@ import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
+import org.seasar.dbflute.exception.VaryingUpdateInvalidColumnSpecificationException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.InternalMapContext;
@@ -173,6 +175,9 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
             final ColumnSqlName columnSqlName = pt.getColumnSqlName();
             final String propertyName = pt.getPropertyName();
             if (uniqueDrivenPropSet != null && uniqueDrivenPropSet.contains(propertyName)) {
+                if (option != null && option.hasStatement(columnDbName)) {
+                    throwUniqueDrivenColumnUpdateStatementException(tableDbName, columnDbName, uniqueDrivenPropSet);
+                }
                 continue;
             }
             if (columnCount > 0) {
@@ -198,6 +203,20 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         sb.append(ln());
         setupUpdateWhere(sb, uniqueDrivenPropSet, _optimisticLockHandling);
         return sb.toString();
+    }
+
+    protected void throwUniqueDrivenColumnUpdateStatementException(String tableDbName, String columnDbName,
+            Set<String> uniqueDrivenPropSet) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Cannot use the column specified as unique driven as update statement.");
+        br.addItem("Table");
+        br.addElement(tableDbName);
+        br.addItem("Statement Column");
+        br.addElement(columnDbName);
+        br.addItem("UniqueDriven Properties");
+        br.addElement(uniqueDrivenPropSet);
+        final String msg = br.buildExceptionMessage();
+        throw new VaryingUpdateInvalidColumnSpecificationException(msg);
     }
 
     protected void setupVersionNoAutoIncrementOnQuery(StringBuilder sb, ColumnSqlName columnSqlName) {
