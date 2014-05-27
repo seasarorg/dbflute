@@ -144,14 +144,13 @@ public class SqlClauseMySql extends AbstractSqlClause {
     protected String createSelectHint() {
         final StringBuilder sb = new StringBuilder();
         if (canSqlCalcFoundRows()) {
-            sb.append(" sql_calc_found_rows");
-            // and found_rows() is implemented at getClause override
+            sb.append(" sql_calc_found_rows"); // and found_rows() is implemented at getClause override
         }
         return sb.toString();
     }
 
     protected boolean canSqlCalcFoundRows() {
-        return canPagingCountLater() && isSelectClauseNonUnionSelect();
+        return isFetchNarrowingEffective() && canPagingCountLater() && isSelectClauseNonUnionSelect();
     }
 
     /**

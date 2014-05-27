@@ -275,6 +275,12 @@ public interface ConditionBean extends PagingBean {
      */
     void disablePagingCountLeastJoin();
 
+    /**
+     * Can the SQL execution be split by select and query?
+     * @return The determination, true or false.
+     */
+    boolean canPagingSelectAndQuerySplit();
+
     // ===================================================================================
     //                                                                        Lock Setting
     //                                                                        ============

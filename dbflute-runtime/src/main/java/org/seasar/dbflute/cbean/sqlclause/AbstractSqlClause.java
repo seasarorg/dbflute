@@ -173,6 +173,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The list of where clause. (NullAllowed: lazy-load) */
     protected List<QueryClause> _whereList;
 
+    /** The backup list of where clause. (NullAllowed: lazy-load) */
+    protected List<QueryClause> _backupWhereList;
+
     /** The list of in-line where clause for base table. (NullAllowed: lazy-load) */
     protected List<QueryClause> _baseTableInlineWhereList;
 
@@ -283,6 +286,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     /** Is the count executed later? */
     protected boolean _pagingCountLater;
+
+    /** Does it forcedly select only primary key? (basically for paging select and query split) */
+    protected boolean _pkOnlySelectForcedly;
 
     // -----------------------------------------------------
     //                                          Query Update
@@ -582,6 +588,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final String columnDbName = columnInfo.getColumnDbName();
             final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
 
+            if (_pkOnlySelectForcedly && !columnInfo.isPrimary()) {
+                continue;
+            }
+
             if (validSpecifiedLocal && !localSpecifiedMap.containsKey(columnDbName)) {
                 // a case for scalar-select has been already resolved here
                 continue;
@@ -616,6 +626,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected Integer processSelectClauseRelation(StringBuilder sb, Integer selectIndex) {
+        if (_pkOnlySelectForcedly) {
+            return selectIndex;
+        }
         for (Entry<String, Map<String, SelectedRelationColumn>> entry : getSelectedRelationColumnMap().entrySet()) {
             final String tableAliasName = entry.getKey();
             final Map<String, SelectedRelationColumn> map = entry.getValue();
@@ -661,6 +674,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected void processSelectClauseDerivedReferrer(StringBuilder sb) {
+        if (_pkOnlySelectForcedly) {
+            return;
+        }
         if (_specifiedDerivingSubQueryMap == null || _specifiedDerivingSubQueryMap.isEmpty()) {
             return;
         }
@@ -1671,6 +1687,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
     }
 
+    public void backupWhereClauseOnBaseQuery() {
+        _backupWhereList = _whereList;
+    }
+
+    public void restoreWhereClauseOnBaseQuery() {
+        _whereList = _backupWhereList;
+        _backupWhereList = null;
+    }
+
     // ===================================================================================
     //                                                                       In-line Where
     //                                                                       =============
@@ -2037,6 +2062,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public boolean hasOrderByClause() {
         return _orderByClause != null && !_orderByClause.isEmpty();
+    }
+
+    public boolean hasSpecifiedDerivedOrderByClause() {
+        if (!hasOrderByClause()) {
+            return false;
+        }
+        final List<OrderByElement> orderByList = _orderByClause.getOrderByList();
+        for (OrderByElement orderByElement : orderByList) {
+            if (orderByElement.isDerivedOrderBy()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ===================================================================================
@@ -2853,6 +2891,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                       Paging Select
     //                                                                       =============
+    // -----------------------------------------------------
+    //                                     Paging Adjustment
+    //                                     -----------------
     public void makePagingAdjustmentEffective() {
         _pagingAdjustment = true;
     }
@@ -2889,6 +2930,18 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public boolean canPagingCountLeastJoin() {
         return _pagingAdjustment && _pagingCountLeastJoin;
+    }
+
+    // [DBFlute-1.0.5G]
+    // -----------------------------------------------------
+    //                                        PK Only Select
+    //                                        --------------
+    public void makePKOnlySelectForcedlyEffective() {
+        _pkOnlySelectForcedly = true;
+    }
+
+    public void closePKOnlySelectForcedly() {
+        _pkOnlySelectForcedly = false;
     }
 
     // [DBFlute-0.9.9.4C]

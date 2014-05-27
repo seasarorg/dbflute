@@ -421,6 +421,18 @@ public interface SqlClause {
     boolean hasWhereClauseOnBaseQuery();
 
     /**
+     * Back up where clause on base query. <br />
+     * You can restore it later.
+     */
+    void backupWhereClauseOnBaseQuery();
+
+    /**
+     * Restore where clause on base query if backup exists. <br />
+     * You should call this after backup.
+     */
+    void restoreWhereClauseOnBaseQuery();
+
+    /**
      * Clear where clauses on the base query. <br />
      * Clauses on union queries and in-line views are not concerned.
      */
@@ -526,6 +538,13 @@ public interface SqlClause {
      * @return The determination, true or false.
      */
     boolean hasOrderByClause();
+
+    /**
+     * Does it have order-by clauses as specified-derived order-by? <br />
+     * Whether effective or not has no influence.
+     * @return The determination, true or false.
+     */
+    boolean hasSpecifiedDerivedOrderByClause();
 
     // ===================================================================================
     //                                                                               Union
@@ -767,12 +786,14 @@ public interface SqlClause {
     void handleSpecifiedSelectColumn(String tableAliasName, SpecifiedSelectColumnHandler columnHandler);
 
     /**
-     * Back up specified select columns.
+     * Back up specified select columns. <br />
+     * You can restore it later.
      */
     void backupSpecifiedSelectColumn();
 
     /**
-     * Restore specified select columns.
+     * Restore specified select columns if backup exists. <br />
+     * You should call this after backup.
      */
     void restoreSpecifiedSelectColumn();
 
@@ -1055,6 +1076,9 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                       Paging Select
     //                                                                       =============
+    // -----------------------------------------------------
+    //                                     Paging Adjustment
+    //                                     -----------------
     /**
      * Make paging adjustment, e.g. PagingCountLater, PagingCountLeastJoin, effective. <br />
      * The options might be on by default so the adjustments are off normally.
@@ -1066,6 +1090,9 @@ public interface SqlClause {
      */
     void ignorePagingAdjustment();
 
+    // -----------------------------------------------------
+    //                                           Count Later
+    //                                           -----------
     /**
      * Enable paging count-later that means counting after selecting. <br />
      * And you should also make paging adjustment effective to enable this. <br />
@@ -1079,6 +1106,9 @@ public interface SqlClause {
      */
     void disablePagingCountLater();
 
+    // -----------------------------------------------------
+    //                                       Count LeastJoin
+    //                                       ---------------
     /**
      * Enable paging count-least-join, which means least joined on count select. <br />
      * And you should also make paging adjustment effective to enable this.
@@ -1096,6 +1126,22 @@ public interface SqlClause {
      * @return The determination, true or false.
      */
     boolean canPagingCountLeastJoin();
+
+    // [DBFlute-1.0.5G]
+    // -----------------------------------------------------
+    //                                        PK Only Select
+    //                                        --------------
+    /**
+     * Make PK only select forcedly effective, ignoring select clause setting and derived referrer. <br />
+     * Basically for PagingSelectAndQuerySplit.
+     */
+    void makePKOnlySelectForcedlyEffective();
+
+    /**
+     * Close PK only select forcedly. <br />
+     * Basically for PagingSelectAndQuerySplit.
+     */
+    void closePKOnlySelectForcedly();
 
     // [DBFlute-0.9.9.4C]
     // ===================================================================================

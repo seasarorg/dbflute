@@ -83,6 +83,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** Can the paging re-select? {Internal} */
     protected boolean _pagingReSelect = true;
 
+    /** Does it split SQL execution as select and query? {Internal} */
+    protected boolean _pagingSelectAndQuerySplit;
+
     // -----------------------------------------------------
     //                                                 Union
     //                                                 -----
@@ -775,6 +778,46 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public void disablePagingCountLeastJoin() {
         getSqlClause().disablePagingCountLeastJoin();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean canPagingSelectAndQuerySplit() {
+        return _pagingSelectAndQuerySplit;
+    }
+
+    /**
+     * Enable that it splits the SQL execute select and query of paging. <br />
+     * You should confirm that the executed SQL on log matches with your expectation. <br />
+     * It is very difficult internal logic so it also has simplistic logic. Be careful!
+     * <pre>
+     * Cannot use this:
+     *  o if no PK or compound PK table (exception is thrown)
+     *  o if SpecifiedDerivedOrderBy or not Paging (but no exception)
+     *
+     * Automatically Changed:
+     *  o disable PagingCountLater (to suppress rows calculation)
+     * </pre>
+     * @deprecated This is rare handling for performance tuning so don't use this easily.
+     */
+    public void enablePagingSelectAndQuerySplit() {
+        final DBMeta dbmeta = getDBMeta();
+        if (!dbmeta.hasPrimaryKey() || dbmeta.getPrimaryUniqueInfo().isTwoOrMore()) {
+            String msg = "The PagingSelectAndQuerySplit needs only-one column key table: " + getTableDbName();
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+        // MySQL's rows calculation is not fit with this function
+        // e.g.
+        //  paging : select PK only by business condition with sql_calc_found_rows
+        //  paging : select business data by PK without no sql_calc_found_rows
+        //  count  : select found_rows() -> returns latest count, why?  
+        disablePagingCountLater();
+        _pagingSelectAndQuerySplit = true;
+    }
+
+    public void disablePagingSelectAndQuerySplit() {
+        _pagingSelectAndQuerySplit = false;
     }
 
     // -----------------------------------------------------

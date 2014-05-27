@@ -15,14 +15,22 @@
  */
 package org.seasar.dbflute.bhv.core.execution;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.CallbackContext;
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.SqlStringFilter;
 import org.seasar.dbflute.bhv.core.BehaviorCommandMeta;
 import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.ckey.ConditionKey;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
@@ -63,17 +71,39 @@ public class SelectCBExecution extends AbstractFixedArgExecution {
     //                                                                            Resource
     //                                                                            ========
     @Override
+    public Object execute(Object[] args) {
+        final ConditionBean cb = extractConditionBean(args);
+        final Object splitResult = processPagingSelectAndQuerySplit(args, cb);
+        if (splitResult != null) { // rarely
+            return splitResult;
+        }
+        return superExecute(args); // basically here
+    }
+
+    protected Object superExecute(Object[] args) {
+        return super.execute(args);
+    }
+
+    @Override
     protected Node getRootNode(Object[] args) {
         return analyzeTwoWaySql(extractTwoWaySql(args)); // dynamic analysis
     }
 
     protected String extractTwoWaySql(Object[] args) {
+        final ConditionBean cb = extractConditionBean(args);
+        return cb.getSqlClause().getClause();
+    }
+
+    // -----------------------------------------------------
+    //                                     Argument Handling
+    //                                     -----------------
+    protected ConditionBean extractConditionBean(Object[] args) {
         assertArgsValid(args);
         final Object firstElement = args[0];
         assertObjectNotNull("args[0]", firstElement);
         assertFirstElementConditionBean(firstElement);
         final ConditionBean cb = (ConditionBean) firstElement;
-        return cb.getSqlClause().getClause();
+        return cb;
     }
 
     protected void assertArgsValid(Object[] args) {
@@ -91,6 +121,77 @@ public class SelectCBExecution extends AbstractFixedArgExecution {
         if (!(firstElement instanceof ConditionBean)) {
             String msg = "The first element of 'args' should be condition-bean: " + firstElement.getClass();
             throw new IllegalArgumentException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                       Paging Select and Query Split
+    //                                                       =============================
+    protected Object processPagingSelectAndQuerySplit(Object[] args, ConditionBean cb) {
+        if (!cb.canPagingSelectAndQuerySplit()) {
+            return null;
+        }
+        if (!cb.isFetchScopeEffective()) {
+            return null;
+        }
+        final DBMeta dbmeta = cb.getDBMeta();
+        final UniqueInfo primaryUniqueInfo = dbmeta.getPrimaryUniqueInfo();
+        if (primaryUniqueInfo.isTwoOrMore()) { // basically no way, already checked
+            return null;
+        }
+        final ColumnInfo pkColumn = primaryUniqueInfo.getFirstColumn();
+        final SqlClause sqlClause = cb.getSqlClause();
+        if (sqlClause.hasSpecifiedDerivedOrderByClause()) { // too complex so unsupported
+            return null;
+        }
+        final List<Object> pkList = doSplitSelectFirst(args, cb, dbmeta, sqlClause);
+        if (pkList == null) { // no way just in case
+            return null;
+        }
+        if (pkList.isEmpty()) {
+            return pkList;
+        }
+        return doSplitSelectSecond(args, cb, pkColumn, sqlClause, pkList);
+    }
+
+    protected List<Object> doSplitSelectFirst(Object[] args, ConditionBean cb, DBMeta dbmeta, SqlClause sqlClause) {
+        final List<Object> pkList = new ArrayList<Object>();
+        try {
+            sqlClause.makePKOnlySelectForcedlyEffective();
+            final Object firstResult = superExecute(args);
+            if (firstResult == null || !(firstResult instanceof List)) { // no way just in case
+                return null;
+            }
+            @SuppressWarnings("unchecked")
+            final List<Entity> entityList = (List<Entity>) firstResult;
+            for (Entity entity : entityList) {
+                final Map<String, Object> primaryKeyMap = dbmeta.extractPrimaryKeyMap(entity);
+                pkList.add(primaryKeyMap.values().iterator().next()); // only-one here
+            }
+            return pkList;
+        } finally {
+            sqlClause.closePKOnlySelectForcedly();
+        }
+    }
+
+    protected Object doSplitSelectSecond(Object[] args, ConditionBean cb, ColumnInfo pkColumn, SqlClause sqlClause,
+            List<Object> pkList) {
+        final int fetchSize = sqlClause.getFetchSize();
+        final int fetchPageNumber = sqlClause.getFetchPageNumber();
+        try {
+            sqlClause.backupWhereClauseOnBaseQuery();
+            sqlClause.clearWhereClauseOnBaseQuery();
+            sqlClause.ignoreFetchScope();
+
+            // order by is inherited
+            // basically small list here so one more order-by is not problem
+            final String ckey = ConditionKey.CK_IN_SCOPE.getConditionKey();
+            cb.localCQ().invokeQuery(pkColumn.getColumnDbName(), ckey, pkList);
+            return superExecute(args);
+        } finally {
+            sqlClause.restoreWhereClauseOnBaseQuery();
+            sqlClause.fetchFirst(fetchSize);
+            sqlClause.fetchPage(fetchPageNumber);
         }
     }
 

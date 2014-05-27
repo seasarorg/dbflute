@@ -134,6 +134,10 @@ public class MockConditionBean implements ConditionBean {
     public void enablePagingReSelect() {
     }
 
+    public boolean canPagingSelectAndQuerySplit() {
+        return false;
+    }
+
     public PagingBean fetchFirst(int fetchSize) {
         return null;
     }
