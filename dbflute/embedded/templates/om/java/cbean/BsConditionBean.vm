@@ -39,7 +39,7 @@ import ${glPackageBaseCommon}.${glImplementedInvokerAssistant};
 import ${glPackageBaseCommon}.${glImplementedSqlClauseCreator};
 import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
-#if ($table.hasForeignKeyOrReferrerAsOne())
+#if ($table.hasJoinableForeignKeyOrReferrerAsOne())
 import ${glPackageNss}.*;
 #end
 
@@ -507,7 +507,7 @@ public class ${myClassName} extends AbstractConditionBean {
 #end
             }
 #end
-#foreach ($fk in $table.foreignKeyList)
+#foreach ($fk in $table.joinableForeignKeyList)
 #set ($tmpPropertyName = "${fk.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
 #if ($fk.hasLocalColumnExceptPrimaryKey())

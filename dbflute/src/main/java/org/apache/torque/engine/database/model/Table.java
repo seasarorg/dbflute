@@ -1497,6 +1497,10 @@ public class Table {
         return hasForeignKey() || hasReferrerAsOne();
     }
 
+    public boolean hasJoinableForeignKeyOrReferrerAsOne() {
+        return !getJoinableForeignKeyList().isEmpty() || !getJoinableReferrerAsOneList().isEmpty();
+    }
+
     // ===================================================================================
     //                                                                            Referrer
     //                                                                            ========

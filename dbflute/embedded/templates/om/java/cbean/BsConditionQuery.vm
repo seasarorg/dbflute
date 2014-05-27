@@ -453,11 +453,11 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                                         Union Query
     //                                                                         ===========
     public void reflectRelationOnUnionQuery(ConditionQuery bqs, ConditionQuery uqs) {
-#if ($table.hasForeignKeyOrReferrerAsOne())
+#if ($table.hasJoinableForeignKeyOrReferrerAsOne())
         ${myConditionQueryClassName} bq = (${myConditionQueryClassName})bqs;
         ${myConditionQueryClassName} uq = (${myConditionQueryClassName})uqs;
 #end
-#foreach ($fk in $table.foreignKeys)
+#foreach ($fk in $table.joinableForeignKeyList)
         if (bq.hasConditionQuery${fk.foreignPropertyNameInitCap}()) {
 #if ($fk.hasDynamicFixedCondition())
             uq.xsetParameterMap${fk.foreignPropertyNameInitCap}(bq.getParameterMap${fk.foreignPropertyNameInitCap}());
@@ -467,7 +467,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
         }
 #end
-#foreach ($referrer in $table.referrerAsOneList)
+#foreach ($referrer in $table.joinableReferrerAsOneList)
         if (bq.hasConditionQuery${referrer.referrerPropertyNameInitCapAsOne}()) {
             uq.query${referrer.referrerPropertyNameInitCapAsOne}().reflectRelationOnUnionQuery(bq.query${referrer.referrerPropertyNameInitCapAsOne}(), uq.query${referrer.referrerPropertyNameInitCapAsOne}());
         }
