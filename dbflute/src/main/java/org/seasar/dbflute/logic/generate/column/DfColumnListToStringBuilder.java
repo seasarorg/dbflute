@@ -95,10 +95,16 @@ public class DfColumnListToStringBuilder {
 
         String result = "";
         for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
-            Column pk = (Column) ite.next();
-            final String javaName = pk.getJavaName();
-            final String variable = pk.getUncapitalisedJavaName();
-            final String setter = beanPrefix + "set" + javaName + "(" + variable + ");";
+            Column column = (Column) ite.next();
+            final String javaName = column.getJavaName();
+            final String variable = column.getUncapitalisedJavaName();
+            final String cls = column.getClassificationName();
+            final String setter;
+            if (column.isForceClassificationSetting()) {
+                setter = beanPrefix + "set" + javaName + "As" + cls + "(" + variable + ");";
+            } else {
+                setter = beanPrefix + "set" + javaName + "(" + variable + ");";
+            }
             if ("".equals(result)) {
                 result = setter;
             } else {

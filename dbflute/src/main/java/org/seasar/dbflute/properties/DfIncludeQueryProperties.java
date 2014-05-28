@@ -657,7 +657,6 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
             Map<String, Map<String, Map<String, List<String>>>> queryMap) {
         assertQueryMap(propType, ckey, queryMap);
         final String tableDbName = column.getTable().getTableDbName();
-        final String columnName = column.getName();
         final Set<String> columnSet = gatherColumnSet(propType, ckey, queryMap, tableDbName);
         if (PROP_MYSELF.equalsIgnoreCase(propType)) { // e.g. ScalarCondition, MyselfDerived
             return columnSet != null; // empty column list means specified
@@ -673,6 +672,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         if (columnSet.contains(VERSION_NO_MARK) && column.isVersionNo()) {
             return true;
         }
+        final String columnName = column.getName();
         final String typeMark = TYPE_MARK;
         for (String columnExp : columnSet) {
             if (Srl.startsWithIgnoreCase(columnExp, typeMark)) { // e.g. type:LONGVARCHAR

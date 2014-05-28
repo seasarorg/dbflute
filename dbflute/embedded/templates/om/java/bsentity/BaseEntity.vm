@@ -189,8 +189,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         __uniqueDrivenProperties.clear();
 #foreach ($col in $uq.columnList)
         __uniqueDrivenProperties.addPropertyName("${col.javaBeansRulePropertyName}");
-        set${col.javaName}(${col.uncapitalisedJavaName});
 #end
+        ${uq.argsSetupString}
     }
 #end
 

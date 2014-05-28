@@ -2528,7 +2528,11 @@ public class Table {
     //                                                                       Include Query
     //                                                                       =============
     public boolean isAvailableMyselfScalarCondition() {
-        return getIncludeQueryProperties().isAvailableMyselfScalarCondition(getPrimaryKeyAsOne());
+        final Column dummyPk = getMyselfQueryDummyColumn(); // ScalarCondition is available with compound PK
+        if (dummyPk == null) { // basically no way
+            return true; // available fixedly
+        }
+        return getIncludeQueryProperties().isAvailableMyselfScalarCondition(dummyPk);
     }
 
     public boolean isAvailableMyselfMyselfDerived() {
@@ -2541,6 +2545,25 @@ public class Table {
 
     public boolean isAvailableMyselfMyselfInScope() {
         return getIncludeQueryProperties().isAvailableMyselfMyselfInScope(getPrimaryKeyAsOne());
+    }
+
+    protected Column getMyselfQueryDummyColumn() {
+        final Column dummyPk;
+        if (hasPrimaryKey()) {
+            if (hasSinglePrimaryKey()) {
+                dummyPk = getPrimaryKeyAsOne();
+            } else {
+                dummyPk = getPrimaryKey().get(0);
+            }
+        } else {
+            final List<Column> columnList = getColumnList();
+            if (!columnList.isEmpty()) { // just in case
+                dummyPk = columnList.get(0);
+            } else { // basically no way
+                dummyPk = null;
+            }
+        }
+        return dummyPk;
     }
 
     // ===================================================================================
@@ -2581,6 +2604,15 @@ public class Table {
         for (Column column : columns) {
             if (column.isForceClassificationSetting()) {
                 return true;
+            }
+        }
+        final List<Unique> uniqueList = getKeyableUniqueList();
+        for (Unique unique : uniqueList) {
+            final List<Column> columnList = unique.getColumnList();
+            for (Column column : columnList) {
+                if (column.isForceClassificationSetting()) {
+                    return true;
+                }
             }
         }
         return false;

@@ -25,17 +25,17 @@ public class HpDerivingSubQueryInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _aliasName;
-    protected String _derivingSubQuery;
-    protected DerivedReferrer _derivedReferrer;
+    protected final String _aliasName;
+    protected final String _derivingSubQuery;
+    protected final DerivedReferrer _derivedReferrer;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public HpDerivingSubQueryInfo(String aliasName, String derivingSubQuery, DerivedReferrer derivedReferrer) {
-        this._aliasName = aliasName;
-        this._derivingSubQuery = derivingSubQuery;
-        this._derivedReferrer = derivedReferrer;
+        _aliasName = aliasName;
+        _derivingSubQuery = derivingSubQuery;
+        _derivedReferrer = derivedReferrer;
     }
 
     // ===================================================================================

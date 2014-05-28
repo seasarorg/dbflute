@@ -537,7 +537,8 @@ public class DfSchemaXmlSerializer {
         }
 
         processForeignKey(metaData, tableMeta, tableElement);
-        final Map<String, Map<Integer, String>> uniqueKeyMap = processUniqueKey(metaData, tableMeta, tableElement);
+        final Map<String, Map<Integer, String>> uniqueKeyMap = processUniqueKey(metaData, tableMeta, pkInfo,
+                tableElement);
         processIndex(metaData, tableMeta, tableElement, uniqueKeyMap);
 
         _tableElementStagingMap.put(tableFullQualifiedName, tableElement);
@@ -718,8 +719,8 @@ public class DfSchemaXmlSerializer {
     //                                             UniqueKey
     //                                             ---------
     protected Map<String, Map<Integer, String>> processUniqueKey(DatabaseMetaData metaData, DfTableMeta tableMeta,
-            Element tableElement) throws SQLException {
-        final Map<String, Map<Integer, String>> uniqueMap = getUniqueKeyMap(metaData, tableMeta);
+            DfPrimaryKeyMeta pkInfo, Element tableElement) throws SQLException {
+        final Map<String, Map<Integer, String>> uniqueMap = getUniqueKeyMap(metaData, tableMeta, pkInfo);
         if (uniqueMap.isEmpty()) {
             return uniqueMap;
         }
@@ -1219,12 +1220,14 @@ public class DfSchemaXmlSerializer {
      * Get unique column name list.
      * @param metaData The meta data of a database. (NotNull)
      * @param tableMeta The meta information of table. (NotNull)
+     * @param pkInfo The meta information of primary key. (NotNull)
      * @return The list of unique columns. (NotNull)
      * @throws SQLException
      */
-    protected Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMeta tableMeta)
-            throws SQLException {
-        final Map<String, Map<Integer, String>> uniqueKeyMap = _uniqueKeyExtractor.getUniqueKeyMap(metaData, tableMeta);
+    protected Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMeta tableMeta,
+            DfPrimaryKeyMeta pkInfo) throws SQLException {
+        final Map<String, Map<Integer, String>> uniqueKeyMap = _uniqueKeyExtractor.getUniqueKeyMap(metaData, tableMeta,
+                pkInfo);
         if (!canHandleSynonym(tableMeta) || !uniqueKeyMap.isEmpty()) {
             return uniqueKeyMap;
         }

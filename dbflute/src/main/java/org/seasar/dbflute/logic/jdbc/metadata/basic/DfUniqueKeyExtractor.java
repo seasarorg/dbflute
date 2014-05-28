@@ -19,10 +19,12 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -97,13 +99,33 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
             if (rs == null) {
                 return info;
             }
+            // MySQL might return (actually returned) unordered list so sort it by the map
+            // getting ordinal was implemented recently (1.0.5G) so it has just-in-case process
+            final TreeMap<Integer, String> positionColumnNameMap = new TreeMap<Integer, String>();
+            final Map<Integer, String> positionPkNameMap = new HashMap<Integer, String>();
+            int justInCaseIndex = 999;
             while (rs.next()) {
                 final String metaTableName = rs.getString(3);
                 if (checkMetaTableDiffIfNeeds(tableName, metaTableName)) {
                     continue;
                 }
                 final String columnName = rs.getString(4);
+                final String posStr = rs.getString(5);
+                Integer ordinalPosition = null;
+                try {
+                    ordinalPosition = Integer.valueOf(posStr);
+                } catch (NumberFormatException continued) {
+                    warnPrimaryKeyPositionNotNumberException(tableName, columnName, posStr);
+                    ordinalPosition = justInCaseIndex; // just in case
+                    ++justInCaseIndex;
+                }
                 final String pkName = rs.getString(6);
+                positionColumnNameMap.put(ordinalPosition, columnName);
+                positionPkNameMap.put(ordinalPosition, pkName);
+            }
+            for (Entry<Integer, String> entry : positionColumnNameMap.entrySet()) {
+                final String columnName = entry.getValue();
+                final String pkName = positionPkNameMap.get(entry.getKey());
                 info.addPrimaryKey(columnName, pkName);
             }
         } finally {
@@ -112,6 +134,12 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
             }
         }
         return info;
+    }
+
+    protected void warnPrimaryKeyPositionNotNumberException(String tableName, String columnName, String posStr) {
+        String msg = "The primary key column should have ordinal-position as number but: ";
+        msg = msg + posStr + ", " + tableName + "." + columnName;
+        _log.warn(msg);
     }
 
     protected ResultSet extractPrimaryKeyMetaData(DatabaseMetaData dbMeta, UnifiedSchema unifiedSchema,
@@ -175,17 +203,17 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * Retrieves an map of the columns composing the unique key for a given table.
      * @param metaData JDBC meta data. (NotNull)
      * @param tableInfo The meta information of table. (NotNull)
+     * @param pkInfo The information of primary key of the table. (NotNull)
      * @return The meta information map of unique keys. The key is unique key name. (NotNull)
      * @throws SQLException
      */
-    public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMeta tableInfo)
-            throws SQLException { // Non Primary Key Only
+    public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMeta tableInfo,
+            DfPrimaryKeyMeta pkInfo) throws SQLException { // Non Primary Key Only
         final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
         final String tableName = tableInfo.getTableName();
         if (tableInfo.isTableTypeView()) {
             return newLinkedHashMap();
         }
-        final DfPrimaryKeyMeta pkInfo = getPrimaryKey(metaData, tableInfo);
         return getUniqueKeyMap(metaData, unifiedSchema, tableName, pkInfo.getPrimaryKeyList());
     }
 
@@ -260,18 +288,18 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                 final String indexName = rs.getString(6);
                 final Integer ordinalPosition;
                 {
-                    final String ordinalPositionString = rs.getString(8);
-                    if (ordinalPositionString == null) {
+                    final String posStr = rs.getString(8);
+                    if (posStr == null) {
                         String msg = "The unique columnName should have ordinal-position but null: ";
-                        msg = msg + " columnName=" + columnName + " indexType=" + indexType;
+                        msg = msg + " " + tableName + "." + columnName + " indexType=" + indexType;
                         _log.warn(msg);
                         continue;
                     }
                     try {
-                        ordinalPosition = Integer.parseInt(ordinalPositionString);
-                    } catch (NumberFormatException e) {
+                        ordinalPosition = Integer.parseInt(posStr);
+                    } catch (NumberFormatException continued) {
                         String msg = "The unique column should have ordinal-position as number but: ";
-                        msg = msg + ordinalPositionString + " columnName=" + columnName + " indexType=" + indexType;
+                        msg = msg + posStr + ", " + tableName + "." + columnName + " indexType=" + indexType;
                         _log.warn(msg);
                         continue;
                     }
@@ -286,7 +314,7 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                     uniqueKeyMap.put(indexName, uniqueElementMap);
                 }
             }
-            removePkMatchUniqueKey(pkList, uniqueKeyMap);
+            removePkMatchUniqueKey(tableName, pkList, uniqueKeyMap);
         } finally {
             if (rs != null) {
                 rs.close();
@@ -313,8 +341,10 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    protected void removePkMatchUniqueKey(List<String> pkList, Map<String, Map<Integer, String>> uniqueKeyMap) {
-        // PK's unique constraint may be returned so remove it if it exists 
+    protected void removePkMatchUniqueKey(String tableName, List<String> pkList,
+            Map<String, Map<Integer, String>> uniqueKeyMap) {
+        // PK's unique constraint may be returned so remove it if it exists
+        // and the pkList should be ordered formal order ()
         final List<String> pkMatchIndexList = new ArrayList<String>();
         uniqueLoop: //
         for (Entry<String, Map<Integer, String>> entry : uniqueKeyMap.entrySet()) {

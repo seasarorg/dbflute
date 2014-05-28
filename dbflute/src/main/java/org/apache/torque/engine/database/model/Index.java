@@ -304,6 +304,14 @@ public class Index implements Constraint {
         return DfColumnListToStringBuilder.getColumnArgsJavaDocString(getColumnList(), "unique key", ln);
     }
 
+    public String getArgsSetupString() {
+        return DfColumnListToStringBuilder.getColumnArgsSetupString(null, getColumnList());
+    }
+
+    public String getArgsSetupString(String beanName) {
+        return DfColumnListToStringBuilder.getColumnArgsSetupString(beanName, getColumnList());
+    }
+
     public String getArgsConditionSetupString() {
         return DfColumnListToStringBuilder.getColumnArgsConditionSetupString(getColumnList());
     }
