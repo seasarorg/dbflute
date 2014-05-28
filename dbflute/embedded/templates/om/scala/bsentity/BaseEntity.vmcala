@@ -32,6 +32,7 @@ import org.seasar.dbflute.Entity;
 #if ($table.hasOptionalRelation())
 import ${database.relationOptionalEntityClassName};
 #end
+import org.seasar.dbflute.Entity.EntityUniqueDrivenProperties;
 import org.seasar.dbflute.Entity.EntityModifiedProperties;
 import org.seasar.dbflute.Entity.FunCustodial;
 #if ($table.hasAllCommonColumn())
@@ -122,6 +123,9 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
     // -----------------------------------------------------
     //                                              Internal
     //                                              --------
+    /** The unique-driven properties for this entity. (NotNull) */
+    protected val __uniqueDrivenProperties: EntityUniqueDrivenProperties = newUniqueDrivenProperties();
+
     /** The modified properties for this entity. (NotNull) */
     protected val __modifiedProperties: EntityModifiedProperties = newModifiedProperties();
 #if ($table.hasAllCommonColumn())
@@ -175,6 +179,32 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
         if (get${col.javaName}() == null) { return false; }
 #end
         return ${table.hasPrimaryKey()};
+    }
+#foreach ($uq in $table.keyableUniqueList)
+
+    /**
+     * To be unique by the unique column. <br />
+     * You can update the entity by the key when entity update (NOT batch update).
+     * ${uq.argsJavaDocString}
+     */
+    def uniqueBy${uq.javaNameKeyword}(${uq.argsString}): Unit = {
+        __uniqueDrivenProperties.clear();
+#foreach ($col in $uq.columnList)
+        __uniqueDrivenProperties.addPropertyName("${col.javaBeansRulePropertyName}");
+#end
+        ${uq.argsSetupString}
+    }
+#end
+
+    /**
+     * {@inheritDoc}
+     */
+    def myuniqueDrivenProperties(): Set[String] = {
+        return __uniqueDrivenProperties.getPropertyNames();
+    }
+
+    def newUniqueDrivenProperties(): EntityUniqueDrivenProperties = {
+        return new EntityUniqueDrivenProperties();
     }
 
 #if ($table.hasClassification())
@@ -363,7 +393,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
         }
 #end
 #if ($fk.isForeignPropertyOptionalEntity())
-        return if (${foreignVariableName} != null) { ${foreignVariableName}; } else { ${database.relationOptionalEntityClassName}.relationEmpty(); }
+        return if (${foreignVariableName} != null) { ${foreignVariableName}; } else { ${database.relationOptionalEntityClassName}.relationEmpty(this, "${fk.foreignJavaBeansRulePropertyName}"); }
 #else
         return ${foreignVariableName};
 #end
@@ -402,7 +432,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
         }
 #end
 #if ($referrer.isReferrerPropertyOptionalEntityAsOne())
-        return if (${referrerVariableName} != null) { ${referrerVariableName}; } else { ${database.relationOptionalEntityClassName}.relationEmpty(); }
+        return if (${referrerVariableName} != null) { ${referrerVariableName}; } else { ${database.relationOptionalEntityClassName}.relationEmpty(this, "${referrer.referrerJavaBeansRulePropertyNameAsOne}"); }
 #else
         return ${referrerVariableName};
 #end
@@ -665,7 +695,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
     }
 #end
 #if ($table.hasOptionalRelation())
-    protected def xbRDS[ET <: Entity](et: ${database.relationOptionalEntityClassName}[ET], name String): String = {
+    protected def xbRDS[ET <: Entity](et: ${database.relationOptionalEntityClassName}[ET], name: String): String = {
         return et.get().buildDisplayString(name, true, true);
     }
 #end

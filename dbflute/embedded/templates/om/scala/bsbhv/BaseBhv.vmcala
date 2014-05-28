@@ -261,38 +261,47 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     /**
      * Select the entity by the primary-key value.
      * ${table.primaryKeyArgsJavaDocString}
-     * @return The entity selected by the PK. (NullAllowed: if no data, it returns null)
+     * @return The optional entity selected by the PK. (NotNull: if no data, empty entity)
+     * @exception EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
-    def selectByPKValue(${table.primaryKeyArgsString}): ${myExtendedObjectClassName} = {
-        return doSelectByPKValue(${table.primaryKeyArgsCallingString}, classOf[${myExtendedObjectClassName}]);
+    def selectByPK(${table.primaryKeyArgsString}): OptionalEntity[${myExtendedObjectClassName}] = {
+        return doSelectByPK(${table.primaryKeyArgsCallingString}, classOf[${myExtendedObjectClassName}]);
     }
 
-    protected def doSelectByPKValue[ENTITY <: ${myExtendedObjectClassName}](${table.primaryKeyArgsString}, entityType: Class[ENTITY]): ENTITY = {
-        return doSelectEntity(buildPKCB(${table.primaryKeyArgsCallingString}), entityType);
+    protected def doSelectByPK[ENTITY <: ${myExtendedObjectClassName}](${table.primaryKeyArgsString}, entityType: Class[ENTITY]): OptionalEntity[ENTITY] = {
+        return createOptionalEntity(doSelectEntity(xprepareCBAsPK(${table.primaryKeyArgsCallingString}), entityType));
     }
 
-    /**
-     * Select the entity by the primary-key value with deleted check.
-     * ${table.primaryKeyArgsJavaDocString}
-     * @return The entity selected by the PK. (NotNull: if no data, throws exception)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
-     */
-    def selectByPKValueWithDeletedCheck(${table.primaryKeyArgsString}): ${myExtendedObjectClassName} = {
-        return doSelectByPKValueWithDeletedCheck(${table.primaryKeyArgsCallingString}, classOf[${myExtendedObjectClassName}]);
-    }
-
-    protected def doSelectByPKValueWithDeletedCheck[ENTITY <: ${myExtendedObjectClassName}](${table.primaryKeyArgsString}, entityType: Class[ENTITY]): ENTITY = {
-        return doSelectEntityWithDeletedCheck(buildPKCB(${table.primaryKeyArgsCallingString}), entityType);
-    }
-
-    private def buildPKCB(${table.primaryKeyArgsString}): ${myConditionBeanClassName} = {
+    protected def xprepareCBAsPK(${table.primaryKeyArgsString}): ${myConditionBeanClassName} = {
         ${table.primaryKeyArgsAssertString}
         val cb: ${myConditionBeanClassName} = newMyConditionBean();
         ${table.primaryKeyArgsConditionSetupString}
+        return cb;
+    }
+#end
+#foreach ($uq in $table.keyableUniqueList)
+
+    /**
+     * Select the entity by the unique-key value.
+     * ${uq.argsJavaDocString}
+     * @return The optional entity selected by the unique key. (NotNull: if no data, empty entity)
+     * @exception EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
+     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     */
+    def selectByUniqueOf${uq.javaNameKeyword}(${uq.argsString}): OptionalEntity[${myExtendedObjectClassName}] = {
+        return doSelectByUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString}, classOf[${myExtendedObjectClassName}]);
+    }
+
+    protected def doSelectByUniqueOf${uq.javaNameKeyword}[ENTITY <: ${myExtendedObjectClassName}](${uq.argsString}, entityType: Class[ENTITY]): OptionalEntity[ENTITY] = {
+        return createOptionalEntity(doSelectEntity(xprepareCBAsUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString}), entityType), ${uq.argsCallingString});
+    }
+
+    protected def xprepareCBAsUniqueOf${uq.javaNameKeyword}(${uq.argsString}): ${myConditionBeanClassName} = {
+        ${uq.argsAssertString}
+        val cb: ${myConditionBeanClassName} = newMyConditionBean(); cb.acceptUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString});
         return cb;
     }
 #end
@@ -709,8 +718,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
-#set ($referrerTable = $referrer.table)
-#set ($referrerEntityClassName = "${glProjectPrefix}${referrerTable.javaName}")
+#set ($referrerEntityClassName = $referrer.referrerTableExtendedEntityClassName)
     /**
      * Pull out the list of referrer-as-one table '${referrerEntityClassName}'.
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)

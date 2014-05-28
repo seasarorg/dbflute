@@ -219,6 +219,8 @@ object ${myClassName} extends AbstractDBMeta {
     // ===================================================================================
     //                                                                       Relation Info
     //                                                                       =============
+    // cannot cache because it uses related DB meta instance while booting
+    // (instead, cached by super's collection)
     // -----------------------------------------------------
     //                                      Foreign Property
     //                                      ----------------
