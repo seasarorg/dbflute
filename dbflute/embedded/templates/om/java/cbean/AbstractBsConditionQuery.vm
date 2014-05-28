@@ -1258,7 +1258,6 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     protected void reg${tmpJavaName}(ConditionKey ky, Object vl) { regQ(ky, vl, getCValue${tmpJavaName}(), "${col.name}"); }
     protected abstract ConditionValue getCValue${tmpJavaName}();
 #end
-#if ($table.hasSinglePrimaryKey())
 #if ($table.isAvailableMyselfScalarCondition())
 
     // ===================================================================================
@@ -1384,6 +1383,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         ${myConditionBeanClassName} cb = newMyCB(); cb.xsetupForScalarConditionPartitionBy(this); return cb;
     }
 #end
+#if ($table.hasSinglePrimaryKey())
 #if ($table.isAvailableMyselfMyselfDerived())
 
     // ===================================================================================

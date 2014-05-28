@@ -23,7 +23,6 @@ import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
-import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 
 /**
  * @author jflute
@@ -81,11 +80,13 @@ public class ScalarCondition extends AbstractSubQuery {
     }
 
     protected String getSubQueryClause(String function) {
-        if (!_subQueryDBMeta.hasPrimaryKey() || _subQueryDBMeta.hasCompoundPrimaryKey()) {
-            String msg = "The scalar-condition is unsupported when no primary key or compound primary key:";
-            msg = msg + " table=" + _subQueryDBMeta.getTableDbName();
-            throw new IllegalConditionBeanOperationException(msg);
-        }
+        // release ScalarCondition for compound PK
+        // (compound PK restricted until 1.0.5G without special reason)
+        //if (!_subQueryDBMeta.hasPrimaryKey() || _subQueryDBMeta.hasCompoundPrimaryKey()) {
+        //    String msg = "The scalar-condition is unsupported when no primary key or compound primary key:";
+        //    msg = msg + " table=" + _subQueryDBMeta.getTableDbName();
+        //    throw new IllegalConditionBeanOperationException(msg);
+        //}
         final String tableAliasName = getSubQueryLocalAliasName();
         final String derivedColumnDbName = _subQuerySqlClause.getSpecifiedColumnDbNameAsOne();
         if (derivedColumnDbName == null) {

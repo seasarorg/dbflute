@@ -265,9 +265,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
 #end
     protected Map<String, Object> xfindFixedConditionDynamicParameterMap(String pp) { return null; }
-#if ($table.hasSinglePrimaryKey())
     public String keepScalarCondition(${myConditionQueryClassName} sq)
     { throwIICBOE("ScalarCondition"); return null; }
+#if ($table.hasSinglePrimaryKey())
     public String keepSpecifyMyselfDerived(${myConditionQueryClassName} sq)
     { throwIICBOE("(Specify)MyselfDerived"); return null;}
     public String keepQueryMyselfDerived(${myConditionQueryClassName} sq)
