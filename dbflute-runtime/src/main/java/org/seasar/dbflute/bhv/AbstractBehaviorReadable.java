@@ -1470,7 +1470,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     protected void assertEntityNotNullAndHasPrimaryKeyValue(Entity entity) {
         assertEntityNotNull(entity);
-        final Set<String> uniqueDrivenPropSet = entity.uniqueDrivenProperties();
+        final Set<String> uniqueDrivenPropSet = entity.myuniqueDrivenProperties();
         if (uniqueDrivenPropSet.isEmpty()) { // PK, basically here
             if (!entity.hasPrimaryKeyValue()) {
                 createBhvExThrower().throwEntityPrimaryKeyNotFoundException(entity);

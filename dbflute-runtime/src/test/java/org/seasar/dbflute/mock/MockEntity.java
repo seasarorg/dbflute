@@ -52,7 +52,7 @@ public class MockEntity implements Entity {
         return _memberId != null;
     }
 
-    public Set<String> uniqueDrivenProperties() {
+    public Set<String> myuniqueDrivenProperties() {
         return Collections.emptySet();
     }
 

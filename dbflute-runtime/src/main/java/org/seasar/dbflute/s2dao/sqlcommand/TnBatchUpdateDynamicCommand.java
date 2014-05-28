@@ -90,6 +90,14 @@ public class TnBatchUpdateDynamicCommand extends TnUpdateEntityDynamicCommand {
     }
 
     // ===================================================================================
+    //                                                                          Create SQL
+    //                                                                          ==========
+    @Override
+    protected Set<String> extractUniqueDrivenPropSet(Object bean) {
+        return null; // cannot use unique-driven for batch
+    }
+
+    // ===================================================================================
     //                                                                  Non Update Message
     //                                                                  ==================
     @Override

@@ -17,6 +17,7 @@ package org.seasar.dbflute.bhv;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
@@ -186,29 +187,48 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     protected <ENTITY extends Entity, CB_TYPE extends ConditionBean> void helpInsertOrUpdateInternally(ENTITY entity,
             InternalInsertOrUpdateCallback<ENTITY, CB_TYPE> callback) {
         assertEntityNotNull(entity);
-        if (!entity.hasPrimaryKeyValue()) {
+        if (helpDetermineInsertOrUpdateDirectInsert(entity)) {
+            callback.callbackInsert(entity);
+            return;
+        }
+        RuntimeException updateException = null;
+        try {
+            callback.callbackUpdate(entity);
+        } catch (EntityAlreadyUpdatedException e) { // already updated (or means not found)
+            updateException = e;
+        } catch (EntityAlreadyDeletedException e) { // means not found
+            updateException = e;
+        } catch (OptimisticLockColumnValueNullException e) { // means insert?
+            updateException = e;
+        }
+        if (updateException == null) {
+            return;
+        }
+        final CB_TYPE cb = callback.callbackNewMyConditionBean();
+        final Set<String> uniqueDrivenProperties = entity.myuniqueDrivenProperties();
+        if (uniqueDrivenProperties != null && !uniqueDrivenProperties.isEmpty()) {
+            for (String prop : uniqueDrivenProperties) {
+                final DBMeta dbmeta = entity.getDBMeta();
+                final ColumnInfo columnInfo = dbmeta.findColumnInfo(prop);
+                final Object value = columnInfo.read(entity); // already checked in update process
+                cb.localCQ().invokeQueryEqual(columnInfo.getColumnDbName(), value);
+            }
+        } else {
+            cb.acceptPrimaryKeyMap(getDBMeta().extractPrimaryKeyMap(entity));
+        }
+        if (callback.callbackSelectCount(cb) == 0) { // anyway if not found, insert
             callback.callbackInsert(entity);
         } else {
-            RuntimeException updateException = null;
-            try {
-                callback.callbackUpdate(entity);
-            } catch (EntityAlreadyUpdatedException e) { // already updated (or means not found)
-                updateException = e;
-            } catch (EntityAlreadyDeletedException e) { // means not found
-                updateException = e;
-            } catch (OptimisticLockColumnValueNullException e) { // means insert?
-                updateException = e;
-            }
-            if (updateException != null) {
-                final CB_TYPE cb = callback.callbackNewMyConditionBean();
-                cb.acceptPrimaryKeyMap(getDBMeta().extractPrimaryKeyMap(entity));
-                if (callback.callbackSelectCount(cb) == 0) { // anyway if not found, insert
-                    callback.callbackInsert(entity);
-                } else {
-                    throw updateException;
-                }
-            }
+            throw updateException;
         }
+    }
+
+    protected boolean helpDetermineInsertOrUpdateDirectInsert(Entity entity) {
+        final Set<String> uniqueDrivenProperties = entity.myuniqueDrivenProperties();
+        if (uniqueDrivenProperties != null && !uniqueDrivenProperties.isEmpty()) {
+            return false;
+        }
+        return !entity.hasPrimaryKeyValue();
     }
 
     protected static interface InternalInsertOrUpdateCallback<ENTITY extends Entity, CB_TYPE extends ConditionBean> {
@@ -224,7 +244,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     protected <ENTITY extends Entity> void helpInsertOrUpdateInternally(ENTITY entity,
             InternalInsertOrUpdateNonstrictCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
-        if (!entity.hasPrimaryKeyValue()) {
+        if (helpDetermineInsertOrUpdateDirectInsert(entity)) {
             callback.callbackInsert(entity);
         } else {
             try {

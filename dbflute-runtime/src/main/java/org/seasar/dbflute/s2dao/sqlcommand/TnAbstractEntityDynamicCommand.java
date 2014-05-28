@@ -97,7 +97,7 @@ public abstract class TnAbstractEntityDynamicCommand extends TnAbstractBasicSqlC
 
     protected Set<String> extractUniqueDrivenPropSet(Object bean) {
         if (bean instanceof Entity) {
-            final Set<String> propSet = ((Entity) bean).uniqueDrivenProperties();
+            final Set<String> propSet = ((Entity) bean).myuniqueDrivenProperties();
             if (propSet != null && !propSet.isEmpty()) {
                 return propSet;
             }

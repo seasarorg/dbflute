@@ -16,6 +16,7 @@
 package org.seasar.dbflute.s2dao.sqlcommand;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -61,5 +62,13 @@ public class TnBatchDeleteDynamicCommand extends TnDeleteEntityDynamicCommand {
 
     protected TnBatchDeleteHandler newBatchDeleteHandler(String sql) {
         return new TnBatchDeleteHandler(_dataSource, _statementFactory, sql, _beanMetaData);
+    }
+
+    // ===================================================================================
+    //                                                                          Create SQL
+    //                                                                          ==========
+    @Override
+    protected Set<String> extractUniqueDrivenPropSet(Object bean) {
+        return null; // cannot use unique-driven for batch
     }
 }

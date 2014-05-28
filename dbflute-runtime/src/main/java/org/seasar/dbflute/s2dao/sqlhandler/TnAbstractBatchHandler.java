@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -130,9 +131,9 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
         addBatch(ps);
     }
 
-    // -----------------------------------------------------
-    //                                           SQL Logging
-    //                                           -----------
+    // ===================================================================================
+    //                                                                         SQL Logging
+    //                                                                         ===========
     @Override
     protected void logSql(Object[] args, Class<?>[] argTypes) {
         if (isBatchLoggingOver()) {
@@ -349,6 +350,14 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
                 throw new EntityAlreadyDeletedException(msg);
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                       Bind Variable
+    //                                                                       =============
+    @Override
+    protected Set<String> extractUniqueDrivenPropSet(Object bean) {
+        return null; // cannot use unique-driven for batch
     }
 
     // ===================================================================================

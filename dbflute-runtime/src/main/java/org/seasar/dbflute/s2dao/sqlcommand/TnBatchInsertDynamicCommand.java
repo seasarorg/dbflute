@@ -72,9 +72,20 @@ public class TnBatchInsertDynamicCommand extends TnInsertEntityDynamicCommand {
     //                                                                             =======
     protected TnBatchInsertHandler createBatchInsertHandler(TnPropertyType[] boundPropTypes, String sql,
             InsertOption<ConditionBean> option) {
-        final TnBatchInsertHandler handler = new TnBatchInsertHandler(_dataSource, _statementFactory, sql,
-                _beanMetaData, boundPropTypes);
+        final TnBatchInsertHandler handler = newBatchInsertHandler(boundPropTypes, sql);
         handler.setInsertOption(option);
         return handler;
+    }
+
+    protected TnBatchInsertHandler newBatchInsertHandler(TnPropertyType[] boundPropTypes, String sql) {
+        return new TnBatchInsertHandler(_dataSource, _statementFactory, sql, _beanMetaData, boundPropTypes);
+    }
+
+    // ===================================================================================
+    //                                                                          Create SQL
+    //                                                                          ==========
+    @Override
+    protected Set<String> extractUniqueDrivenPropSet(Object bean) {
+        return null; // cannot use unique-driven for batch
     }
 }

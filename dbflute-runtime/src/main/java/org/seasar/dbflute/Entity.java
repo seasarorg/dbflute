@@ -70,7 +70,7 @@ public interface Entity {
      * Get the properties of specified unique columns as unique-driven.
      * @return The set of property name for specified unique columns. (NotNull)
      */
-    Set<String> uniqueDrivenProperties();
+    Set<String> myuniqueDrivenProperties(); // prefix 'my' not to show when uniqueBy() completion
 
     /**
      * Entity unique-driven properties. (basically for Framework)
