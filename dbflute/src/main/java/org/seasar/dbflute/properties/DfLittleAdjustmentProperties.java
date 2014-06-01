@@ -52,7 +52,9 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public Map<String, Object> getLittleAdjustmentMap() {
         if (_littleAdjustmentMap == null) {
-            _littleAdjustmentMap = mapProp("torque." + KEY_littleAdjustmentMap, DEFAULT_EMPTY_MAP);
+            final Map<String, Object> map = mapProp("torque." + KEY_littleAdjustmentMap, DEFAULT_EMPTY_MAP);
+            _littleAdjustmentMap = newLinkedHashMap();
+            _littleAdjustmentMap.putAll(map);
         }
         return _littleAdjustmentMap;
     }

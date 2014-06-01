@@ -74,7 +74,9 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     protected Map<String, Object> getDocumentDefinitionMap() {
         if (_documentDefinitionMap == null) {
-            _documentDefinitionMap = mapProp("torque." + KEY_documentDefinitionMap, DEFAULT_EMPTY_MAP);
+            final Map<String, Object> map = mapProp("torque." + KEY_documentDefinitionMap, DEFAULT_EMPTY_MAP);
+            _documentDefinitionMap = newLinkedHashMap();
+            _documentDefinitionMap.putAll(map);
         }
         return _documentDefinitionMap;
     }

@@ -67,7 +67,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     public Map<String, Object> getReplaceSchemaDefinitionMap() {
         if (_replaceSchemaDefinitionMap == null) {
-            _replaceSchemaDefinitionMap = mapProp("torque." + KEY_replaceSchemaDefinitionMap, DEFAULT_EMPTY_MAP);
+            final Map<String, Object> map = mapProp("torque." + KEY_replaceSchemaDefinitionMap, DEFAULT_EMPTY_MAP);
+            _replaceSchemaDefinitionMap = newLinkedHashMap();
+            _replaceSchemaDefinitionMap.putAll(map);
         }
         return _replaceSchemaDefinitionMap;
     }

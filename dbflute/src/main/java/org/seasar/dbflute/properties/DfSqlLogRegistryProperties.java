@@ -39,7 +39,9 @@ public final class DfSqlLogRegistryProperties extends DfAbstractHelperProperties
 
     protected Map<String, Object> getSqlLogRegistryDefinitionMap() { // It's closet!
         if (_sqlLogRegistryDefinitionMap == null) {
-            _sqlLogRegistryDefinitionMap = mapProp("torque." + KEY_sqlLogRegistryDefinitionMap, DEFAULT_EMPTY_MAP);
+            final Map<String, Object> map = mapProp("torque." + KEY_sqlLogRegistryDefinitionMap, DEFAULT_EMPTY_MAP);
+            _sqlLogRegistryDefinitionMap = newLinkedHashMap();
+            _sqlLogRegistryDefinitionMap.putAll(map);
         }
         return _sqlLogRegistryDefinitionMap;
     }

@@ -41,7 +41,9 @@ public final class DfBehaviorFilterProperties extends DfAbstractHelperProperties
 
     public Map<String, Object> getBehaviorFilterMap() {
         if (_behaviorFilterMap == null) {
-            _behaviorFilterMap = mapProp("torque." + KEY_behaviorFilterMap, DEFAULT_EMPTY_MAP);
+            final Map<String, Object> map = mapProp("torque." + KEY_behaviorFilterMap, DEFAULT_EMPTY_MAP);
+            _behaviorFilterMap = newLinkedHashMap();
+            _behaviorFilterMap.putAll(map);
         }
         return _behaviorFilterMap;
     }
@@ -82,7 +84,7 @@ public final class DfBehaviorFilterProperties extends DfAbstractHelperProperties
                 // - - - - - - - - - -/ 
                 _beforeInsertMap = (Map<String, Object>) _behaviorFilterMap.get("beforeInsertMap");
             } else {
-                _beforeInsertMap = DEFAULT_EMPTY_MAP;
+                _beforeInsertMap = newLinkedHashMap();
             }
             filterCommonColumnSetupValue(_beforeInsertMap);
         }
@@ -124,7 +126,7 @@ public final class DfBehaviorFilterProperties extends DfAbstractHelperProperties
                 // - - - - - - - - - -/ 
                 _beforeUpdateMap = (Map<String, Object>) _behaviorFilterMap.get("beforeUpdateMap");
             } else {
-                _beforeUpdateMap = DEFAULT_EMPTY_MAP;
+                _beforeUpdateMap = newLinkedHashMap();
             }
             filterCommonColumnSetupValue(_beforeUpdateMap);
         }
@@ -169,7 +171,7 @@ public final class DfBehaviorFilterProperties extends DfAbstractHelperProperties
                 // - - - - - - - - - -/ 
                 _beforeDeleteMap = (Map<String, Object>) _behaviorFilterMap.get("beforeDeleteMap");
             } else {
-                _beforeDeleteMap = DEFAULT_EMPTY_MAP;
+                _beforeDeleteMap = newLinkedHashMap();
             }
             filterCommonColumnSetupValue(_beforeDeleteMap);
         }

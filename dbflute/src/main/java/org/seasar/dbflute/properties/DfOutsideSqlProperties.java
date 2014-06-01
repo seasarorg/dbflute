@@ -59,7 +59,9 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
 
     protected Map<String, Object> getOutsideSqlDefinitionMap() {
         if (_outsideSqlDefinitionMap == null) {
-            _outsideSqlDefinitionMap = mapProp("torque." + KEY_outsideSqlDefinitionMap, DEFAULT_EMPTY_MAP);
+            final Map<String, Object> map = mapProp("torque." + KEY_outsideSqlDefinitionMap, DEFAULT_EMPTY_MAP);
+            _outsideSqlDefinitionMap = newLinkedHashMap();
+            _outsideSqlDefinitionMap.putAll(map);
         }
         return _outsideSqlDefinitionMap;
     }

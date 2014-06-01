@@ -37,13 +37,15 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                      Definition Map
     //                                                                      ==============
-    protected Map<String, Object> flexDtoDefinitionMap;
+    protected Map<String, Object> _flexDtoDefinitionMap;
 
     protected Map<String, Object> getFlexDtoDefinitionMap() {
-        if (flexDtoDefinitionMap == null) {
-            flexDtoDefinitionMap = mapProp("torque.flexDtoDefinitionMap", DEFAULT_EMPTY_MAP);
+        if (_flexDtoDefinitionMap == null) {
+            final Map<String, Object> map = mapProp("torque.flexDtoDefinitionMap", DEFAULT_EMPTY_MAP);
+            _flexDtoDefinitionMap = newLinkedHashMap();
+            _flexDtoDefinitionMap.putAll(map);
         }
-        return flexDtoDefinitionMap;
+        return _flexDtoDefinitionMap;
     }
 
     // ===================================================================================

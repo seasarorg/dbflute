@@ -20,7 +20,7 @@
 <components>
 
     <!-- The components of Behavior as implementation of an application . -->
-#foreach ($table in $database.tables)
+#foreach ($table in $database.behaviorTableList)
     <component name="${table.behaviorApComponentName}" class="${table.extendedBehaviorApFullClassName}"/>
 #end
 </components>

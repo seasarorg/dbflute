@@ -33,13 +33,15 @@ public final class DfS2jdbcProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                      Definition Map
     //                                                                      ==============
-    protected Map<String, Object> s2jdbcDefinitionMap;
+    protected Map<String, Object> _s2jdbcDefinitionMap;
 
     protected Map<String, Object> getS2JdbcDefinitionMap() { // It's closet!
-        if (s2jdbcDefinitionMap == null) {
-            s2jdbcDefinitionMap = mapProp("torque.s2jdbcDefinitionMap", DEFAULT_EMPTY_MAP);
+        if (_s2jdbcDefinitionMap == null) {
+            final Map<String, Object> map = mapProp("torque.s2jdbcDefinitionMap", DEFAULT_EMPTY_MAP);
+            _s2jdbcDefinitionMap = newLinkedHashMap();
+            _s2jdbcDefinitionMap.putAll(map);
         }
-        return s2jdbcDefinitionMap;
+        return _s2jdbcDefinitionMap;
     }
 
     // ===================================================================================

@@ -566,7 +566,9 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
 
     protected Map<String, Object> getIdentityDefinitionMap() {
         if (_identityDefinitionMap == null) {
-            _identityDefinitionMap = mapProp("torque." + KEY_identityDefinitionMap, DEFAULT_EMPTY_MAP);
+            final Map<String, Object> map = mapProp("torque." + KEY_identityDefinitionMap, DEFAULT_EMPTY_MAP);
+            _identityDefinitionMap = newLinkedHashMap();
+            _identityDefinitionMap.putAll(map);
         }
         return _identityDefinitionMap;
     }

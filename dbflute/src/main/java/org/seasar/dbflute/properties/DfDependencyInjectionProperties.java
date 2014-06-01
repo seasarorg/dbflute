@@ -45,7 +45,9 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
 
     public Map<String, Object> getDependencyInjectionMap() {
         if (_dependencyInjectionMap == null) {
-            _dependencyInjectionMap = mapProp("torque." + KEY_dependencyInjectionMap, DEFAULT_EMPTY_MAP);
+            final Map<String, Object> map = mapProp("torque." + KEY_dependencyInjectionMap, DEFAULT_EMPTY_MAP);
+            _dependencyInjectionMap = newLinkedHashMap();
+            _dependencyInjectionMap.putAll(map);
         }
         return _dependencyInjectionMap;
     }
@@ -160,7 +162,9 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
             return _dbfluteDiconBeforeJ2eeIncludeDefinitionMap;
         }
         String key = KEY_dbfluteDiconBeforeJ2eeIncludeDefinitionMap;
-        _dbfluteDiconBeforeJ2eeIncludeDefinitionMap = getPropertyAsMap(key, DEFAULT_EMPTY_MAP);
+        final Map<String, Object> map = getPropertyAsMap(key, DEFAULT_EMPTY_MAP);
+        _dbfluteDiconBeforeJ2eeIncludeDefinitionMap = newLinkedHashMap();
+        _dbfluteDiconBeforeJ2eeIncludeDefinitionMap.putAll(map);
         return _dbfluteDiconBeforeJ2eeIncludeDefinitionMap;
     }
 
@@ -176,7 +180,9 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
             return _dbfluteDiconOtherIncludeDefinitionMap;
         }
         String key = KEY_dbfluteDiconOtherIncludeDefinitionMap;
-        _dbfluteDiconOtherIncludeDefinitionMap = getPropertyAsMap(key, DEFAULT_EMPTY_MAP);
+        final Map<String, Object> map = getPropertyAsMap(key, DEFAULT_EMPTY_MAP);
+        _dbfluteDiconOtherIncludeDefinitionMap = newLinkedHashMap();
+        _dbfluteDiconOtherIncludeDefinitionMap.putAll(map);
         return _dbfluteDiconOtherIncludeDefinitionMap;
     }
 

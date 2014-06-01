@@ -36,7 +36,7 @@ public class ${glDBFluteModuleAp} extends ${glDBFluteModuleLib} {
     protected void setupBehavior(BehaviorCommandInvoker ker, BehaviorSelector tor, CommonColumnAutoSetupper per) {
         super.setupBehavior(ker, tor, per);
 
-#foreach ($table in $database.tables)
+#foreach ($table in $database.behaviorTableList)
         {
             ${table.extendedBehaviorApClassName} bhv = new ${table.extendedBehaviorApClassName}();
 #if ($table.isWritable())

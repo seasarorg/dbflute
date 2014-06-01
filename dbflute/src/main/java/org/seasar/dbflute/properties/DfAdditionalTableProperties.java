@@ -57,7 +57,9 @@ public final class DfAdditionalTableProperties extends DfAbstractHelperPropertie
 
     public Map<String, Object> getAdditionalTableMap() {
         if (_additionalTableMap == null) {
-            _additionalTableMap = mapProp("torque." + KEY_additionalTableMap, DEFAULT_EMPTY_MAP);
+            final Map<String, Object> map = mapProp("torque." + KEY_additionalTableMap, DEFAULT_EMPTY_MAP);
+            _additionalTableMap = newLinkedHashMap();
+            _additionalTableMap.putAll(map);
         }
         return _additionalTableMap;
     }

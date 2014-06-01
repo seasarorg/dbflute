@@ -67,7 +67,9 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
 
     public Map<String, Object> getBasicInfoMap() {
         if (_basicInfoMap == null) {
-            _basicInfoMap = mapProp("torque." + KEY_basicInfoMap, DEFAULT_EMPTY_MAP);
+            final Map<String, Object> map = mapProp("torque." + KEY_basicInfoMap, DEFAULT_EMPTY_MAP);
+            _basicInfoMap = newLinkedHashMap();
+            _basicInfoMap.putAll(map);
         }
         return _basicInfoMap;
     }

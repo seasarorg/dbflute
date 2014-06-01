@@ -1284,43 +1284,50 @@ public class Table {
     }
 
     // -----------------------------------------------------
-    //                                         Determination
-    //                                         -------------
+    //                                  Existing Foreign Key
+    //                                  --------------------
     public boolean existsForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList) {
+            List<String> foreignColumnNameList) { // no suffix
         return doExistsForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, null, false);
     }
 
     public boolean existsForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList, String fixedSuffix) {
+            List<String> foreignColumnNameList, String fixedSuffix) { // all
         return doExistsForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, true);
     }
 
     protected boolean doExistsForeignKey(String foreignTableName, List<String> localColumnNameList,
             List<String> foreignColumnNameList, String fixedSuffix, boolean compareSuffix) {
         final ForeignKey fk = doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList,
-                fixedSuffix, compareSuffix);
+                fixedSuffix, compareSuffix, true);
         return fk != null;
     }
 
     public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList) {
-        return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, null, false);
+            List<String> foreignColumnNameList) { // no suffix
+        return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, null, false, true);
+    }
+
+    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> foreignColumnNameList,
+            String fixedSuffix) { // no local columns
+        final List<String> emptyList = DfCollectionUtil.emptyList();
+        return doFindExistingForeignKey(foreignTableName, emptyList, foreignColumnNameList, fixedSuffix, true, false);
     }
 
     public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList, String fixedSuffix) {
-        return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, true);
+            List<String> foreignColumnNameList, String fixedSuffix) { // all
+        return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix,
+                true, true);
     }
 
     protected ForeignKey doFindExistingForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList, String fixedSuffix, boolean compareSuffix) {
+            List<String> foreignColumnNameList, String fixedSuffix, boolean compareSuffix, boolean compareLocalColumn) {
         final StringSet localColumnNameSet = StringSet.createAsFlexibleOrdered();
         localColumnNameSet.addAll(localColumnNameList);
         final StringSet foreignColumnNameSet = StringSet.createAsFlexibleOrdered();
         foreignColumnNameSet.addAll(foreignColumnNameList);
 
-        for (final ForeignKey fk : getForeignKeys()) {
+        for (ForeignKey fk : getForeignKeys()) {
             if (!Srl.equalsFlexible(foreignTableName, fk.getForeignTablePureName())) {
                 continue;
             }
@@ -1329,7 +1336,7 @@ public class Table {
             }
             final StringSet currentLocalColumnNameSet = StringSet.createAsFlexibleOrdered();
             currentLocalColumnNameSet.addAll(fk.getLocalColumnNameList());
-            if (!localColumnNameSet.equalsUnderCharOption(currentLocalColumnNameSet)) {
+            if (compareLocalColumn && !localColumnNameSet.equalsUnderCharOption(currentLocalColumnNameSet)) {
                 continue;
             }
             final StringSet currentForeignColumnNameSet = StringSet.createAsFlexibleOrdered();
@@ -1337,11 +1344,14 @@ public class Table {
             if (!foreignColumnNameSet.equalsUnderCharOption(currentForeignColumnNameSet)) {
                 continue;
             }
-            return fk;
+            return fk; // first-found one
         }
         return null;
     }
 
+    // -----------------------------------------------------
+    //                                         Determination
+    //                                         -------------
     public boolean hasForeignKey() {
         return (getForeignKeys().length != 0);
     }

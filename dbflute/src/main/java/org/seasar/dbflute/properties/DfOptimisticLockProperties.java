@@ -50,7 +50,9 @@ public final class DfOptimisticLockProperties extends DfAbstractHelperProperties
 
     public Map<String, Object> getOptimisticLockDefinitionMap() {
         if (_optimisticLockDefinitionMap == null) {
-            _optimisticLockDefinitionMap = mapProp("torque." + KEY_optimisticLockDefinitionMap, DEFAULT_EMPTY_MAP);
+            final Map<String, Object> map = mapProp("torque." + KEY_optimisticLockDefinitionMap, DEFAULT_EMPTY_MAP);
+            _optimisticLockDefinitionMap = newLinkedHashMap();
+            _optimisticLockDefinitionMap.putAll(map);
         }
         return _optimisticLockDefinitionMap;
     }

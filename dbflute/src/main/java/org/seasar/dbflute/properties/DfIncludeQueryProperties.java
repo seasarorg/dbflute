@@ -223,8 +223,8 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
 
     protected Map<String, Map<String, Map<String, List<String>>>> doGetIncludeQueryMap() {
         final Map<String, Map<String, Map<String, List<String>>>> resultMap = newLinkedHashMap();
-        final Map<String, Object> targetMap = mapProp("torque.includeQueryMap", DEFAULT_EMPTY_MAP);
-        adjustColumnDrivenMergedDummyPropIfNeeds(targetMap);
+        Map<String, Object> targetMap = mapProp("torque.includeQueryMap", DEFAULT_EMPTY_MAP);
+        targetMap = adjustColumnDrivenMergedDummyPropIfNeeds(targetMap);
         final Map<String, Map<String, Map<String, List<String>>>> columnDrivenTranslatedMap = extractColumnDrivenTranslatedMap(targetMap);
         for (Entry<String, Object> propEntry : targetMap.entrySet()) {
             final String propType = propEntry.getKey();
@@ -245,14 +245,17 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return resultMap;
     }
 
-    protected void adjustColumnDrivenMergedDummyPropIfNeeds(Map<String, Object> targetMap) {
+    protected Map<String, Object> adjustColumnDrivenMergedDummyPropIfNeeds(Map<String, Object> targetMap) {
+        final Map<String, Object> adjustedMap = newLinkedHashMap();
+        adjustedMap.putAll(targetMap);
         for (String prop : _ckeySetMap.keySet()) {
-            final Object element = targetMap.get(prop);
+            final Object element = adjustedMap.get(prop);
             if (element == null) {
                 // you can specify e.g. OrderBy as column-driven without normal settings
-                targetMap.put(prop, new LinkedHashMap<String, Object>());
+                adjustedMap.put(prop, new LinkedHashMap<String, Object>());
             }
         }
+        return adjustedMap;
     }
 
     protected Map<String, Map<String, List<String>>> prepareElementMap(String propType,

@@ -219,6 +219,10 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
 
     protected String doFindAttributeValue(String foreignKeyName, String optionKey) {
         final Map<String, String> attributeMap = getAdditionalForeignKeyMap().get(foreignKeyName);
+        if (attributeMap == null) {
+            String msg = "Unknown name of additional foreign key: " + foreignKeyName + " option=" + optionKey;
+            throw new IllegalStateException(msg);
+        }
         return attributeMap.get(optionKey);
     }
 

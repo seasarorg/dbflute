@@ -37,13 +37,15 @@ public final class DfHibernateProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                      Definition Map
     //                                                                      ==============
-    protected Map<String, Object> hibernateDefinitionMap;
+    protected Map<String, Object> _hibernateDefinitionMap;
 
     protected Map<String, Object> getHibernateDefinitionMap() { // It's closet!
-        if (hibernateDefinitionMap == null) {
-            hibernateDefinitionMap = mapProp("torque.hibernateDefinitionMap", DEFAULT_EMPTY_MAP);
+        if (_hibernateDefinitionMap == null) {
+            final Map<String, Object> map = mapProp("torque.hibernateDefinitionMap", DEFAULT_EMPTY_MAP);
+            _hibernateDefinitionMap = newLinkedHashMap();
+            _hibernateDefinitionMap.putAll(map);
         }
-        return hibernateDefinitionMap;
+        return _hibernateDefinitionMap;
     }
 
     // ===================================================================================

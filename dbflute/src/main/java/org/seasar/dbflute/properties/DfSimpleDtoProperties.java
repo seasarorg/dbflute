@@ -40,13 +40,15 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                      Definition Map
     //                                                                      ==============
-    protected Map<String, Object> simpleDtoDefinitionMap;
+    protected Map<String, Object> _simpleDtoDefinitionMap;
 
     protected Map<String, Object> getSimpleDtoDefinitionMap() {
-        if (simpleDtoDefinitionMap == null) {
-            simpleDtoDefinitionMap = mapProp("torque.simpleDtoDefinitionMap", DEFAULT_EMPTY_MAP);
+        if (_simpleDtoDefinitionMap == null) {
+            final Map<String, Object> map = mapProp("torque.simpleDtoDefinitionMap", DEFAULT_EMPTY_MAP);
+            _simpleDtoDefinitionMap = newLinkedHashMap();
+            _simpleDtoDefinitionMap.putAll(map);
         }
-        return simpleDtoDefinitionMap;
+        return _simpleDtoDefinitionMap;
     }
 
     // ===================================================================================

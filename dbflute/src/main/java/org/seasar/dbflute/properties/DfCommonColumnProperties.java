@@ -54,7 +54,9 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     @SuppressWarnings("unchecked")
     public Map<String, String> getCommonColumnMap() {
         if (_commonColumnTopMap == null) {
-            _commonColumnTopMap = mapProp("torque." + KEY_commonColumnMap, DEFAULT_EMPTY_MAP);
+            final Map<String, Object> map = mapProp("torque." + KEY_commonColumnMap, DEFAULT_EMPTY_MAP);
+            _commonColumnTopMap = newLinkedHashMap();
+            _commonColumnTopMap.putAll(map);
             if (_commonColumnTopMap.containsKey(KEY_commonColumnMap)) {
                 // For the way by dfprop-setting.
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -217,7 +219,9 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
             } else {
                 // For old style.
                 final String key = "torque." + KEY_commonColumnSetupBeforeInsertInterceptorLogicMap;
-                _beforeInsertMap = mapProp(key, DEFAULT_EMPTY_MAP);
+                final Map<String, Object> map = mapProp(key, DEFAULT_EMPTY_MAP);
+                _beforeInsertMap = newLinkedHashMap();
+                _beforeInsertMap.putAll(map);
             }
             filterCommonColumnSetupValue(_beforeInsertMap);
         }
@@ -262,7 +266,9 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
             } else {
                 // For old style.
                 final String key = "torque." + KEY_commonColumnSetupBeforeUpdateInterceptorLogicMap;
-                _beforeUpdateMap = mapProp(key, DEFAULT_EMPTY_MAP);
+                final Map<String, Object> map = mapProp(key, DEFAULT_EMPTY_MAP);
+                _beforeUpdateMap = newLinkedHashMap();
+                _beforeUpdateMap.putAll(map);
             }
             filterCommonColumnSetupValue(_beforeUpdateMap);
         }

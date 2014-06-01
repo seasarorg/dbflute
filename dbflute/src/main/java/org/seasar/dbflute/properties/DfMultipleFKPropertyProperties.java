@@ -53,7 +53,9 @@ public final class DfMultipleFKPropertyProperties extends DfAbstractHelperProper
     public Map<String, Map<String, Map<String, String>>> getMultipleFKPropertyMap() { // It's closet!
         if (_multipleFKPropertyMap == null) {
             final Object obj = mapProp("torque." + KEY_multipleFKPropertyMap, DEFAULT_EMPTY_MAP);
-            _multipleFKPropertyMap = (Map<String, Map<String, Map<String, String>>>) obj;
+            final Map<String, Map<String, Map<String, String>>> map = (Map<String, Map<String, Map<String, String>>>) obj;
+            _multipleFKPropertyMap = newLinkedHashMap();
+            _multipleFKPropertyMap.putAll(map);
         }
         return _multipleFKPropertyMap;
     }

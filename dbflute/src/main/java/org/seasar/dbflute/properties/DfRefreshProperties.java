@@ -43,7 +43,9 @@ public final class DfRefreshProperties extends DfAbstractHelperProperties {
 
     protected Map<String, Object> getRefreshDefinitionMap() {
         if (refreshDefinitionMap == null) {
-            refreshDefinitionMap = mapProp("torque.refreshDefinitionMap", DEFAULT_EMPTY_MAP);
+            final Map<String, Object> map = mapProp("torque.refreshDefinitionMap", DEFAULT_EMPTY_MAP);
+            refreshDefinitionMap = newLinkedHashMap();
+            refreshDefinitionMap.putAll(map);
         }
         return refreshDefinitionMap;
     }

@@ -23,7 +23,6 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -46,6 +45,7 @@ import org.seasar.dbflute.properties.propreader.DfOutsideMapPropReader;
 import org.seasar.dbflute.properties.propreader.DfOutsideStringPropReader;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
@@ -82,8 +82,8 @@ public abstract class DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                                   Empty Default Value
     //                                   -------------------
-    public static final Map<String, Object> DEFAULT_EMPTY_MAP = new LinkedHashMap<String, Object>();
-    public static final List<Object> DEFAULT_EMPTY_LIST = new ArrayList<Object>();
+    public static final Map<String, Object> DEFAULT_EMPTY_MAP = DfCollectionUtil.emptyMap();
+    public static final List<Object> DEFAULT_EMPTY_LIST = DfCollectionUtil.emptyList();
     public static final String DEFAULT_EMPTY_MAP_STRING = "map:{}";
     public static final String DEFAULT_EMPTY_LIST_STRING = "list:{}";
 

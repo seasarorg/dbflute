@@ -118,7 +118,9 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
 
     protected Map<String, Object> getFreeGenDefinitionMap() {
         if (_freeGenDefinitionMap == null) {
-            _freeGenDefinitionMap = mapProp("torque.freeGenDefinitionMap", DEFAULT_EMPTY_MAP);
+            final Map<String, Object> map = mapProp("torque.freeGenDefinitionMap", DEFAULT_EMPTY_MAP);
+            _freeGenDefinitionMap = newLinkedHashMap();
+            _freeGenDefinitionMap.putAll(map);
         }
         return _freeGenDefinitionMap;
     }
