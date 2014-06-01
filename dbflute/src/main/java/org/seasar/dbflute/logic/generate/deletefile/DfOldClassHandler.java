@@ -225,7 +225,7 @@ public class DfOldClassHandler {
     public void deleteOldTableClass_for_NestSelectSetupper() {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                return table.getNestSelectSetupperClassName();
+                return table.hasNestSelectSetupper() ? table.getNestSelectSetupperClassName() : null;
             }
         };
         final String packagePath = getConditionBeanPackage() + ".nss";
@@ -264,7 +264,7 @@ public class DfOldClassHandler {
     public void deleteOldTableClass_for_ExtendedConditionInlineQuery() {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                return table.getExtendedConditionInlineQueryClassName();
+                return table.hasConditionInlineQuery() ? table.getExtendedConditionInlineQueryClassName() : null;
             }
         };
         final String packagePath = getConditionBeanPackage() + ".cq.ciq";

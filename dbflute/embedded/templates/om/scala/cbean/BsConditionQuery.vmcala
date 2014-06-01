@@ -33,6 +33,7 @@ import ${glPackageCQ}._
  * @author ${database.classAuthor}
  */
 class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasName: String, nestLevel: Integer) extends ${myAbstractBaseConditionQueryClassName}(referrerQuery, sqlClause, aliasName, nestLevel) {
+#if ($table.isAvailableMyselfInlineView())
 
     // ===================================================================================
     //                                                                           Attribute
@@ -78,21 +79,22 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         if (isBaseQuery()) { throw new IllegalConditionBeanOperationException("OnClause for local table is unavailable!"); }
         val inlineQuery: ${myConditionInlineQueryClassName} = inline(); inlineQuery.xsetOnClause(true); return inlineQuery;
     }
+#end
 
     // ===================================================================================
     //                                                                               Query
     //                                                                               =====
 #foreach ($col in $table.columns)
-#set ($tmpJavaName = "${col.JavaName}")
-#set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
+#set ($tmpJavaName = "${col.javaName}")
+#set ($tmpUncapitalisedJavaName = "${col.uncapitalisedJavaName}")
 #set ($fk = $col.foreignKey)
-
     protected var _${tmpUncapitalisedJavaName}: ConditionValue = null;
     def get${tmpJavaName}(): ConditionValue = {
         if (_${tmpUncapitalisedJavaName} == null) { _${tmpUncapitalisedJavaName} = nCV(); }
         return _${tmpUncapitalisedJavaName};
     }
     protected def getCValue${tmpJavaName}(): ConditionValue = { return get${tmpJavaName}(); }
+
 #if (${col.isJavaNativeStringObject()})
 #foreach ($referrer in $col.existsReferrerReferrers)
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
@@ -104,7 +106,6 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -112,6 +113,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(ky, sq); return "${subQueryPropertyName}." + ky;
     }
+
 #end
 #foreach ($referrer in $col.existsReferrerReferrers)
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
@@ -123,7 +125,6 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -131,13 +132,13 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(ky, sq); return "${subQueryPropertyName}." + ky;
     }
+
 #end
 #if (${col.isInScopeRelationAllowedForeignKey()})
 #set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -145,6 +146,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(ky, sq); return "${subQueryPropertyName}." + ky;
     }
+
 #end
 #foreach ($referrer in $col.inScopeRelationReferrers)
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
@@ -156,7 +158,6 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
 #end
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -164,13 +165,13 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(ky, sq); return "${subQueryPropertyName}." + ky;
     }
+
 #end
 #if (${col.isInScopeRelationAllowedForeignKey()})
 #set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -178,6 +179,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(ky, sq); return "${subQueryPropertyName}." + ky;
     }
+
 #end
 #foreach ($referrer in $col.inScopeRelationReferrers)
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
@@ -189,7 +191,6 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
 #end
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -197,6 +198,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(ky, sq); return "${subQueryPropertyName}." + ky;
     }
+
 #end
 #foreach ($referrer in $col.derivedReferrerReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
@@ -204,7 +206,6 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -212,6 +213,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(ky, sq); return "${subQueryPropertyName}." + ky;
     }
+
 #end
 #foreach ($referrer in $col.derivedReferrerReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
@@ -219,7 +221,6 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -234,6 +235,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryParameterKey" + (_${subQueryPropertyName}ParameterMap.size() + 1);
         _${subQueryPropertyName}ParameterMap.put(ky, vl); return "${subQueryPropertyName}Parameter." + ky;
     }
+
 #end
 #end
 #if (${col.isJavaNativeNumberObject()})
@@ -247,7 +249,6 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -255,6 +256,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(ky, sq); return "${subQueryPropertyName}." + ky;
     }
+
 #end
 #foreach ($referrer in $col.existsReferrerReferrers)
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
@@ -266,7 +268,6 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -274,6 +275,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(ky, sq); return "${subQueryPropertyName}." + ky;
     }
+
 #end
 #foreach ($referrer in $col.derivedReferrerReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
@@ -281,7 +283,6 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -289,13 +290,13 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(ky, sq); return "${subQueryPropertyName}." + ky;
     }
+
 #end
 #if (${col.isInScopeRelationAllowedForeignKey()})
 #set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -303,6 +304,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(ky, sq); return "${subQueryPropertyName}." + ky;
     }
+
 #end
 #foreach ($referrer in $col.inScopeRelationReferrers)
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
@@ -314,7 +316,6 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
 #end
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -322,13 +323,13 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(ky, sq); return "${subQueryPropertyName}." + ky;
     }
+
 #end
 #if (${col.isInScopeRelationAllowedForeignKey()})
 #set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -336,6 +337,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(ky, sq); return "${subQueryPropertyName}." + ky;
     }
+
 #end
 #foreach ($referrer in $col.inScopeRelationReferrers)
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
@@ -347,7 +349,6 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
 #end
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -355,6 +356,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(ky, sq); return "${subQueryPropertyName}." + ky;
     }
+
 #end
 #foreach ($referrer in $col.derivedReferrerReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
@@ -362,7 +364,6 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-
     protected var _${subQueryPropertyName}Map: Map[${subQueryKeepMapGeneric}] = null;
     def get${subQueryPropertyNameInitCap}(): Map[${subQueryKeepMapGeneric}] = { return _${subQueryPropertyName}Map; }
     def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String = {
@@ -377,28 +378,29 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         val ky: String = "subQueryParameterKey" + (_${subQueryPropertyName}ParameterMap.size() + 1);
         _${subQueryPropertyName}ParameterMap.put(ky, vl); return "${subQueryPropertyName}Parameter." + ky;
     }
+
 #end
 #end
 #if ($col.isAvailableOrderByAsc())
-
     /** 
      * Add order-by as ascend. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @return this. (NotNull)
      */
     def addOrderBy_${tmpJavaName}_Asc(): ${myClassName} = { regOBA("${col.name}"); return this; }
+
 #end
 #if ($col.isAvailableOrderByDesc())
-
     /**
      * Add order-by as descend. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @return this. (NotNull)
      */
     def addOrderBy_${tmpJavaName}_Desc(): ${myClassName} = { regOBD("${col.name}"); return this; }
-#end
-#end
 
+#end
+#end
+#if ($table.isAvailableRelationSpecifiedDerivedOrderBy())
     // ===================================================================================
     //                                                             SpecifiedDerivedOrderBy
     //                                                             =======================
@@ -436,6 +438,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
     def addSpecifiedDerivedOrderBy_Desc(aliasName: String): ${myClassName} =
     { registerSpecifiedDerivedOrderBy_Desc(aliasName); return this; }
 
+#end
     // ===================================================================================
     //                                                                         Union Query
     //                                                                         ===========
@@ -581,6 +584,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         return null;
     }
 
+#if ($table.isAvailableMyselfScalarCondition())
     // ===================================================================================
     //                                                                     ScalarCondition
     //                                                                     ===============
@@ -592,7 +596,9 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         _scalarConditionMap.put(ky, sq); return "scalarCondition." + ky;
     }
 
+#end
 #if ($table.hasSinglePrimaryKey())
+#if ($table.isAvailableMyselfMyselfDerived())
     // ===================================================================================
     //                                                                       MyselfDerived
     //                                                                       =============
@@ -619,6 +625,8 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         _qyeryMyselfDerivedParameterMap.put(ky, vl); return "queryMyselfDerivedParameter." + ky;
     }
 
+#end
+#if ($table.isAvailableMyselfMyselfExists())
     // ===================================================================================
     //                                                                        MyselfExists
     //                                                                        ============
@@ -630,6 +638,8 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         _myselfExistsMap.put(ky, sq); return "myselfExists." + ky;
     }
 
+#end
+#if ($table.isAvailableMyselfMyselfInScope())
     // ===================================================================================
     //                                                                       MyselfInScope
     //                                                                       =============
@@ -641,6 +651,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
         _myselfInScopeMap.put(ky, sq); return "myselfInScope." + ky;
     }
 
+#end
 #end
 #if (${table.hasCompoundKeyReferrer()})
     // ===================================================================================

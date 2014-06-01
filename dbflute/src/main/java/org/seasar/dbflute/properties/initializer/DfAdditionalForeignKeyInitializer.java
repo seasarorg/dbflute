@@ -96,32 +96,35 @@ public class DfAdditionalForeignKeyInitializer {
         final StringSet foreignColumnSet = StringSet.createAsFlexible();
         foreignColumnSet.addAll(foreignColumnNameList);
 
-        for (final Table localTable : getTableList()) {
-            final String localTableName = localTable.getTableDbName();
+        for (Table table : getTableList()) {
+            final String localTableName = table.getTableDbName();
             final List<String> localColumnNameList = getLocalColumnNameList(foreignKeyName, foreignTableName,
                     foreignColumnNameList, localTableName, false);
-            if (!localTable.containsColumn(localColumnNameList)) {
+            if (!table.containsColumn(localColumnNameList)) {
                 continue;
             }
 
             // check same-column self reference
             final StringSet localColumnSet = StringSet.createAsFlexible();
             localColumnSet.addAll(localColumnNameList);
-            final boolean selfReference = localTable.getTableDbName().equals(foreignTable.getTableDbName());
+            final boolean selfReference = table.getTableDbName().equals(foreignTable.getTableDbName());
             if (selfReference && localColumnSet.equalsUnderCharOption(foreignColumnSet)) {
                 continue;
             }
 
             // check same foreign key existence
-            if (localTable.existsForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix)) {
+            final ForeignKey existingFK = table.findExistingForeignKey(foreignTableName, localColumnNameList,
+                    foreignColumnNameList, fixedSuffix);
+            if (existingFK != null) {
                 _log.info("The foreign key has already set up: " + foreignKeyName + "(" + fixedSuffix + ")");
+                reflectOptionToExistingFKIfNeeds(foreignKeyName, fixedSuffix, existingFK);
                 continue;
             }
 
             final String currentForeignKeyName = foreignKeyName + "_" + toConstraintPart(localTableName);
             setupForeignKeyToTable(currentForeignKeyName, foreignTableName, foreignColumnNameList, fixedCondition,
-                    localTable, localColumnNameList, fixedSuffix, fixedInline, fixedReferrer, comment);
-            showResult(foreignTableName, foreignColumnNameList, fixedCondition, localTable, localColumnNameList);
+                    table, localColumnNameList, fixedSuffix, fixedInline, fixedReferrer, comment);
+            showResult(foreignTableName, foreignColumnNameList, fixedCondition, table, localColumnNameList);
         }
     }
 
@@ -141,6 +144,8 @@ public class DfAdditionalForeignKeyInitializer {
         final List<String> localColumnNameList = getLocalColumnNameList(foreignKeyName, foreignTableName,
                 foreignColumnNameList, localTableName, true);
         assertLocalTableColumn(foreignKeyName, localTableName, localColumnNameList);
+
+        // check same foreign key existence
         final ForeignKey existingFK = table.findExistingForeignKey(foreignTableName, localColumnNameList,
                 foreignColumnNameList, fixedSuffix);
         if (existingFK != null) {
@@ -148,6 +153,7 @@ public class DfAdditionalForeignKeyInitializer {
             reflectOptionToExistingFKIfNeeds(foreignKeyName, fixedSuffix, existingFK);
             return;
         }
+
         setupForeignKeyToTable(foreignKeyName, foreignTableName, foreignColumnNameList, fixedCondition, table,
                 localColumnNameList, fixedSuffix, fixedInline, fixedReferrer, comment);
         showResult(foreignTableName, foreignColumnNameList, fixedCondition, table, localColumnNameList);

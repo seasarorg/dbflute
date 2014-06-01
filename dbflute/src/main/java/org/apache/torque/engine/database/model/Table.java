@@ -1346,6 +1346,16 @@ public class Table {
         return (getForeignKeys().length != 0);
     }
 
+    public boolean hasForeignKeyAsOne() {
+        final List<ForeignKey> foreignKeyList = getForeignKeyList();
+        for (ForeignKey fk : foreignKeyList) {
+            if (fk.isOneToOne()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Has relation? (hasForeignKey() or hasReferrer())
      * @return The determination, true or false.
@@ -1499,6 +1509,22 @@ public class Table {
 
     public boolean hasJoinableForeignKeyOrReferrerAsOne() {
         return !getJoinableForeignKeyList().isEmpty() || !getJoinableReferrerAsOneList().isEmpty();
+    }
+
+    public boolean hasJoinableRelationNestSelectSetupper() {
+        final List<ForeignKey> foreignKeyList = getJoinableForeignKeyList();
+        for (ForeignKey fk : foreignKeyList) {
+            if (fk.hasForeignNestSelectSetupper()) {
+                return true;
+            }
+        }
+        final List<ForeignKey> referrerAsOneList = getJoinableReferrerAsOneList();
+        for (ForeignKey referrer : referrerAsOneList) {
+            if (referrer.hasReferrerNestSelectSetupper()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ===================================================================================
@@ -2202,6 +2228,22 @@ public class Table {
         return getExtendedEntityClassName() + "Nss";
     }
 
+    public boolean hasConditionInlineQuery() {
+        if (getLittleAdjustmentProperties().isCompatibleConditionInlineQueryAlwaysGenerate()) {
+            return true;
+        }
+        return isAvailableMyselfInlineView();
+    }
+
+    public boolean hasNestSelectSetupper() {
+        if (getLittleAdjustmentProperties().isCompatibleNestSelectSetupperAlwaysGenerate()) {
+            return true;
+        }
+        // might be referred from BizOneToOne so cannot determine it any more
+        //final boolean canBeReferred = hasForeignKeyAsOne() || hasReferrer();
+        return hasForeignKeyOrReferrerAsOne();
+    }
+
     // -----------------------------------------------------
     //                                   Schema Class Prefix
     //                                   -------------------
@@ -2527,12 +2569,19 @@ public class Table {
     // ===================================================================================
     //                                                                       Include Query
     //                                                                       =============
+    public boolean isAvailableRelationSpecifiedDerivedOrderBy() {
+        final Column dummyPk = getTableOnlyIncludeQueryDummyColumn(); // it is available in any time
+        return dummyPk == null || getIncludeQueryProperties().isAvailableRelationSpecifiedDerivedOrderBy(dummyPk);
+    }
+
+    public boolean isAvailableMyselfInlineView() {
+        final Column dummyPk = getTableOnlyIncludeQueryDummyColumn(); // it is available in any time
+        return dummyPk == null || getIncludeQueryProperties().isAvailableMyselfInlineView(dummyPk);
+    }
+
     public boolean isAvailableMyselfScalarCondition() {
-        final Column dummyPk = getMyselfQueryDummyColumn(); // ScalarCondition is available with compound PK
-        if (dummyPk == null) { // basically no way
-            return true; // available fixedly
-        }
-        return getIncludeQueryProperties().isAvailableMyselfScalarCondition(dummyPk);
+        final Column dummyPk = getTableOnlyIncludeQueryDummyColumn(); // it is available with compound PK
+        return dummyPk == null || getIncludeQueryProperties().isAvailableMyselfScalarCondition(dummyPk);
     }
 
     public boolean isAvailableMyselfMyselfDerived() {
@@ -2547,7 +2596,7 @@ public class Table {
         return getIncludeQueryProperties().isAvailableMyselfMyselfInScope(getPrimaryKeyAsOne());
     }
 
-    protected Column getMyselfQueryDummyColumn() {
+    protected Column getTableOnlyIncludeQueryDummyColumn() {
         final Column dummyPk;
         if (hasPrimaryKey()) {
             if (hasSinglePrimaryKey()) {
@@ -2560,7 +2609,7 @@ public class Table {
             if (!columnList.isEmpty()) { // just in case
                 dummyPk = columnList.get(0);
             } else { // basically no way
-                dummyPk = null;
+                dummyPk = null; // means available fixedly
             }
         }
         return dummyPk;

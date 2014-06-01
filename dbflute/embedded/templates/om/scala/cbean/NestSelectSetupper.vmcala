@@ -46,31 +46,45 @@ class ${myClassName}(query: ${myConditionQueryClassName}) {
 #set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionFinalArgs}")
 #set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
 #end
+#set ($hasNestSelectSetupper = ${fk.hasForeignNestSelectSetupper()})
     /**
      * With nested relation columns to select clause. <br />
      * ${fk.foreignDispForJavaDoc}
 #if ($fk.hasDynamicFixedCondition())
      * ${fk.dynamicFixedConditionArgsJavaDocString}
 #end
+#set ($setupSelectReturnType = "Unit")
+#if ($hasNestSelectSetupper)
      * @return The set-upper of more nested relation. {...with[nested-relation].with[more-nested-relation]} (NotNull)
+#set ($setupSelectReturnType = "${fk.foreignTableNestSelectSetupperClassName}")
+#end
      */
     def with${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}): ${fk.foreignTableNestSelectSetupperClassName} = {
         _query.doNss(new NssCall() { def qf(): ConditionQuery = { return _query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
+#if ($hasNestSelectSetupper)
         return new ${fk.foreignTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
+#end
     }
 #end
 
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($hasNestSelectSetupper = ${referrer.hasReferrerNestSelectSetupper()})
     /**
      * With nested relation columns to select clause. <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
+#set ($setupSelectReturnType = "Unit")
+#if ($hasNestSelectSetupper)
      * @return The set-upper of more nested relation. {...with[nested-relation].with[more-nested-relation]} (NotNull)
+#set ($setupSelectReturnType = "${referrer.referrerTableNestSelectSetupperClassName}")
+#end
      */
     def with${tmpPropertyNameInitCap}(): ${referrer.referrerTableNestSelectSetupperClassName} = {
         _query.doNss(new NssCall() { def qf(): ConditionQuery = { return _query.query${tmpPropertyNameInitCap}(); }});
+#if ($hasNestSelectSetupper)
         return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
+#end
     }
 #end
 }

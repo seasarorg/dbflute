@@ -53,27 +53,20 @@ class ${myClassName}(childQuery: ConditionQuery, sqlClause: SqlClause, aliasName
     // ===================================================================================
     //                                                             Override about Register
     //                                                             =======================
-    override protected def reflectRelationOnUnionQuery(bq: ConditionQuery, uq: ConditionQuery): Unit = {
-        val msg: String = "InlineView must not need UNION method: " + bq + " : " + uq;
-        throw new IllegalConditionBeanOperationException(msg);
-    }
+    override protected def reflectRelationOnUnionQuery(bq: ConditionQuery, uq: ConditionQuery): Unit =
+    { throw new IllegalConditionBeanOperationException("InlineView cannot use Union: " + bq + " : " + uq); }
 
-    override protected def setupConditionValueAndRegisterWhereClause(k: ConditionKey, v: Object, cv: ConditionValue, col: String): Unit = {
-        regIQ(k, v, cv, col);
-    }
+    override protected def setupConditionValueAndRegisterWhereClause(k: ConditionKey, v: Object, cv: ConditionValue, col: String): Unit =
+    { regIQ(k, v, cv, col); }
 
-    override protected def setupConditionValueAndRegisterWhereClause(k: ConditionKey, v: Object, cv: ConditionValue, col: String, op: ConditionOption): Unit = {
-        regIQ(k, v, cv, col, op);
-    }
+    override protected def setupConditionValueAndRegisterWhereClause(k: ConditionKey, v: Object, cv: ConditionValue, col: String, op: ConditionOption): Unit =
+    { regIQ(k, v, cv, col, op); }
 
-    override protected def registerWhereClause(wc: String): Unit = {
-        registerInlineWhereClause(wc);
-    }
+    override protected def registerWhereClause(wc: String): Unit =
+    { registerInlineWhereClause(wc); }
 
     override protected def isInScopeRelationSuppressLocalAliasName(): Boolean = {
-        if (_onClause) {
-            throw new IllegalConditionBeanOperationException("InScopeRelation on OnClause is unsupported.");
-        }
+        if (_onClause) { throw new IllegalConditionBeanOperationException("InScopeRelation on OnClause is unsupported."); }
         return true;
     }
 
@@ -259,24 +252,31 @@ class ${myClassName}(childQuery: ConditionQuery, sqlClause: SqlClause, aliasName
 #end
 #end
     protected def xfindFixedConditionDynamicParameterMap(pp: String): Map[String, Object] = { return null; }
+#if ($table.isAvailableMyselfScalarCondition())
     def keepScalarCondition(sq: ${myConditionQueryClassName}): String =
     { throwIICBOE("ScalarCondition"); return null; }
+#end
 #if ($table.hasSinglePrimaryKey())
+#if ($table.isAvailableMyselfMyselfDerived())
     def keepSpecifyMyselfDerived(sq: ${myConditionQueryClassName}): String =
     { throwIICBOE("(Specify)MyselfDerived"); return null;}
     def keepQueryMyselfDerived(sq: ${myConditionQueryClassName}): String =
     { throwIICBOE("(Query)MyselfDerived"); return null;}
     def keepQueryMyselfDerivedParameter(vl: Object): String =
     { throwIICBOE("(Query)MyselfDerived"); return null;}
+#end
+#if ($table.isAvailableMyselfMyselfExists())
     def keepMyselfExists(sq: ${myConditionQueryClassName}): String =
     { throwIICBOE("MyselfExists"); return null;}
+#end
+#if ($table.isAvailableMyselfMyselfInScope())
     def keepMyselfInScope(sq: ${myConditionQueryClassName}): String =
     { throwIICBOE("MyselfInScope"); return null;}
 #end
+#end
 
-    protected def throwIICBOE(name: String): Unit = { // throwInlineIllegalConditionBeanOperationException()
-        throw new IllegalConditionBeanOperationException(name + " at InlineView is unsupported.");
-    }
+    protected def throwIICBOE(name: String): Unit =
+    { throw new IllegalConditionBeanOperationException(name + " at InlineView is unsupported."); }
 
     // ===================================================================================
     //                                                                       Very Internal

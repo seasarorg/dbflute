@@ -927,6 +927,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isCompatibleBatchUpdateDefaultEveryColumn", false);
     }
 
+    public boolean isCompatibleConditionInlineQueryAlwaysGenerate() { // closet
+        return isProperty("isCompatibleConditionInlineQueryAlwaysGenerate", false);
+    }
+
+    public boolean isCompatibleNestSelectSetupperAlwaysGenerate() { // closet
+        return isProperty("isCompatibleNestSelectSetupperAlwaysGenerate", false);
+    }
+
     public boolean isCompatibleSelectByPKOldStyle() { // closet
         return isProperty("isCompatibleSelectByPKOldStyle", isCompatibleBeforeJava8());
     }

@@ -49,7 +49,8 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     protected static final String PROP_NUMBER = "Number";
     protected static final String PROP_DATE = "Date";
     protected static final String PROP_ORDER_BY = "OrderBy";
-    protected static final String PROP_MYSELF = "Myself";
+    protected static final String PROP_RELATION = "Relation";
+    protected static final String PROP_MYSELF = "Myself"; // old style
 
     protected static final Set<String> _stringCKeySet = new LinkedHashSet<String>();
     static {
@@ -223,6 +224,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     protected Map<String, Map<String, Map<String, List<String>>>> doGetIncludeQueryMap() {
         final Map<String, Map<String, Map<String, List<String>>>> resultMap = newLinkedHashMap();
         final Map<String, Object> targetMap = mapProp("torque.includeQueryMap", DEFAULT_EMPTY_MAP);
+        adjustColumnDrivenMergedDummyPropIfNeeds(targetMap);
         final Map<String, Map<String, Map<String, List<String>>>> columnDrivenTranslatedMap = extractColumnDrivenTranslatedMap(targetMap);
         for (Entry<String, Object> propEntry : targetMap.entrySet()) {
             final String propType = propEntry.getKey();
@@ -241,6 +243,16 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
             resultMap.put(propType, prepareElementMap(propType, ckeyColumnMap));
         }
         return resultMap;
+    }
+
+    protected void adjustColumnDrivenMergedDummyPropIfNeeds(Map<String, Object> targetMap) {
+        for (String prop : _ckeySetMap.keySet()) {
+            final Object element = targetMap.get(prop);
+            if (element == null) {
+                // you can specify e.g. OrderBy as column-driven without normal settings
+                targetMap.put(prop, new LinkedHashMap<String, Object>());
+            }
+        }
     }
 
     protected Map<String, Map<String, List<String>>> prepareElementMap(String propType,
@@ -341,7 +353,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
                     String msg = "The column expression should be e.g. Member(Date) but: " + columnExp;
                     throw new DfIllegalPropertySettingException(msg);
                 }
-                final String propType = scopeFirst.getContent().trim();
+                final String propType = scopeFirst.getContent().trim(); // e.g. String, OrderBy
                 final List<String> ckeyList = columnTypeCKeyEntry.getValue();
                 Map<String, Map<String, List<String>>> ckeyColumnMap = translatedMap.get(propType);
                 if (ckeyColumnMap == null) {
@@ -400,6 +412,10 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
                     }
                     final String currentPropType = scopeFirst.getContent().trim();
                     final Set<String> ckeySet = _ckeySetMap.get(currentPropType);
+                    if (ckeySet == null) {
+                        String msg = "Unknown condition-key: " + currentPropType + ", expected=" + _ckeySetMap.keySet();
+                        throw new DfIllegalPropertySettingException(msg);
+                    }
                     final List<String> allCKeyList = new ArrayList<String>();
                     for (String ckey : ckeySet) {
                         allCKeyList.add("!" + ckey);
@@ -584,8 +600,31 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     }
 
     // -----------------------------------------------------
+    //                                              Relation
+    //                                              --------
+    public boolean isAvailableRelationExistsReferrer(Column column) {
+        return isAvailable(PROP_RELATION, "ExistsReferrer", column);
+    }
+
+    public boolean isAvailableRelationInScopeRelation(Column column) {
+        return isAvailable(PROP_RELATION, "InScopeRelation", column);
+    }
+
+    public boolean isAvailableRelationDerivedReferrer(Column column) {
+        return isAvailable(PROP_RELATION, "DerivedReferrer", column);
+    }
+
+    public boolean isAvailableRelationSpecifiedDerivedOrderBy(Column column) {
+        return isAvailable(PROP_RELATION, "SpecifiedDerivedOrderBy", column);
+    }
+
+    // -----------------------------------------------------
     //                                                Myself
     //                                                ------
+    public boolean isAvailableMyselfInlineView(Column column) {
+        return isAvailable(PROP_MYSELF, "InlineView", column); // contains OnClause
+    }
+
     public boolean isAvailableMyselfScalarCondition(Column column) {
         return isAvailable(PROP_MYSELF, "ScalarCondition", column);
     }
@@ -658,8 +697,8 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         assertQueryMap(propType, ckey, queryMap);
         final String tableDbName = column.getTable().getTableDbName();
         final Set<String> columnSet = gatherColumnSet(propType, ckey, queryMap, tableDbName);
-        if (PROP_MYSELF.equalsIgnoreCase(propType)) { // e.g. ScalarCondition, MyselfDerived
-            return columnSet != null; // empty column list means specified
+        if (isTableOnlyProp(propType)) { // e.g. ExistsReferrer, ScalarCondition
+            return columnSet != null; // only null check here, empty column list means specified
         } else {
             if (columnSet == null || columnSet.isEmpty()) {
                 return false;
@@ -715,5 +754,9 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
             }
         }
         return columnSet;
+    }
+
+    protected boolean isTableOnlyProp(String propType) {
+        return PROP_RELATION.equalsIgnoreCase(propType) || PROP_MYSELF.equalsIgnoreCase(propType);
     }
 }

@@ -41,7 +41,7 @@ import ${glPackageBaseCommon}.${glImplementedSqlClauseCreator};
 import ${glPackageBaseCommon}.ScrHpColQyOperand;
 import ${glPackageCB}._
 import ${glPackageCQ}._
-#if ($table.hasForeignKeyOrReferrerAsOne())
+#if ($table.hasJoinableRelationNestSelectSetupper())
 import ${glPackageNss}._
 #end
 
@@ -368,11 +368,14 @@ class ${myClassName} extends AbstractConditionBean {
 #set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionFinalArgs}")
 #set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
 #end
+#set ($hasNestSelectSetupper = ${fk.hasForeignNestSelectSetupper()})
+#if ($hasNestSelectSetupper)
     protected var _nss${tmpPropertyNameInitCap}: ${nestSelectSetuppperClassName} = null;
     def getNss${tmpPropertyNameInitCap}(): ${nestSelectSetuppperClassName} = {
         if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
         return _nss${tmpPropertyNameInitCap};
     }
+#end
     /**
      * Set up relation columns to select clause. <br />
      * ${fk.foreignDispForJavaDoc}
@@ -386,9 +389,13 @@ class ${myClassName} extends AbstractConditionBean {
 #if ($fk.hasDynamicFixedCondition())
      * ${fk.dynamicFixedConditionArgsJavaDocString}
 #end
+#set ($setupSelectReturnType = "Unit")
+#if ($hasNestSelectSetupper)
      * @return The set-upper of nested relation. {setupSelect...().with[nested-relation]} (NotNull)
+#set ($setupSelectReturnType = "${nestSelectSetuppperClassName}")
+#end
      */
-    def setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}): ${nestSelectSetuppperClassName} = {
+    def setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}): ${setupSelectReturnType} = {
         assertSetupSelectPurpose("${tmpPropertyName}");
 #if ($fk.hasLocalColumnExceptPrimaryKey())
         if (hasSpecifiedColumn()) { // if reverse call
@@ -400,21 +407,26 @@ class ${myClassName} extends AbstractConditionBean {
         }
 #end
         doSetupSelect(new SsCall() { def qf(): ConditionQuery = { return query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); } });
+#if ($hasNestSelectSetupper)
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery())
         { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})); }
         return _nss${tmpPropertyNameInitCap};
+#end
     }
+
 #end
 #foreach ($referrer in $table.joinableReferrerAsOneList)
 #set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
-
+#set ($hasNestSelectSetupper = ${referrer.hasReferrerNestSelectSetupper()})
+#if ($hasNestSelectSetupper)
     protected var _nss${tmpPropertyNameInitCap}: ${nestSelectSetuppperClassName} = null;
     def getNss${tmpPropertyNameInitCap}(): ${nestSelectSetuppperClassName} = {
         if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
         return _nss${tmpPropertyNameInitCap};
     }
+#end
     /**
      * Set up relation columns to select clause. <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
@@ -425,16 +437,22 @@ class ${myClassName} extends AbstractConditionBean {
      * ${myExtendedObjectClassName} ${myEntityVariableName} = ${myEntityVariableName}Bhv.selectEntityWithDeletedCheck(cb);
      * ... = ${myEntityVariableName}.<span style="color: #DD4747">get${tmpPropertyNameInitCap}()</span>; <span style="color: #3F7E5E">// you can get by using SetupSelect</span>
      * </pre>
+#set ($setupSelectReturnType = "Unit")
+#if ($hasNestSelectSetupper)
      * @return The set-upper of nested relation. {setupSelect...().with[nested-relation]} (NotNull)
+#set ($setupSelectReturnType = "${nestSelectSetuppperClassName}")
+#end
      */
-    def setupSelect_${tmpPropertyNameInitCap}(): ${nestSelectSetuppperClassName} = {
+    def setupSelect_${tmpPropertyNameInitCap}(): ${setupSelectReturnType} = {
         assertSetupSelectPurpose("${tmpPropertyName}");
         doSetupSelect(new SsCall() { def qf(): ConditionQuery = { return query().query${tmpPropertyNameInitCap}(); } });
+#if ($hasNestSelectSetupper)
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}()); }
         return _nss${tmpPropertyNameInitCap};
-    }
 #end
+    }
 
+#end
     // [DBFlute-0.7.4]
     // ===================================================================================
     //                                                                             Specify

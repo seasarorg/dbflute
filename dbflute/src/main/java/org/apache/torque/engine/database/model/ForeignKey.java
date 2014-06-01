@@ -149,6 +149,7 @@ import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPac
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
@@ -1465,6 +1466,17 @@ public class ForeignKey implements Constraint {
     }
 
     // -----------------------------------------------------
+    //                                           Nest Select
+    //                                           -----------
+    public boolean hasForeignNestSelectSetupper() {
+        return getForeignTable().hasNestSelectSetupper();
+    }
+
+    public boolean hasReferrerNestSelectSetupper() {
+        return getTable().hasNestSelectSetupper();
+    }
+
+    // -----------------------------------------------------
     //                                              SubQuery
     //                                              --------
     public boolean isExistsReferrerSupported() {
@@ -1477,12 +1489,24 @@ public class ForeignKey implements Constraint {
         if (isSuppressSubQuery()) {
             return false;
         }
+        final List<Column> columnList = getForeignColumnList();
+        for (Column column : columnList) {
+            if (!getIncludeQueryProperties().isAvailableRelationExistsReferrer(column)) {
+                return false;
+            }
+        }
         return true;
     }
 
     public boolean isInScopeRelationAllowedForeignKey() {
         if (!isMakeConditionQueryInScopeRelationToOne()) {
             return false; // suppress InScopeRelation for many-to-one
+        }
+        final List<Column> columnList = getLocalColumnList();
+        for (Column column : columnList) {
+            if (!getIncludeQueryProperties().isAvailableRelationInScopeRelation(column)) {
+                return false;
+            }
         }
         return isSimpleKeyFK() && !hasFixedCondition();
     }
@@ -1497,6 +1521,12 @@ public class ForeignKey implements Constraint {
         if (isSuppressSubQuery()) {
             return false;
         }
+        final List<Column> columnList = getForeignColumnList();
+        for (Column column : columnList) {
+            if (!getIncludeQueryProperties().isAvailableRelationInScopeRelation(column)) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -1510,10 +1540,13 @@ public class ForeignKey implements Constraint {
         if (isSuppressSubQuery()) {
             return false;
         }
-        final List<Column> localColumnList = getLocalColumnList();
-        for (Column column : localColumnList) {
+        final List<Column> columnList = getForeignColumnList();
+        for (Column column : columnList) {
             if (!(column.isJavaNativeStringObject() || column.isJavaNativeNumberObject())) {
                 return false; // only string or number is supported
+            }
+            if (!getIncludeQueryProperties().isAvailableRelationDerivedReferrer(column)) {
+                return false;
             }
         }
         return true;
@@ -1705,6 +1738,10 @@ public class ForeignKey implements Constraint {
 
     protected DfDocumentProperties getDocumentProperties() {
         return getProperties().getDocumentProperties();
+    }
+
+    protected DfIncludeQueryProperties getIncludeQueryProperties() {
+        return getProperties().getIncludeQueryProperties();
     }
 
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
