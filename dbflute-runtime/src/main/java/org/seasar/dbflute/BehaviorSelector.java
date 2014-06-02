@@ -40,6 +40,8 @@ public interface BehaviorSelector {
      * Select a behavior instance by table name.
      * @param tableFlexibleName The flexible name of table. (NotNull)
      * @return The instance as behavior-readable. (NotNull)
+     * @throws org.seasar.dbflute.exception.DBMetaNotFoundException When the table is not found.
+     * @throws org.seasar.dbflute.exception.IllegalBehaviorStateException When the behavior class is suppressed.
      */
     BehaviorReadable byName(String tableFlexibleName);
 }
