@@ -75,7 +75,7 @@ public class TnRelationOptionalFactory {
      * @param rpt The property type for the relation. (NotNull)
      * @return The optional object for the relation. (NotNull)
      */
-    protected OptionalEntity<Object> createOptionalNullEntity(Object row, TnRelationPropertyType rpt) {
+    protected Object createOptionalNullEntity(Object row, TnRelationPropertyType rpt) { // object for override
         return OptionalEntity.ofNullable(null, createOptionalNullableThrower(row, rpt));
     }
 
@@ -177,7 +177,7 @@ public class TnRelationOptionalFactory {
      * @param relationRow The row instance of relation entity. (NullAllowed)
      * @return The optional object for the relation. (NotNull)
      */
-    protected OptionalEntity<Object> createOptionalPresentEntity(Object relationRow) {
+    protected Object createOptionalPresentEntity(Object relationRow) { // object for override
         return OptionalEntity.of(relationRow);
     }
 
