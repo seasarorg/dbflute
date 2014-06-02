@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.DfCoupleProperties;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.exception.DfBeanFieldNotFoundException;
 import org.seasar.dbflute.helper.beans.exception.DfBeanMethodNotFoundException;
@@ -192,6 +193,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
     //                                                                     ===============
     protected void setupPropertyDesc() {
         final Method[] methods = _beanClass.getMethods();
+        final Map<String, Method> coupleMethodMap = hasCoupleProperties() ? new HashMap<String, Method>() : null;
         for (int i = 0; i < methods.length; i++) {
             final Method method = methods[i];
             if (DfReflectionUtil.isBridgeMethod(method) || DfReflectionUtil.isSyntheticMethod(method)) {
@@ -219,6 +221,10 @@ public class DfBeanDescImpl implements DfBeanDesc {
                 }
                 final String propertyName = initBeansProp(methodName.substring(3));
                 setupWriteMethod(method, propertyName);
+            } else {
+                if (coupleMethodMap != null) {
+                    doSetupCouplePropertyDesc(coupleMethodMap, method, methodName);
+                }
             }
         }
         for (Iterator<String> i = _invalidPropertyNames.iterator(); i.hasNext();) {
@@ -227,8 +233,41 @@ public class DfBeanDescImpl implements DfBeanDesc {
         _invalidPropertyNames.clear();
     }
 
+    protected boolean hasCoupleProperties() {
+        return DfCoupleProperties.class.isAssignableFrom(_beanClass);
+    }
+
     protected static String initBeansProp(String name) {
         return Srl.initBeansProp(name);
+    }
+
+    protected void doSetupCouplePropertyDesc(Map<String, Method> coupleMethodMap, Method method, String methodName) {
+        final Method coupleMethod = coupleMethodMap.get(methodName);
+        if (coupleMethod != null) {
+            final Class<?>[] coupleParamTypes = coupleMethod.getParameterTypes();
+            final int coupleParamLen = coupleParamTypes.length;
+            if (coupleParamLen == 0) { // couple might be read method
+                final Class<?>[] paramTypes = method.getParameterTypes();
+                if (paramTypes.length == 1 && paramTypes[0] == coupleMethod.getReturnType()) {
+                    setupReadMethod(coupleMethod, methodName);
+                    setupWriteMethod(method, methodName);
+                }
+            } else if (coupleParamLen == 1) { // couple might be write method
+                final Class<?>[] paramTypes = method.getParameterTypes();
+                if (paramTypes.length == 0 && method.getReturnType() == coupleParamTypes[0]) {
+                    setupReadMethod(method, methodName);
+                    setupWriteMethod(coupleMethod, methodName);
+                }
+            }
+        } else {
+            final int paramLen = method.getParameterTypes().length;
+            final Class<?> returnType = method.getReturnType();
+            if (paramLen == 0 && returnType != void.class) { // e.g. String memberName()
+                coupleMethodMap.put(methodName, method);
+            } else if (paramLen == 1 || returnType == void.class) { // e.g. memberName(String)
+                coupleMethodMap.put(methodName, method);
+            }
+        }
     }
 
     protected void addPropertyDesc(DfPropertyDesc propertyDesc) {
@@ -241,7 +280,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
 
     protected void setupReadMethod(Method readMethod, String propertyName) {
         final Class<?> propertyType = readMethod.getReturnType();
-        DfPropertyDesc propDesc = getPropertyDescInternally(propertyName);
+        final DfPropertyDesc propDesc = getPropertyDescInternally(propertyName);
         if (propDesc != null) {
             if (!propDesc.getPropertyType().equals(propertyType)) {
                 _invalidPropertyNames.add(propertyName);
@@ -249,14 +288,13 @@ public class DfBeanDescImpl implements DfBeanDesc {
                 propDesc.setReadMethod(readMethod);
             }
         } else {
-            propDesc = createPropertyDesc(propertyName, propertyType, readMethod, null, null);
-            addPropertyDesc(propDesc);
+            addPropertyDesc(createPropertyDesc(propertyName, propertyType, readMethod, null, null));
         }
     }
 
     protected void setupWriteMethod(Method writeMethod, String propertyName) {
         final Class<?> propertyType = writeMethod.getParameterTypes()[0];
-        DfPropertyDesc propDesc = getPropertyDescInternally(propertyName);
+        final DfPropertyDesc propDesc = getPropertyDescInternally(propertyName);
         if (propDesc != null) {
             if (!propDesc.getPropertyType().equals(propertyType)) {
                 _invalidPropertyNames.add(propertyName);
@@ -264,8 +302,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
                 propDesc.setWriteMethod(writeMethod);
             }
         } else {
-            propDesc = createPropertyDesc(propertyName, propertyType, null, writeMethod, null);
-            addPropertyDesc(propDesc);
+            addPropertyDesc(createPropertyDesc(propertyName, propertyType, null, writeMethod, null));
         }
     }
 
