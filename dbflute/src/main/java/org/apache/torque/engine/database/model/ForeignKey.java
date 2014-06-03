@@ -435,7 +435,8 @@ public class ForeignKey implements Constraint {
     }
 
     protected String getRelationOptionalEntityClassName() {
-        return getTable().getDatabase().getRelationOptionalEntityClassName();
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return !prop.isAvailableRelationPlainEntity() ? prop.getRelationOptionalEntityClass() : null;
     }
 
     // -----------------------------------------------------
@@ -561,20 +562,24 @@ public class ForeignKey implements Constraint {
         return getReferrerPropertyNameAsOne(false);
     }
 
-    public String getReferrerPropertyNameAsOneInitCap() {
+    public String getReferrerPropertyNameInitCapAsOne() {
         return initCap(getReferrerPropertyNameAsOne());
     }
 
-    public String getReferrerPropertyNameInitCapAsOne() {
-        return getReferrerPropertyNameAsOneInitCap();
+    public String getReferrerPropertyNameAsOneInitCap() { // for compatible
+        return getReferrerPropertyNameInitCapAsOne();
     }
 
     public String getReferrerJavaBeansRulePropertyNameAsOne() {
         return getReferrerPropertyNameAsOne(true);
     }
 
-    public String getReferrerJavaBeansRulePropertyNameAsOneInitCap() {
+    public String getReferrerJavaBeansRulePropertyNameInitCapAsOne() {
         return initCap(getReferrerPropertyNameAsOne(true));
+    }
+
+    public String getReferrerJavaBeansRulePropertyNameAsOneInitCap() { // for compatible
+        return getReferrerJavaBeansRulePropertyNameInitCapAsOne();
     }
 
     protected String getReferrerPropertyNameAsOne(boolean isJavaBeansRule) {

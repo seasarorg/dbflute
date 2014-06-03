@@ -35,14 +35,14 @@ trait ${glEntityDefinedCommonColumn} extends Entity {
      * Get the value of ${uncapitalisedJavaName}.
      * @return The instance of the property type. (NullAllowed)
      */
-    def get${javaName}(): ${javaNative};
+    def ${uncapitalisedJavaName}(): ${javaNative};
 
 #if (!$database.isForcedClassificationHandling() || !$database.isAllClassificationColumn($filteredColumnName))
     /**
      * Set the value of ${uncapitalisedJavaName}.
      * @param ${uncapitalisedJavaName} The instance of the property type. (NullAllowed)
      */
-    def set${javaName}(${uncapitalisedJavaName}: ${javaNative}): Unit;
+    def ${uncapitalisedJavaName}(${uncapitalisedJavaName}: ${javaNative}): Unit;
 #end
 #if ($database.isAllClassificationColumn($filteredColumnName))
 #set ($classificationName = $database.getAllClassificationName($filteredColumnName))
@@ -53,7 +53,7 @@ trait ${glEntityDefinedCommonColumn} extends Entity {
      * Set the value of ${uncapitalisedJavaName} as ${classificationElement.name}. <br />
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
-    def set${javaName}_${classificationElement.name}(): Unit;
+    def ${uncapitalisedJavaName}_${classificationElement.name}(): Unit;
 #if ($database.isMakeEntityOldStyleClassify())
 
     /**

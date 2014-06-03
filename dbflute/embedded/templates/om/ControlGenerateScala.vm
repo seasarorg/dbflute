@@ -83,6 +83,7 @@ $database.checkProperties()
 #set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
 #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
 #set ($glScrCBeanHelper = "${glProjectPrefix}ScrCBeanHelper")
+#set ($glScrInternalDbGateway = "${glProjectPrefix}ScrInternalDbGateway")
 
 ## ===================================================================================
 ##                                                                            Variable
@@ -171,6 +172,10 @@ $generator.parse("om/${glResourceDirectory}/allcommon/ImplementedSqlClauseCreato
 $database.info("    parse('ScrCBeanHelper');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glScrCBeanHelper}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/ScrCBeanHelper.${glTemplateFileExtension}",$path ,"" ,"")
+
+$database.info("    parse('ScrInternalDbGateway');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glScrInternalDbGateway}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/ScrInternalDbGateway.${glTemplateFileExtension}",$path ,"" ,"")
 
 $database.info("}")
 

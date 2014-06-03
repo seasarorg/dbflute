@@ -192,13 +192,96 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //    return _entityOptionalPropertyClassSimpleName;
     //}
 
+    // -----------------------------------------------------
+    //                                        Basic Optional
+    //                                        --------------
+    public String getBasicOptionalEntityClass() { // closet
+        return getProperty("basicOptionalEntityClass", getOptionalEntityDBFluteEmbeddedClassName());
+    }
+
+    public String getBasicOptionalEntitySimpleName() { // closet
+        final String className = getBasicOptionalEntityClass();
+        return className != null ? Srl.substringLastRear(className, ".") : null;
+    }
+
+    public boolean isBasicOptionalEntityDBFluteEmbeddedClass() {
+        final String className = getBasicOptionalEntityClass();
+        return className != null && className.equals(getOptionalEntityDBFluteEmbeddedClassName());
+    }
+
+    public boolean isBasicOptionalEntityScalaOption() {
+        final String className = getBasicOptionalEntitySimpleName();
+        return className != null && className.equals("Option");
+    }
+
+    public boolean needsBasicOptionalEntityImport() {
+        if (isBasicOptionalEntityScalaOption()) {
+            return false;
+        }
+        return true;
+    }
+
+    // -----------------------------------------------------
+    //                                     Relation Optional
+    //                                     -----------------
     public boolean isAvailableRelationPlainEntity() {
         return isProperty("isAvailableRelationPlainEntity", isCompatibleBeforeJava8());
     }
 
     public String getRelationOptionalEntityClass() { // closet
         // you should also override TnRelationOptionalFactory if you change this
-        return getProperty("relationOptionalEntityClass", OptionalEntity.class.getName());
+        return getProperty("relationOptionalEntityClass", getOptionalEntityDBFluteEmbeddedClassName());
+    }
+
+    public String getRelationOptionalEntitySimpleName() {
+        final String className = getRelationOptionalEntityClass();
+        return className != null ? Srl.substringLastRear(className, ".") : null;
+    }
+
+    public boolean isRelationOptionalEntityDBFluteEmbeddedClass() {
+        final String className = getRelationOptionalEntityClass();
+        return className != null && className.equals(getOptionalEntityDBFluteEmbeddedClassName());
+    }
+
+    public boolean isRelationOptionalEntityScalaOption() {
+        final String className = getRelationOptionalEntitySimpleName();
+        return className != null && className.equals("Option");
+    }
+
+    public boolean needsRelationOptionalEntityImport() {
+        if (isRelationOptionalEntityScalaOption()) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean needsRelationOptionalEntityNextImport() {
+        if (isRelationOptionalEntityScalaOption()) {
+            return false;
+        }
+        final String relationOptionalEntityClassName = getRelationOptionalEntityClass();
+        if (relationOptionalEntityClassName.equals(getBasicOptionalEntityClass())) {
+            return false;
+        }
+        return true;
+    }
+
+    // -----------------------------------------------------
+    //                             DBFlute Embedded Optional
+    //                             -------------------------
+    protected String getOptionalEntityDBFluteEmbeddedClassName() {
+        return getOptionalEntityDBFluteEmbeddedType().getName();
+    }
+
+    protected Class<?> getOptionalEntityDBFluteEmbeddedType() {
+        return OptionalEntity.class;
+    }
+
+    // -----------------------------------------------------
+    //                                 Mutable Entity Prefix 
+    //                                 ---------------------
+    public String getEntityMutablePrefix() { // closet, basically for Scala
+        return getProperty("entityMutablePrefix", "");
     }
 
     // -----------------------------------------------------

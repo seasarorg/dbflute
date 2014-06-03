@@ -91,20 +91,24 @@ public class DfColumnListToStringBuilder {
 
     public static String getColumnArgsSetupString(String beanName, List<Column> columnList) {
         validateColumnList(columnList);
-        final String beanPrefix = (beanName != null ? beanName + "." : "");
-
+        final boolean hasPrefix = beanName != null;
+        final String beanPrefix = (hasPrefix ? beanName + "." : "");
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final DfLanguageImplStyle implStyle = lang.getLanguageImplStyle();
         String result = "";
         for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
-            Column column = (Column) ite.next();
+            final Column column = (Column) ite.next();
             final String javaName = column.getJavaName();
             final String variable = column.getUncapitalisedJavaName();
             final String cls = column.getClassificationName();
-            final String setter;
+            final String basic;
             if (column.isForceClassificationSetting()) {
-                setter = beanPrefix + "set" + javaName + "As" + cls + "(" + variable + ");";
+                basic = "set" + javaName + "As" + cls + "(" + variable + ")";
             } else {
-                setter = beanPrefix + "set" + javaName + "(" + variable + ");";
+                basic = "set" + javaName + "(" + variable + ")";
             }
+            final String adjusted = implStyle.adjustEntitySetMethodCall(basic, !hasPrefix);
+            final String setter = beanPrefix + adjusted + ";";
             if ("".equals(result)) {
                 result = setter;
             } else {
@@ -120,9 +124,9 @@ public class DfColumnListToStringBuilder {
 
         String result = "";
         for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
-            Column pk = (Column) ite.next();
-            final String javaName = pk.getJavaName();
-            final String variable = pk.getUncapitalisedJavaName();
+            final Column column = (Column) ite.next();
+            final String javaName = column.getJavaName();
+            final String variable = column.getUncapitalisedJavaName();
             final String setter = beanPrefix + javaName + " = " + variable + ";";
             if ("".equals(result)) {
                 result = setter;

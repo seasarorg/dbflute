@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
-#if ($table.hasOptionalRelation())
+#if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
 #end
 import org.seasar.dbflute.dbmeta.AbstractDBMeta;

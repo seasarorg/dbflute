@@ -33,6 +33,10 @@ public class DfLanguageImplStyleJava implements DfLanguageImplStyle {
         return true;
     }
 
+    public String adjustEntitySetMethodCall(String basicSetMethod, boolean calledByThis) {
+        return basicSetMethod;
+    }
+
     public String adjustConditionBeanLocalCQCall(String cb) {
         return cb + ".query()";
     }

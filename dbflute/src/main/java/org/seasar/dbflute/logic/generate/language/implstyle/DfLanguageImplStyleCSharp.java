@@ -35,6 +35,13 @@ public class DfLanguageImplStyleCSharp implements DfLanguageImplStyle {
         return false;
     }
 
+    public String adjustEntitySetMethodCall(String basicSetMethod, boolean calledByThis) {
+        final String removedPrefix = Srl.substringFirstRear(basicSetMethod, "set");
+        final String propertyName = Srl.substringFirstFront(removedPrefix, "(");
+        final String arg = Srl.extractScopeWide(removedPrefix, "(", ")").getContent();
+        return propertyName + " = " + arg;
+    }
+
     public String adjustConditionBeanLocalCQCall(String cb) {
         return cb + ".Query()";
     }

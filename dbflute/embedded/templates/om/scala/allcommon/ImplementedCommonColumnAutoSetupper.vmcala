@@ -90,7 +90,7 @@ class ${glImplementedCommonColumnAutoSetupper} extends CommonColumnAutoSetupper 
 #else
 
         val ${uncapitalisedJavaName}: ${javaNative} = ${logic};
-        entity.set${javaName}(${uncapitalisedJavaName});
+        entity.${uncapitalisedJavaName}(${uncapitalisedJavaName});
 #end
 #end
 #end
@@ -127,7 +127,7 @@ class ${glImplementedCommonColumnAutoSetupper} extends CommonColumnAutoSetupper 
 #else
 
         val ${uncapitalisedJavaName}: ${javaNative} = ${logic};
-        entity.set${javaName}(${uncapitalisedJavaName});
+        entity.${uncapitalisedJavaName}(${uncapitalisedJavaName});
 #end
 #end
 #end

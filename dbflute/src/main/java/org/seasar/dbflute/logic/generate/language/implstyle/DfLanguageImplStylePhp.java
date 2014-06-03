@@ -33,6 +33,10 @@ public class DfLanguageImplStylePhp implements DfLanguageImplStyle {
         return false;
     }
 
+    public String adjustEntitySetMethodCall(String basicSetMethod, boolean calledByThis) {
+        return basicSetMethod;
+    }
+
     public String adjustConditionBeanLocalCQCall(String cb) {
         return cb + ".query()";
     }

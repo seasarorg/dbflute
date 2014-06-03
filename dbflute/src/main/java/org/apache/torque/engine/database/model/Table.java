@@ -2127,11 +2127,22 @@ public class Table {
     // -----------------------------------------------------
     //                                       Base Class Name
     //                                       ---------------
-    public String getBaseEntityClassName() {
+    public String getBaseEntityClassName() { // mutable entity
+        final String mutablePrefix = getLittleAdjustmentProperties().getEntityMutablePrefix();
+        return buildBaseEntityClassName(mutablePrefix);
+    }
+
+    public String getImmutableBaseEntityClassName() { // immutable entity
+        return buildBaseEntityClassName("");
+    }
+
+    protected String buildBaseEntityClassName(String mutablePrefix) {
         final String projectPrefix = getDatabase().getProjectPrefix();
         final String basePrefix = getDatabase().getBasePrefix();
+        final String schemaClassPrefix = getSchemaClassPrefix();
+        final String javaName = getJavaName();
         final String baseSuffixForEntity = getDatabase().getBaseSuffixForEntity();
-        return projectPrefix + basePrefix + getSchemaClassPrefix() + getJavaName() + baseSuffixForEntity;
+        return projectPrefix + basePrefix + mutablePrefix + schemaClassPrefix + javaName + baseSuffixForEntity;
     }
 
     public String getBaseDaoClassName() {
@@ -2168,13 +2179,19 @@ public class Table {
     // -----------------------------------------------------
     //                                   Extended Class Name
     //                                   -------------------
-    public String getExtendedEntityClassName() {
+    public String getExtendedEntityClassName() { // mutable entity
         final String projectPrefix = getBasicProperties().getProjectPrefix();
-        return buildExtendedEntityClassName(projectPrefix);
+        final String mutablePrefix = getLittleAdjustmentProperties().getEntityMutablePrefix();
+        return buildExtendedEntityClassName(projectPrefix, mutablePrefix);
     }
 
-    protected String buildExtendedEntityClassName(String projectPrefix) {
-        return projectPrefix + getSchemaClassPrefix() + getJavaName();
+    public String getImmutableExtendedEntityClassName() { // immutable entity
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        return buildExtendedEntityClassName(projectPrefix, "");
+    }
+
+    protected String buildExtendedEntityClassName(String projectPrefix, String mutablePrefix) {
+        return projectPrefix + mutablePrefix + getSchemaClassPrefix() + getJavaName();
     }
 
     public String getRelationTraceClassName() {
@@ -2209,7 +2226,7 @@ public class Table {
 
     public String getExtendedBehaviorLibClassName() {
         final String projectPrefix = getBasicProperties().getLibraryProjectPrefix();
-        return buildExtendedEntityClassName(projectPrefix) + "Bhv";
+        return buildExtendedEntityClassName(projectPrefix, "") + "Bhv";
     }
 
     public String getExtendedBehaviorFullClassName() {
@@ -3261,6 +3278,11 @@ public class Table {
         return sb.toString();
     }
 
+    public String findTargetColumnUncapitalisedJavaNameByCommonColumnName(String commonColumnName) { // called by templates
+        final Column column = findMyCommonColumn(commonColumnName);
+        return column != null ? column.getUncapitalisedJavaName() : null;
+    }
+
     public String findTargetColumnJavaNameByCommonColumnName(String commonColumnName) { // called by templates
         final Column column = findMyCommonColumn(commonColumnName);
         return column != null ? column.getJavaName() : null;
@@ -3306,15 +3328,24 @@ public class Table {
         return getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
     }
 
+    // -----------------------------------------------------
+    //                                         Select Entity
+    //                                         -------------
     public boolean isAvailableSelectEntityPlainReturn() {
         return getLittleAdjustmentProperties().isAvailableSelectEntityPlainReturn();
+    }
+
+    public String filterSelectEntityOptionalReturn(String entityType) {
+        final String optionalEntity = getLittleAdjustmentProperties().getBasicOptionalEntitySimpleName();
+        return optionalEntity + getLanguageGrammar().buildGenericOneClassHint(entityType);
     }
 
     public String filterSelectEntityOptionalReturnIfNeeds(String entityType) {
         if (isAvailableSelectEntityPlainReturn()) {
             return entityType;
         } else {
-            return "OptionalEntity" + getLanguageGrammar().buildGenericOneClassHint(entityType);
+            final String optionalEntity = getLittleAdjustmentProperties().getBasicOptionalEntitySimpleName();
+            return optionalEntity + getLanguageGrammar().buildGenericOneClassHint(entityType);
         }
     }
 
@@ -3340,6 +3371,21 @@ public class Table {
     public boolean isCompatibleSelectByPKWithDeletedCheck() {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         return prop.isCompatibleSelectByPKWithDeletedCheck();
+    }
+
+    // -----------------------------------------------------
+    //                                   Optional Properties
+    //                                   -------------------
+    public boolean needsBasicOptionalEntityImport() {
+        return getLittleAdjustmentProperties().needsBasicOptionalEntityImport();
+    }
+
+    public boolean needsRelationOptionalEntityImport() {
+        return hasOptionalRelation() && getLittleAdjustmentProperties().needsRelationOptionalEntityImport();
+    }
+
+    public boolean needsRelationOptionalEntityNextImport() {
+        return hasOptionalRelation() && getLittleAdjustmentProperties().needsRelationOptionalEntityNextImport();
     }
 
     // ===================================================================================

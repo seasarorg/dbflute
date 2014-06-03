@@ -30,6 +30,8 @@ public interface DfLanguageImplStyle {
 
     boolean isTypedParameterBeanEnabled();
 
+    String adjustEntitySetMethodCall(String basicSetMethod, boolean calledByThis);
+
     String adjustConditionBeanLocalCQCall(String cb);
 
     String adjustConditionQuerySetMethodCall(String basicSetMethod);

@@ -167,7 +167,6 @@ import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbGenerationHandler;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
-import org.seasar.dbflute.optional.OptionalEntity;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -2038,21 +2037,39 @@ public class Database {
         return getLittleAdjustmentProperties().isCompatibleBatchUpdateDefaultEveryColumn();
     }
 
-    public boolean isRelationOptionalEntityOriginalClass() {
-        final String className = getRelationOptionalEntityClassName();
-        return className != null && !className.equals(OptionalEntity.class.getName());
+    // -----------------------------------------------------
+    //                                       Optional Entity
+    //                                       ---------------
+    public String getBasicOptionalEntityClassName() {
+        return getLittleAdjustmentProperties().getBasicOptionalEntityClass();
+    }
+
+    public String getBasicOptionalEntitySimpleName() {
+        return getLittleAdjustmentProperties().getBasicOptionalEntitySimpleName();
+    }
+
+    public boolean isBasicOptionalEntityDBFluteEmbeddedClass() {
+        return getLittleAdjustmentProperties().isBasicOptionalEntityDBFluteEmbeddedClass();
+    }
+
+    public boolean isBasicOptionalEntityScalaOption() {
+        return getLittleAdjustmentProperties().isBasicOptionalEntityScalaOption();
     }
 
     public String getRelationOptionalEntityClassName() {
-        if (!getLittleAdjustmentProperties().isAvailableRelationPlainEntity()) {
-            return getLittleAdjustmentProperties().getRelationOptionalEntityClass();
-        }
-        return null;
+        return getLittleAdjustmentProperties().getRelationOptionalEntityClass();
     }
 
     public String getRelationOptionalEntitySimpleName() {
-        final String className = getRelationOptionalEntityClassName();
-        return className != null ? Srl.substringLastRear(className, ".") : null;
+        return getLittleAdjustmentProperties().getRelationOptionalEntitySimpleName();
+    }
+
+    public boolean isRelationOptionalEntityDBFluteEmbeddedClass() {
+        return getLittleAdjustmentProperties().isRelationOptionalEntityDBFluteEmbeddedClass();
+    }
+
+    public boolean isRelationOptionalEntityScalaOption() {
+        return getLittleAdjustmentProperties().isRelationOptionalEntityScalaOption();
     }
 
     // ===================================================================================

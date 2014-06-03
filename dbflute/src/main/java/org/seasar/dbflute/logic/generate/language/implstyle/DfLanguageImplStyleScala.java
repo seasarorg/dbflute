@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.logic.generate.language.implstyle;
 
+import org.seasar.dbflute.util.Srl;
+
 /**
  * @author jflute
  * @since 1.0.5F (2014/05/04 Sunday)
@@ -31,6 +33,14 @@ public class DfLanguageImplStyleScala implements DfLanguageImplStyle {
 
     public boolean isTypedParameterBeanEnabled() {
         return true;
+    }
+
+    public String adjustEntitySetMethodCall(String basicSetMethod, boolean calledByThis) {
+        final String removedPrefix = Srl.substringFirstRear(basicSetMethod, "set");
+        final String propertyName = Srl.substringFirstFront(removedPrefix, "(");
+        final String arg = Srl.extractScopeWide(removedPrefix, "(", ")").getContent();
+        final String basePrefix = (calledByThis ? "this." : ""); // memberAccount(memberAccount) not allowed
+        return basePrefix + Srl.initUncap(propertyName) + "(" + arg + ")";
     }
 
     public String adjustConditionBeanLocalCQCall(String cb) {

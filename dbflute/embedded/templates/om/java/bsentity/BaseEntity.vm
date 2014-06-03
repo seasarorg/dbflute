@@ -28,7 +28,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 #if (!$table.hasAllCommonColumn() || $table.hasRelation())
 import org.seasar.dbflute.Entity;
 #end
-#if ($table.hasOptionalRelation())
+#if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
 #end
 #if ($table.hasAllCommonColumn())
