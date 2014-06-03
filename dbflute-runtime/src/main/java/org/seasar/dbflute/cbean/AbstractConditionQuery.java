@@ -439,7 +439,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected FixedConditionResolver createForeignFixedConditionResolver(ConditionQuery foreignCQ) {
-        return new HpFixedConditionQueryResolver(this, foreignCQ, xgetDBMetaProvider());
+        return newFixedConditionResolver(this, foreignCQ, xgetDBMetaProvider());
+    }
+
+    protected FixedConditionResolver newFixedConditionResolver(ConditionQuery localCQ, ConditionQuery foreignCQ,
+            DBMetaProvider dbmetaProvider) {
+        return new HpFixedConditionQueryResolver(localCQ, foreignCQ, dbmetaProvider);
     }
 
     protected void xprepareFixedConditionDynamicParameterLazyChecker(final String foreignPropertyName,
@@ -1127,7 +1132,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected FixedConditionResolver createReferrerFixedConditionResolver(ConditionQuery referrerCQ) {
-        return new HpFixedConditionQueryResolver(referrerCQ, this, xgetDBMetaProvider());
+        return newFixedConditionResolver(referrerCQ, this, xgetDBMetaProvider());
     }
 
     // *unsupported ExistsReferrer as in-line because it's (or was) so dangerous

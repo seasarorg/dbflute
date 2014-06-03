@@ -87,11 +87,16 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
      * {@inheritDoc}
      */
     public String resolveVariable(String fixedCondition, boolean fixedInline) {
+        // should be called before optimization
+        // because analyzing process has saving the fixed condition
+        // so it needs to filter it before saved
+        fixedCondition = filterLocationMark(fixedCondition, fixedInline);
+
         analyzeInlineViewOptimization(fixedCondition, fixedInline);
         fixedCondition = filterBasicMark(fixedCondition, fixedInline);
         fixedCondition = filterSubQueryIndentMark(fixedCondition, fixedInline, false);
-        fixedCondition = filterLocationMark(fixedCondition, fixedInline);
         fixedCondition = resolveOverRelation(fixedCondition, fixedInline);
+
         final String resolvedFixedCondition;
         final String delimiter = getInlineMark();
         if (fixedCondition.contains(delimiter)) { // mark optimization
