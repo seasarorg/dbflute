@@ -2128,11 +2128,22 @@ public class Table {
     //                                       Base Class Name
     //                                       ---------------
     public String getBaseEntityClassName() { // mutable entity
+        // basically pure name sometimes it has mutable mark
+        //  e.g. MEMBER_SERVICE -> BsMemberService (normally)
+        //  e.g. MEMBER_SERVICE -> BsMbleMemberService (e.g. in Scala)
         final String mutablePrefix = getLittleAdjustmentProperties().getEntityMutablePrefix();
         return buildBaseEntityClassName(mutablePrefix);
     }
 
+    public boolean isMakeImmutableEntity() {
+        return getLittleAdjustmentProperties().isMakeImmutableEntity();
+    }
+
     public String getImmutableBaseEntityClassName() { // immutable entity
+        return getPureBaseEntityClassName(); // basically for Scala (same as pure name)
+    }
+
+    protected String getPureBaseEntityClassName() { // e.g. MEMBER_SERVICE -> BsMemberService
         return buildBaseEntityClassName("");
     }
 
@@ -2146,11 +2157,11 @@ public class Table {
     }
 
     public String getBaseDaoClassName() {
-        return getBaseEntityClassName() + "Dao";
+        return getPureBaseEntityClassName() + "Dao";
     }
 
     public String getBaseBehaviorClassName() {
-        return getBaseEntityClassName() + "Bhv";
+        return getPureBaseEntityClassName() + "Bhv";
     }
 
     public String getBaseBehaviorApClassName() {
@@ -2163,7 +2174,7 @@ public class Table {
     }
 
     public String getBaseConditionBeanClassName() {
-        return getBaseEntityClassName() + "CB";
+        return getPureBaseEntityClassName() + "CB";
     }
 
     public String getAbstractBaseConditionQueryClassName() {
@@ -2173,19 +2184,26 @@ public class Table {
     }
 
     public String getBaseConditionQueryClassName() {
-        return getBaseEntityClassName() + "CQ";
+        return getPureBaseEntityClassName() + "CQ";
     }
 
     // -----------------------------------------------------
     //                                   Extended Class Name
     //                                   -------------------
     public String getExtendedEntityClassName() { // mutable entity
+        // basically pure name sometimes it has mutable mark
+        //  e.g. MEMBER_SERVICE -> MemberService (normally)
+        //  e.g. MEMBER_SERVICE -> MbleMemberService (e.g. in Scala)
         final String projectPrefix = getBasicProperties().getProjectPrefix();
         final String mutablePrefix = getLittleAdjustmentProperties().getEntityMutablePrefix();
         return buildExtendedEntityClassName(projectPrefix, mutablePrefix);
     }
 
     public String getImmutableExtendedEntityClassName() { // immutable entity
+        return getPureExtendedEntityClassName(); // basically for Scala (same as pure name)
+    }
+
+    protected String getPureExtendedEntityClassName() { // e.g. MEMBER_SERVICE -> MemberService
         final String projectPrefix = getBasicProperties().getProjectPrefix();
         return buildExtendedEntityClassName(projectPrefix, "");
     }
@@ -2199,7 +2217,7 @@ public class Table {
     }
 
     public String getDBMetaClassName() {
-        return getExtendedEntityClassName() + "Dbm";
+        return getPureExtendedEntityClassName() + "Dbm";
     }
 
     public String getDBMetaFullClassName() {
@@ -2207,7 +2225,7 @@ public class Table {
     }
 
     public String getExtendedDaoClassName() {
-        return getExtendedEntityClassName() + "Dao";
+        return getPureExtendedEntityClassName() + "Dao";
     }
 
     public String getExtendedDaoFullClassName() {
@@ -2216,7 +2234,7 @@ public class Table {
     }
 
     public String getExtendedBehaviorClassName() {
-        return getExtendedEntityClassName() + "Bhv";
+        return getPureExtendedEntityClassName() + "Bhv";
     }
 
     public String getExtendedBehaviorApClassName() {
@@ -2240,19 +2258,19 @@ public class Table {
     }
 
     public String getExtendedConditionBeanClassName() {
-        return getExtendedEntityClassName() + "CB";
+        return getPureExtendedEntityClassName() + "CB";
     }
 
     public String getExtendedConditionQueryClassName() {
-        return getExtendedEntityClassName() + "CQ";
+        return getPureExtendedEntityClassName() + "CQ";
     }
 
     public String getExtendedConditionInlineQueryClassName() {
-        return getExtendedEntityClassName() + "CIQ";
+        return getPureExtendedEntityClassName() + "CIQ";
     }
 
     public String getNestSelectSetupperClassName() {
-        return getExtendedEntityClassName() + "Nss";
+        return getPureExtendedEntityClassName() + "Nss";
     }
 
     public boolean hasConditionInlineQuery() {

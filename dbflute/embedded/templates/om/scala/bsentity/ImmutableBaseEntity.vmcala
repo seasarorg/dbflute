@@ -1,0 +1,419 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${myBaseEntityPackageName};
+#set ($myClassName = "${myImmutableBaseObjectClassName}")
+
+import scala.collection.JavaConverters._
+
+import java.lang.Long;
+import java.io.Serializable;
+import java.util.Set;
+#if ($table.hasUtilDateColumn())
+import java.util.Date;
+#end
+
+import org.seasar.dbflute.dbmeta.DBMeta;
+#if (!$table.hasAllCommonColumn() || $table.hasRelation())
+import org.seasar.dbflute.Entity;
+#end
+#if ($table.needsRelationOptionalEntityImport())
+import ${database.relationOptionalEntityClassName};
+#end
+import org.seasar.dbflute.Entity.EntityUniqueDrivenProperties;
+import org.seasar.dbflute.Entity.EntityModifiedProperties;
+import org.seasar.dbflute.Entity.FunCustodial;
+import org.seasar.dbflute.helper.beans.DfCoupleProperties;
+#if ($table.hasAllCommonColumn())
+import ${glPackageBaseCommon}.${glEntityDefinedCommonColumn};
+#end
+#if (!$isSql2Entity)
+import ${glPackageBaseCommon}.${glDBMetaInstanceHandler};
+#end
+#if ($table.hasClassification())
+import ${glPackageBaseCommon}.${glCDef};
+#end
+import ${myExtendedEntityPackageName}._;
+#if ($table.isLoadableCustomizeEntity())
+import ${glPackageExtendedEntity}._;
+#end
+#set ($myEntityInterfaceName = "")
+#if (${table.hasAllCommonColumn()})
+  #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumn})
+#else
+  #set ($myEntityInterfaceName = "Entity")
+#end
+#if ($table.hasRelationalNullObjectProviderImport())
+import ${table.relationalNullObjectProviderPackage}._;
+#end
+
+/**
+ * The entity of ${table.basicInfoDispString}. <br />
+#if ($table.isCommentForJavaDocValid())
+ * ${table.commentForJavaDoc}
+#end
+ * <pre>
+ * [primary-key]
+ *     ${table.primaryKeyNameCommaString}
+ * 
+ * [column]
+ *     ${table.columnNameCommaString}
+ * 
+ * [sequence]
+ *     ${table.definedSequenceName}
+ * 
+ * [identity]
+ *     ${table.identityColumnName}
+ * 
+ * [version-no]
+ *     ${table.versionNoColumnName}
+ * 
+ * [foreign table]
+ *     ${table.foreignTableNameCommaString}
+ * 
+ * [referrer table]
+ *     ${table.referrerTableNameCommaString}
+ * 
+ * [foreign property]
+ *     ${table.foreignPropertyNameCommaString}
+ * 
+ * [referrer property]
+ *     ${table.referrerPropertyNameCommaString}
+ * 
+ * [get/set template]
+ * /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+#foreach ($col in $table.columns)
+ * ${col.javaNative} ${col.uncapitalisedJavaName} = entity.get${col.javaName}();
+#end
+#foreach ($col in $table.columns)
+ * entity.set${col.javaName}(${col.uncapitalisedJavaName});
+#end
+ * = = = = = = = = = =/
+ * </pre>
+ * @author ${database.classAuthor}
+ */
+abstract class $myClassName(mbleEntity: ${myExtendedObjectClassName}) extends Serializable with Cloneable {
+
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
+    /**
+     * {@inheritDoc}
+     */
+    def getTableDbName(): String = {
+        return "${table.tableDbName}";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    def getTablePropertyName(): String = { // according to Java Beans rule
+        return "${table.javaBeansRulePropertyName}";
+    }
+
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    /**
+     * {@inheritDoc}
+     */
+    def getDBMeta(): DBMeta = {
+#if ($isSql2Entity)
+        return ${myDBMetaPackageName}.${myDBMetaClassName};
+#else
+        return ${glDBMetaInstanceHandler}.findDBMeta(getTableDbName());
+#end
+    }
+
+    // ===================================================================================
+    //                                                                         Primary Key
+    //                                                                         ===========
+    /**
+     * {@inheritDoc}
+     */
+    def hasPrimaryKeyValue(): Boolean = {
+#foreach ($col in $table.primaryKey)
+        if (${col.uncapitalisedJavaName}() == null) { return false; }
+#end
+        return ${table.hasPrimaryKey()};
+    }
+
+#if ($table.hasClassification())
+    // ===================================================================================
+    //                                                             Classification Property
+    //                                                             =======================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
+    /**
+     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * <p>It's treated as case insensitive and if the code value is null, it returns null.</p>
+     * @return The instance of classification definition (as ENUM type). (NullAllowed: when the column value is null)
+     */
+    def ${col.uncapitalisedJavaName}As${col.classificationName}(): ${glCDef}.${col.classificationName} = {
+        return mbleEntity.${col.uncapitalisedJavaName}As${col.classificationName};
+    }
+
+#end
+#end
+#end
+    // ===================================================================================
+    //                                                        Classification Determination
+    //                                                        ============================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
+    /**
+     * Is the value of ${col.uncapitalisedJavaName} ${classificationElement.name}? <br />
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
+     * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
+     * @return The determination, true or false.
+     */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
+    def is${col.javaName}_${classificationElement.name}(): Boolean = {
+        return mbleEntity.is${col.javaName}_${classificationElement.name};
+    }
+
+#end
+#foreach ($group in $col.classificationTop.groupList)
+#if ($group.hasGroupComment())
+    /**
+     * ${group.groupCommentForJavaDoc} <br />
+     * ${group.buildElementDisp()}
+     * @return The determination, true or false.
+     */
+#end
+    def is${col.javaName}_${group.groupNameInitCap}(): Boolean = {
+        return mbleEntity.is${col.javaName}_${group.groupNameInitCap};
+    }
+
+#end
+#end
+#end
+#if ($table.hasImplicitClassification())
+    // ===================================================================================
+    //                                                           Classification Name/Alias
+    //                                                           =========================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
+#if (!$col.isTableClassification())
+#if ($col.hasClassificationName())
+    /**
+     * Get the value of the column '${col.uncapitalisedJavaName}' as classification name.
+     * @return The string of classification name. (NullAllowed: when the column value is null)
+     */
+    def ${col.uncapitalisedJavaName}Name(): String = {
+        return mbleEntity.${col.uncapitalisedJavaName}Name;
+    }
+
+#end
+#if (${col.hasClassificationAlias()})
+    /**
+     * Get the value of the column '${col.uncapitalisedJavaName}' as classification alias.
+     * @return The string of classification alias. (NullAllowed: when the column value is null)
+     */
+    def ${col.uncapitalisedJavaName}Alias(): String = {
+        return mbleEntity.${col.uncapitalisedJavaName}Alias;
+    }
+
+#end
+#end
+#end
+#end
+#end
+    // ===================================================================================
+    //                                                                    Foreign Property
+    //                                                                    ================
+#foreach ($fk in $table.foreignKeys)
+#set ($foreignTable = $fk.foreignTable)
+#set ($foreignEntityClassName = "${fk.foreignPropertyEntityDefinitionType}")
+#set ($foreignVariableName = "_${fk.foreignPropertyName}")
+    /**
+     * ${fk.foreignDispForJavaDoc}
+     * @return The entity of foreign property '${fk.foreignJavaBeansRulePropertyName}'. (NullAllowed: when e.g. null FK column, no setupSelect)
+     */
+    def ${fk.foreignJavaBeansRulePropertyName}(): ${foreignEntityClassName} = {
+        return mbleEntity.${fk.foreignJavaBeansRulePropertyName};
+    }
+
+#end
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.referrerPropertyEntityDefinitionTypeAsOne}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+    /**
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * @return the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (NullAllowed: when e.g. no data, no setupSelect)
+     */
+    def ${referrer.referrerJavaBeansRulePropertyNameAsOne}(): ${referrerEntityClassName} = {
+        return mbleEntity.${referrer.referrerJavaBeansRulePropertyNameAsOne};
+    }
+
+#end
+    // ===================================================================================
+    //                                                                   Referrer Property
+    //                                                                   =================
+#foreach ($referrer in $table.referrerAsManyList)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+    /**
+     * ${referrer.referrerDispForJavaDoc}
+     * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: even if no loading, returns empty list)
+     */
+    def ${referrer.referrerJavaBeansRulePropertyName}(): scala.collection.immutable.List[${referrerEntityClassName}] = {
+        return mbleEntity.${referrer.referrerJavaBeansRulePropertyName};
+    }
+
+#end
+#if ($table.isLoadableCustomizeEntity())
+#set ($domain = $table.loadableCustomizeDomain)
+    protected var __innerDomain: ${domain.extendedEntityClassName} = null;
+
+    protected def innerDomain(): ${domain.extendedEntityClassName} = {
+        if (__innerDomain == null) {
+            __innerDomain = new ${domain.extendedEntityClassName}();
+        }
+        return __innerDomain;
+    }
+
+    /**
+     * Prepare the inner instance of domain entity (basically for LoadReferrer).
+     * <pre>
+     * List&lt;UnpaidSummaryMember&gt; memberList = memberBhv.outsideSql()...;
+     * List&lt;Member&gt; domainList = new ArrayList&lt;Member&gt;();
+     * for (UnpaidSummaryMember member : memberList) {
+     *     domainList.add(member.<span style="color: #DD4747">prepareDomain()</span>);
+     * }
+     * memberBhv.<span style="color: #DD4747">loadPurchaseList</span>(domainList, new ConditionBeanSetupper...);
+     * for (UnpaidSummaryMember member : memberList) {
+     *     Purchase purchase = member.<span style="color: #DD4747">getPurchaseList()</span>; <span style="color: #3F7E5E">// you can get it</span>
+     *     ...
+     * }
+     * </pre>
+     * @return The domain entity for this customize entity. (NotNull)
+     */
+    def prepareDomain(): ${domain.extendedEntityClassName} = {
+#foreach ($exp in $table.loadableCustomizePrimaryKeySettingExpressionList)
+        innerDomain().${exp};
+#end
+        return innerDomain();
+    }
+
+#foreach ($referrer in $domain.referrerAsManyList)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+    /**
+     * ${referrer.referrerDispForJavaDoc}
+     * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
+     */
+    def get${referrer.referrerJavaBeansRulePropertyNameInitCap}(): List[${referrerEntityClassName}] = {
+        return innerDomain().get${referrer.referrerJavaBeansRulePropertyNameInitCap}();
+    }
+
+#end
+#end
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    /**
+     * Determine the object is equal with this. <br />
+     * If primary-keys or columns of the other are same as this one, returns true.
+     * @param obj The object as other entity. (NullAllowed: if null, returns false fixedly)
+     * @return Comparing result.
+     */
+    override def equals(obj: Any) = {
+        obj match {
+            case obj: $myClassName => {
+                val other: $myClassName = obj.asInstanceOf[$myClassName];
+                {
+                    mbleEntity.equals(other)
+                }
+            }
+            case _ => false
+        }
+    }
+    protected def xSV(v1: Object, v2: Object): Boolean = {
+        return FunCustodial.isSameValue(v1, v2);
+    }
+
+    /**
+     * Calculate the hash-code from primary-keys or columns.
+     * @return The hash-code from primary-key or columns.
+     */
+    override def hashCode(): Int = {
+        return mbleEntity.hashCode;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    def instanceHash(): Int = {
+        return mbleEntity.instanceHash;
+    }
+
+    /**
+     * Convert to display string of entity's data. (no relation data)
+     * @return The display string of all columns and relation existences. (NotNull)
+     */
+    override def toString(): String = {
+        return mbleEntity.buildDisplayString(FunCustodial.toClassTitle(this), true, true);
+    }
+
+    /**
+     * Clone entity instance using super.clone(). (shallow copy) 
+     * @return The cloned instance of this entity. (NotNull)
+     */
+    override def clone(): ${myExtendedObjectClassName} = {
+        try {
+            return super.clone().asInstanceOf[${myExtendedObjectClassName}];
+        } catch {
+            case e: CloneNotSupportedException => {
+                throw new IllegalStateException("Failed to clone the entity: " + toString(), e);
+            }
+        }
+    }
+
+#set ($propertyLoopIndex = 0)
+#foreach ($col in $table.columns)
+#if ($propertyLoopIndex == 0)
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+#else
+
+#end
+    /**
+     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($col.isCommentForJavaDocValid())
+     * ${col.commentForJavaDoc}
+#end
+#if ($col.isNotNull())
+     * @return The value of the column '${col.name}'. (basically NotNull if selected: for the constraint)
+#else
+     * @return The value of the column '${col.name}'. (NullAllowed even if selected: for no constraint)
+#end
+     */
+    def ${col.uncapitalisedJavaName}(): ${col.javaNative} = {
+        return mbleEntity.${col.uncapitalisedJavaName};
+    }
+#end
+}

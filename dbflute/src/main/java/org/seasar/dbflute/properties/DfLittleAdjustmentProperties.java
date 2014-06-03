@@ -278,10 +278,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // -----------------------------------------------------
-    //                                 Mutable Entity Prefix 
-    //                                 ---------------------
+    //                              Entity Mutable/Immutable
+    //                              ------------------------
     public String getEntityMutablePrefix() { // closet, basically for Scala
         return getProperty("entityMutablePrefix", "");
+    }
+
+    public boolean isMakeImmutableEntity() { // closet, basically for Scala
+        return isProperty("isMakeImmutableEntity", false);
     }
 
     // -----------------------------------------------------

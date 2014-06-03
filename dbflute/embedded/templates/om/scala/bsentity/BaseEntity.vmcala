@@ -603,6 +603,15 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
         return __canCommonColumnAutoSetup;
     }
 #end
+#if ($table.isMakeImmutableEntity())
+
+    // ===================================================================================
+    //                                                                    Immutable Entity
+    //                                                                    ================
+    def toImmutable(): ${myImmutableExtendedObjectClassName} = {
+        return new ${myImmutableExtendedObjectClassName}(this);
+    }
+#end
 
     // ===================================================================================
     //                                                                      Basic Override
