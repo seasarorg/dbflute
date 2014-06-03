@@ -311,7 +311,7 @@ public interface Entity {
             return ParameterUtil.convertEmptyToNull(value);
         }
 
-        public static String toClassTitle(Entity entity) {
+        public static String toClassTitle(Object entity) {
             return DfTypeUtil.toClassTitle(entity);
         }
 
