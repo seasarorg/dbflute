@@ -415,12 +415,24 @@ public class ForeignKey implements Constraint {
         return doGetForeignPropertyEntityDefinitionType(extendedEntityClassName, propertyAccessType);
     }
 
+    public String getForeignPropertyImmutableEntityDefinitionType() {
+        final String extendedEntityClassName = getForeignTableImmutableExtendedEntityClassName();
+        final String propertyAccessType = getRelationOptionalEntityClassName();
+        return doGetForeignPropertyEntityDefinitionType(extendedEntityClassName, propertyAccessType);
+    }
+
     public boolean isReferrerPropertyOptionalEntityAsOne() {
         return getRelationOptionalEntityClassName() != null;
     }
 
     public String getReferrerPropertyEntityDefinitionTypeAsOne() {
         final String extendedEntityClassName = getReferrerTableExtendedEntityClassName();
+        final String propertyAccessType = getRelationOptionalEntityClassName();
+        return doGetForeignPropertyEntityDefinitionType(extendedEntityClassName, propertyAccessType);
+    }
+
+    public String getReferrerPropertyImmutableEntityDefinitionTypeAsOne() {
+        final String extendedEntityClassName = getReferrerTableImmutableExtendedEntityClassName();
         final String propertyAccessType = getRelationOptionalEntityClassName();
         return doGetForeignPropertyEntityDefinitionType(extendedEntityClassName, propertyAccessType);
     }
@@ -1288,6 +1300,10 @@ public class ForeignKey implements Constraint {
         return getForeignTable().getExtendedEntityClassName();
     }
 
+    public String getForeignTableImmutableExtendedEntityClassName() {
+        return getForeignTable().getImmutableExtendedEntityClassName();
+    }
+
     public String getForeignTableDBMetaClassName() {
         return getForeignTable().getDBMetaClassName();
     }
@@ -1313,6 +1329,10 @@ public class ForeignKey implements Constraint {
     //                                   -------------------
     public String getReferrerTableExtendedEntityClassName() {
         return getTable().getExtendedEntityClassName();
+    }
+
+    public String getReferrerTableImmutableExtendedEntityClassName() {
+        return getTable().getImmutableExtendedEntityClassName();
     }
 
     public String getReferrerTableExtendedBehaviorClassName() {

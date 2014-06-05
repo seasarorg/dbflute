@@ -609,7 +609,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
     //                                                                    Immutable Entity
     //                                                                    ================
     def toImmutable(): ${myImmutableExtendedObjectClassName} = {
-        return new ${myImmutableExtendedObjectClassName}(this);
+        return new ${myImmutableExtendedObjectClassName}(this.asInstanceOf[${myExtendedObjectClassName}]);
     }
 #end
 

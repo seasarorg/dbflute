@@ -391,7 +391,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         }
 #end
 #if ($fk.isForeignPropertyOptionalEntity())
-        if (${foreignVariableName} != null) { return ${foreignVariableName}; } else { return ${database.relationOptionalEntityClassName}.relationEmpty(this, "${fk.foreignJavaBeansRulePropertyName}"); }
+        if (${foreignVariableName} != null) { return ${foreignVariableName}; } else { return ${database.relationOptionalEntitySimpleName}.relationEmpty(this, "${fk.foreignJavaBeansRulePropertyName}"); }
 #else
         return ${foreignVariableName};
 #end
@@ -430,7 +430,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         }
 #end
 #if ($referrer.isReferrerPropertyOptionalEntityAsOne())
-        if (${referrerVariableName} != null) { return ${referrerVariableName}; } else { return ${database.relationOptionalEntityClassName}.relationEmpty(this, "${referrer.referrerJavaBeansRulePropertyNameAsOne}"); }
+        if (${referrerVariableName} != null) { return ${referrerVariableName}; } else { return ${database.relationOptionalEntitySimpleName}.relationEmpty(this, "${referrer.referrerJavaBeansRulePropertyNameAsOne}"); }
 #else
         return ${referrerVariableName};
 #end

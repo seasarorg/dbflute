@@ -262,7 +262,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     /**
      * Select the entity by the primary-key value.
      * ${table.primaryKeyArgsJavaDocString}
-#if ($table.isAvailableSelectEntityPlainReturn())
+#if ($table.isCompatibleSelectByPKPlainReturn())
      * @return The entity selected by the PK. (NullAllowed: if no data, it returns null)
 #else
      * @return The optional entity selected by the PK. (NotNull: if no data, empty entity)
@@ -271,8 +271,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
-    public ${table.filterSelectEntityOptionalReturnIfNeeds($myExtendedObjectClassName)} selectByPK${table.selectByPKSuffix}(${table.primaryKeyArgsString}) {
-#if ($table.isAvailableSelectEntityPlainReturn())
+    public ${table.filterSelectByPKOptionalReturnIfNeeds($myExtendedObjectClassName)} selectByPK${table.selectByPKSuffix}(${table.primaryKeyArgsString}) {
+#if ($table.isCompatibleSelectByPKPlainReturn())
         return doSelectByPK(${table.primaryKeyArgsCallingString}, ${myExtendedObjectClassName}.class);
 #else
         return doSelectOptionalByPK(${table.primaryKeyArgsCallingString}, ${myExtendedObjectClassName}.class);

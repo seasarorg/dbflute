@@ -3381,6 +3381,19 @@ public class Table {
         return !modifier.isEmpty() ? modifier + " " : "";
     }
 
+    public boolean isCompatibleSelectByPKPlainReturn() {
+        return getLittleAdjustmentProperties().isCompatibleSelectByPKPlainReturn();
+    }
+
+    public String filterSelectByPKOptionalReturnIfNeeds(String entityType) {
+        if (isCompatibleSelectByPKPlainReturn()) {
+            return entityType;
+        } else {
+            final String optionalEntity = getLittleAdjustmentProperties().getBasicOptionalEntitySimpleName();
+            return optionalEntity + getLanguageGrammar().buildGenericOneClassHint(entityType);
+        }
+    }
+
     public String getSelectByPKSuffix() {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         return prop.isCompatibleSelectByPKOldStyle() ? "Value" : "";

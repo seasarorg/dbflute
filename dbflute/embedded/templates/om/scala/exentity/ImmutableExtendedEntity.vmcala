@@ -26,6 +26,5 @@ import ${myBaseEntityPackageName}.${myImmutableBaseObjectClassName};
  * </p>
  * @author ${database.classAuthor}
  */
-class $myClassName(mbleEntity: ${myExtendedObjectClassName}) extends ${myImmutableBaseObjectClassName}(mbleEntity) {
-
+class $myClassName(mble: ${myExtendedObjectClassName}) extends ${myImmutableBaseObjectClassName}(mble) {
 }

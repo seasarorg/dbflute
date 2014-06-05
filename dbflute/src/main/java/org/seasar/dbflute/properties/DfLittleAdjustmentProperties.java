@@ -1028,6 +1028,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isCompatibleSelectByPKOldStyle", isCompatibleBeforeJava8());
     }
 
+    public boolean isCompatibleSelectByPKPlainReturn() { // closet
+        return isProperty("isCompatibleSelectByPKPlainReturn", isAvailableSelectEntityPlainReturn());
+    }
+
     public boolean isCompatibleSelectByPKWithDeletedCheck() { // closet
         return isProperty("isCompatibleSelectByPKWithDeletedCheck", isCompatibleBeforeJava8());
     }

@@ -27,5 +27,4 @@ import ${myBaseEntityPackageName}.${myBaseObjectClassName};
  * @author ${database.classAuthor}
  */
 class $myClassName extends ${myBaseObjectClassName} {
-
 }

@@ -146,21 +146,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     //                                                                       Entity Select
     //                                                                       =============
     /**
-#if ($table.isAvailableSelectEntityPlainReturn())
-     * Select the entity by the condition-bean. #beforejava8 <br />
-     * <span style="color: #AD4747; font-size: 120%">The return might be null if no data, so you should have null check.</span> <br />
-     * <span style="color: #AD4747; font-size: 120%">If the data always exists as your business rule, use selectEntityWithDeletedCheck().</span>
-     * <pre>
-     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-     * cb.query().setFoo...(value);
-     * ${myExtendedObjectClassName} ${myEntityVariableName} = ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectEntity</span>(cb);
-     * if (${myEntityVariableName} != null) { <span style="color: #3F7E5E">// null check</span>
-     *     ... = ${myEntityVariableName}.get...();
-     * } else {
-     *     ...
-     * }
-     * </pre>
-#else
      * Select the entity by the condition-bean. <br />
      * It returns not-null optional entity, so you should ... <br />
      * <span style="color: #AD4747; font-size: 120%">If the data always exists as your business rule, get() without check.</span> <br />
@@ -186,23 +171,14 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      *     ...
      * }
      * </pre>
-#end
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
-#if ($table.isAvailableSelectEntityPlainReturn())
-     * @return The entity selected by the condition. (NullAllowed: if no data, it returns null)
-#else
      * @return The optional entity selected by the condition. (NotNull: if no data, empty entity)
      * @exception EntityAlreadyDeletedException When get() of return value is called and the value is null, which means entity has already been deleted (point is not found).
-#end
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
-    def selectEntity(cb: ${myConditionBeanClassName}): ${table.filterSelectEntityOptionalReturnIfNeeds($myExtendedObjectClassName)} = {
-#if ($table.isAvailableSelectEntityPlainReturn())
-        return doSelectEntity(cb, classOf[${myExtendedObjectClassName}]);
-#else
-        return doSelectOptionalEntity(cb, classOf[${myExtendedObjectClassName}]);
-#end
+    def selectEntity(cb: ${myConditionBeanClassName}): ${table.filterSelectEntityOptionalReturnIfNeeds(${myImmutableExtendedObjectClassName})} = {
+        return doSelectOptionalEntity(cb, classOf[${myExtendedObjectClassName}]).map(f => new ${myImmutableExtendedObjectClassName}(f));
     }
 
     protected def doSelectEntity[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY]): ENTITY = {
@@ -217,11 +193,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     @Override
     protected def doReadEntity(cb: ConditionBean): Entity = {
-#if ($table.isAvailableSelectEntityPlainReturn())
-        return selectEntity(downcast(cb));
-#else
-        return selectEntity(downcast(cb)).getOrElse(null);
-#end
+        return doSelectEntity(downcast(cb), classOf[${myExtendedObjectClassName}]);
     }
 
     /**
@@ -239,8 +211,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
-    ${table.selectEntityWithDeletedCheckModifierAsPrefix}def selectEntityWithDeletedCheck(cb: ${myConditionBeanClassName}): ${myExtendedObjectClassName} = {
-        return doSelectEntityWithDeletedCheck(cb, classOf[${myExtendedObjectClassName}]);
+    ${table.selectEntityWithDeletedCheckModifierAsPrefix}def selectEntityWithDeletedCheck(cb: ${myConditionBeanClassName}): ${myImmutableExtendedObjectClassName} = {
+        return new ${myImmutableExtendedObjectClassName}(doSelectEntityWithDeletedCheck(cb, classOf[${myExtendedObjectClassName}]));
     }
 
     protected def doSelectEntityWithDeletedCheck[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY]): ENTITY = {
@@ -251,7 +223,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     @Override
     protected def doReadEntityWithDeletedCheck(cb: ConditionBean): Entity = {
-        return selectEntityWithDeletedCheck(downcast(cb));
+        return doSelectEntityWithDeletedCheck(downcast(cb), classOf[${myExtendedObjectClassName}]);
     }
 #if ($table.hasPrimaryKey())
 
@@ -263,8 +235,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
-    def selectByPK(${table.primaryKeyArgsString}): ${table.filterSelectEntityOptionalReturnIfNeeds(${myExtendedObjectClassName})} = {
-        return doSelectByPK(${table.primaryKeyArgsCallingString}, classOf[${myExtendedObjectClassName}]);
+    def selectByPK(${table.primaryKeyArgsString}): ${table.filterSelectByPKOptionalReturnIfNeeds(${myImmutableExtendedObjectClassName})} = {
+        return doSelectByPK(${table.primaryKeyArgsCallingString}, classOf[${myExtendedObjectClassName}]).map(f => new ${myImmutableExtendedObjectClassName}(f));
     }
 
     protected def doSelectByPK[ENTITY <: ${myExtendedObjectClassName}](${table.primaryKeyArgsString}, entityType: Class[ENTITY]): ${table.filterSelectEntityOptionalReturn("ENTITY")} = {
@@ -288,8 +260,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
-    def selectByUniqueOf${uq.javaNameKeyword}(${uq.argsString}): ${table.filterSelectEntityOptionalReturn(${myExtendedObjectClassName})} = {
-        return doSelectByUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString}, classOf[${myExtendedObjectClassName}]);
+    def selectByUniqueOf${uq.javaNameKeyword}(${uq.argsString}): ${table.filterSelectEntityOptionalReturn(${myImmutableExtendedObjectClassName})} = {
+        return doSelectByUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString}, classOf[${myExtendedObjectClassName}]).map(f => new ${myImmutableExtendedObjectClassName}(f));
     }
 
     protected def doSelectByUniqueOf${uq.javaNameKeyword}[ENTITY <: ${myExtendedObjectClassName}](${uq.argsString}, entityType: Class[ENTITY]): ${table.filterSelectEntityOptionalReturn("ENTITY")} = {
