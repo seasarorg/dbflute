@@ -190,14 +190,6 @@ object ${myClassName} extends AbstractDBMeta {
 
     { initializeInformationResource(); }
 
-    override protected def buildPropertyGetterMethodName(propertyName: String): String = {
-        return initUncap(propertyName);
-    }
-
-    override protected def buildPropertySetterMethodName(propertyName: String): String = {
-        return initUncap(propertyName);
-    }
-
     // ===================================================================================
     //                                                                         Unique Info
     //                                                                         ===========
@@ -283,10 +275,6 @@ object ${myClassName} extends AbstractDBMeta {
         return cri("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyName}", this, ${referrer.referrerTableDBMetaClassName}, mp, ${referrer.isOneToOne()}, ${referrer.referrerReverseRelationPropertyNameArg});
     }
 #end
-
-    override def getReferrerPropertyListType(): Class[_] = {
-        return classOf[scala.collection.immutable.List[_]];
-    }
 
     // ===================================================================================
     //                                                                        Various Info

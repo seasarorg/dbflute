@@ -2703,7 +2703,7 @@ public class Table {
     public boolean hasImplicitClassification() {
         final Column[] columns = getColumns();
         for (Column column : columns) {
-            if (!column.isTableClassification()) {
+            if (column.hasClassification() && !column.isTableClassification()) {
                 return true;
             }
         }

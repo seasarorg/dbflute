@@ -85,12 +85,10 @@ class ${glImplementedCommonColumnAutoSetupper} extends CommonColumnAutoSetupper 
 #set ($logic = ${database.getCommonColumnBeforeInsertLogicByColumnName(${columnName})})
 #if ($database.isCommonColumnSetupInvokingLogic($logic))
 #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
-
         ${filteredLogic}
 #else
-
         val ${uncapitalisedJavaName}: ${javaNative} = ${logic};
-        entity.${uncapitalisedJavaName}(${uncapitalisedJavaName});
+        entity.set${javaName}(${uncapitalisedJavaName});
 #end
 #end
 #end
@@ -122,12 +120,10 @@ class ${glImplementedCommonColumnAutoSetupper} extends CommonColumnAutoSetupper 
 #set ($logic = ${database.getCommonColumnBeforeUpdateLogicByColumnName(${columnName})})
 #if ($database.isCommonColumnSetupInvokingLogic($logic))
 #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
-
         ${filteredLogic}
 #else
-
         val ${uncapitalisedJavaName}: ${javaNative} = ${logic};
-        entity.${uncapitalisedJavaName}(${uncapitalisedJavaName});
+        entity.set${javaName}(${uncapitalisedJavaName});
 #end
 #end
 #end
