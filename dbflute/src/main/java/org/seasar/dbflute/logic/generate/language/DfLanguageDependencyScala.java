@@ -21,6 +21,8 @@ import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyleScala;
 import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
 import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolverScala;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingScala;
 
 /**
  * @author jflute
@@ -37,6 +39,7 @@ public class DfLanguageDependencyScala extends DfLanguageDependencyJava {
     //                                                                           =========
     protected final DfLanguageGrammar _grammarScala = new DfLanguageGrammarScala();
     protected final DfLanguageImplStyle _implStyleScala = new DfLanguageImplStyleScala();
+    protected final DfLanguageTypeMapping _mappingScala = new DfLanguageTypeMappingScala();
     protected final DfLanguagePropertyPackageResolver _packageResolverScala = new DfLanguagePropertyPackageResolverScala();
 
     // ===================================================================================
@@ -53,6 +56,11 @@ public class DfLanguageDependencyScala extends DfLanguageDependencyJava {
     @Override
     public DfLanguageGrammar getLanguageGrammar() {
         return _grammarScala;
+    }
+
+    @Override
+    public DfLanguageTypeMapping getLanguageTypeMapping() {
+        return _mappingScala;
     }
 
     @Override

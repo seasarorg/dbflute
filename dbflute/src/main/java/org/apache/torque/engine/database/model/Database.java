@@ -2052,10 +2052,6 @@ public class Database {
         return getLittleAdjustmentProperties().isBasicOptionalEntityDBFluteEmbeddedClass();
     }
 
-    public boolean isBasicOptionalEntityScalaOption() {
-        return getLittleAdjustmentProperties().isBasicOptionalEntityScalaOption();
-    }
-
     public String getRelationOptionalEntityClassName() {
         return getLittleAdjustmentProperties().getRelationOptionalEntityClass();
     }
@@ -2066,10 +2062,6 @@ public class Database {
 
     public boolean isRelationOptionalEntityDBFluteEmbeddedClass() {
         return getLittleAdjustmentProperties().isRelationOptionalEntityDBFluteEmbeddedClass();
-    }
-
-    public boolean isRelationOptionalEntityScalaOption() {
-        return getLittleAdjustmentProperties().isRelationOptionalEntityScalaOption();
     }
 
     // ===================================================================================

@@ -87,4 +87,16 @@ public interface DfLanguageTypeMapping {
      * @return The switched or non-switched type. No switch for Java. (NotNull)
      */
     String switchParameterBeanTestValueType(String plainTypeName);
+
+    /**
+     * @param javaNative The java native type for mutable (normal) entity. (NotNull)
+     * @return The java native type for immutable entity. (NotNull)
+     */
+    String convertToImmutableJavaNativeType(String javaNative);
+
+    /**
+     * @param immutableJavaNative The java native type for immutable entity. (NotNull)
+     * @return The default value of java native type for immutable entity. (NotNull)
+     */
+    String convertToImmutableJavaNativeDefaultValue(String immutableJavaNative);
 }

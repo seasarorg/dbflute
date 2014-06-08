@@ -118,6 +118,35 @@ public class DfColumnListToStringBuilder {
         return result;
     }
 
+    public static String getColumnArgsSetupPropertyString(String beanName, List<Column> columnList) {
+        validateColumnList(columnList);
+        final boolean hasPrefix = beanName != null;
+        final String beanPrefix = (hasPrefix ? beanName + "." : "");
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final DfLanguageImplStyle implStyle = lang.getLanguageImplStyle();
+        String result = "";
+        for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
+            final Column column = (Column) ite.next();
+            final String javaName = column.getJavaName();
+            final String variable = column.getUncapitalisedJavaName();
+            final String cls = column.getClassificationName();
+            final String basic;
+            if (column.isForceClassificationSetting()) {
+                basic = "set" + javaName + "As" + cls + "(" + variable + ")";
+            } else {
+                basic = "set" + javaName + "(" + variable + ")";
+            }
+            final String adjusted = implStyle.adjustEntitySetPropertyCall(basic, !hasPrefix);
+            final String setter = beanPrefix + adjusted + ";";
+            if ("".equals(result)) {
+                result = setter;
+            } else {
+                result = result + setter;
+            }
+        }
+        return result;
+    }
+
     public static String getColumnArgsSetupStringCSharp(String beanName, List<Column> columnList) {
         validateColumnList(columnList);
         final String beanPrefix = (beanName != null ? beanName + "." : "");

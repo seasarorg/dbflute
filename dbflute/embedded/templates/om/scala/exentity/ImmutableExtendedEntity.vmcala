@@ -17,14 +17,26 @@ ${database.allClassCopyright}package ${myExtendedEntityPackageName};
 #set ($myClassName = "${myImmutableExtendedObjectClassName}")
 
 import ${myBaseEntityPackageName}.${myImmutableBaseObjectClassName};
+import ${myBaseEntityPackageName}.${myMutableBaseObjectClassName};
 
 /**
- * The entity of ${table.tableDbName}.
+ * The immutable entity of ${table.tableDbName}.
  * <p>
  * You can implement your original methods here.
  * This class remains when re-generating.
  * </p>
  * @author ${database.classAuthor}
  */
-class $myClassName(mble: ${myExtendedObjectClassName}) extends ${myImmutableBaseObjectClassName}(mble) {
+class ${myClassName}(dble: ${myExtendedObjectClassName}) extends ${myImmutableBaseObjectClassName}(dble) {
+}
+
+/**
+ * The mutable entity of ${table.tableDbName}.
+ * <p>
+ * You can implement your original methods here.
+ * This class remains when re-generating.
+ * </p>
+ * @author ${database.classAuthor}
+ */
+class ${myMutableExtendedObjectClassName} extends ${myMutableBaseObjectClassName} {
 }

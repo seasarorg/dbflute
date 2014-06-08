@@ -312,6 +312,14 @@ public class Index implements Constraint {
         return DfColumnListToStringBuilder.getColumnArgsSetupString(beanName, getColumnList());
     }
 
+    public String getArgsSetupPropertyString() {
+        return DfColumnListToStringBuilder.getColumnArgsSetupPropertyString(null, getColumnList());
+    }
+
+    public String getArgsSetupPropertyString(String beanName) {
+        return DfColumnListToStringBuilder.getColumnArgsSetupPropertyString(beanName, getColumnList());
+    }
+
     public String getArgsConditionSetupString() {
         return DfColumnListToStringBuilder.getColumnArgsConditionSetupString(getColumnList());
     }

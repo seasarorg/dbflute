@@ -140,6 +140,8 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
+import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
@@ -1577,7 +1579,7 @@ public class Column {
 
     public String getJavaNativeTypeLiteral() {
         final String javaNative = getJavaNative();
-        final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency().getLanguageGrammar();
+        final DfLanguageGrammar grammarInfo = getLanguageDependency().getLanguageGrammar();
         final String pureNative = Srl.substringFirstFront(javaNative, "<"); // for example, List<String>
         return grammarInfo.buildClassTypeLiteral(pureNative);
     }
@@ -1722,16 +1724,19 @@ public class Column {
     //}
 
     public String getPropertySettingModifier() {
-        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
-        final DfLanguageGrammar grammar = lang.getLanguageGrammar();
+        final DfLanguageGrammar grammar = getLanguageDependency().getLanguageGrammar();
         final String publicModifier = grammar.getPublicModifier();
         final String protectedModifier = grammar.getProtectedModifier();
-        return isForceClassificationSetting() ? protectedModifier : publicModifier;
+        return isPropertySettingModifierClosed() ? protectedModifier : publicModifier;
     }
 
     public String getPropertySettingModifierAsPrefix() {
         final String modifier = getPropertySettingModifier(); // Scala might return empty for public
         return !modifier.isEmpty() ? modifier + " " : ""; // add rear space if exists
+    }
+
+    public boolean isPropertySettingModifierClosed() {
+        return isForceClassificationSetting();
     }
 
     // ===================================================================================
@@ -1778,6 +1783,89 @@ public class Column {
      */
     public void setSql2EntityForcedJavaNative(String sql2EntityForcedJavaNative) {
         _sql2EntityForcedJavaNative = sql2EntityForcedJavaNative;
+    }
+
+    // ===================================================================================
+    //                                                                           Immutable
+    //                                                                           =========
+
+    public String getImmutableJavaNative() {
+        if (hasClassification()) {
+            return getClassificationDefinitionType();
+        } else {
+            return getLanguageTypeMapping().convertToImmutableJavaNativeType(getJavaNative());
+        }
+    }
+
+    public String getImmutableJavaNativeDefaultValue() {
+        if (hasClassification()) {
+            return "null";
+        } else {
+            return getLanguageTypeMapping().convertToImmutableJavaNativeDefaultValue(getImmutableJavaNative());
+        }
+    }
+
+    public boolean isImmutablePropertyOptional() {
+        final DfLanguageImplStyle implStyle = getLanguageImplStyle();
+        return implStyle.isImmutablePropertyOptional(this);
+    }
+
+    public String getImmutablePropertyDefinitionType() {
+        final String immutableJavaNative = getImmutableJavaNative();
+        final String definitionType;
+        if (isImmutablePropertyOptional()) {
+            definitionType = getLanguageImplStyle().adjustImmutablePropertyOptionalType(immutableJavaNative);
+        } else {
+            definitionType = immutableJavaNative;
+        }
+        return definitionType;
+    }
+
+    public String getImmutablePropertyGetterReturningValue(String gettingExp) {
+        String nativeExp;
+        if (hasClassification()) {
+            final boolean hasSuffix = gettingExp.endsWith("()");
+            final String pureExp = hasSuffix ? Srl.substringLastFront(gettingExp, "()") : gettingExp;
+            nativeExp = pureExp + getClassificationMethodSuffix() + (hasSuffix ? "()" : "");
+        } else {
+            nativeExp = gettingExp;
+        }
+        return convertToImmutablePropertyValue(nativeExp);
+    }
+
+    public String convertToImmutablePropertyValue(String nativeExp) {
+        final String converted;
+        if (isImmutablePropertyOptional()) {
+            converted = getLanguageImplStyle().adjustImmutablePropertyOptionalValue(nativeExp);
+        } else {
+            converted = nativeExp;
+        }
+        return converted;
+    }
+
+    public String convertToImmutablePropertyOrElseNull(String variable) {
+        final String converted;
+        if (isImmutablePropertyOptional()) {
+            converted = getLanguageImplStyle().adjustImmutablePropertyOptionalOrElseNull(variable);
+        } else {
+            converted = variable;
+        }
+        return converted;
+    }
+
+    // ===================================================================================
+    //                                                                            Language
+    //                                                                            ========
+    protected DfLanguageDependency getLanguageDependency() {
+        return getBasicProperties().getLanguageDependency();
+    }
+
+    protected DfLanguageImplStyle getLanguageImplStyle() {
+        return getLanguageDependency().getLanguageImplStyle();
+    }
+
+    protected DfLanguageTypeMapping getLanguageTypeMapping() {
+        return getLanguageDependency().getLanguageTypeMapping();
     }
 
     // ===================================================================================
@@ -2169,13 +2257,25 @@ public class Column {
         return getClassificationProperties().getClassificationName(getTable().getTableDbName(), getName());
     }
 
+    public String getClassificationCDefName() {
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        return projectPrefix + "CDef";
+    }
+
+    public String getClassificationDefinitionType() {
+        final String classificationName = getClassificationName();
+        return hasClassification() ? getClassificationCDefName() + "." + classificationName : "";
+    }
+
     public String getClassificationMetaSettingExpression() { // for DBMeta
         if (!hasClassification()) {
             return "null";
         }
-        final String classificationName = getClassificationName();
-        final String projectPrefix = getBasicProperties().getProjectPrefix();
-        return projectPrefix + "CDef.DefMeta." + classificationName;
+        return getClassificationCDefName() + ".DefMeta." + getClassificationName();
+    }
+
+    public String getClassificationMethodSuffix() {
+        return hasClassification() ? "As" + getClassificationName() : "";
     }
 
     public boolean isCheckSelectedClassification() {

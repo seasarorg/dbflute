@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.logic.generate.language.implstyle;
 
+import org.apache.torque.engine.database.model.Column;
+
 /**
  * @author jflute
  * @since 1.0.5F (2014/05/04 Sunday)
@@ -37,11 +39,55 @@ public class DfLanguageImplStyleJava implements DfLanguageImplStyle {
         return basicSetMethod;
     }
 
+    public String adjustEntitySetPropertyCall(String basicSetMethod, boolean calledByThis) {
+        return basicSetMethod;
+    }
+
     public String adjustConditionBeanLocalCQCall(String cb) {
         return cb + ".query()";
     }
 
     public String adjustConditionQuerySetMethodCall(String basicSetMethod) {
         return basicSetMethod;
+    }
+
+    public String getBasicOptionalEntityClass() {
+        return null; // means DBFlute embedded
+    }
+
+    public String getRelationOptionalEntityClass() {
+        return null; // means DBFlute embedded
+    }
+
+    public boolean isMakeImmutableEntity() {
+        return false;
+    }
+
+    public String getEntityDBablePrefix() {
+        return "";
+    }
+
+    public String getEntityMutablePrefix() {
+        return "";
+    }
+
+    public boolean isImmutablePropertyOptional(Column column) {
+        return !column.isNotNull();
+    }
+
+    public String adjustImmutablePropertyOptionalType(String immutableJavaNative) {
+        return "OptionalProperty<" + immutableJavaNative + ">";
+    }
+
+    public String adjustImmutablePropertyOptionalValue(String nativeExp) {
+        return "OptionalProperty.of(" + nativeExp + ")";
+    }
+
+    public String adjustImmutablePropertyOptionalOrElseNull(String variable) {
+        return variable + ".orElseNull()";
+    }
+
+    public boolean isCompatibleBeforeJava8() {
+        return true; // #later false since 1.1
     }
 }

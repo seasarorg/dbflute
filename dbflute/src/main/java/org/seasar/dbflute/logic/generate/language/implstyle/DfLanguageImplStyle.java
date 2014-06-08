@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.logic.generate.language.implstyle;
 
+import org.apache.torque.engine.database.model.Column;
+
 /**
  * @author jflute
  * @since 1.0.5F (2014/05/04 Sunday)
@@ -32,7 +34,29 @@ public interface DfLanguageImplStyle {
 
     String adjustEntitySetMethodCall(String basicSetMethod, boolean calledByThis);
 
+    String adjustEntitySetPropertyCall(String basicSetMethod, boolean calledByThis);
+
     String adjustConditionBeanLocalCQCall(String cb);
 
     String adjustConditionQuerySetMethodCall(String basicSetMethod);
+
+    String getBasicOptionalEntityClass();
+
+    String getRelationOptionalEntityClass();
+
+    boolean isMakeImmutableEntity();
+
+    String getEntityDBablePrefix();
+
+    String getEntityMutablePrefix();
+
+    boolean isImmutablePropertyOptional(Column column);
+
+    String adjustImmutablePropertyOptionalType(String immutableJavaNative);
+
+    String adjustImmutablePropertyOptionalValue(String nativeExp);
+
+    String adjustImmutablePropertyOptionalOrElseNull(String variable);
+
+    boolean isCompatibleBeforeJava8();
 }

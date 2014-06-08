@@ -381,7 +381,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     protected ${foreignEntityClassName} ${foreignVariableName};
 
     /**
-     * ${fk.foreignDispForJavaDoc}
+     * [get] ${fk.foreignDispForJavaDoc}
      * @return The entity of foreign property '${fk.foreignJavaBeansRulePropertyName}'. (NullAllowed: when e.g. null FK column, no setupSelect)
      */
     public ${foreignEntityClassName} get${fk.foreignJavaBeansRulePropertyNameInitCap}() {
@@ -398,7 +398,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 
     /**
-     * ${fk.foreignDispForJavaDoc}
+     * [set] ${fk.foreignDispForJavaDoc}
      * @param ${fk.foreignPropertyName} The entity of foreign property '${fk.foreignJavaBeansRulePropertyName}'. (NullAllowed)
      */
     public void set${fk.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${fk.foreignPropertyName}) {
@@ -420,7 +420,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     protected ${referrerEntityClassName} ${referrerVariableName};
 
     /**
-     * ${referrer.referrerDispAsOneForJavaDoc}
+     * [get] ${referrer.referrerDispAsOneForJavaDoc}
      * @return the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (NullAllowed: when e.g. no data, no setupSelect)
      */
     public ${referrerEntityClassName} get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
@@ -437,7 +437,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 
     /**
-     * ${referrer.referrerDispAsOneForJavaDoc}
+     * [set] ${referrer.referrerDispAsOneForJavaDoc}
      * @param ${referrer.referrerJavaBeansRulePropertyNameAsOne} The entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (NullAllowed)
      */
     public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
@@ -459,10 +459,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
     /** ${referrer.referrerSimpleDisp}. */
-    protected List<${referrerEntityClassName}> $referrerVariableName;
+    protected List<${referrerEntityClassName}> ${referrerVariableName};
 
     /**
-     * ${referrer.referrerDispForJavaDoc}
+     * [get] ${referrer.referrerDispForJavaDoc}
      * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: even if no loading, returns empty list)
      */
     public List<${referrerEntityClassName}> get${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
@@ -471,7 +471,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 
     /**
-     * ${referrer.referrerDispForJavaDoc}
+     * [set] ${referrer.referrerDispForJavaDoc}
      * @param ${referrer.referrerPropertyName} The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NullAllowed)
      */
     public void set${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {

@@ -18,101 +18,86 @@ package org.seasar.dbflute.logic.generate.language.typemapping;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.util.DfCollectionUtil;
-
 /**
  * @author jflute
  */
-public class DfLanguageTypeMappingPhp implements DfLanguageTypeMapping {
+public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final Map<String, String> _jdbcToJavaNativeMap;
-    static {
-        final Map<String, String> map = DfCollectionUtil.newLinkedHashMap();
-        map.put("CHAR", "string");
-        map.put("VARCHAR", "string");
-        map.put("LONGVARCHAR", "string");
-        map.put("NUMERIC", "integer");
-        map.put("DECIMAL", "double");
-        map.put("BIT", "integer");
-        map.put("TINYINT", "integer");
-        map.put("SMALLINT", "integer");
-        map.put("INTEGER", "integer");
-        map.put("BIGINT", "integer");
-        map.put("REAL", "double");
-        map.put("FLOAT", "double");
-        map.put("DOUBLE", "double");
-        map.put("DATE", "string");
-        map.put("TIME", "string");
-        map.put("TIMESTAMP", "string");
-        _jdbcToJavaNativeMap = map;
-    }
-    protected static final List<String> _stringList = DfCollectionUtil.newArrayList("string");
-    protected static final List<String> _numberList = DfCollectionUtil.newArrayList("integer");
-    protected static final List<String> _dateList = DfCollectionUtil.newArrayList("string");
-    protected static final List<String> _booleanList = DfCollectionUtil.newArrayList("bool?");
-    protected static final List<String> _binaryList = DfCollectionUtil.newArrayList("byte[]");
+    protected final DfLanguageTypeMapping _mappingJava = new DfLanguageTypeMappingJava();
 
     // ===================================================================================
     //                                                                        Type Mapping
     //                                                                        ============
     public Map<String, String> getJdbcToJavaNativeMap() {
-        return _jdbcToJavaNativeMap;
+        return _mappingJava.getJdbcToJavaNativeMap();
     }
 
     // ===================================================================================
     //                                                                  Native Suffix List
     //                                                                  ==================
     public List<String> getStringList() {
-        return _stringList;
+        return _mappingJava.getStringList();
     }
 
     public List<String> getNumberList() {
-        return _numberList;
+        return _mappingJava.getNumberList();
     }
 
     public List<String> getDateList() {
-        return _dateList;
+        return _mappingJava.getDateList();
     }
 
     public List<String> getBooleanList() {
-        return _booleanList;
+        return _mappingJava.getBooleanList();
     }
 
     public List<String> getBinaryList() {
-        return _binaryList;
+        return _mappingJava.getBinaryList();
     }
 
     // ===================================================================================
-    //                                                                JDBC Type Adjustment
-    //                                                                ====================
+    //                                                                    Small Adjustment
+    //                                                                    ================
     public String getSequenceJavaNativeType() {
-        return "integer";
+        return _mappingJava.getSequenceJavaNativeType();
     }
 
     public String getDefaultNumericJavaNativeType() {
-        return "double";
+        return _mappingJava.getDefaultNumericJavaNativeType();
     }
 
     public String getDefaultDecimalJavaNativeType() {
-        return "double";
+        return _mappingJava.getDefaultDecimalJavaNativeType();
     }
 
     public String getJdbcTypeOfUUID() {
-        return null; // unknown, null means no mapping
+        return _mappingJava.getJdbcTypeOfUUID();
     }
 
     public String switchParameterBeanTestValueType(String plainTypeName) {
-        return plainTypeName; // unknown
+        return _mappingJava.switchParameterBeanTestValueType(plainTypeName);
     }
 
     public String convertToImmutableJavaNativeType(String javaNative) {
-        return javaNative;
+        final String converted;
+        if (javaNative.endsWith("Integer")) {
+            converted = "Int";
+        } else {
+            converted = javaNative;
+        }
+        return converted;
     }
 
     public String convertToImmutableJavaNativeDefaultValue(String immutableJavaNative) {
-        return "null";
+        final String defaultValue;
+        if ("Int".equals(immutableJavaNative) || "Long".equals(immutableJavaNative)) {
+            defaultValue = "0";
+        } else {
+            defaultValue = "null";
+        }
+        return defaultValue;
     }
 }

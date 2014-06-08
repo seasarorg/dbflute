@@ -100,4 +100,12 @@ public class DfLanguageTypeMappingJava implements DfLanguageTypeMapping {
     public String switchParameterBeanTestValueType(String plainTypeName) {
         return plainTypeName;
     }
+
+    public String convertToImmutableJavaNativeType(String javaNative) {
+        return javaNative;
+    }
+
+    public String convertToImmutableJavaNativeDefaultValue(String immutableJavaNative) {
+        return "null";
+    }
 }

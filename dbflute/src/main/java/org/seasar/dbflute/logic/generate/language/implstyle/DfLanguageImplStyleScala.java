@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.logic.generate.language.implstyle;
 
+import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -36,11 +37,14 @@ public class DfLanguageImplStyleScala implements DfLanguageImplStyle {
     }
 
     public String adjustEntitySetMethodCall(String basicSetMethod, boolean calledByThis) {
+        return basicSetMethod;
+    }
+
+    public String adjustEntitySetPropertyCall(String basicSetMethod, boolean calledByThis) {
         final String removedPrefix = Srl.substringFirstRear(basicSetMethod, "set");
         final String propertyName = Srl.substringFirstFront(removedPrefix, "(");
         final String arg = Srl.extractScopeWide(removedPrefix, "(", ")").getContent();
-        final String basePrefix = (calledByThis ? "this." : ""); // memberAccount(memberAccount) not allowed
-        return basePrefix + Srl.initUncap(propertyName) + "(" + arg + ")";
+        return propertyName + " = " + arg;
     }
 
     public String adjustConditionBeanLocalCQCall(String cb) {
@@ -49,5 +53,45 @@ public class DfLanguageImplStyleScala implements DfLanguageImplStyle {
 
     public String adjustConditionQuerySetMethodCall(String basicSetMethod) {
         return basicSetMethod;
+    }
+
+    public String getBasicOptionalEntityClass() {
+        return "Option";
+    }
+
+    public String getRelationOptionalEntityClass() {
+        return "Option";
+    }
+
+    public boolean isMakeImmutableEntity() {
+        return true;
+    }
+
+    public String getEntityDBablePrefix() {
+        return "Dble";
+    }
+
+    public String getEntityMutablePrefix() {
+        return "Mble";
+    }
+
+    public boolean isImmutablePropertyOptional(Column column) {
+        return !column.isNotNull();
+    }
+
+    public String adjustImmutablePropertyOptionalType(String immutableJavaNative) {
+        return "Option[" + immutableJavaNative + "]";
+    }
+
+    public String adjustImmutablePropertyOptionalValue(String nativeExp) {
+        return "Option(" + nativeExp + ")";
+    }
+
+    public String adjustImmutablePropertyOptionalOrElseNull(String variable) {
+        return variable + ".orNull";
+    }
+
+    public boolean isCompatibleBeforeJava8() {
+        return false;
     }
 }

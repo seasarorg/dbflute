@@ -125,4 +125,12 @@ public class DfLanguageTypeMappingCSharp implements DfLanguageTypeMapping {
             return plainTypeName;
         }
     }
+
+    public String convertToImmutableJavaNativeType(String javaNative) {
+        return javaNative;
+    }
+
+    public String convertToImmutableJavaNativeDefaultValue(String immutableJavaNative) {
+        return "null";
+    }
 }

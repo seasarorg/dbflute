@@ -2130,30 +2130,35 @@ public class Table {
     public String getBaseEntityClassName() { // mutable entity
         // basically pure name sometimes it has mutable mark
         //  e.g. MEMBER_SERVICE -> BsMemberService (normally)
-        //  e.g. MEMBER_SERVICE -> BsMbleMemberService (e.g. in Scala)
-        final String mutablePrefix = getLittleAdjustmentProperties().getEntityMutablePrefix();
-        return buildBaseEntityClassName(mutablePrefix);
+        //  e.g. MEMBER_SERVICE -> BsDbleMemberService (e.g. in Scala)
+        final String dbablePrefix = getLittleAdjustmentProperties().getEntityDBablePrefix();
+        return buildBaseEntityClassName(dbablePrefix);
     }
 
     public boolean isMakeImmutableEntity() {
         return getLittleAdjustmentProperties().isMakeImmutableEntity();
     }
 
-    public String getImmutableBaseEntityClassName() { // immutable entity
-        return getPureBaseEntityClassName(); // basically for Scala (same as pure name)
+    public String getImmutableBaseEntityClassName() { // immutable entity, basically for Scala
+        return getPureBaseEntityClassName(); // same as pure name
+    }
+
+    public String getMutableBaseEntityClassName() { // mutable entity, basically for Scala
+        final String mutablePrefix = getLittleAdjustmentProperties().getEntityMutablePrefix();
+        return buildBaseEntityClassName(mutablePrefix);
     }
 
     protected String getPureBaseEntityClassName() { // e.g. MEMBER_SERVICE -> BsMemberService
         return buildBaseEntityClassName("");
     }
 
-    protected String buildBaseEntityClassName(String mutablePrefix) {
+    protected String buildBaseEntityClassName(String symbolPrefix) {
         final String projectPrefix = getDatabase().getProjectPrefix();
         final String basePrefix = getDatabase().getBasePrefix();
         final String schemaClassPrefix = getSchemaClassPrefix();
         final String javaName = getJavaName();
         final String baseSuffixForEntity = getDatabase().getBaseSuffixForEntity();
-        return projectPrefix + basePrefix + mutablePrefix + schemaClassPrefix + javaName + baseSuffixForEntity;
+        return projectPrefix + basePrefix + symbolPrefix + schemaClassPrefix + javaName + baseSuffixForEntity;
     }
 
     public String getBaseDaoClassName() {
@@ -2193,14 +2198,20 @@ public class Table {
     public String getExtendedEntityClassName() { // mutable entity
         // basically pure name sometimes it has mutable mark
         //  e.g. MEMBER_SERVICE -> MemberService (normally)
-        //  e.g. MEMBER_SERVICE -> MbleMemberService (e.g. in Scala)
+        //  e.g. MEMBER_SERVICE -> DbleMemberService (e.g. in Scala)
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        final String dbablePrefix = getLittleAdjustmentProperties().getEntityDBablePrefix();
+        return buildExtendedEntityClassName(projectPrefix, dbablePrefix);
+    }
+
+    public String getImmutableExtendedEntityClassName() { // immutable entity, basically for Scala
+        return getPureExtendedEntityClassName(); // same as pure name
+    }
+
+    public String getMutableExtendedEntityClassName() { // mutable entity, basically for Scala
         final String projectPrefix = getBasicProperties().getProjectPrefix();
         final String mutablePrefix = getLittleAdjustmentProperties().getEntityMutablePrefix();
         return buildExtendedEntityClassName(projectPrefix, mutablePrefix);
-    }
-
-    public String getImmutableExtendedEntityClassName() { // immutable entity
-        return getPureExtendedEntityClassName(); // basically for Scala (same as pure name)
     }
 
     protected String getPureExtendedEntityClassName() { // e.g. MEMBER_SERVICE -> MemberService
@@ -2365,8 +2376,8 @@ public class Table {
     }
 
     // -----------------------------------------------------
-    //                                        Component Name
-    //                                        --------------
+    //                                Behavior Handling Name
+    //                                -----------s-----------
     public String getBehaviorComponentName() {
         final String componentName = Srl.initUncap(getExtendedBehaviorClassName());
 
@@ -2374,6 +2385,12 @@ public class Table {
         // for example, in Spring Framework case:
         //   -> SAXParseException: Attribute value FOO$BAR of type ID must be a name.
         return Srl.replace(componentName, "$", "");
+    }
+
+    public String getBehaviorInstanceMethodName() { // basically for Scala
+        final String methodName = Srl.initUncap(getExtendedBehaviorClassName());
+        final DfLanguageDependency lang = getLanguageDependency();
+        return lang.getLanguageGrammar().adjustMethodInitialChar(methodName);
     }
 
     public String getBehaviorApComponentName() {

@@ -83,23 +83,23 @@ object ${myClassName} extends AbstractDBMeta {
 ## for different type between relation (Integer, Long and BigDecimal are prior)
 ## - - - - - - - - - -/
     class ${setupperClassName} extends PropertyGateway {
-        def read(et: Entity): Object = { return et.asInstanceOf[${myExtendedObjectClassName}].${col.uncapitalisedJavaName}(); }
+        def read(et: Entity): Object = { return et.asInstanceOf[${myExtendedObjectClassName}].get${col.javaName}(); }
 #if ($col.isJavaNativeNumberObject())
 #if ($col.isJavaNativeInteger())
-        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].${col.uncapitalisedJavaName}(dgcti(vl)); }
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}(dgcti(vl)); }
 #elseif ($col.isJavaNativeLong())
-        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].${col.uncapitalisedJavaName}(dgctl(vl)); }
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}(dgctl(vl)); }
 #elseif ($col.isJavaNativeBigDecimal())
-        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].${col.uncapitalisedJavaName}(dgctb(vl)); }
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}(dgctb(vl)); }
 #else
-        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].${col.uncapitalisedJavaName}(dgctn(vl, classOf[${col.javaNative}])); }
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}(dgctn(vl, classOf[${col.javaNative}])); }
 #end
 #else
 #if ($col.isJavaNativeUtilList())
         @SuppressWarnings("unchecked")
-        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].${col.uncapitalisedJavaName}(vl.asInstanceOf[${col.javaNative}]); }
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}(vl.asInstanceOf[${col.javaNative}]); }
 #else
-        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].${col.uncapitalisedJavaName}(vl.asInstanceOf[${col.javaNative}]); }
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}(vl.asInstanceOf[${col.javaNative}]); }
 #end
 #end
 #end
@@ -128,8 +128,8 @@ object ${myClassName} extends AbstractDBMeta {
 #foreach ($fk in $table.foreignKeys)
 #set ($setupperClassName = "Efpg${fk.foreignJavaBeansRulePropertyNameInitCap}")
     class ${setupperClassName} extends PropertyGateway {
-        def read(et: Entity): Object = { return et.asInstanceOf[${myExtendedObjectClassName}].${fk.foreignJavaBeansRulePropertyName}(); }
-        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].${fk.foreignJavaBeansRulePropertyName}(vl.asInstanceOf[${fk.foreignPropertyEntityDefinitionType}]); }
+        def read(et: Entity): Object = { return et.asInstanceOf[${myExtendedObjectClassName}].get${fk.foreignJavaBeansRulePropertyNameInitCap}(); }
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${fk.foreignJavaBeansRulePropertyNameInitCap}(vl.asInstanceOf[${fk.foreignPropertyEntityDefinitionType}]); }
     }
 #end
 #end
@@ -142,8 +142,8 @@ object ${myClassName} extends AbstractDBMeta {
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($setupperClassName = "Efpg${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}")
     class ${setupperClassName} extends PropertyGateway {
-        def read(et: Entity): Object = { return et.asInstanceOf[${myExtendedObjectClassName}].${referrer.referrerJavaBeansRulePropertyNameAsOne}(); }
-        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].${referrer.referrerJavaBeansRulePropertyNameAsOne}(vl.asInstanceOf[${referrer.referrerPropertyEntityDefinitionTypeAsOne}]); }
+        def read(et: Entity): Object = { return et.asInstanceOf[${myExtendedObjectClassName}].get${referrer.referrerJavaBeansRulePropertyNameInitCapAsOne}(); }
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${referrer.referrerJavaBeansRulePropertyNameInitCapAsOne}(vl.asInstanceOf[${referrer.referrerPropertyEntityDefinitionTypeAsOne}]); }
     }
 #end
 #end

@@ -124,8 +124,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The count for the condition. (NotMinus)
      */
-    def selectCount(cb: ${myConditionBeanClassName}): Integer = {
-        return doSelectCountUniquely(cb);
+    def selectCount(cb: ${myConditionBeanClassName}): Int = {
+        return Integer2int(doSelectCountUniquely(cb));
     }
 
     protected def doSelectCountUniquely(cb: ${myConditionBeanClassName}): Integer = { // called by selectCount(cb)
@@ -235,7 +235,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
-    def selectByPK(${table.primaryKeyArgsString}): ${table.filterSelectByPKOptionalReturnIfNeeds(${myImmutableExtendedObjectClassName})} = {
+    def selectByPK(${table.primaryKeyArgsString}): ${table.filterSelectEntityOptionalReturnIfNeeds(${myImmutableExtendedObjectClassName})} = {
         return doSelectByPK(${table.primaryKeyArgsCallingString}, classOf[${myExtendedObjectClassName}]).map(f => new ${myImmutableExtendedObjectClassName}(f));
     }
 
@@ -284,18 +284,18 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.query().setFoo...(value);
      * cb.query().addOrderBy_Bar...();
-     * ListResultBean&lt;${myExtendedObjectClassName}&gt; ${myEntityListVariableName} = ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectList</span>(cb);
-     * for (${myExtendedObjectClassName} ${myEntityVariableName} : ${myEntityListVariableName}) {
-     *     ... = ${myEntityVariableName}.get...();
+     * List&lt;${${myImmutableExtendedObjectClassName}}&gt; ${myEntityListVariableName} = ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectList</span>(cb);
+     * ${myEntityListVariableName}.foreach(${myEntityVariableName} =>
+     *     ... = ${myEntityVariableName}...;
      * }
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The result bean of selected list. (NotNull: if no data, returns empty list)
      * @exception DangerousResultSizeException When the result size is over the specified safety size.
      */
-    def selectList(cb: ${myConditionBeanClassName}): scala.collection.immutable.List[${myExtendedObjectClassName}] = {
-        val javaList = doSelectList(cb, classOf[${myExtendedObjectClassName}]);
-        return toScalaList(javaList);
+    def selectList(cb: ${myConditionBeanClassName}): scala.collection.immutable.List[${myImmutableExtendedObjectClassName}] = {
+        val dbleList = doSelectList(cb, classOf[${myExtendedObjectClassName}]);
+        return toImmutableEntityList(dbleList);
     }
 
     protected def doSelectList[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY]): ListResultBean[ENTITY] = {
@@ -549,33 +549,33 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return helpLoadReferrerInternally(${myEntityListVariableName}.asJava, option, new InternalLoadReferrerCallback[${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}]() {
             def getPKVal(et: ${myExtendedObjectClassName}): ${keyJavaNative} =
 #if ($referrer.canImplicitConversion())
-            { if (et.${localColumn.uncapitalisedJavaName}() == null) { return null; }
+            { if (et.get${localColumn.javaName}() == null) { return null; }
 #if ($referrer.isConvertToReferrerByToString())
-              return et.${localColumn.uncapitalisedJavaName}().toString(); }
+              return et.get${localColumn.javaName}().toString(); }
 #elseif ($referrer.isConvertToReferrerByConstructor())
-              return new ${keyJavaNative}(et.${localColumn.uncapitalisedJavaName}().toString()); }
+              return new ${keyJavaNative}(et.get${localColumn.javaName}().toString()); }
 #elseif ($referrer.isConvertToReferrerByValueOf())
-              return ${keyJavaNative}.valueOf(et.${localColumn.uncapitalisedJavaName}().toString()); }
+              return ${keyJavaNative}.valueOf(et.get${localColumn.javaName}().toString()); }
 #else
-              return et.${localColumn.uncapitalisedJavaName}(); }
+              return et.get${localColumn.javaName}(); }
 #end
 #else
-            { return et.${localColumn.uncapitalisedJavaName}(); }
+            { return et.get${localColumn.javaName}(); }
 #end
             def setRfLs(et: ${myExtendedObjectClassName}, ls: List[${referrerEntityClassName}]): Unit =
-            { et.${referrer.referrerPropertyName}(toScalaList(ls)); }
+            { et.set${referrer.referrerPropertyNameInitCap}(ls); }
             def newMyCB(): ${referrerCBClassName} = { return referrerBhv.newMyConditionBean(); }
             def qyFKIn(cb: ${referrerCBClassName}, ls: List[${keyJavaNative}]): Unit =
             { cb.query().set${referrerColumn.javaName}_InScope(ls); }
             def qyOdFKAsc(cb: ${referrerCBClassName}): Unit = { cb.query().addOrderBy_${referrerColumn.javaName}_Asc(); }
             def spFKCol(cb: ${referrerCBClassName}): Unit = { cb.specify().column${referrerColumn.javaName}(); }
-            def selRfLs(cb: ${referrerCBClassName}): List[${referrerEntityClassName}] = { return referrerBhv.selectList(cb).asJava; }
-            def getFKVal(re: ${referrerEntityClassName}): ${keyJavaNative} = { return re.${referrerColumn.uncapitalisedJavaName}(); }
+            def selRfLs(cb: ${referrerCBClassName}): List[${referrerEntityClassName}] = { return referrerBhv.toDBableEntityList(referrerBhv.selectList(cb)); }
+            def getFKVal(re: ${referrerEntityClassName}): ${keyJavaNative} = { return re.get${referrerColumn.javaName}(); }
             def setlcEt(re: ${referrerEntityClassName}, le: ${myExtendedObjectClassName}): Unit =
 #if ($referrer.isForeignPropertyOptionalEntity())
-            { re.${referrer.foreignPropertyName}(${database.relationOptionalEntitySimpleName}.apply(le)); }
+            { re.set${referrer.foreignPropertyNameInitCap}(${database.relationOptionalEntitySimpleName}.apply(le)); }
 #else
-            { re.${referrer.foreignPropertyName}(le); }
+            { re.set${referrer.foreignPropertyNameInitCap}(le); }
 #end
             def getRfPrNm(): String = { return "${referrer.referrerPropertyName}"; }
         });
@@ -593,7 +593,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 #end
                 return primaryKeyMap;
             }
-            def setRfLs(et: ${myExtendedObjectClassName}, ls: List[${referrerEntityClassName}]): Unit = { et.set${referrer.referrerPropertyNameInitCap}(toScalaList(ls)); }
+            def setRfLs(et: ${myExtendedObjectClassName}, ls: List[${referrerEntityClassName}]): Unit = { et.set${referrer.referrerPropertyNameInitCap}(ls); }
             def newMyCB(): ${referrerCBClassName} = { return referrerBhv.newMyConditionBean(); }
             def qyFKIn(cb: ${referrerCBClassName}, ls: List[${keyJavaNative}]): Unit = {
                 val aliasName: String = cb.getSqlClause().getBasePointAliasName();
@@ -626,7 +626,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
                 cb.specify().column${col.javaName}();
 #end
             }
-            def selRfLs(cb: ${referrerCBClassName}): List[${referrerEntityClassName}] = { return referrerBhv.selectList(cb).asJava; }
+            def selRfLs(cb: ${referrerCBClassName}): List[${referrerEntityClassName}] = { return toDBableEntityList(referrerBhv.selectList(cb)); }
             def getFKVal(re: ${referrerEntityClassName}): ${keyJavaNative} = {
                 val foreignKeyMap: ${keyJavaNative} = new java.util.LinkedHashMap<String,  Object>();
 #foreach ($col in $referrer.localColumnList)
@@ -662,22 +662,22 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return toScalaList(helpPulloutInternally(${myEntityListVariableName}.asJava, new InternalPulloutCallback[${myExtendedObjectClassName}, ${foreignEntityClassName}]() {
             def getFr(et: ${myExtendedObjectClassName}): ${foreignEntityClassName} =
 #if ($fk.isForeignPropertyOptionalEntity())
-            { return et.${fk.foreignPropertyName}().get; }
+            { return et.get${fk.foreignPropertyNameInitCap}().get; }
 #else
-            { return et.${fk.foreignPropertyName}(); }
+            { return et.get${fk.foreignPropertyNameInitCap}(); }
 #end
             def hasRf(): Boolean = { return ${fk.canBeReferrer()}; }
 #if ($fk.canBeReferrer())
 #if ($fk.isOneToOne())
             def setRfLs(et: ${foreignEntityClassName}, ls: List[${myExtendedObjectClassName}]): Unit =
 #if ($fk.isReferrerPropertyOptionalEntityAsOne())
-            { if (!ls.isEmpty()) { et.${fk.referrerPropertyNameAsOne}(${database.relationOptionalEntitySimpleName}.apply(ls.get(0))); } }
+            { if (!ls.isEmpty()) { et.set${fk.referrerPropertyNameInitCapAsOne}(${database.relationOptionalEntitySimpleName}.apply(ls.get(0))); } }
 #else
-            { if (!ls.isEmpty()) { et.${fk.referrerPropertyNameAsOne}(ls.get(0)); } }
+            { if (!ls.isEmpty()) { et.set${fk.referrerPropertyNameInitCapAsOne}(ls.get(0)); } }
 #end
 #else
             def setRfLs(et: ${foreignEntityClassName}, ls: List[${myExtendedObjectClassName}]): Unit =
-            { et.${fk.referrerPropertyName}(toScalaList(ls)); }
+            { et.set${fk.referrerPropertyNameInitCap}(ls); }
 #end
 #else
             def setRfLs(et: ${foreignEntityClassName}, ls: List[${myExtendedObjectClassName}]): Unit =
@@ -697,16 +697,16 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback[${myExtendedObjectClassName}, ${referrerEntityClassName}]() {
             def getFr(et: ${myExtendedObjectClassName}): ${referrerEntityClassName} =
 #if ($referrer.isReferrerPropertyOptionalEntityAsOne())
-            { return et.${referrer.referrerPropertyNameAsOne}().get; }
+            { return et.get${referrer.referrerPropertyNameInitCapAsOne}().get; }
 #else
-            { return et.${referrer.referrerPropertyNameAsOne}(); }
+            { return et.get${referrer.referrerPropertyNameInitCapAsOne}(); }
 #end
             def hasRf(): Boolean = { return ${referrer.canBeReferrer()}; }
             def setRfLs(et: ${referrerEntityClassName}, ls: List[${myExtendedObjectClassName}]): Unit =
 #if ($referrer.isForeignPropertyOptionalEntity())
-            { if (!ls.isEmpty()) { et.${referrer.foreignPropertyName}(${database.relationOptionalEntitySimpleName}.apply(ls.get(0))); } }
+            { if (!ls.isEmpty()) { et.set${referrer.foreignPropertyNameInitCap}(${database.relationOptionalEntitySimpleName}.apply(ls.get(0))); } }
 #else
-            { if (!ls.isEmpty()) { et.${referrer.foreignPropertyName}(ls.get(0)); } }
+            { if (!ls.isEmpty()) { et.set${referrer.foreignPropertyNameInitCap}(ls.get(0)); } }
 #end
         });
     }
@@ -724,7 +724,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      */
     def extract${pkCol.javaName}List(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): List[${pkCol.javaNative}] = {
         return helpExtractListInternally(${myEntityListVariableName}, new InternalExtractCallback[${myExtendedObjectClassName}, ${pkCol.javaNative}]() {
-            def getCV(et: ${myExtendedObjectClassName}): ${pkCol.javaNative} = { return et.${pkCol.uncapitalisedJavaName}(); }
+            def getCV(et: ${myExtendedObjectClassName}): ${pkCol.javaNative} = { return et.get${pkCol.javaName}(); }
         });
     }
 #end
@@ -737,7 +737,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      */
     def extract${uqCol.javaName}List(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): List[${uqCol.javaNative}] = {
         return helpExtractListInternally(${myEntityListVariableName}, new InternalExtractCallback[${myExtendedObjectClassName}, ${uqCol.javaNative}]() {
-            def getCV(et: ${myExtendedObjectClassName}): ${uqCol.javaNative} = { return et.${uqCol.uncapitalisedJavaName}(); }
+            def getCV(et: ${myExtendedObjectClassName}): ${uqCol.javaNative} = { return et.get${uqCol.javaName}(); }
         });
     }
 #end
@@ -823,8 +823,10 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    def update(${myEntityVariableName}: ${myExtendedObjectClassName}): Unit = {
-        doUpdate(${myEntityVariableName}, null);
+    def update(setting: (${myMutableExtendedObjectClassName}) => Unit): Unit = {
+        val mble = new ${myMutableExtendedObjectClassName}();
+        setting(mble);
+        doUpdate(mble.toDBableEntity, null);
     }
 
     protected def doUpdate(${myEntityVariableName}: ${myExtendedObjectClassName}, op: UpdateOption[${myConditionBeanClassName}]): Unit = {
@@ -859,7 +861,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     @Override
     protected def doModify(et: Entity, op: UpdateOption[_ <: ConditionBean]): Unit = {
-        if (op == null) { update(downcast(et)); }
+        if (op == null) { doUpdate(downcast(et), null); }
         else { varyingUpdate(downcast(et), downcast(op)); }
     }
 #if ($table.hasOptimisticLock())
@@ -1412,8 +1414,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param setupper The setup-per of query-insert. (NotNull)
      * @return The inserted count.
      */
-    def queryInsert(setupper: QueryInsertSetupper[${myExtendedObjectClassName}, ${myConditionBeanClassName}]): Integer = {
-        return doQueryInsert(setupper, null);
+    def queryInsert(setupper: QueryInsertSetupper[${myExtendedObjectClassName}, ${myConditionBeanClassName}]): Int = {
+        return Integer2int(doQueryInsert(setupper, null));
     }
 
     protected def doQueryInsert(sp: QueryInsertSetupper[${myExtendedObjectClassName}, ${myConditionBeanClassName}], op: InsertOption[${myConditionBeanClassName}]): Integer = {
@@ -1458,8 +1460,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @return The updated count.
      * @exception NonQueryUpdateNotAllowedException When the query has no condition.
      */
-    def queryUpdate(${myEntityVariableName}: ${myExtendedObjectClassName}, cb: ${myConditionBeanClassName}): Integer = {
-        return doQueryUpdate(${myEntityVariableName}, cb, null);
+    def queryUpdate(${myEntityVariableName}: ${myExtendedObjectClassName}, cb: ${myConditionBeanClassName}): Int = {
+        return Integer2int(doQueryUpdate(${myEntityVariableName}, cb, null));
     }
 
     protected def doQueryUpdate(${myEntityVariableName}: ${myExtendedObjectClassName}, cb: ${myConditionBeanClassName}, op: UpdateOption[${myConditionBeanClassName}]): Integer = {
@@ -1485,8 +1487,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @return The deleted count.
      * @exception NonQueryDeleteNotAllowedException When the query has no condition.
      */
-    def queryDelete(cb: ${myConditionBeanClassName}): Integer = {
-        return doQueryDelete(cb, null);
+    def queryDelete(cb: ${myConditionBeanClassName}): Int = {
+        return Integer2int(doQueryDelete(cb, null));
     }
 
     protected def doQueryDelete(cb: ${myConditionBeanClassName}, op: DeleteOption[${myConditionBeanClassName}]): Integer = {
@@ -2010,7 +2012,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     @Override
     protected def hasVersionNoValue(et: Entity): Boolean = {
 #if ($table.isUseVersionNo())
-        return !(downcast(et).${database.initUncap(${table.versionNoJavaName})}() + "").equals("null");// For primitive type
+        return downcast(et).get${table.versionNoJavaName}() != null;
 #else
         return false;
 #end
@@ -2065,7 +2067,15 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     //                                                                        Scala Helper
     //                                                                        ============
     protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): scala.collection.immutable.List[ENTITY] = {
-         // #pending easy convert for now
+        if (javaList == null) { scala.collection.immutable.List() }
         return scala.collection.immutable.List.fromArray(javaList.toArray()).asInstanceOf[scala.collection.immutable.List[ENTITY]];
+    }
+
+    def toImmutableEntityList(dbleList: Collection[${myExtendedObjectClassName}]): scala.collection.immutable.List[${myImmutableExtendedObjectClassName}] = {
+        return toScalaList(dbleList).map(new ${myImmutableExtendedObjectClassName}(_))
+    }
+
+    def toDBableEntityList(immuList: scala.collection.immutable.List[${myImmutableExtendedObjectClassName}]): List[${myExtendedObjectClassName}] = {
+        return immuList.map(new ${myExtendedObjectClassName}().acceptImmutableEntity(_)).asJava
     }
 }

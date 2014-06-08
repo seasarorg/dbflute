@@ -76,6 +76,7 @@ $database.checkProperties()
 #set ($glDBCurrent = "${glProjectPrefix}DBCurrent")
 #set ($glDBFluteConfig = "${glProjectPrefix}DBFluteConfig")
 #set ($glDBFluteInitializer = "${glProjectPrefix}DBFluteInitializer")
+#set ($glDBFlutist = "${glProjectPrefix}DBFlutist")
 #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
 #set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
 #set ($glImplementedBehaviorSelector = "${glProjectPrefix}ImplementedBehaviorSelector")
@@ -144,6 +145,10 @@ $generator.parse("om/${glResourceDirectory}/allcommon/DBFluteConfig.${glTemplate
 $database.info("    parse('DBFluteInitializer');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteInitializer}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/DBFluteInitializer.${glTemplateFileExtension}",$path,"", "")
+
+$database.info("    parse('DBFlutist');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFlutist}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/DBFlutist.${glTemplateFileExtension}",$path ,"" ,"")
 
 $database.info("    parse('DBMetaInstanceHandler');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBMetaInstanceHandler}.${glClassFileExtension}" )
@@ -304,10 +309,12 @@ $database.info("public void parseTableClass() {")
 
   #set ($myBaseObjectClassName = "${table.baseEntityClassName}")
   #set ($myImmutableBaseObjectClassName = "${table.immutableBaseEntityClassName}")
+  #set ($myMutableBaseObjectClassName = "${table.mutableBaseEntityClassName}")
   #set ($myBaseEntityPackageName = "${glPackageBaseEntity}")
 
   #set ($myExtendedObjectClassName = "${table.extendedEntityClassName}")
   #set ($myImmutableExtendedObjectClassName = "${table.immutableExtendedEntityClassName}")
+  #set ($myMutableExtendedObjectClassName = "${table.mutableExtendedEntityClassName}")
   #set ($myExtendedEntityPackageName = "${glPackageExtendedEntity}")
 
   #set ($myBaseConditionBeanClassName = "${table.baseConditionBeanClassName}")

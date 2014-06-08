@@ -27,7 +27,9 @@ import org.seasar.dbflute.exception.DfTableColumnNameNonCompilableConnectorExcep
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.framework.DfLanguageFramework;
+import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.seasar.dbflute.optional.OptionalEntity;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -157,46 +159,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // -----------------------------------------------------
-    //                                              Optional
-    //                                              --------
-    // #thinking optional property
-    //public boolean isEntityOptionalPropertyAllColumn() { // closet
-    //    return isProperty("isEntityOptionalPropertyAllColumn", false);
-    //}
-    //
-    //public boolean isEntityOptionalPropertyxIfNullable() { // closet
-    //    return isProperty("isEntityOptionalPropertyIfNullable", false);
-    //}
-    //
-    //protected String _entityOptionalPropertyClassName;
-    //protected String _entityOptionalPropertyClassSimpleName;
-    //
-    //protected String getEntityOptionalPropertyClass() { // closet
-    //    return OptionalProperty.class.getName();
-    //    // fixedly for now
-    //    //return getProperty("entityOptionalPropertyClass", OptionalProperty.class.getName());
-    //}
-    //
-    //public String getEntityOptionalPropertyClassName() {
-    //    if (_entityOptionalPropertyClassName == null) {
-    //        _entityOptionalPropertyClassName = getEntityOptionalPropertyClass();
-    //    }
-    //    return _entityOptionalPropertyClassName;
-    //}
-    //
-    //public String getEntityOptionalPropertyClassSimpleName() {
-    //    if (_entityOptionalPropertyClassSimpleName == null) {
-    //        final String className = getEntityOptionalPropertyClassName();
-    //        _entityOptionalPropertyClassSimpleName = Srl.substringLastRear(className, ".");
-    //    }
-    //    return _entityOptionalPropertyClassSimpleName;
-    //}
-
-    // -----------------------------------------------------
     //                                        Basic Optional
     //                                        --------------
     public String getBasicOptionalEntityClass() { // closet
-        return getProperty("basicOptionalEntityClass", getOptionalEntityDBFluteEmbeddedClassName());
+        final DfLanguageImplStyle implStyle = getLanguageDependency().getLanguageImplStyle();
+        final String langClass = implStyle.getBasicOptionalEntityClass();
+        final String embedded = getOptionalEntityDBFluteEmbeddedClassName();
+        return getProperty("basicOptionalEntityClass", langClass != null ? langClass : embedded);
     }
 
     public String getBasicOptionalEntitySimpleName() { // closet
@@ -209,16 +178,16 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return className != null && className.equals(getOptionalEntityDBFluteEmbeddedClassName());
     }
 
-    public boolean isBasicOptionalEntityScalaOption() {
-        final String className = getBasicOptionalEntitySimpleName();
-        return className != null && className.equals("Option");
-    }
-
     public boolean needsBasicOptionalEntityImport() {
         if (isBasicOptionalEntityScalaOption()) {
             return false;
         }
         return true;
+    }
+
+    protected boolean isBasicOptionalEntityScalaOption() {
+        final String className = getBasicOptionalEntitySimpleName();
+        return className != null && className.equals("Option");
     }
 
     // -----------------------------------------------------
@@ -230,7 +199,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public String getRelationOptionalEntityClass() { // closet
         // you should also override TnRelationOptionalFactory if you change this
-        return getProperty("relationOptionalEntityClass", getOptionalEntityDBFluteEmbeddedClassName());
+        final DfLanguageImplStyle implStyle = getLanguageDependency().getLanguageImplStyle();
+        final String langClass = implStyle.getRelationOptionalEntityClass();
+        final String embedded = getOptionalEntityDBFluteEmbeddedClassName();
+        return getProperty("relationOptionalEntityClass", langClass != null ? langClass : embedded);
     }
 
     public String getRelationOptionalEntitySimpleName() {
@@ -241,11 +213,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isRelationOptionalEntityDBFluteEmbeddedClass() {
         final String className = getRelationOptionalEntityClass();
         return className != null && className.equals(getOptionalEntityDBFluteEmbeddedClassName());
-    }
-
-    public boolean isRelationOptionalEntityScalaOption() {
-        final String className = getRelationOptionalEntitySimpleName();
-        return className != null && className.equals("Option");
     }
 
     public boolean needsRelationOptionalEntityImport() {
@@ -266,6 +233,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return true;
     }
 
+    protected boolean isRelationOptionalEntityScalaOption() {
+        final String className = getRelationOptionalEntitySimpleName();
+        return className != null && className.equals("Option");
+    }
+
     // -----------------------------------------------------
     //                             DBFlute Embedded Optional
     //                             -------------------------
@@ -280,12 +252,19 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                              Entity Mutable/Immutable
     //                              ------------------------
-    public String getEntityMutablePrefix() { // closet, basically for Scala
-        return getProperty("entityMutablePrefix", "");
+    public boolean isMakeImmutableEntity() { // closet, basically for Scala
+        DfLanguageDependency lang = getLanguageDependency();
+        return isProperty("isMakeImmutableEntity", lang.getLanguageImplStyle().isMakeImmutableEntity());
     }
 
-    public boolean isMakeImmutableEntity() { // closet, basically for Scala
-        return isProperty("isMakeImmutableEntity", false);
+    public String getEntityDBablePrefix() { // closet, basically for Scala
+        DfLanguageDependency lang = getLanguageDependency();
+        return getProperty("entityDBablePrefix", lang.getLanguageImplStyle().getEntityDBablePrefix());
+    }
+
+    public String getEntityMutablePrefix() { // closet, basically for Scala
+        DfLanguageDependency lang = getLanguageDependency();
+        return getProperty("entityMutablePrefix", lang.getLanguageImplStyle().getEntityMutablePrefix());
     }
 
     // -----------------------------------------------------
@@ -845,7 +824,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isPgReservColumn(String columnName) {
         final Set<String> pgReservColumnList = getPgReservColumnSet();
         if (pgReservColumnList.isEmpty()) {
-            return getBasicProperties().getLanguageDependency().getLanguageGrammar().isPgReservColumn(columnName);
+            return getLanguageDependency().getLanguageGrammar().isPgReservColumn(columnName);
         } else {
             return pgReservColumnList.contains(columnName);
         }
@@ -993,7 +972,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                                               S2Dao
     //                                                                               =====
     public boolean isMakeDaoInterface() { // closet, basically CSharp only
-        final DfLanguageFramework framework = getBasicProperties().getLanguageDependency().getLanguageFramework();
+        final DfLanguageFramework framework = getLanguageDependency().getLanguageFramework();
         return booleanProp("torque.isMakeDaoInterface", framework.isMakeDaoInterface());
     }
 
@@ -1041,6 +1020,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public boolean isCompatibleBeforeJava8() { // closet
-        return isProperty("isCompatibleBeforeJava8", true); // #later false from DBFlute-1.1
+        final boolean defaultValue = getLanguageDependency().getLanguageImplStyle().isCompatibleBeforeJava8();
+        return isProperty("isCompatibleBeforeJava8", defaultValue);
+    }
+
+    // ===================================================================================
+    //                                                                            Language
+    //                                                                            ========
+    protected DfLanguageDependency getLanguageDependency() {
+        return getBasicProperties().getLanguageDependency();
     }
 }

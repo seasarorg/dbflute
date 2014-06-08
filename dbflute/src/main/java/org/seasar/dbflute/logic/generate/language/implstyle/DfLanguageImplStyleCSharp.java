@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.logic.generate.language.implstyle;
 
+import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -42,11 +43,55 @@ public class DfLanguageImplStyleCSharp implements DfLanguageImplStyle {
         return propertyName + " = " + arg;
     }
 
+    public String adjustEntitySetPropertyCall(String basicSetMethod, boolean calledByThis) {
+        return adjustEntitySetMethodCall(basicSetMethod, calledByThis);
+    }
+
     public String adjustConditionBeanLocalCQCall(String cb) {
         return cb + ".Query()";
     }
 
     public String adjustConditionQuerySetMethodCall(String basicSetMethod) {
         return Srl.initCap(basicSetMethod);
+    }
+
+    public String getBasicOptionalEntityClass() {
+        return null; // means DBFlute embedded
+    }
+
+    public String getRelationOptionalEntityClass() {
+        return null; // means DBFlute embedded
+    }
+
+    public boolean isMakeImmutableEntity() {
+        return false;
+    }
+
+    public String getEntityDBablePrefix() {
+        return "";
+    }
+
+    public String getEntityMutablePrefix() {
+        return "";
+    }
+
+    public boolean isImmutablePropertyOptional(Column column) {
+        return !column.isNotNull();
+    }
+
+    public String adjustImmutablePropertyOptionalType(String immutableJavaNative) {
+        return "OptionalProperty<" + immutableJavaNative + ">";
+    }
+
+    public String adjustImmutablePropertyOptionalValue(String nativeExp) {
+        return "OptionalProperty.of(" + nativeExp + ")";
+    }
+
+    public String adjustImmutablePropertyOptionalOrElseNull(String variable) {
+        return variable + ".orElseNull()";
+    }
+
+    public boolean isCompatibleBeforeJava8() {
+        return true; // #later false since 1.1
     }
 }
