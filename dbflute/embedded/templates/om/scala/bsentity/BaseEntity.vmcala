@@ -635,7 +635,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
     //                                                                        Scala Helper
     //                                                                        ============
     protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): scala.collection.immutable.List[ENTITY] = {
-        if (javaList == null) { scala.collection.immutable.List() }
+        if (javaList == null) { return scala.collection.immutable.List(); }
         return scala.collection.immutable.List.fromArray(javaList.toArray).asInstanceOf[scala.collection.immutable.List[ENTITY]];
     }
 
