@@ -14,10 +14,14 @@
 ## governing permissions and limitations under the License.
 ##
 ${database.allClassCopyright}package ${glPackageBaseCQ};
-
 #set ($myClassName = "${myAbstractBaseConditionQueryClassName}")
-import java.lang.Long;
-import java.util._;
+
+import scala.collection.immutable._;
+import scala.collection.JavaConverters._;
+
+import java.util.Collection;
+import java.util.Date;
+import java.sql.Timestamp;
 
 import org.seasar.dbflute.cbean._;
 import org.seasar.dbflute.cbean.AbstractConditionQuery._;
@@ -238,8 +242,8 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (NullAllowed: if null (or empty), no condition)
      */
-    def set${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
-        doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List);
+    def set${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: List[${col.immutableJavaNative}]): Unit = {
+        doSet${tmpJavaName}_InScope(toMutableValueCollectionImplicitly(${tmpUncapitalisedJavaName}List));
     }
 #if ($col.hasClassification())
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
@@ -252,8 +256,8 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
      */
-    def set${tmpJavaName}_InScope_As${col.classificationName}(cdefList: Collection[${glCDef}.${col.classificationName}]): Unit = {
-        doSet${tmpJavaName}_InScope(cTStrL(cdefList));
+    def set${tmpJavaName}_InScope_As${col.classificationName}(cdefList: List[${glCDef}.${col.classificationName}]): Unit = {
+        doSet${tmpJavaName}_InScope(cTStrL(cdefList.asJava));
     }
 #foreach ($group in $classificationTop.groupList)
 
@@ -284,8 +288,8 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope. (NullAllowed: if null (or empty), no condition)
      */
-    def set${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
-        doSet${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List);
+    def set${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: List[${col.immutableJavaNative}]): Unit = {
+        doSet${tmpJavaName}_NotInScope(if (${tmpUncapitalisedJavaName}List != null) { ${tmpUncapitalisedJavaName}List.map(_.asInstanceOf[${col.javaNative}]).asJava } else { null });
     }
 #if ($col.hasClassification())
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
@@ -298,8 +302,8 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
      */
-    def set${tmpJavaName}_NotInScope_As${col.classificationName}(cdefList: Collection[${glCDef}.${col.classificationName}]): Unit = {
-        doSet${tmpJavaName}_NotInScope(cTStrL(cdefList));
+    def set${tmpJavaName}_NotInScope_As${col.classificationName}(cdefList: List[${glCDef}.${col.classificationName}]): Unit = {
+        doSet${tmpJavaName}_NotInScope(cTStrL(cdefList.asJava));
     }
 #end
 
@@ -742,8 +746,8 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (NullAllowed: if null (or empty), no condition)
      */
-    def set${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
-        doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List);
+    def set${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: List[${col.immutableJavaNative}]): Unit = {
+        doSet${tmpJavaName}_InScope(toMutableValueCollectionImplicitly(${tmpUncapitalisedJavaName}List));
     }
 #if ($col.hasClassification())
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
@@ -756,8 +760,8 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
      */
-    def set${tmpJavaName}_InScope_As${col.classificationName}(cdefList: Collection[${glCDef}.${col.classificationName}]): Unit = {
-        doSet${tmpJavaName}_InScope(cTNumL(cdefList, classOf[${col.javaNative}]));
+    def set${tmpJavaName}_InScope_As${col.classificationName}(cdefList: List[${glCDef}.${col.classificationName}]): Unit = {
+        doSet${tmpJavaName}_InScope(cTNumL(cdefList.asJava, classOf[${col.javaNative}]));
     }
 #foreach ($group in $classificationTop.groupList)
 
@@ -788,8 +792,8 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope. (NullAllowed: if null (or empty), no condition)
      */
-    def set${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
-        doSet${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List);
+    def set${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: List[${col.javaNative}]): Unit = {
+        doSet${tmpJavaName}_NotInScope(if (${tmpUncapitalisedJavaName}List != null) { ${tmpUncapitalisedJavaName}List.map(_.asInstanceOf[${col.javaNative}]).asJava } else { null });
     }
 #if ($col.hasClassification())
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
@@ -802,8 +806,8 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
      */
-    def set${tmpJavaName}_NotInScope_As${col.classificationName}(cdefList: Collection[${glCDef}.${col.classificationName}]): Unit = {
-        doSet${tmpJavaName}_NotInScope(cTNumL(cdefList, classOf[${col.javaNative}]));
+    def set${tmpJavaName}_NotInScope_As${col.classificationName}(cdefList: List[${glCDef}.${col.classificationName}]): Unit = {
+        doSet${tmpJavaName}_NotInScope(cTNumL(cdefList.asJava, classOf[${col.javaNative}]));
     }
 #end
 
@@ -1152,8 +1156,8 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (NullAllowed: if null (or empty), no condition)
      */
-    def set${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
-        doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List);
+    def set${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: List[${col.immutableJavaNative}]): Unit = {
+        doSet${tmpJavaName}_InScope(toMutableValueCollectionImplicitly(${tmpUncapitalisedJavaName}List));
     }
 
     protected def doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
@@ -1247,7 +1251,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
     def set${tmpJavaName}_IsNotNull(): Unit = { reg${tmpJavaName}(CK_ISNN, AbstractConditionQuery.DOBJ); }
 #end
 
-    protected def reg${tmpJavaName}(ky: ConditionKey, vl: Object): Unit = { regQ(ky, vl, getCValue${tmpJavaName}(), "${col.name}"); }
+    protected def reg${tmpJavaName}(ky: ConditionKey, vl: Any): Unit = { regQ(ky, vl, getCValue${tmpJavaName}(), "${col.name}"); }
     protected def getCValue${tmpJavaName}(): ConditionValue;
 #end
 #if ($table.isAvailableMyselfScalarCondition())
@@ -1586,6 +1590,13 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         withManualOrder(manualOrderBean);
     }
 #end
+
+    // ===================================================================================
+    //                                                                        Scala Helper
+    //                                                                        ============
+    protected def toMutableValueCollectionImplicitly[SCALA, JAVA](ls: List[SCALA]): Collection[JAVA] = {
+        if (ls != null) { ls.map(_.asInstanceOf[JAVA]).asJava } else { null }
+    }
 
     // ===================================================================================
     //                                                                       Very Internal

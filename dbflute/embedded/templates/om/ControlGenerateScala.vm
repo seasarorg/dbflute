@@ -83,6 +83,7 @@ $database.checkProperties()
 #set ($glImplementedCommonColumnAutoSetupper = "${glProjectPrefix}ImplementedCommonColumnAutoSetupper")
 #set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
 #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
+#set ($glScrBhvHelper = "${glProjectPrefix}ScrBhvHelper")
 #set ($glScrCBeanHelper = "${glProjectPrefix}ScrCBeanHelper")
 #set ($glScrInternalDbGateway = "${glProjectPrefix}ScrInternalDbGateway")
 
@@ -173,6 +174,10 @@ $generator.parse("om/${glResourceDirectory}/allcommon/ImplementedInvokerAssistan
 $database.info("    parse('ImplementedSqlClauseCreator');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glImplementedSqlClauseCreator}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/ImplementedSqlClauseCreator.${glTemplateFileExtension}",$path ,"" ,"")
+
+$database.info("    parse('ScrBhvHelper');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glScrBhvHelper}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/ScrBhvHelper.${glTemplateFileExtension}",$path ,"" ,"")
 
 $database.info("    parse('ScrCBeanHelper');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glScrCBeanHelper}.${glClassFileExtension}" )
@@ -304,8 +309,10 @@ $database.info("public void parseTableClass() {")
 
   #set ($myBaseBhvClassName = "${table.baseBehaviorClassName}")
   #set ($myBaseBhvPackageName = "${glPackageBaseBhv}")
+  #set ($myBaseReferrerLoaderClassName = "${table.baseReferrerLoaderClassName}")
   #set ($myExtendedBhvClassName = "${table.extendedBehaviorClassName}")
   #set ($myExtendedBhvPackageName = "${glPackageExtendedBhv}")
+  #set ($myExtendedReferrerLoaderClassName = "${table.extendedReferrerLoaderClassName}")
 
   #set ($myBaseObjectClassName = "${table.baseEntityClassName}")
   #set ($myImmutableBaseObjectClassName = "${table.immutableBaseEntityClassName}")

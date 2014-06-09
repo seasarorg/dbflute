@@ -17,6 +17,7 @@ ${database.allClassCopyright}package ${glPackageExtendedBhv};
 #set ($myClassName = "${myExtendedBhvClassName}")
 
 import ${glPackageBaseBhv}.${myBaseBhvClassName};
+import ${glPackageBaseBhv}.${myBaseReferrerLoaderClassName};
 
 /**
  * The behavior of ${table.tableDbName}.
@@ -27,4 +28,15 @@ import ${glPackageBaseBhv}.${myBaseBhvClassName};
  * @author ${database.classAuthor}
  */
 class $myClassName extends ${myBaseBhvClassName} {
+}
+
+/**
+ * The referrer loader of ${table.tableDbName}.
+ * <p>
+ * You can implement your original methods here.
+ * This class remains when re-generating.
+ * </p>
+ * @author jflute
+ */
+class ${myExtendedReferrerLoaderClassName} extends ${myBaseReferrerLoaderClassName} {
 }

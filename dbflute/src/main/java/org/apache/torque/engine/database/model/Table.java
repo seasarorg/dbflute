@@ -2174,6 +2174,10 @@ public class Table {
         return getBaseBehaviorClassName() + suffix;
     }
 
+    public String getBaseReferrerLoaderClassName() {
+        return buildBaseEntityClassName("LoaderOf");
+    }
+
     public String getBaseBehaviorExtendsClassName() {
         return isWritable() ? "AbstractBehaviorWritable" : "AbstractBehaviorReadable";
     }
@@ -2266,6 +2270,11 @@ public class Table {
     public String getExtendedBehaviorApFullClassName() {
         final String extendedBehaviorPackage = getBasicProperties().getExtendedBehaviorPackage();
         return extendedBehaviorPackage + "." + getExtendedBehaviorApClassName();
+    }
+
+    public String getExtendedReferrerLoaderClassName() {
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        return buildExtendedEntityClassName(projectPrefix, "LoaderOf");
     }
 
     public String getExtendedConditionBeanClassName() {

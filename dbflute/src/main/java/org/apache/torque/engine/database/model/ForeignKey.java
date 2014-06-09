@@ -1339,6 +1339,10 @@ public class ForeignKey implements Constraint {
         return getTable().getExtendedBehaviorClassName();
     }
 
+    public String getReferrerTableExtendedReferrerLoaderClassName() {
+        return getTable().getExtendedReferrerLoaderClassName();
+    }
+
     public String getReferrerTableDBMetaClassName() {
         return getTable().getDBMetaClassName();
     }
