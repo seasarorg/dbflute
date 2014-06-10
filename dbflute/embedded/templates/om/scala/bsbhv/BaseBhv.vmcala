@@ -701,16 +701,17 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     //                                                                   =================
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
+#set ($foreignImmutableEntityClassName = "${fk.foreignTableImmutableExtendedEntityClassName}")
     /**
      * Pull out the list of foreign table '${foreignEntityClassName}'.
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
      * @return The list of foreign table. (NotNull, EmptyAllowed, NotNullElement)
      */
-    def pullout${fk.foreignPropertyNameInitCap}(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}]): scala.collection.immutable.List[${foreignEntityClassName}] = {
-        return toScalaList(helpPulloutInternally(${myEntityListVariableName}.asJava, new InternalPulloutCallback[${myExtendedObjectClassName}, ${foreignEntityClassName}]() {
+    def pullout${fk.foreignPropertyNameInitCap}(${myEntityListVariableName}: scala.collection.immutable.List[${myImmutableExtendedObjectClassName}]): scala.collection.immutable.List[${foreignImmutableEntityClassName}] = {
+        val dbleList = helpPulloutInternally(toDBableEntityList(${myEntityListVariableName}), new InternalPulloutCallback[${myExtendedObjectClassName}, ${foreignEntityClassName}]() {
             def getFr(et: ${myExtendedObjectClassName}): ${foreignEntityClassName} =
 #if ($fk.isForeignPropertyOptionalEntity())
-            { return et.get${fk.foreignPropertyNameInitCap}().get; }
+            { return et.get${fk.foreignPropertyNameInitCap}().orNull; }
 #else
             { return et.get${fk.foreignPropertyNameInitCap}(); }
 #end
@@ -731,21 +732,24 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
             def setRfLs(et: ${foreignEntityClassName}, ls: List[${myExtendedObjectClassName}]): Unit =
             { throw new UnsupportedOperationException(); }
 #end
-        }));
+        });
+        return toScalaList(dbleList).map(new ${foreignImmutableEntityClassName}(_));
     }
+
 #end
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerEntityClassName = $referrer.referrerTableExtendedEntityClassName)
+#set ($referrerImmutableEntityClassName = $referrer.referrerTableImmutableExtendedEntityClassName)
     /**
      * Pull out the list of referrer-as-one table '${referrerEntityClassName}'.
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
      * @return The list of referrer-as-one table. (NotNull, EmptyAllowed, NotNullElement)
      */
-    def pullout${referrer.referrerPropertyNameInitCapAsOne}(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): List[${referrerEntityClassName}] = {
-        return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback[${myExtendedObjectClassName}, ${referrerEntityClassName}]() {
+    def pullout${referrer.referrerPropertyNameInitCapAsOne}(${myEntityListVariableName}: scala.collection.immutable.List[${myImmutableExtendedObjectClassName}]): scala.collection.immutable.List[${referrerImmutableEntityClassName}] = {
+        val dbleList = helpPulloutInternally(toDBableEntityList(${myEntityListVariableName}), new InternalPulloutCallback[${myExtendedObjectClassName}, ${referrerEntityClassName}]() {
             def getFr(et: ${myExtendedObjectClassName}): ${referrerEntityClassName} =
 #if ($referrer.isReferrerPropertyOptionalEntityAsOne())
-            { return et.get${referrer.referrerPropertyNameInitCapAsOne}().get; }
+            { return et.get${referrer.referrerPropertyNameInitCapAsOne}().orNull; }
 #else
             { return et.get${referrer.referrerPropertyNameInitCapAsOne}(); }
 #end
@@ -757,9 +761,10 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
             { if (!ls.isEmpty()) { et.set${referrer.foreignPropertyNameInitCap}(ls.get(0)); } }
 #end
         });
+        return toScalaList(dbleList).map(new ${referrerImmutableEntityClassName}(_));
     }
-#end
 
+#end
     // ===================================================================================
     //                                                                      Extract Column
     //                                                                      ==============
@@ -770,10 +775,10 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
      * @return The list of the column value. (NotNull, EmptyAllowed, NotNullElement)
      */
-    def extract${pkCol.javaName}List(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): List[${pkCol.javaNative}] = {
-        return helpExtractListInternally(${myEntityListVariableName}, new InternalExtractCallback[${myExtendedObjectClassName}, ${pkCol.javaNative}]() {
+    def extract${pkCol.javaName}List(${myEntityListVariableName}: scala.collection.immutable.List[${myImmutableExtendedObjectClassName}]): scala.collection.immutable.List[${pkCol.immutableJavaNative}] = {
+        return toScalaList(helpExtractListInternally(toDBableEntityList(${myEntityListVariableName}), new InternalExtractCallback[${myExtendedObjectClassName}, ${pkCol.javaNative}]() {
             def getCV(et: ${myExtendedObjectClassName}): ${pkCol.javaNative} = { return et.get${pkCol.javaName}(); }
-        });
+        })).map(_.asInstanceOf[${pkCol.immutableJavaNative}]);
     }
 #end
 #foreach ($uqCol in $table.singleUniqueUQColumnList)
@@ -783,10 +788,10 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
      * @return The list of the column value. (NotNull, EmptyAllowed, NotNullElement)
      */
-    def extract${uqCol.javaName}List(${myEntityListVariableName}: List[${myExtendedObjectClassName}]): List[${uqCol.javaNative}] = {
-        return helpExtractListInternally(${myEntityListVariableName}, new InternalExtractCallback[${myExtendedObjectClassName}, ${uqCol.javaNative}]() {
+    def extract${uqCol.javaName}List(${myEntityListVariableName}: scala.collection.immutable.List[${myImmutableExtendedObjectClassName}]): scala.collection.immutable.List[${uqCol.immutableJavaNative}] = {
+        return toScalaList(helpExtractListInternally(toDBableEntityList(${myEntityListVariableName}), new InternalExtractCallback[${myExtendedObjectClassName}, ${uqCol.javaNative}]() {
             def getCV(et: ${myExtendedObjectClassName}): ${uqCol.javaNative} = { return et.get${uqCol.javaName}(); }
-        });
+        })).map(_.asInstanceOf[${uqCol.immutableJavaNative}]);
     }
 #end
 #if ($table.isWritable())
@@ -808,17 +813,14 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * ... = ${myEntityVariableName}.getPK...(); <span style="color: #3F7E5E">// if auto-increment, you can get the value after</span>
      * </pre>
      * <p>While, when the entity is created by select, all columns are registered.</p>
-     * @param ${myEntityVariableName} The entity of insert target. (NotNull, PrimaryKeyNullAllowed: when auto-increment)
+     * @param entityCall The callback for entity of insert target. (NotNull, PrimaryKeyNullAllowed: when auto-increment)
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    def insert(${myEntityVariableName}: ${myExtendedObjectClassName}): Unit = {
-#if ($database.isCompatibleInsertColumnNotNullOnly())
-        InsertOption[${myConditionBeanClassName}] option = new InsertOption[${myConditionBeanClassName}]();val option: InsertOption[${myConditionBeanClassName}] = new InsertOption[${myConditionBeanClassName}]();
-        option.xtoBeCompatibleInsertColumnNotNullOnly();
-        doInsert(${myEntityVariableName}, option);
-#else
-        doInsert(${myEntityVariableName}, null);
-#end
+    def insert(entityCall: (${myMutableExtendedObjectClassName}) => Unit): Unit = {
+        assertObjectNotNull("entityCall", entityCall);
+        val mble = new ${myMutableExtendedObjectClassName}();
+        entityCall(mble);
+        doInsert(mble.toDBableEntity, null);
     }
 
     protected def doInsert(${myEntityVariableName}: ${myExtendedObjectClassName}, op: InsertOption[${myConditionBeanClassName}]): Unit = {
@@ -837,8 +839,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     @Override
     protected def doCreate(et: Entity, op: InsertOption[_ <: ConditionBean]): Unit = {
-        if (op == null) { insert(downcast(et)); }
-        else { varyingInsert(downcast(et), downcast(op)); }
+        if (op == null) { doInsert(downcast(et), null); }
+        else { doInsert(downcast(et), downcast(op)); }
     }
 
     /**
@@ -862,7 +864,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      *     ...
      * }
      * </pre>
-     * @param ${myEntityVariableName} The entity of update target. (NotNull, PrimaryKeyNotNull, ConcurrencyColumnRequired)
+     * @param entityCall The callback for entity of update target. (NotNull, basically PrimaryKeyNotNull)
 #if ($table.hasOptimisticLock())
      * @exception EntityAlreadyUpdatedException When the entity has already been updated.
 #else
@@ -871,10 +873,16 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    def update(setting: (${myMutableExtendedObjectClassName}) => Unit): Unit = {
+    def update(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (UpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+        assertObjectNotNull("entityCall", entityCall);
         val mble = new ${myMutableExtendedObjectClassName}();
-        setting(mble);
-        doUpdate(mble.toDBableEntity, null);
+        entityCall(mble);
+        var option: UpdateOption[${myConditionBeanClassName}] = null;
+        if (optionCall != null) {
+            option = new UpdateOption[${myConditionBeanClassName}]();
+            optionCall(option);
+        }
+        doUpdate(mble.toDBableEntity, option);
     }
 
     protected def doUpdate(${myEntityVariableName}: ${myExtendedObjectClassName}, op: UpdateOption[${myConditionBeanClassName}]): Unit = {
@@ -910,7 +918,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     @Override
     protected def doModify(et: Entity, op: UpdateOption[_ <: ConditionBean]): Unit = {
         if (op == null) { doUpdate(downcast(et), null); }
-        else { varyingUpdate(downcast(et), downcast(op)); }
+        else { doUpdate(downcast(et), downcast(op)); }
     }
 #if ($table.hasOptimisticLock())
 
@@ -928,13 +936,16 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
      * ${myEntityVariableName}Bhv.<span style="color: #DD4747">updateNonstrict</span>(${myEntityVariableName});
      * </pre>
-     * @param ${myEntityVariableName} The entity of update target. (NotNull, PrimaryKeyNotNull)
+     * @param entityCall The callback for entity of update target. (NotNull, basically PrimaryKeyNotNull)
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    def updateNonstrict(${myEntityVariableName}: ${myExtendedObjectClassName}): Unit = {
-        doUpdateNonstrict(${myEntityVariableName}, null);
+    def updateNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit): Unit = {
+        assertObjectNotNull("entityCall", entityCall);
+        val mble = new ${myMutableExtendedObjectClassName}();
+        entityCall(mble);
+        doUpdateNonstrict(mble.toDBableEntity, null);
     }
 
     protected def doUpdateNonstrict(${myEntityVariableName}: ${myExtendedObjectClassName}, op: UpdateOption[${myConditionBeanClassName}]): Unit = {
@@ -948,8 +959,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     @Override
     protected def doModifyNonstrict(et: Entity, op: UpdateOption[_ <: ConditionBean]): Unit = {
 #if ($table.hasOptimisticLock())
-        if (op == null) { updateNonstrict(downcast(et)); }
-        else { varyingUpdateNonstrict(downcast(et), downcast(op)); }
+        if (op == null) { doUpdateNonstrict(downcast(et), null); }
+        else { doUpdateNonstrict(downcast(et), downcast(op)); }
 #else
         doModify(et, op);
 #end
@@ -963,7 +974,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 #end
      * if (the entity has no PK) { insert() } else { update(), but no data, insert() } <br />
      * <p><span style="color: #DD4747; font-size: 120%">Attention, you cannot update by unique keys instead of PK.</span></p>
-     * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
+     * @param entityCall The callback for entity of insert or update target. (NotNull)
 #if ($table.hasOptimisticLock())
      * @exception EntityAlreadyUpdatedException When the entity has already been updated.
 #else
@@ -972,8 +983,11 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    def insertOrUpdate(${myEntityVariableName}: ${myExtendedObjectClassName}): Unit = {
-        doInesrtOrUpdate(${myEntityVariableName}, null, null);
+    def insertOrUpdate(entityCall: (${myMutableExtendedObjectClassName}) => Unit): Unit = {
+        assertObjectNotNull("entityCall", entityCall);
+        val mble = new ${myMutableExtendedObjectClassName}();
+        entityCall(mble);
+        doInesrtOrUpdate(mble.toDBableEntity, null, null);
     }
 
     protected def doInesrtOrUpdate(${myEntityVariableName}: ${myExtendedObjectClassName}, iop: InsertOption[${myConditionBeanClassName}], uop: UpdateOption[${myConditionBeanClassName}]): Unit = {
@@ -987,7 +1001,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     @Override
     protected def doCreateOrModify(et: Entity, iop: InsertOption[_ <: ConditionBean], uop: UpdateOption[_ <: ConditionBean]): Unit = {
-        if (iop == null && uop == null) { insertOrUpdate(downcast(et)); }
+        if (iop == null && uop == null) { doInesrtOrUpdate(downcast(et), null, null); }
         else {
             val niop = if (iop != null) { iop } else { new InsertOption[${myConditionBeanClassName}]() };
             val nuop = if (uop != null) { uop } else { new UpdateOption[${myConditionBeanClassName}]() };
@@ -1000,13 +1014,16 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * Insert or update the entity non-strictly modified-only. (DefaultConstraintsEnabled, NonExclusiveControl) <br />
      * if (the entity has no PK) { insert() } else { update(), but no data, insert() }
      * <p><span style="color: #DD4747; font-size: 120%">Attention, you cannot update by unique keys instead of PK.</span></p>
-     * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
+     * @param entityCall The callback for entity of insert or update target. (NotNull)
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    def insertOrUpdateNonstrict(${myEntityVariableName}: ${myExtendedObjectClassName}): Unit = {
-        doInesrtOrUpdateNonstrict(${myEntityVariableName}, null, null);
+    def insertOrUpdateNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit): Unit = {
+        assertObjectNotNull("entityCall", entityCall);
+        val mble = new ${myMutableExtendedObjectClassName}();
+        entityCall(mble);
+        doInesrtOrUpdateNonstrict(mble.toDBableEntity, null, null);
     }
 
     protected def doInesrtOrUpdateNonstrict(${myEntityVariableName}: ${myExtendedObjectClassName}, iop: InsertOption[${myConditionBeanClassName}], uop: UpdateOption[${myConditionBeanClassName}]): Unit = {
@@ -1020,7 +1037,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     @Override
     protected def doCreateOrModifyNonstrict(et: Entity, iop: InsertOption[_ <: ConditionBean], uop: UpdateOption[_ <: ConditionBean]): Unit = {
 #if ($table.hasOptimisticLock())
-        if (iop == null && uop == null) { insertOrUpdateNonstrict(downcast(et)); }
+        if (iop == null && uop == null) { doInesrtOrUpdateNonstrict(downcast(et), null, null); }
         else {
             val niop = if (iop != null) { iop } else { new InsertOption[${myConditionBeanClassName}]() };
             val nuop = if (uop != null) { uop } else { new UpdateOption[${myConditionBeanClassName}]() };
@@ -2095,7 +2112,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     protected def doCallbackLoader(dbleList: List[${myExtendedObjectClassName}], loaderCall: (${myExtendedReferrerLoaderClassName}) => Unit = null): Unit = {
         if (loaderCall != null) {
             val loader = new ${myExtendedReferrerLoaderClassName}();
-            loader.selectedList = dbleList.asInstanceOf[List[${myExtendedObjectClassName}]];
+            loader.ready(dbleList.asInstanceOf[List[${myExtendedObjectClassName}]], _behaviorSelector);
             loaderCall(loader);
         }
     }
@@ -2143,7 +2160,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     }
 
     def toDBableEntityList(immuList: scala.collection.immutable.List[${myImmutableExtendedObjectClassName}]): List[${myExtendedObjectClassName}] = {
-        return immuList.map(new ${myExtendedObjectClassName}().acceptImmutableEntity(_)).asJava
+        return immuList.map(new ${myExtendedObjectClassName}().acceptImmutable(_)).asJava
     }
 }
 
@@ -2158,32 +2175,54 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 /* _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
 
 /**
+ * The referrer loader of ${table.basicInfoDispString}.
  * @author jflute
  */
 class ${myBaseReferrerLoaderClassName} {
 
     protected var _selectedList: List[${myExtendedObjectClassName}] = null;
-    def selectedList: List[${myExtendedObjectClassName}] = {
-        return _selectedList;
-    }
-    def selectedList_=(ls: List[${myExtendedObjectClassName}]): Unit = {
-        _selectedList = ls;
-    }
+    protected var _selector: BehaviorSelector = null;
+    protected var _myBhv: ${myExtendedBhvClassName} = null; // lazy-loaded
+
+    def ready(selectedList: List[${myExtendedObjectClassName}], selector: BehaviorSelector): ${myExtendedReferrerLoaderClassName} =
+    { _selectedList = selectedList; _selector = selector; return this.asInstanceOf[${myExtendedReferrerLoaderClassName}]; }
+
+    protected def myBhv: ${myExtendedBhvClassName} =
+    { if (_myBhv != null) { _myBhv } else { _myBhv = _selector.select(classOf[${myExtendedBhvClassName}]); _myBhv } }
 #foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
-#set ($referrerBhvClassName = "${referrer.referrerTableExtendedBehaviorClassName}")
 #set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($referrerLoaderClassName = "${referrer.referrerTableExtendedReferrerLoaderClassName}")
 
-    var _referrer${referrer.referrerPropertyNameInitCap}List: List[${referrerEntityClassName}] = null;
-    def load${referrer.referrerPropertyNameInitCap}(setupCall: (${referrerCBClassName}) => Unit): ScrNestedReferrerLoader[${referrer.referrerTableExtendedReferrerLoaderClassName}] = {
-        ${glDBFlutist}.${table.behaviorInstanceMethodName}.load${referrer.referrerPropertyNameInitCap}(_selectedList, setupCall).withNestedReferrer(new ReferrerListHandler[${referrerEntityClassName}]() {
-            def handle(referrerList: List[${referrerEntityClassName}]): Unit = { _referrer${referrer.referrerPropertyNameInitCap}List = referrerList; }
+    protected var _referrer${referrer.referrerPropertyNameInitCap}: List[${referrerEntityClassName}] = null;
+    def load${referrer.referrerPropertyNameInitCap}(cbCall: (${referrerCBClassName}) => Unit): ScrNestedReferrerLoader[${referrerLoaderClassName}] = {
+        myBhv.load${referrer.referrerPropertyNameInitCap}(_selectedList, cbCall).withNestedReferrer(new ReferrerListHandler[${referrerEntityClassName}]() {
+            def handle(referrerList: List[${referrerEntityClassName}]): Unit = { _referrer${referrer.referrerPropertyNameInitCap} = referrerList; }
         });
-        return new ScrNestedReferrerLoader[${referrer.referrerTableExtendedReferrerLoaderClassName}](() => {
-            val nestedLoader = new ${referrer.referrerTableExtendedReferrerLoaderClassName}();
-            nestedLoader.selectedList = _referrer${referrer.referrerPropertyNameInitCap}List;
-            nestedLoader;
-        });
+        return createNested(() => { new ${referrerLoaderClassName}().ready(_referrer${referrer.referrerPropertyNameInitCap}, _selector); });
     }
 #end
+#foreach ($fk in $table.foreignKeys)
+#set ($foreignEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
+#set ($foreignImmutableEntityClassName = "${fk.foreignTableImmutableExtendedEntityClassName}")
+#set ($foreignLoaderClassName = "${fk.foreignTableExtendedReferrerLoaderClassName}")
+
+    protected var _foreign${fk.foreignPropertyNameInitCap}List: List[${foreignEntityClassName}] = null;
+    def pullout${fk.foreignPropertyNameInitCap}: ${foreignLoaderClassName} = {
+        if (_foreign${fk.foreignPropertyNameInitCap}List == null)
+        { _foreign${fk.foreignPropertyNameInitCap}List = myBhv.pullout${fk.foreignPropertyNameInitCap}(toScalaList(_selectedList).map(new ${myImmutableExtendedObjectClassName}(_))).map(new ${foreignEntityClassName}().acceptImmutable(_)).asJava }
+        return new ${foreignLoaderClassName}().ready(_foreign${fk.foreignPropertyNameInitCap}List, _selector);
+    }
+#end
+
+    protected def createNested[LOADER](loaderCall: () => LOADER): ScrNestedReferrerLoader[LOADER] =
+    { return new ScrNestedReferrerLoader[LOADER](loaderCall); }
+
+    protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): scala.collection.immutable.List[ENTITY] = {
+        if (javaList == null) { scala.collection.immutable.List() }
+        return scala.collection.immutable.List.fromArray(javaList.toArray()).asInstanceOf[scala.collection.immutable.List[ENTITY]];
+    }
+
+    def selectedList: List[${myExtendedObjectClassName}] = { _selectedList; }
+    def selector: BehaviorSelector = { _selector; }
 }

@@ -95,45 +95,22 @@ import ${table.relationalNullObjectProviderPackage}._;
 abstract class $myClassName(dble: ${myExtendedObjectClassName}) extends Serializable {
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    // -----------------------------------------------------
-    //                                                Column
-    //                                                ------
-#foreach ($col in $table.columns)
-    /** ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} */
-    protected val _${col.uncapitalisedJavaName}: ${col.immutablePropertyDefinitionType} = ${col.getImmutablePropertyGetterReturningValue("dble.get${col.javaName}")};
-
-#end
-    // -----------------------------------------------------
-    //                                              Internal
-    //                                              --------
-    /** The unique-driven properties for this entity. (NotNull) */
-    protected val __uniqueDrivenProperties: Set[String] = toScalaStringSet(dble.myuniqueDrivenProperties());
-
-    /** The modified properties for this entity. (NotNull) */
-    protected val __modifiedProperties: Set[String] = toScalaStringSet(dble.modifiedProperties());
-
-    protected def toScalaStringSet(javaList: java.util.Collection[String]): Set[String] =
-    { Set(javaList.toArray).asInstanceOf[Set[String]] }
-
-    // ===================================================================================
     //                                                                           Case Like
     //                                                                           =========
     def copy(
 #set ($argIndex = 0)
 #foreach ($col in $table.columns)
-        #if ($argIndex > 0),#end ${col.uncapitalisedJavaName}: ${col.immutablePropertyDefinitionType} = _${col.uncapitalisedJavaName}
+        #if ($argIndex > 0),#end ${col.uncapitalisedJavaName}: ${col.immutablePropertyDefinitionType} = ${col.uncapitalisedJavaName}
 #set ($argIndex = $argIndex + 1)
 #end
     ): ${myImmutableExtendedObjectClassName} = {
-        val newDble = new ${myExtendedObjectClassName}();
-        newDble.myuniqueDrivenProperties.addAll(__uniqueDrivenProperties.asJava); // inherit
-        newDble.modifiedProperties.addAll(__modifiedProperties.asJava); // inherit
+        val newDble = new ${myExtendedObjectClassName}
+        newDble.myuniqueDrivenProperties.addAll(dble.myuniqueDrivenProperties) // inherit
+        newDble.modifiedProperties.addAll(dble.modifiedProperties) // inherit
 #foreach ($col in $table.columns)
-        if (!${col.uncapitalisedJavaName}.equals(_${col.uncapitalisedJavaName})) { newDble.set${col.javaName}${col.classificationMethodSuffix}(${col.convertToImmutablePropertyOrElseNull("_${col.uncapitalisedJavaName}")}); }
+        if (!${col.uncapitalisedJavaName}.equals(this.${col.uncapitalisedJavaName})) { newDble.set${col.javaName}${col.classificationMethodSuffix}(${col.convertToImmutablePropertyOrElseNull("${col.uncapitalisedJavaName}")}) }
 #end
-        return new ${myImmutableExtendedObjectClassName}(newDble);
+        new ${myImmutableExtendedObjectClassName}(newDble)
     }
 
     // ===================================================================================
@@ -141,8 +118,11 @@ abstract class $myClassName(dble: ${myExtendedObjectClassName}) extends Serializ
     //                                                                         ===========
     def getTableDbName(): String = { dble.getTableDbName }
     def getDBMeta(): DBMeta = { dble.getDBMeta }
-    def getMyUniqueDrivenProperties(): Set[String] = { __uniqueDrivenProperties }
-    def getModifiedProperties(): Set[String] = { __modifiedProperties }
+    def getMyUniqueDrivenProperties(): Set[String] = { toScalaStringSet(dble.myuniqueDrivenProperties) }
+    def getModifiedProperties(): Set[String] = { toScalaStringSet(dble.modifiedProperties) }
+
+    protected def toScalaStringSet(javaList: java.util.Collection[String]): Set[String] =
+    { Set(javaList.toArray).asInstanceOf[Set[String]] }
 
 #if ($table.hasClassification())
     // ===================================================================================
@@ -230,28 +210,22 @@ abstract class $myClassName(dble: ${myExtendedObjectClassName}) extends Serializ
 #set ($foreignTable = $fk.foreignTable)
 #set ($foreignEntityClassName = "${fk.foreignPropertyImmutableEntityDefinitionType}")
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
-    /** ${fk.foreignSimpleDisp}. */
-    protected val ${foreignVariableName}: ${foreignEntityClassName} = dble.toImmutable${fk.foreignJavaBeansRulePropertyNameInitCap}
-
     /**
      * [get] ${fk.foreignDispForJavaDoc}
      * @return The entity of foreign property '${fk.foreignJavaBeansRulePropertyName}'. (EmptyAllowed: when e.g. null FK column, no setupSelect)
      */
-    def ${fk.foreignPropertyName}: ${foreignEntityClassName} = { ${foreignVariableName} }
+    def ${fk.foreignPropertyName}: ${foreignEntityClassName} = { dble.toImmutable${fk.foreignJavaBeansRulePropertyNameInitCap} }
 
 #end
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.referrerPropertyImmutableEntityDefinitionTypeAsOne}")
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
-    /** ${referrer.referrerSimpleDispAsOne}. */
-    protected val ${referrerVariableName}: ${referrerEntityClassName} = dble.toImmutable${referrer.referrerJavaBeansRulePropertyNameInitCapAsOne}
-
     /**
      * [get] ${referrer.referrerDispAsOneForJavaDoc}
      * @return the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (EmptyAllowed: when e.g. no data, no setupSelect)
      */
-    def ${referrer.referrerPropertyNameAsOne}: ${referrerEntityClassName} = { return ${referrerVariableName}; }
+    def ${referrer.referrerPropertyNameAsOne}: ${referrerEntityClassName} = { dble.toImmutable${referrer.referrerJavaBeansRulePropertyNameInitCapAsOne} }
 
 #end
     // ===================================================================================
@@ -261,14 +235,11 @@ abstract class $myClassName(dble: ${myExtendedObjectClassName}) extends Serializ
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.referrerTableImmutableExtendedEntityClassName}")
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
-    /** ${referrer.referrerSimpleDisp}. */
-    protected var ${referrerVariableName}: List[${referrerEntityClassName}] = dble.toImmutable${referrer.referrerJavaBeansRulePropertyNameInitCap}
-
     /**
      * [get] ${referrer.referrerDispForJavaDoc}
      * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: even if no loading, returns empty list)
      */
-    def ${referrer.referrerPropertyName}: List[${referrerEntityClassName}] = { return ${referrerVariableName}; }
+    def ${referrer.referrerPropertyName}: List[${referrerEntityClassName}] = { dble.toImmutable${referrer.referrerJavaBeansRulePropertyNameInitCap} }
 
 #end
     // ===================================================================================
@@ -310,7 +281,7 @@ abstract class $myClassName(dble: ${myExtendedObjectClassName}) extends Serializ
      * Convert to display string of entity's data. (no relation data)
      * @return The display string of all columns and relation existences. (NotNull)
      */
-    override def toString(): String = { return dble.buildDisplayString(FunCustodial.toClassTitle(this), true, true); }
+    override def toString(): String = { dble.buildDisplayString(FunCustodial.toClassTitle(this), true, true) }
 
 #set ($propertyLoopIndex = 0)
 #foreach ($col in $table.columns)
@@ -332,7 +303,7 @@ abstract class $myClassName(dble: ${myExtendedObjectClassName}) extends Serializ
      * @return The value of the column '${col.name}'. (NotNull but EmptyAllowed if null in database)
 #end
      */
-    def ${col.uncapitalisedJavaName}: ${col.immutablePropertyDefinitionType} = { return _${col.uncapitalisedJavaName}; }
+    def ${col.uncapitalisedJavaName}: ${col.immutablePropertyDefinitionType} = { ${col.getImmutablePropertyGetterReturningValue("dble.get${col.javaName}")} }
 #set ($propertyLoopIndex = $propertyLoopIndex + 1)
 #end
 }

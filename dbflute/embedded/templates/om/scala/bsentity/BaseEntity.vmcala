@@ -144,18 +144,18 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
      * Accept immutable entity to initialize this.
      * @return this. (NotNull)
      */
-    def acceptImmutableEntity(immu: ${myImmutableExtendedObjectClassName}): ${myExtendedObjectClassName} = {
+    def acceptImmutable(immu: ${myImmutableExtendedObjectClassName}): ${myExtendedObjectClassName} = {
 #foreach ($col in $table.columns)
         set${col.javaName}${col.classificationMethodSuffix}(${col.convertToImmutablePropertyOrElseNull("immu.${col.uncapitalisedJavaName}")});
 #end
 #foreach ($fk in $table.foreignKeys)
-        set${fk.foreignJavaBeansRulePropertyNameInitCap}(immu.${fk.foreignPropertyName}.map(new ${fk.foreignTableExtendedEntityClassName}().acceptImmutableEntity(_)))
+        set${fk.foreignJavaBeansRulePropertyNameInitCap}(immu.${fk.foreignPropertyName}.map(new ${fk.foreignTableExtendedEntityClassName}().acceptImmutable(_)))
 #end
 #foreach ($referrer in $table.referrerAsOneList)
-        set${referrer.referrerJavaBeansRulePropertyNameInitCapAsOne}(immu.${referrer.referrerPropertyNameAsOne}.map(new ${referrer.referrerTableExtendedEntityClassName}().acceptImmutableEntity(_)))
+        set${referrer.referrerJavaBeansRulePropertyNameInitCapAsOne}(immu.${referrer.referrerPropertyNameAsOne}.map(new ${referrer.referrerTableExtendedEntityClassName}().acceptImmutable(_)))
 #end
 #foreach ($referrer in $table.referrerAsManyList)
-        set${referrer.referrerJavaBeansRulePropertyNameInitCap}(immu.${referrer.referrerPropertyName}.map(new ${referrer.referrerTableExtendedEntityClassName}().acceptImmutableEntity(_)).asJava)
+        set${referrer.referrerJavaBeansRulePropertyNameInitCap}(immu.${referrer.referrerPropertyName}.map(new ${referrer.referrerTableExtendedEntityClassName}().acceptImmutable(_)).asJava)
 #end
         __uniqueDrivenProperties.clear();
         immu.getMyUniqueDrivenProperties().foreach(__uniqueDrivenProperties.addPropertyName(_))

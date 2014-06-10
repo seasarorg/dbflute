@@ -1304,6 +1304,14 @@ public class ForeignKey implements Constraint {
         return getForeignTable().getImmutableExtendedEntityClassName();
     }
 
+    public String getForeignTableExtendedBehaviorClassName() {
+        return getForeignTable().getExtendedBehaviorClassName();
+    }
+
+    public String getForeignTableExtendedReferrerLoaderClassName() {
+        return getForeignTable().getExtendedReferrerLoaderClassName();
+    }
+
     public String getForeignTableDBMetaClassName() {
         return getForeignTable().getDBMetaClassName();
     }

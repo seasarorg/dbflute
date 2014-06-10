@@ -765,7 +765,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}>() {
             public ${foreignEntityClassName} getFr(${myExtendedObjectClassName} et)
 #if ($fk.isForeignPropertyOptionalEntity())
-            { return et.get${fk.foreignPropertyNameInitCap}().get(); }
+            { return et.get${fk.foreignPropertyNameInitCap}().orElseNull(); }
 #else
             { return et.get${fk.foreignPropertyNameInitCap}(); }
 #end
@@ -800,7 +800,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${referrerEntityClassName}>() {
             public ${referrerEntityClassName} getFr(${myExtendedObjectClassName} et)
 #if ($referrer.isReferrerPropertyOptionalEntityAsOne())
-            { return et.get${referrer.referrerPropertyNameInitCapAsOne}().get(); }
+            { return et.get${referrer.referrerPropertyNameInitCapAsOne}().orElseNull(); }
 #else
             { return et.get${referrer.referrerPropertyNameInitCapAsOne}(); }
 #end
