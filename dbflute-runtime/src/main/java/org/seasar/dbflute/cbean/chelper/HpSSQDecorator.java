@@ -20,8 +20,8 @@ import org.seasar.dbflute.cbean.SpecifyQuery;
 
 /**
  * The decorator for ScalarCondition (the old name: ScalarSubQuery).
- * @author jflute
  * @param <CB> The type of condition-bean.
+ * @author jflute
  */
 public class HpSSQDecorator<CB extends ConditionBean> {
 

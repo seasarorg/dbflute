@@ -21,8 +21,8 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 
 /**
  * The option for ScalarCondition (the old name: ScalarSubQuery).
- * @author jflute
  * @param <CB> The type of condition-bean.
+ * @author jflute
  */
 public class HpSSQOption<CB extends ConditionBean> {
 

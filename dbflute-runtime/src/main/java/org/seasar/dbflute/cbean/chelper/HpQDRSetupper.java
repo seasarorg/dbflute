@@ -21,8 +21,8 @@ import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 
 /**
  * The set-upper for (Query)DerivedReferrer.
- * @author jflute
  * @param <CB> The type of condition-bean.
+ * @author jflute
  */
 public interface HpQDRSetupper<CB extends ConditionBean> {
 

@@ -20,8 +20,8 @@ import org.seasar.dbflute.cbean.SubQuery;
 
 /**
  * The function for ScalarCondition (the old name: ScalarSubQuery).
- * @author jflute
  * @param <CB> The type of condition-bean.
+ * @author jflute
  */
 public class HpSSQFunction<CB extends ConditionBean> {
 

@@ -20,8 +20,8 @@ import org.seasar.dbflute.cbean.SpecifyQuery;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 
 /**
- * @author jflute
  * @param <CB> The type of condition-bean.
+ * @author jflute
  */
 public class HpColQyOperand<CB extends ConditionBean> {
 

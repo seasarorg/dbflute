@@ -1935,15 +1935,6 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * @param date The date to calculate. (NotNull)
-     * @return The count of year as distance between the two date. (MinusAllowed)
-     * @deprecated use {@link #calculateCalendarDistanceYears(Date)}
-     */
-    public int calculateDistanceYears(Date date) {
-        return calculateCalendarDistanceYears(date);
-    }
-
-    /**
      * Calculate calendar distance of month between two date. <br />
      * <pre>
      * e.g.
@@ -1975,15 +1966,6 @@ public class HandyDate implements Serializable {
             countMonths = countMonths + plusMonths;
         }
         return -1 * countMonths; // -1 for greater: plus, less: minus
-    }
-
-    /**
-     * @param date The date to calculate. (NotNull)
-     * @return The count of month as distance between the two date. (MinusAllowed)
-     * @deprecated use {@link #calculateCalendarDistanceMonths(Date)}
-     */
-    public int calculateDistanceMonths(Date date) {
-        return calculateCalendarDistanceMonths(date);
     }
 
     /**
@@ -2019,24 +2001,6 @@ public class HandyDate implements Serializable {
             countDays = countDays + plusDays;
         }
         return -1 * countDays; // -1 for greater: plus, less: minus
-    }
-
-    /**
-     * Calculate calendar distance of day between two date.
-     * <pre>
-     * e.g.
-     *  2013/03/03(this) and 2013/03/07(argument): 4
-     *  2013/03/03(this) and 2013/04/07(argument): 35
-     *  2013/04/07(this) and 2013/03/03(argument): -35
-     *  2013/03/03(this) and 2014/03/03(argument): 365
-     *  2013/03/03 23:59:59(this) and 2013/03/07 00:00:00(argument): 4 *attention
-     * </pre>
-     * @param date The date to calculate. (NotNull)
-     * @return The count of day as distance between the two date. (MinusAllowed)
-     * @deprecated use {@link #calculateCalendarDistanceDays(Date)}
-     */
-    public int calculateDistanceDays(Date date) {
-        return calculateCalendarDistanceDays(date);
     }
 
     /**

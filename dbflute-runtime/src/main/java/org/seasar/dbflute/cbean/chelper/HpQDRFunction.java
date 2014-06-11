@@ -21,8 +21,8 @@ import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 
 /**
  * The function of (Query)DerivedReferrer.
- * @author jflute
  * @param <CB> The type of condition-bean.
+ * @author jflute
  */
 public class HpQDRFunction<CB extends ConditionBean> {
 

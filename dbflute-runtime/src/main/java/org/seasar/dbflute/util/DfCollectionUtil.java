@@ -71,13 +71,13 @@ public class DfCollectionUtil {
     }
 
     public static <ELEMENT> ArrayList<ELEMENT> newArrayList(Collection<ELEMENT> elements) {
-        final ArrayList<ELEMENT> list = newArrayList();
+        final ArrayList<ELEMENT> list = newArrayListSized(elements.size());
         list.addAll(elements);
         return list;
     }
 
     public static <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) {
-        final ArrayList<ELEMENT> list = newArrayList();
+        final ArrayList<ELEMENT> list = newArrayListSized(elements.length);
         for (ELEMENT element : elements) {
             list.add(element);
         }
@@ -268,13 +268,13 @@ public class DfCollectionUtil {
     }
 
     public static <KEY, VALUE> HashMap<KEY, VALUE> newHashMap(KEY key, VALUE value) {
-        final HashMap<KEY, VALUE> map = newHashMap();
+        final HashMap<KEY, VALUE> map = newHashMapSized(1);
         map.put(key, value);
         return map;
     }
 
     public static <KEY, VALUE> HashMap<KEY, VALUE> newHashMap(KEY key1, VALUE value1, KEY key2, VALUE value2) {
-        final HashMap<KEY, VALUE> map = newHashMap();
+        final HashMap<KEY, VALUE> map = newHashMapSized(2);
         map.put(key1, value1);
         map.put(key2, value2);
         return map;
@@ -293,13 +293,13 @@ public class DfCollectionUtil {
     }
 
     public static <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap(KEY key, VALUE value) {
-        final LinkedHashMap<KEY, VALUE> map = newLinkedHashMap();
+        final LinkedHashMap<KEY, VALUE> map = newLinkedHashMapSized(1);
         map.put(key, value);
         return map;
     }
 
     public static <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap(KEY key1, VALUE value1, KEY key2, VALUE value2) {
-        final LinkedHashMap<KEY, VALUE> map = newLinkedHashMap();
+        final LinkedHashMap<KEY, VALUE> map = newLinkedHashMapSized(2);
         map.put(key1, value1);
         map.put(key2, value2);
         return map;
@@ -318,14 +318,14 @@ public class DfCollectionUtil {
     }
 
     public static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap(KEY key, VALUE value) {
-        final ConcurrentHashMap<KEY, VALUE> map = newConcurrentHashMap();
+        final ConcurrentHashMap<KEY, VALUE> map = newConcurrentHashMapSized(1);
         map.put(key, value);
         return map;
     }
 
     public static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap(KEY key1, VALUE value1, KEY key2,
             VALUE value2) {
-        final ConcurrentHashMap<KEY, VALUE> map = newConcurrentHashMap();
+        final ConcurrentHashMap<KEY, VALUE> map = newConcurrentHashMapSized(2);
         map.put(key1, value1);
         map.put(key2, value2);
         return map;
@@ -348,13 +348,13 @@ public class DfCollectionUtil {
     }
 
     public static <ELEMENT> HashSet<ELEMENT> newHashSet(Collection<ELEMENT> elements) {
-        final HashSet<ELEMENT> set = newHashSet();
+        final HashSet<ELEMENT> set = newHashSetSized(elements.size());
         set.addAll(elements);
         return set;
     }
 
     public static <ELEMENT> HashSet<ELEMENT> newHashSet(ELEMENT... elements) {
-        final HashSet<ELEMENT> set = newHashSet();
+        final HashSet<ELEMENT> set = newHashSetSized(elements.length);
         for (ELEMENT element : elements) {
             set.add(element);
         }
@@ -370,13 +370,13 @@ public class DfCollectionUtil {
     }
 
     public static <ELEMENT> LinkedHashSet<ELEMENT> newLinkedHashSet(Collection<ELEMENT> elements) {
-        final LinkedHashSet<ELEMENT> set = newLinkedHashSet();
+        final LinkedHashSet<ELEMENT> set = newLinkedHashSetSized(elements.size());
         set.addAll(elements);
         return set;
     }
 
     public static <ELEMENT> LinkedHashSet<ELEMENT> newLinkedHashSet(ELEMENT... elements) {
-        final LinkedHashSet<ELEMENT> set = newLinkedHashSet();
+        final LinkedHashSet<ELEMENT> set = newLinkedHashSetSized(elements.length);
         for (ELEMENT element : elements) {
             set.add(element);
         }

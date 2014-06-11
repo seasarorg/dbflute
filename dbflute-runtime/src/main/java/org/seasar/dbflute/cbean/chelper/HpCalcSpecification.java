@@ -31,8 +31,8 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
- * @author jflute
  * @param <CB> The type of condition-bean for column specification. 
+ * @author jflute
  */
 public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculator, HpCalcStatement {
 

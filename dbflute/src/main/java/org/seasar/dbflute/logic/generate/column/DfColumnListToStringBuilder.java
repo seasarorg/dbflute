@@ -186,7 +186,7 @@ public class DfColumnListToStringBuilder {
                 final String adjusted = implStyle.adjustConditionQuerySetMethodCall(basic);
                 setter = query + "." + adjusted + ";";
             } else {
-                final String basic = "set" + javaName + "_Equal(" + variable + ");";
+                final String basic = "set" + javaName + "_Equal(" + variable + ")";
                 final String adjusted = implStyle.adjustConditionQuerySetMethodCall(basic);
                 setter = query + "." + adjusted + ";";
             }

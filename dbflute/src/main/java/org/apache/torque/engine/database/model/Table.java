@@ -3445,6 +3445,19 @@ public class Table {
         return hasOptionalRelation() && getLittleAdjustmentProperties().needsRelationOptionalEntityNextImport();
     }
 
+    // -----------------------------------------------------
+    //                                      Small Adjustment
+    //                                      ----------------
+    public boolean isCompatibleBehaviorNewMyEntityConditionBean() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isCompatibleBehaviorNewMyEntityConditionBean();
+    }
+
+    public boolean isCompatibleDeleteNonstrictIgnoreDeleted() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isCompatibleDeleteNonstrictIgnoreDeleted();
+    }
+
     // ===================================================================================
     //                                                                   Entity Adjustment
     //                                                                   =================

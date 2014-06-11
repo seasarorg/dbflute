@@ -19,8 +19,8 @@ import org.seasar.dbflute.cbean.ConditionQuery;
 
 /**
  * The callback of query for specification.
- * @author jflute
  * @param <CQ> The type of condition-query.
+ * @author jflute
  */
 public interface HpSpQyCall<CQ extends ConditionQuery> {
 

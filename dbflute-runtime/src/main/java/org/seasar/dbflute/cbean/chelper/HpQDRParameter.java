@@ -28,9 +28,9 @@ import org.seasar.dbflute.cbean.coption.FromToOption;
 
 /**
  * The parameter of (Query)DerivedReferrer.
- * @author jflute
  * @param <CB> The type of condition-bean.
  * @param <PARAMETER> The type of parameter.
+ * @author jflute
  */
 public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
 
