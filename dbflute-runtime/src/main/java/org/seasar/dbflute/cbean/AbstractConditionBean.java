@@ -32,6 +32,7 @@ import org.seasar.dbflute.cbean.coption.CursorSelectOption;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
+import org.seasar.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinNoWaySpeaker;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
@@ -1068,11 +1069,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
     public ConditionBean xsetupSelectCountIgnoreFetchScope(boolean uniqueCount) {
         _isSelectCountIgnoreFetchScope = true;
 
-        final SqlClause.SelectClauseType clauseType;
+        final SelectClauseType clauseType;
         if (uniqueCount) {
-            clauseType = SqlClause.SelectClauseType.UNIQUE_COUNT;
+            clauseType = SelectClauseType.UNIQUE_COUNT;
         } else {
-            clauseType = SqlClause.SelectClauseType.PLAIN_COUNT;
+            clauseType = SelectClauseType.PLAIN_COUNT;
         }
         getSqlClause().classifySelectClauseType(clauseType);
         getSqlClause().ignoreOrderBy();

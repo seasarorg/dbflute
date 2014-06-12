@@ -31,6 +31,7 @@ import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
+import org.seasar.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionLazyChecker;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.join.LeftOuterJoinInfo;
@@ -929,55 +930,6 @@ public interface SqlClause {
      * If it has no change, classify its type into default type.
      */
     void rollbackSelectClauseType();
-
-    /**
-     * The type of select clause.
-     */
-    public static enum SelectClauseType {
-        COLUMNS(false, false, false, false) // normal
-        , UNIQUE_COUNT(true, true, true, false) // basically for selectCount(cb)
-        , PLAIN_COUNT(true, true, false, false) // basically for count of selectPage(cb)
-        // scalar mainly for Behavior.scalarSelect(cb)
-        , COUNT_DISTINCT(false, true, true, true) // count(distinct)
-        , MAX(false, true, true, true), MIN(false, true, true, true) // max(), min()
-        , SUM(false, true, true, true), AVG(false, true, true, true); // sum(), avg()
-
-        private final boolean _count;
-        private final boolean _scalar;
-        private final boolean _uniqueScalar;
-        private final boolean _specifiedScalar;
-
-        private SelectClauseType(boolean count, boolean scalar, boolean uniqueScalar, boolean specifiedScalar) {
-            _count = count;
-            _scalar = scalar;
-            _uniqueScalar = uniqueScalar;
-            _specifiedScalar = specifiedScalar;
-        }
-
-        public boolean isCount() { // except count-distinct
-            return _count;
-        }
-
-        public boolean isScalar() { // also contains count
-            return _scalar;
-        }
-
-        /**
-         * Should the scalar be selected uniquely?
-         * @return The determination, true or false.
-         */
-        public boolean isUniqueScalar() { // not contains plain-count
-            return _uniqueScalar;
-        }
-
-        /**
-         * Does the scalar need specified only-one column?
-         * @return The determination, true or false.
-         */
-        public boolean isSpecifiedScalar() { // not contains all-count
-            return _specifiedScalar;
-        }
-    }
 
     // [DBFlute-0.9.8.6]
     // ===================================================================================

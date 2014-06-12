@@ -50,12 +50,12 @@ public class HpInvalidQueryInfo {
     }
 
     public HpInvalidQueryInfo inlineView() {
-        this._inlineView = true;
+        _inlineView = true;
         return this;
     }
 
     public HpInvalidQueryInfo onClause() {
-        this._onClause = true;
+        _onClause = true;
         return this;
     }
 

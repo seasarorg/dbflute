@@ -26,6 +26,10 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    protected static final String SCALA_NATIVE_INTEGER = "Int";
+    protected static final String SCALA_NATIVE_LONG = "Long";
+    protected static final String SCALA_NATIVE_BIGINTEGER = "scala.math.BigInt";
+    protected static final String SCALA_NATIVE_BIGDECIMAL = "scala.math.BigDecimal";
     protected final DfLanguageTypeMapping _mappingJava = new DfLanguageTypeMappingJava();
 
     // ===================================================================================
@@ -62,7 +66,7 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
     //                                                                    Small Adjustment
     //                                                                    ================
     public String getSequenceJavaNativeType() {
-        return _mappingJava.getSequenceJavaNativeType();
+        return SCALA_NATIVE_BIGINTEGER;
     }
 
     public String getDefaultNumericJavaNativeType() {
@@ -84,7 +88,9 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
     public String convertToImmutableJavaNativeType(String javaNative) {
         final String converted;
         if (javaNative.endsWith("Integer")) {
-            converted = "Int";
+            converted = SCALA_NATIVE_INTEGER;
+        } else if ("java.math.BigDecimal".equals(javaNative)) {
+            converted = SCALA_NATIVE_BIGDECIMAL;
         } else {
             converted = javaNative;
         }
@@ -93,7 +99,9 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
 
     public String convertToImmutableJavaNativeDefaultValue(String immutableJavaNative) {
         final String defaultValue;
-        if ("Int".equals(immutableJavaNative) || "Long".equals(immutableJavaNative)) {
+        if (SCALA_NATIVE_INTEGER.equals(immutableJavaNative) || SCALA_NATIVE_LONG.equals(immutableJavaNative)) {
+            defaultValue = "0";
+        } else if (SCALA_NATIVE_BIGDECIMAL.equals(immutableJavaNative)) {
             defaultValue = "0";
         } else {
             defaultValue = "null";

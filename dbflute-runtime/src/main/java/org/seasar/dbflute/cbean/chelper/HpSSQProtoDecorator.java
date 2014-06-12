@@ -19,17 +19,22 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SpecifyQuery;
 
 /**
- * The decorator for ScalarCondition (the old name: ScalarSubQuery).
+ * The decorator for ScalarCondition (the old name: ScalarSubQuery) as prototype.
  * @param <CB> The type of condition-bean.
  * @author jflute
  */
-public class HpSSQDecorator<CB extends ConditionBean> extends HpSSQProtoDecorator<CB> {
+public class HpSSQProtoDecorator<CB extends ConditionBean> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final HpSSQOption<CB> _option;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public HpSSQDecorator(HpSSQOption<CB> option) {
-        super(option);
+    public HpSSQProtoDecorator(HpSSQOption<CB> option) {
+        _option = option;
     }
 
     // ===================================================================================
@@ -52,7 +57,22 @@ public class HpSSQDecorator<CB extends ConditionBean> extends HpSSQProtoDecorato
      * </pre>
      * @param specifyQuery The query to specify the partition. (NotNull)
      */
-    public void partitionBy(SpecifyQuery<CB> specifyQuery) {
-        facadePartitionBy(specifyQuery);
+    protected void facadePartitionBy(SpecifyQuery<CB> specifyQuery) {
+        assertSpecifyQuery(specifyQuery);
+        _option.setPartitionBySpecify(specifyQuery);
+
+        // It's difficult for using relation in partition-by so unsupported.
+        // The alias-name problem occurs so if you try, check ColumnQuery way.
+        // (You need to synchronize QyCall...)
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected void assertSpecifyQuery(SpecifyQuery<?> specifyQuery) {
+        if (specifyQuery == null) {
+            String msg = "The argument 'specifyQuery' for ScalarCondition should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
     }
 }

@@ -44,6 +44,7 @@ import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
+import org.seasar.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionLazyChecker;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinLazyReflector;

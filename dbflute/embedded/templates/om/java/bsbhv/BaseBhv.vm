@@ -21,6 +21,8 @@ import java.util.List;
 import org.seasar.dbflute.*;
 import org.seasar.dbflute.bhv.*;
 import org.seasar.dbflute.cbean.*;
+import org.seasar.dbflute.cbean.chelper.HpSLSExecutor;
+import org.seasar.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.seasar.dbflute.dbmeta.DBMeta;
 #if ($database.isMakeFlatExpansion())
 import org.seasar.dbflute.dbmeta.hierarchy.HierarchyArranger;
@@ -504,14 +506,18 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         return doScalarSelect(resultType, newConditionBean());
     }
 
-    protected <RESULT, CB extends ${myConditionBeanClassName}> SLFunction<CB, RESULT> doScalarSelect(Class<RESULT> tp, CB cb) {
+    protected <RESULT, CB extends ${myConditionBeanClassName}> SLFunction<CB, RESULT> doScalarSelect(final Class<RESULT> tp, final CB cb) {
         assertObjectNotNull("resultType", tp); assertCBStateValid(cb);
         cb.xsetupForScalarSelect(); cb.getSqlClause().disableSelectIndex(); // for when you use union
-        return createSLFunction(cb, tp);
+        return createSLFunction(cb, tp, new HpSLSExecutor<CB, RESULT>() {
+            public RESULT execute(CB lcb, Class<RESULT> ltp, SelectClauseType sctp) {
+                return invoke(createSelectScalarCBCommand(lcb, ltp, sctp));
+            }
+        });
     }
 
-    protected <RESULT, CB extends ${myConditionBeanClassName}> SLFunction<CB, RESULT> createSLFunction(CB cb, Class<RESULT> tp) {
-        return new SLFunction<CB, RESULT>(cb, tp);
+    protected <RESULT, CB extends ${myConditionBeanClassName}> SLFunction<CB, RESULT> createSLFunction(CB cb, Class<RESULT> tp, HpSLSExecutor<CB, RESULT> exec) {
+        return new SLFunction<CB, RESULT>(cb, tp, exec);
     }
 
     protected <RESULT> SLFunction<? extends ConditionBean, RESULT> doReadScalar(Class<RESULT> tp) {

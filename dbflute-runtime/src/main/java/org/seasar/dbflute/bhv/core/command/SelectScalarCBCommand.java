@@ -19,7 +19,7 @@ import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
-import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -36,7 +36,7 @@ public class SelectScalarCBCommand<RESULT> extends AbstractSelectCBCommand<RESUL
     protected Class<RESULT> _resultType;
 
     /** The type of select clause. (NotNull) */
-    protected SqlClause.SelectClauseType _selectClauseType;
+    protected SelectClauseType _selectClauseType;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -114,7 +114,7 @@ public class SelectScalarCBCommand<RESULT> extends AbstractSelectCBCommand<RESUL
         _resultType = resultType;
     }
 
-    public void setSelectClauseType(SqlClause.SelectClauseType selectClauseType) {
+    public void setSelectClauseType(SelectClauseType selectClauseType) {
         _selectClauseType = selectClauseType;
     }
 }

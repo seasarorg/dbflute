@@ -46,12 +46,12 @@ import org.seasar.dbflute.cbean.PagingHandler;
 import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.cbean.PagingResultBean;
 import org.seasar.dbflute.cbean.ResultBeanBuilder;
-import org.seasar.dbflute.cbean.ScalarQuery;
 import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
+import org.seasar.dbflute.cbean.chelper.HpSLSExecutor;
+import org.seasar.dbflute.cbean.chelper.HpSLSFunction;
 import org.seasar.dbflute.cbean.coption.CursorSelectOption;
-import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
-import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -459,311 +459,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     protected abstract <RESULT> SLFunction<? extends ConditionBean, RESULT> doReadScalar(Class<RESULT> resultType);
 
-    /**
-     * The scalar function. <br />
-     * This is not static class because this uses the method 'invoke(BehaviorCommand)'
-     * @param <CB> The type of condition-bean.
-     * @param <RESULT> The type of result.
-     */
-    public class SLFunction<CB extends ConditionBean, RESULT> { // SL: ScaLar
-
-        /** The condition-bean for scalar select. (NotNull) */
-        protected CB _conditionBean;
-
-        /** The condition-bean for scalar select. (NotNull) */
-        protected Class<RESULT> _resultType;
-
-        /**
-         * @param conditionBean The condition-bean initialized only for scalar select. (NotNull)
-         * @param resultType The type os result. (NotNull)
-         */
-        public SLFunction(CB conditionBean, Class<RESULT> resultType) {
-            _conditionBean = conditionBean;
-            _resultType = resultType;
-        }
-
-        /**
-         * Select the count value. <br />
-         * You can also get same result by selectCount(cb) method.
-         * <pre>
-         * memberBhv.scalarSelect(Integer.class).<span style="color: #DD4747">count</span>(new ScalarQuery(MemberCB cb) {
-         *     cb.specify().<span style="color: #DD4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
-         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-         * });
-         * </pre>
-         * @param scalarQuery The query for scalar. (NotNull)
-         * @return The count value calculated by function. (NotNull)
-         */
-        public RESULT count(ScalarQuery<CB> scalarQuery) {
-            return doCount(scalarQuery, null);
-        }
-
-        /**
-         * Select the count value with function conversion option.
-         * <pre>
-         * memberBhv.scalarSelect(Integer.class).<span style="color: #DD4747">count</span>(new ScalarQuery(MemberCB cb) {
-         *     cb.specify().columnMemberId(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
-         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-         * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
-         * </pre>
-         * @param scalarQuery The query for scalar. (NotNull)
-         * @param option The option for scalar. (NotNull)
-         * @return The count value calculated by function. (NotNull)
-         */
-        public RESULT count(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertScalarSelectOption(option);
-            return doCount(scalarQuery, option);
-        }
-
-        protected RESULT doCount(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertScalarQuery(scalarQuery);
-            return exec(scalarQuery, SqlClause.SelectClauseType.UNIQUE_COUNT, option);
-        }
-
-        /**
-         * Select the count-distinct value. <br />
-         * You can also get same result by selectCount(cb) method.
-         * <pre>
-         * memberBhv.scalarSelect(Integer.class).<span style="color: #DD4747">countDistinct</span>(new ScalarQuery(MemberCB cb) {
-         *     cb.specify().<span style="color: #DD4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
-         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-         * });
-         * </pre>
-         * @param scalarQuery The query for scalar. (NotNull)
-         * @return The count-distinct value calculated by function. (NotNull)
-         */
-        public RESULT countDistinct(ScalarQuery<CB> scalarQuery) {
-            return doCountDistinct(scalarQuery, null);
-        }
-
-        /**
-         * Select the count-distinct value with function conversion option.
-         * <pre>
-         * memberBhv.scalarSelect(Integer.class).<span style="color: #DD4747">countDistinct</span>(new ScalarQuery(MemberCB cb) {
-         *     cb.specify().columnMemberId(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
-         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-         * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
-         * </pre>
-         * @param scalarQuery The query for scalar. (NotNull)
-         * @param option The option for scalar. (NotNull)
-         * @return The count-distinct value calculated by function. (NotNull)
-         */
-        public RESULT countDistinct(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertScalarSelectOption(option);
-            return doCountDistinct(scalarQuery, option);
-        }
-
-        protected RESULT doCountDistinct(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertScalarQuery(scalarQuery);
-            return exec(scalarQuery, SqlClause.SelectClauseType.COUNT_DISTINCT, option);
-        }
-
-        /**
-         * Select the maximum value.
-         * <pre>
-         * memberBhv.scalarSelect(Date.class).<span style="color: #DD4747">max</span>(new ScalarQuery(MemberCB cb) {
-         *     cb.specify().<span style="color: #DD4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-         * });
-         * </pre>
-         * @param scalarQuery The query for scalar. (NotNull)
-         * @return The maximum value calculated by function. (NullAllowed)
-         */
-        public RESULT max(ScalarQuery<CB> scalarQuery) {
-            return doMax(scalarQuery, null);
-        }
-
-        /**
-         * Select the maximum value with function conversion option.
-         * <pre>
-         * memberBhv.scalarSelect(Date.class).<span style="color: #DD4747">max</span>(new ScalarQuery(MemberCB cb) {
-         *     cb.specify().<span style="color: #DD4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-         * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
-         * </pre>
-         * @param scalarQuery The query for scalar. (NotNull)
-         * @param option The option for scalar. (NotNull)
-         * @return The maximum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
-         */
-        public RESULT max(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertScalarSelectOption(option);
-            return doMax(scalarQuery, option);
-        }
-
-        protected RESULT doMax(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertScalarQuery(scalarQuery);
-            return exec(scalarQuery, SqlClause.SelectClauseType.MAX, option);
-        }
-
-        /**
-         * Select the minimum value.
-         * <pre>
-         * memberBhv.scalarSelect(Date.class).<span style="color: #DD4747">min</span>(new ScalarQuery(MemberCB cb) {
-         *     cb.specify().<span style="color: #DD4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-         * });
-         * </pre>
-         * @param scalarQuery The query for scalar. (NotNull)
-         * @return The minimum value calculated by function. (NullAllowed)
-         */
-        public RESULT min(ScalarQuery<CB> scalarQuery) {
-            return doMin(scalarQuery, null);
-        }
-
-        /**
-         * Select the minimum value with function conversion option.
-         * <pre>
-         * memberBhv.scalarSelect(Date.class).<span style="color: #DD4747">min</span>(new ScalarQuery(MemberCB cb) {
-         *     cb.specify().<span style="color: #DD4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-         * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
-         * </pre>
-         * @param scalarQuery The query for scalar. (NotNull)
-         * @param option The option for scalar. (NotNull)
-         * @return The minimum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
-         */
-        public RESULT min(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertScalarSelectOption(option);
-            return doMin(scalarQuery, option);
-        }
-
-        protected RESULT doMin(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertScalarQuery(scalarQuery);
-            return exec(scalarQuery, SqlClause.SelectClauseType.MIN, option);
-        }
-
-        /**
-         * Select the summary value.
-         * <pre>
-         * purchaseBhv.scalarSelect(Integer.class).<span style="color: #DD4747">sum</span>(new ScalarQuery(PurchaseCB cb) {
-         *     cb.specify().<span style="color: #DD4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-         *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
-         * });
-         * </pre>
-         * @param scalarQuery The query for scalar. (NotNull)
-         * @return The summary value calculated by function. (NullAllowed)
-         */
-        public RESULT sum(ScalarQuery<CB> scalarQuery) {
-            return doSum(scalarQuery, null);
-        }
-
-        /**
-         * Select the summary value with function conversion option.
-         * <pre>
-         * purchaseBhv.scalarSelect(Integer.class).<span style="color: #DD4747">sum</span>(new ScalarQuery(PurchaseCB cb) {
-         *     cb.specify().<span style="color: #DD4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-         *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
-         * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
-         * </pre>
-         * @param scalarQuery The query for scalar. (NotNull)
-         * @param option The option for scalar. (NotNull)
-         * @return The summary value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
-         */
-        public RESULT sum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertScalarSelectOption(option);
-            return doSum(scalarQuery, option);
-        }
-
-        protected RESULT doSum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertScalarQuery(scalarQuery);
-            return exec(scalarQuery, SqlClause.SelectClauseType.SUM, option);
-        }
-
-        /**
-         * Select the average value.
-         * <pre>
-         * purchaseBhv.scalarSelect(Integer.class).<span style="color: #DD4747">avg</span>(new ScalarQuery(PurchaseCB cb) {
-         *     cb.specify().<span style="color: #DD4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-         *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
-         * });
-         * </pre>
-         * @param scalarQuery The query for scalar. (NotNull)
-         * @return The average value calculated by function. (NullAllowed)
-         */
-        public RESULT avg(ScalarQuery<CB> scalarQuery) {
-            return doAvg(scalarQuery, null);
-        }
-
-        /**
-         * Select the average value.
-         * <pre>
-         * purchaseBhv.scalarSelect(Integer.class).<span style="color: #DD4747">avg</span>(new ScalarQuery(PurchaseCB cb) {
-         *     cb.specify().<span style="color: #DD4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-         *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
-         * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
-         * </pre>
-         * @param scalarQuery The query for scalar. (NotNull)
-         * @param option The option for scalar. (NotNull)
-         * @return The average value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
-         */
-        public RESULT avg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertScalarSelectOption(option);
-            return doAvg(scalarQuery, option);
-        }
-
-        protected RESULT doAvg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertScalarQuery(scalarQuery);
-            return exec(scalarQuery, SqlClause.SelectClauseType.AVG, option);
-        }
-
-        protected RESULT exec(ScalarQuery<CB> scalarQuery, SqlClause.SelectClauseType selectClauseType,
-                ScalarSelectOption option) {
-            assertObjectNotNull("scalarQuery", scalarQuery);
-            assertObjectNotNull("selectClauseType", selectClauseType);
-            assertObjectNotNull("conditionBean", _conditionBean);
-            assertObjectNotNull("resultType", _resultType);
-            scalarQuery.query(_conditionBean);
-            setupTargetColumnInfo(option);
-            setupScalarSelectOption(option);
-            assertScalarSelectRequiredSpecifyColumn();
-            return invoke(createSelectScalarCBCommand(_conditionBean, _resultType, selectClauseType));
-        }
-
-        protected void setupTargetColumnInfo(ScalarSelectOption option) {
-            if (option == null) {
-                return;
-            }
-            final SqlClause sqlClause = _conditionBean.getSqlClause();
-            ColumnInfo columnInfo = sqlClause.getSpecifiedColumnInfoAsOne();
-            if (columnInfo != null) {
-                columnInfo = sqlClause.getSpecifiedDerivingColumnInfoAsOne();
-            }
-            option.xsetTargetColumnInfo(columnInfo);
-        }
-
-        protected void setupScalarSelectOption(ScalarSelectOption option) {
-            if (option != null) {
-                _conditionBean.xacceptScalarSelectOption(option);
-                _conditionBean.localCQ().xregisterParameterOption(option);
-            }
-        }
-
-        protected void assertScalarSelectRequiredSpecifyColumn() {
-            final SqlClause sqlClause = _conditionBean.getSqlClause();
-            final String columnName = sqlClause.getSpecifiedColumnDbNameAsOne();
-            final String subQuery = sqlClause.getSpecifiedDerivingSubQueryAsOne();
-            // should be specified is an only one object (column or sub-query)
-            if ((columnName != null && subQuery != null) || (columnName == null && subQuery == null)) {
-                throwScalarSelectInvalidColumnSpecificationException();
-            }
-        }
-
-        protected void throwScalarSelectInvalidColumnSpecificationException() {
-            createCBExThrower().throwScalarSelectInvalidColumnSpecificationException(_conditionBean, _resultType);
-        }
-
-        protected void assertScalarQuery(ScalarQuery<?> scalarQuery) {
-            if (scalarQuery == null) {
-                String msg = "The argument 'scalarQuery' for ScalarSelect should not be null.";
-                throw new IllegalArgumentException(msg);
-            }
-        }
-
-        protected void assertScalarSelectOption(ScalarSelectOption option) {
-            if (option == null) {
-                String msg = "The argument 'option' for ScalarSelect should not be null.";
-                throw new IllegalArgumentException(msg);
-            }
+    // use exiting SLFunction for compatible
+    public class SLFunction<CB extends ConditionBean, RESULT> extends HpSLSFunction<CB, RESULT> {
+        public SLFunction(CB conditionBean, Class<RESULT> resultType, HpSLSExecutor<CB, RESULT> executor) {
+            super(conditionBean, resultType, executor);
         }
     }
 
@@ -1270,7 +969,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     protected <RESULT> SelectScalarCBCommand<RESULT> createSelectScalarCBCommand(ConditionBean cb,
-            Class<RESULT> resultType, SqlClause.SelectClauseType selectClauseType) {
+            Class<RESULT> resultType, SelectClauseType selectClauseType) {
         assertBehaviorCommandInvoker("createSelectScalarCBCommand");
         final SelectScalarCBCommand<RESULT> cmd = newSelectScalarCBCommand();
         xsetupSelectCommand(cmd);
@@ -1413,9 +1112,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                         -------------
     /**
      * Assert that the object is not null.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
+     * @param variableName The variable name for message. (NotNull)
+     * @param value The value the checked variable. (NotNull)
+     * @exception IllegalArgumentException When the variable name or the variable is null.
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
@@ -1430,7 +1129,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     /**
      * Assert that the entity is not null.
-     * @param entity Entity. (NotNull)
+     * @param entity The instance of entity to be checked. (NotNull)
      */
     protected void assertEntityNotNull(Entity entity) {
         assertObjectNotNull("entity", entity);
@@ -1438,7 +1137,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     /**
      * Assert that the condition-bean state is valid.
-     * @param cb Condition-bean. (NotNull)
+     * @param cb The instance of condition-bean to be checked. (NotNull)
      */
     protected void assertCBStateValid(ConditionBean cb) {
         assertCBNotNull(cb);
@@ -1447,7 +1146,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     /**
      * Assert that the condition-bean is not null.
-     * @param cb Condition-bean. (NotNull)
+     * @param cb The instance of condition-bean to be checked. (NotNull)
      */
     protected void assertCBNotNull(ConditionBean cb) {
         assertObjectNotNull("cb", cb);
@@ -1455,7 +1154,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     /**
      * Assert that the condition-bean is not dream cruise.
-     * @param cb Condition-bean. (NotNull)
+     * @param cb The instance of condition-bean to be checked. (NotNull)
      */
     protected void assertCBNotDreamCruise(ConditionBean cb) {
         if (cb.xisDreamCruiseShip()) {
@@ -1466,7 +1165,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     /**
      * Assert that the entity has primary-key value. e.g. insert(), update(), delete()
-     * @param entity Entity. (NotNull)
+     * @param entity The instance of entity to be checked. (NotNull)
      */
     protected void assertEntityNotNullAndHasPrimaryKeyValue(Entity entity) {
         assertEntityNotNull(entity);
@@ -1493,8 +1192,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                         -------------
     /**
      * Assert that the entity is not null and not trimmed empty.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
+     * @param variableName The variable name for message. (NotNull)
+     * @param value The value the checked variable. (NotNull)
      */
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
         assertObjectNotNull("variableName", variableName);
@@ -1510,7 +1209,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                           -----------
     /**
      * Assert that the list is empty.
-     * @param ls List. (NotNull)
+     * @param ls The instance of list to be checked. (NotNull)
      */
     protected void assertListNotNullAndEmpty(List<?> ls) {
         assertObjectNotNull("ls", ls);
@@ -1522,7 +1221,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     /**
      * Assert that the list is not empty.
-     * @param ls List. (NotNull)
+     * @param ls The instance of list to be checked. (NotNull)
      */
     protected void assertListNotNullAndNotEmpty(List<?> ls) {
         assertObjectNotNull("ls", ls);
@@ -1534,7 +1233,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     /**
      * Assert that the list having only one.
-     * @param ls List. (NotNull)
+     * @param ls The instance of list to be checked. (NotNull)
      */
     protected void assertListNotNullAndHasOnlyOne(List<?> ls) {
         assertObjectNotNull("ls", ls);
@@ -1549,8 +1248,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                      ==============
     /**
      * To lower case if the type is String.
-     * @param obj Object. (NullAllowed)
-     * @return Lower object. (NullAllowed)
+     * @param obj The object might be string. (NullAllowed)
+     * @return The lower string or plain object. (NullAllowed)
      */
     protected Object toLowerCaseIfString(Object obj) {
         if (obj != null && obj instanceof String) {

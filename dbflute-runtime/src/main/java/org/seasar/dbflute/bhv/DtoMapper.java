@@ -21,9 +21,9 @@ import org.seasar.dbflute.Entity;
 
 /**
  * The interface of DTO mapper. 
- * @author jflute
  * @param <ENTITY> The type of entity.
  * @param <DTO> The type of DTO.
+ * @author jflute
  */
 public interface DtoMapper<ENTITY extends Entity, DTO> {
 

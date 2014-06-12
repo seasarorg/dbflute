@@ -15,27 +15,42 @@
  */
 package org.seasar.dbflute.cbean.chelper;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SubQuery;
+import org.seasar.dbflute.cbean.ckey.ConditionKey;
+import org.seasar.dbflute.cbean.coption.DateFromToOption;
 import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.cbean.coption.FromToOption;
 
 /**
- * The parameter of (Query)DerivedReferrer.
+ * The parameter of (Query)DerivedReferrer as prototype.
  * @param <CB> The type of condition-bean.
  * @param <PARAMETER> The type of parameter.
  * @author jflute
  */
-public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRProtoParameter<CB, PARAMETER> {
+public class HpQDRProtoParameter<CB extends ConditionBean, PARAMETER> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final String _function;
+    protected final SubQuery<CB> _subQuery;
+    protected final DerivedReferrerOption _option;
+    protected final HpQDRSetupper<CB> _setupper;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public HpQDRParameter(String function, SubQuery<CB> subQuery, DerivedReferrerOption option,
+    public HpQDRProtoParameter(String function, SubQuery<CB> subQuery, DerivedReferrerOption option,
             HpQDRSetupper<CB> setupper) {
-        super(function, subQuery, option, setupper);
+        _function = function;
+        _subQuery = subQuery;
+        _option = option;
+        _setupper = setupper;
     }
 
     // ===================================================================================
@@ -47,7 +62,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
+     *     protected void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// If the type is Integer...</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
@@ -55,8 +70,9 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * </pre>
      * @param value The value of parameter. (NotNull) 
      */
-    public void equal(PARAMETER value) {
-        facadeEqual(value);
+    protected void facadeEqual(PARAMETER value) {
+        assertParameterNotNull(value);
+        _setupper.setup(_function, _subQuery, ConditionKey.CK_EQUAL.getOperand(), value, _option);
     }
 
     /**
@@ -65,7 +81,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
+     *     protected void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// If the type is Integer...</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
@@ -73,8 +89,9 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * </pre>
      * @param value The value of parameter. (NotNull) 
      */
-    public void notEqual(PARAMETER value) {
-        facadeNotEqual(value);
+    protected void facadeNotEqual(PARAMETER value) {
+        assertParameterNotNull(value);
+        _setupper.setup(_function, _subQuery, ConditionKey.CK_NOT_EQUAL_STANDARD.getOperand(), value, _option);
     }
 
     /**
@@ -83,7 +100,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
+     *     protected void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// If the type is Integer...</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
@@ -91,8 +108,9 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * </pre>
      * @param value The value of parameter. (NotNull) 
      */
-    public void greaterThan(PARAMETER value) {
-        facadeGreaterThan(value);
+    protected void facadeGreaterThan(PARAMETER value) {
+        assertParameterNotNull(value);
+        _setupper.setup(_function, _subQuery, ConditionKey.CK_GREATER_THAN.getOperand(), value, _option);
     }
 
     /**
@@ -101,7 +119,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
+     *     protected void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// If the type is Integer...</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
@@ -109,8 +127,9 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * </pre>
      * @param value The value of parameter. (NotNull) 
      */
-    public void lessThan(PARAMETER value) {
-        facadeLessThan(value);
+    protected void facadeLessThan(PARAMETER value) {
+        assertParameterNotNull(value);
+        _setupper.setup(_function, _subQuery, ConditionKey.CK_LESS_THAN.getOperand(), value, _option);
     }
 
     /**
@@ -119,7 +138,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
+     *     protected void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// If the type is Integer...</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
@@ -127,8 +146,9 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * </pre>
      * @param value The value of parameter. (NotNull) 
      */
-    public void greaterEqual(PARAMETER value) {
-        facadeGreaterEqual(value);
+    protected void facadeGreaterEqual(PARAMETER value) {
+        assertParameterNotNull(value);
+        _setupper.setup(_function, _subQuery, ConditionKey.CK_GREATER_EQUAL.getOperand(), value, _option);
     }
 
     /**
@@ -137,7 +157,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
+     *     protected void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// If the type is Integer...</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
@@ -145,8 +165,9 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * </pre>
      * @param value The value of parameter. (NotNull) 
      */
-    public void lessEqual(PARAMETER value) {
-        facadeLessEqual(value);
+    protected void facadeLessEqual(PARAMETER value) {
+        assertParameterNotNull(value);
+        _setupper.setup(_function, _subQuery, ConditionKey.CK_LESS_EQUAL.getOperand(), value, _option);
     }
 
     /**
@@ -154,15 +175,15 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * The type of the parameter should be same as the type of target column. 
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
+     *     protected void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchasePrice();
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * }).isNull(); <span style="color: #3F7E5E">// no parameter</span>
      * </pre>
      */
-    public void isNull() {
-        facadeIsNull();
+    protected void facadeIsNull() {
+        _setupper.setup(_function, _subQuery, ConditionKey.CK_IS_NULL.getOperand(), null, _option);
     }
 
     /**
@@ -170,15 +191,15 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * The type of the parameter should be same as the type of target column. 
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
+     *     protected void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchasePrice();
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * }).isNotNull(); <span style="color: #3F7E5E">// no parameter</span>
      * </pre>
      */
-    public void isNotNull() {
-        facadeIsNotNull();
+    protected void facadeIsNotNull() {
+        _setupper.setup(_function, _subQuery, ConditionKey.CK_IS_NOT_NULL.getOperand(), null, _option);
     }
 
     /**
@@ -187,7 +208,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
+     *     protected void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// If the type is Integer...</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
@@ -196,8 +217,13 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * @param fromValue The 'from' value of parameter. (NotNull) 
      * @param toValue The 'to' value of parameter. (NotNull) 
      */
-    public void between(PARAMETER fromValue, PARAMETER toValue) {
-        facadeBetween(fromValue, toValue);
+    protected void facadeBetween(PARAMETER fromValue, PARAMETER toValue) {
+        assertParameterFromNotNull(fromValue);
+        assertParameterToNotNull(toValue);
+        final List<PARAMETER> fromToValueList = new ArrayList<PARAMETER>();
+        fromToValueList.add(fromValue);
+        fromToValueList.add(toValue);
+        _setupper.setup(_function, _subQuery, "between", fromToValueList, _option);
     }
 
     /**
@@ -206,7 +232,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
+     *     protected void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchaseDatetime();
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
@@ -216,8 +242,8 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * @param fromDate The 'from' date of parameter. (NullAllowed: if null, from-date condition is ignored) 
      * @param toDate The 'to' date of parameter. (NullAllowed: if null, to-date condition is ignored) 
      */
-    public void dateFromTo(Date fromDate, Date toDate) {
-        facadeDateFromTo(fromDate, toDate);
+    protected void facadeDateFromTo(Date fromDate, Date toDate) {
+        doFromTo(fromDate, toDate, new DateFromToOption());
     }
 
     /**
@@ -226,7 +252,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
+     *     protected void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchaseDatetime();
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
@@ -237,7 +263,69 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> extends HpQDRPr
      * @param toDate The 'to' date of parameter. (NullAllowed: if null, to-date condition is ignored) 
      * @param option The option of from-to. (NotNull)
      */
-    public void fromTo(Date fromDate, Date toDate, FromToOption option) {
-        facadeFromTo(fromDate, toDate, option);
+    protected void facadeFromTo(Date fromDate, Date toDate, FromToOption option) {
+        doFromTo(fromDate, toDate, option);
+    }
+
+    protected void doFromTo(Date fromDate, Date toDate, FromToOption option) {
+        if (option == null) {
+            String msg = "The argument 'option' of parameter for DerivedReferrer should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (fromDate == null && toDate == null) {
+            return;
+        }
+        if (fromDate != null) {
+            fromDate = option.filterFromDate(fromDate);
+        }
+        if (toDate != null) {
+            toDate = option.xfilterToDateBetweenWay(toDate);
+        }
+        @SuppressWarnings("unchecked")
+        final PARAMETER fromValue = (PARAMETER) fromDate;
+        @SuppressWarnings("unchecked")
+        final PARAMETER toValue = (PARAMETER) toDate;
+        dispatchFromTo(fromValue, toValue);
+    }
+
+    protected void dispatchFromTo(PARAMETER fromValue, PARAMETER toValue) {
+        if (fromValue != null && toValue != null) {
+            facadeBetween(fromValue, toValue);
+        } else if (fromValue != null) {
+            facadeGreaterEqual(fromValue);
+        } else if (toValue != null) {
+            facadeLessEqual(toValue);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertParameterNotNull(Object value) {
+        if (value == null) {
+            String msg = "The argument 'value' of parameter for DerivedReferrer should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertParameterFromNotNull(Object fromValue) {
+        if (fromValue == null) {
+            String msg = "The argument 'fromValue' of parameter for DerivedReferrer should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertParameterToNotNull(Object toValue) {
+        if (toValue == null) {
+            String msg = "The argument 'toValue' of parameter for DerivedReferrer should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public static boolean isOperandIsNull(String operand) { // basically for auto-detect of inner-join
+        return ConditionKey.CK_IS_NULL.getOperand().equals(operand);
     }
 }
