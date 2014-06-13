@@ -400,8 +400,10 @@ public class ${myClassName} extends AbstractDBMeta {
     // ===================================================================================
     //                                                                     Object Instance
     //                                                                     ===============
-    public Entity newEntity() { return newMyEntity(); }
+    public ${myExtendedObjectClassName} newEntity() { return new ${myExtendedObjectClassName}(); }
+#if ($table.isCompatibleNewMyEntityConditionBean())
     public ${myExtendedObjectClassName} newMyEntity() { return new ${myExtendedObjectClassName}(); }
+#end
 
     // ===================================================================================
     //                                                                   Map Communication

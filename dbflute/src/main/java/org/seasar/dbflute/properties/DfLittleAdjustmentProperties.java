@@ -1022,8 +1022,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isCompatibleOrScopeQueryPurposeNoCheck", isCompatibleBeforeJava8());
     }
 
-    public boolean isCompatibleBehaviorNewMyEntityConditionBean() { // closet
-        return isProperty("isCompatibleBehaviorNewMyEntityConditionBean", isCompatibleBeforeJava8());
+    public boolean isCompatibleNewMyEntityConditionBean() { // closet
+        return isProperty("isCompatibleNewMyEntityConditionBean", isCompatibleBeforeJava8());
     }
 
     public boolean isCompatibleDeleteNonstrictIgnoreDeleted() { // closet

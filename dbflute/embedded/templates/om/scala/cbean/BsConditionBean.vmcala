@@ -39,6 +39,7 @@ import ${glPackageBaseCommon}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommon}.${glImplementedInvokerAssistant};
 import ${glPackageBaseCommon}.${glImplementedSqlClauseCreator};
 import ${glPackageBaseCommon}.ScrHpColQyOperand;
+import ${glPackageBaseCommon}.ScrHpSDRFunction;
 import ${glPackageCB}._
 import ${glPackageCQ}._
 #if ($table.hasJoinableRelationNestSelectSetupper())
@@ -813,11 +814,11 @@ object Hp${myConditionBeanClassName} {
          * </pre>
          * @return The object to set up a function for referrer table. (NotNull)
          */
-        def derived${tmpPropertyNameInitCap}(): HpSDRFunction[${tmpCBClassName}, ${tmpLocalCQClassName}] = {
+        def derived${tmpPropertyNameInitCap}(): ScrHpSDRFunction[${tmpCBClassName}, ${tmpLocalCQClassName}] = {
             assertDerived("${tmpPropertyName}"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
-            return new HpSDRFunction[${tmpCBClassName}, ${tmpLocalCQClassName}](_baseCB, _qyCall.qy(), new HpSDRSetupper[${tmpCBClassName}, ${tmpLocalCQClassName}]() {
+            return toScalaSDRFunction(new HpSDRFunction[${tmpCBClassName}, ${tmpLocalCQClassName}](_baseCB, _qyCall.qy(), new HpSDRSetupper[${tmpCBClassName}, ${tmpLocalCQClassName}]() {
                 def setup(fn: String, sq: SubQuery[${tmpCBClassName}], cq: ${tmpLocalCQClassName}, al: String, op: DerivedReferrerOption): Unit = {
-                    cq.xsderive${referrer.referrerPropertyNameInitCap}(fn, sq, al, op); } }, _dbmetaProvider);
+                    cq.xsderive${referrer.referrerPropertyNameInitCap}(fn, sq, al, op); } }, _dbmetaProvider));
         }
 #end
 #if ($table.hasSinglePrimaryKey())
@@ -826,13 +827,16 @@ object Hp${myConditionBeanClassName} {
          * Prepare for (Specify)MyselfDerived (SubQuery).
          * @return The object to set up a function for myself table. (NotNull)
          */
-        def myselfDerived(): HpSDRFunction[${myConditionBeanClassName}, ${myConditionQueryClassName}] = {
+        def myselfDerived(): ScrHpSDRFunction[${myConditionBeanClassName}, ${myConditionQueryClassName}] = {
             assertDerived("myselfDerived"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
-            return new HpSDRFunction[${myConditionBeanClassName}, ${myConditionQueryClassName}](_baseCB, _qyCall.qy(), new HpSDRSetupper[${myConditionBeanClassName}, ${myConditionQueryClassName}]() {
+            return toScalaSDRFunction(new HpSDRFunction[${myConditionBeanClassName}, ${myConditionQueryClassName}](_baseCB, _qyCall.qy(), new HpSDRSetupper[${myConditionBeanClassName}, ${myConditionQueryClassName}]() {
                 def setup(fn: String, sq: SubQuery[${myConditionBeanClassName}], cq: ${myConditionQueryClassName}, al: String, op: DerivedReferrerOption): Unit = {
-                    cq.xsmyselfDerive(fn, sq, al, op); } }, _dbmetaProvider);
+                    cq.xsmyselfDerive(fn, sq, al, op); } }, _dbmetaProvider));
         }
 #end
 #end
     }
+
+    protected def toScalaSDRFunction[CB <: ConditionBean, CQ <: ConditionQuery](function: HpSDRFunction[CB, CQ]): ScrHpSDRFunction[CB, CQ] =
+    { new ScrHpSDRFunction[CB, CQ](function) } 
 }

@@ -16,10 +16,10 @@
 package org.seasar.dbflute.bhv;
 
 import org.seasar.dbflute.Entity;
-import org.seasar.dbflute.bhv.AbstractBehaviorReadable.SLFunction;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ListResultBean;
 import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.cbean.chelper.HpSLSFunction;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 
@@ -123,7 +123,7 @@ public interface BehaviorReadable {
      * @param resultType The type of result. (NotNull)
      * @return The scalar function object to specify function for scalar value. (NotNull)
      */
-    <RESULT> SLFunction<ConditionBean, RESULT> readScalar(Class<RESULT> resultType);
+    <RESULT> HpSLSFunction<ConditionBean, RESULT> readScalar(Class<RESULT> resultType);
 
     // ===================================================================================
     //                                                                            Sequence

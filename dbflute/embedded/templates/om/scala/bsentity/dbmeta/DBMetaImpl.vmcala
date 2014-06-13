@@ -329,8 +329,7 @@ object ${myClassName} extends AbstractDBMeta {
     // ===================================================================================
     //                                                                     Object Instance
     //                                                                     ===============
-    def newEntity(): Entity = { return newMyEntity(); }
-    def newMyEntity(): ${myExtendedObjectClassName} = { return new ${myExtendedObjectClassName}(); }
+    def newEntity(): ${myExtendedObjectClassName} = { return new ${myExtendedObjectClassName}(); }
 
     // ===================================================================================
     //                                                                   Map Communication

@@ -3448,9 +3448,9 @@ public class Table {
     // -----------------------------------------------------
     //                                      Small Adjustment
     //                                      ----------------
-    public boolean isCompatibleBehaviorNewMyEntityConditionBean() {
+    public boolean isCompatibleNewMyEntityConditionBean() {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        return prop.isCompatibleBehaviorNewMyEntityConditionBean();
+        return prop.isCompatibleNewMyEntityConditionBean();
     }
 
     public boolean isCompatibleDeleteNonstrictIgnoreDeleted() {

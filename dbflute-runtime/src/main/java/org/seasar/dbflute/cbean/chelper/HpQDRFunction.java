@@ -24,13 +24,18 @@ import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
  * @param <CB> The type of condition-bean.
  * @author jflute
  */
-public class HpQDRFunction<CB extends ConditionBean> extends HpQDRProtoFunction<CB> {
+public class HpQDRFunction<CB extends ConditionBean> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final HpQDRSetupper<CB> _setupper;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public HpQDRFunction(HpQDRSetupper<CB> setupper) {
-        super(setupper);
+        _setupper = setupper;
     }
 
     // ===================================================================================
@@ -46,11 +51,11 @@ public class HpQDRFunction<CB extends ConditionBean> extends HpQDRProtoFunction<
      *     }
      * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull) 
+     * @param subQuery The sub query of referrer. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Integer> count(SubQuery<CB> subQuery) {
-        return facadeCount(subQuery);
+        return doCount(subQuery, null);
     }
 
     /**
@@ -67,7 +72,13 @@ public class HpQDRFunction<CB extends ConditionBean> extends HpQDRProtoFunction<
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Integer> count(SubQuery<CB> subQuery, DerivedReferrerOption option) {
-        return facadeCount(subQuery, option);
+        assertDerivedReferrerOption(option);
+        return doCount(subQuery, option);
+    }
+
+    protected HpQDRParameter<CB, Integer> doCount(SubQuery<CB> subQuery, DerivedReferrerOption option) {
+        assertSubQuery(subQuery);
+        return createQDRParameter("count", subQuery, option);
     }
 
     /**
@@ -80,11 +91,11 @@ public class HpQDRFunction<CB extends ConditionBean> extends HpQDRProtoFunction<
      *     }
      * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull) 
+     * @param subQuery The sub query of referrer. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Integer> countDistinct(SubQuery<CB> subQuery) {
-        return facadeCountDistinct(subQuery);
+        return doCountDistinct(subQuery, null);
     }
 
     /**
@@ -101,7 +112,13 @@ public class HpQDRFunction<CB extends ConditionBean> extends HpQDRProtoFunction<
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Integer> countDistinct(SubQuery<CB> subQuery, DerivedReferrerOption option) {
-        return facadeCountDistinct(subQuery, option);
+        assertDerivedReferrerOption(option);
+        return doCountDistinct(subQuery, option);
+    }
+
+    protected HpQDRParameter<CB, Integer> doCountDistinct(SubQuery<CB> subQuery, DerivedReferrerOption option) {
+        assertSubQuery(subQuery);
+        return createQDRParameter("count(distinct", subQuery, option);
     }
 
     /**
@@ -114,11 +131,11 @@ public class HpQDRFunction<CB extends ConditionBean> extends HpQDRProtoFunction<
      *     }
      * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull) 
+     * @param subQuery The sub query of referrer. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Object> max(SubQuery<CB> subQuery) {
-        return facadeMax(subQuery);
+        return doMax(subQuery, null);
     }
 
     /**
@@ -135,7 +152,13 @@ public class HpQDRFunction<CB extends ConditionBean> extends HpQDRProtoFunction<
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Object> max(SubQuery<CB> subQuery, DerivedReferrerOption option) {
-        return facadeMax(subQuery, option);
+        assertDerivedReferrerOption(option);
+        return doMax(subQuery, option);
+    }
+
+    protected HpQDRParameter<CB, Object> doMax(SubQuery<CB> subQuery, DerivedReferrerOption option) {
+        assertSubQuery(subQuery);
+        return createQDRParameter("max", subQuery, option);
     }
 
     /**
@@ -148,11 +171,11 @@ public class HpQDRFunction<CB extends ConditionBean> extends HpQDRProtoFunction<
      *     }
      * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull) 
+     * @param subQuery The sub query of referrer. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Object> min(SubQuery<CB> subQuery) {
-        return facadeMin(subQuery);
+        return doMin(subQuery, null);
     }
 
     /**
@@ -169,7 +192,12 @@ public class HpQDRFunction<CB extends ConditionBean> extends HpQDRProtoFunction<
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Object> min(SubQuery<CB> subQuery, DerivedReferrerOption option) {
-        return facadeMin(subQuery, option);
+        return doMin(subQuery, option);
+    }
+
+    protected HpQDRParameter<CB, Object> doMin(SubQuery<CB> subQuery, DerivedReferrerOption option) {
+        assertSubQuery(subQuery);
+        return createQDRParameter("min", subQuery, option);
     }
 
     /**
@@ -182,11 +210,11 @@ public class HpQDRFunction<CB extends ConditionBean> extends HpQDRProtoFunction<
      *     }
      * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull) 
+     * @param subQuery The sub query of referrer. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Number> sum(SubQuery<CB> subQuery) {
-        return facadeSum(subQuery);
+        return doSum(subQuery, null);
     }
 
     /**
@@ -203,7 +231,13 @@ public class HpQDRFunction<CB extends ConditionBean> extends HpQDRProtoFunction<
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Number> sum(SubQuery<CB> subQuery, DerivedReferrerOption option) {
-        return facadeSum(subQuery, option);
+        assertDerivedReferrerOption(option);
+        return doSum(subQuery, option);
+    }
+
+    protected HpQDRParameter<CB, Number> doSum(SubQuery<CB> subQuery, DerivedReferrerOption option) {
+        assertSubQuery(subQuery);
+        return createQDRParameter("sum", subQuery, option);
     }
 
     /**
@@ -216,11 +250,11 @@ public class HpQDRFunction<CB extends ConditionBean> extends HpQDRProtoFunction<
      *     }
      * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull) 
+     * @param subQuery The sub query of referrer. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Number> avg(SubQuery<CB> subQuery) {
-        return facadeAvg(subQuery);
+        return doAvg(subQuery, null);
     }
 
     /**
@@ -237,6 +271,33 @@ public class HpQDRFunction<CB extends ConditionBean> extends HpQDRProtoFunction<
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Number> avg(SubQuery<CB> subQuery, DerivedReferrerOption option) {
-        return facadeAvg(subQuery, option);
+        return doAvg(subQuery, option);
+    }
+
+    protected HpQDRParameter<CB, Number> doAvg(SubQuery<CB> subQuery, DerivedReferrerOption option) {
+        assertSubQuery(subQuery);
+        return createQDRParameter("avg", subQuery, option);
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected <PARAMETER> HpQDRParameter<CB, PARAMETER> createQDRParameter(String fuction, SubQuery<CB> subQuery,
+            DerivedReferrerOption option) {
+        return new HpQDRParameter<CB, PARAMETER>(fuction, subQuery, option, _setupper);
+    }
+
+    protected void assertSubQuery(SubQuery<?> subQuery) {
+        if (subQuery == null) {
+            String msg = "The argument 'subQuery' for DerivedReferrer should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertDerivedReferrerOption(DerivedReferrerOption option) {
+        if (option == null) {
+            String msg = "The argument 'option' for DerivedReferrer should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
     }
 }

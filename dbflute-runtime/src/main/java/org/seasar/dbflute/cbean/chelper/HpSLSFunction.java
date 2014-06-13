@@ -18,6 +18,10 @@ package org.seasar.dbflute.cbean.chelper;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ScalarQuery;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.cbean.sqlclause.clause.SelectClauseType;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 
 /**
  * The function for scalar select. 
@@ -25,18 +29,32 @@ import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
  * @param <RESULT> The type of result for scalar select
  * @author jflute
  */
-public class HpSLSFunction<CB extends ConditionBean, RESULT> extends HpSLSProtoFunction<CB, RESULT> {
+public class HpSLSFunction<CB extends ConditionBean, RESULT> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The condition-bean for scalar select. (NotNull) */
+    protected final CB _conditionBean;
+
+    /** The condition-bean for scalar select. (NotNull) */
+    protected final Class<RESULT> _resultType;
+
+    /** The executor of scalar select. (NotNull) */
+    protected final HpSLSExecutor<CB, RESULT> _executor;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
      * @param conditionBean The condition-bean initialized only for scalar select. (NotNull)
-     * @param resultType The type os result. (NotNull)
+     * @param resultType The type as result. (NotNull)
      * @param executor The executor of scalar select with select clause type. (NotNull)
      */
     public HpSLSFunction(CB conditionBean, Class<RESULT> resultType, HpSLSExecutor<CB, RESULT> executor) {
-        super(conditionBean, resultType, executor);
+        _conditionBean = conditionBean;
+        _resultType = resultType;
+        _executor = executor;
     }
 
     // ===================================================================================
@@ -51,11 +69,11 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> extends HpSLSProtoF
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar. (NotNull)
+     * @param scalarQuery The query for scalar select. (NotNull)
      * @return The count value calculated by function. (NotNull)
      */
     public RESULT count(ScalarQuery<CB> scalarQuery) {
-        return facadeCount(scalarQuery);
+        return doCount(scalarQuery, null);
     }
 
     /**
@@ -66,12 +84,18 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> extends HpSLSProtoF
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar. (NotNull)
-     * @param option The option for scalar. (NotNull)
+     * @param scalarQuery The query for scalar select. (NotNull)
+     * @param option The option for scalar select. (NotNull)
      * @return The count value calculated by function. (NotNull)
      */
     public RESULT count(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-        return facadeCount(scalarQuery, option);
+        assertScalarSelectOption(option);
+        return doCount(scalarQuery, option);
+    }
+
+    protected RESULT doCount(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+        assertScalarQuery(scalarQuery);
+        return exec(scalarQuery, SelectClauseType.UNIQUE_COUNT, option);
     }
 
     /**
@@ -83,11 +107,11 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> extends HpSLSProtoF
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar. (NotNull)
+     * @param scalarQuery The query for scalar select. (NotNull)
      * @return The count-distinct value calculated by function. (NotNull)
      */
     public RESULT countDistinct(ScalarQuery<CB> scalarQuery) {
-        return facadeCountDistinct(scalarQuery);
+        return doCountDistinct(scalarQuery, null);
     }
 
     /**
@@ -98,12 +122,18 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> extends HpSLSProtoF
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar. (NotNull)
-     * @param option The option for scalar. (NotNull)
+     * @param scalarQuery The query for scalar select. (NotNull)
+     * @param option The option for scalar select. (NotNull)
      * @return The count-distinct value calculated by function. (NotNull)
      */
     public RESULT countDistinct(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-        return facadeCountDistinct(scalarQuery, option);
+        assertScalarSelectOption(option);
+        return doCountDistinct(scalarQuery, option);
+    }
+
+    protected RESULT doCountDistinct(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+        assertScalarQuery(scalarQuery);
+        return exec(scalarQuery, SelectClauseType.COUNT_DISTINCT, option);
     }
 
     /**
@@ -114,11 +144,11 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> extends HpSLSProtoF
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar. (NotNull)
+     * @param scalarQuery The query for scalar select. (NotNull)
      * @return The maximum value calculated by function. (NullAllowed)
      */
     public RESULT max(ScalarQuery<CB> scalarQuery) {
-        return facadeMax(scalarQuery);
+        return doMax(scalarQuery, null);
     }
 
     /**
@@ -129,12 +159,18 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> extends HpSLSProtoF
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar. (NotNull)
-     * @param option The option for scalar. (NotNull)
+     * @param scalarQuery The query for scalar select. (NotNull)
+     * @param option The option for scalar select. (NotNull)
      * @return The maximum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
     public RESULT max(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-        return facadeMax(scalarQuery, option);
+        assertScalarSelectOption(option);
+        return doMax(scalarQuery, option);
+    }
+
+    protected RESULT doMax(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+        assertScalarQuery(scalarQuery);
+        return exec(scalarQuery, SelectClauseType.MAX, option);
     }
 
     /**
@@ -145,11 +181,11 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> extends HpSLSProtoF
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar. (NotNull)
+     * @param scalarQuery The query for scalar select. (NotNull)
      * @return The minimum value calculated by function. (NullAllowed)
      */
     public RESULT min(ScalarQuery<CB> scalarQuery) {
-        return facadeMin(scalarQuery);
+        return doMin(scalarQuery, null);
     }
 
     /**
@@ -160,12 +196,18 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> extends HpSLSProtoF
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar. (NotNull)
-     * @param option The option for scalar. (NotNull)
+     * @param scalarQuery The query for scalar select. (NotNull)
+     * @param option The option for scalar select. (NotNull)
      * @return The minimum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
     public RESULT min(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-        return facadeMin(scalarQuery, option);
+        assertScalarSelectOption(option);
+        return doMin(scalarQuery, option);
+    }
+
+    protected RESULT doMin(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+        assertScalarQuery(scalarQuery);
+        return exec(scalarQuery, SelectClauseType.MIN, option);
     }
 
     /**
@@ -176,11 +218,11 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> extends HpSLSProtoF
      *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar. (NotNull)
+     * @param scalarQuery The query for scalar select. (NotNull)
      * @return The summary value calculated by function. (NullAllowed)
      */
     public RESULT sum(ScalarQuery<CB> scalarQuery) {
-        return facadeSum(scalarQuery);
+        return doSum(scalarQuery, null);
     }
 
     /**
@@ -191,12 +233,18 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> extends HpSLSProtoF
      *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
      * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar. (NotNull)
-     * @param option The option for scalar. (NotNull)
+     * @param scalarQuery The query for scalar select. (NotNull)
+     * @param option The option for scalar select. (NotNull)
      * @return The summary value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
     public RESULT sum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-        return facadeSum(scalarQuery, option);
+        assertScalarSelectOption(option);
+        return doSum(scalarQuery, option);
+    }
+
+    protected RESULT doSum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+        assertScalarQuery(scalarQuery);
+        return exec(scalarQuery, SelectClauseType.SUM, option);
     }
 
     /**
@@ -211,7 +259,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> extends HpSLSProtoF
      * @return The average value calculated by function. (NullAllowed)
      */
     public RESULT avg(ScalarQuery<CB> scalarQuery) {
-        return facadeAvg(scalarQuery);
+        return doAvg(scalarQuery, null);
     }
 
     /**
@@ -227,6 +275,98 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> extends HpSLSProtoF
      * @return The average value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
     public RESULT avg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-        return facadeAvg(scalarQuery, option);
+        assertScalarSelectOption(option);
+        return doAvg(scalarQuery, option);
+    }
+
+    protected RESULT doAvg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+        assertScalarQuery(scalarQuery);
+        return exec(scalarQuery, SelectClauseType.AVG, option);
+    }
+
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    protected RESULT exec(ScalarQuery<CB> scalarQuery, SelectClauseType selectClauseType, ScalarSelectOption option) {
+        assertObjectNotNull("scalarQuery", scalarQuery);
+        assertObjectNotNull("selectClauseType", selectClauseType);
+        assertObjectNotNull("conditionBean", _conditionBean);
+        assertObjectNotNull("resultType", _resultType);
+        scalarQuery.query(_conditionBean);
+        setupTargetColumnInfo(option);
+        setupScalarSelectOption(option);
+        assertScalarSelectRequiredSpecifyColumn();
+        return _executor.execute(_conditionBean, _resultType, selectClauseType);
+    }
+
+    protected void setupTargetColumnInfo(ScalarSelectOption option) {
+        if (option == null) {
+            return;
+        }
+        final SqlClause sqlClause = _conditionBean.getSqlClause();
+        ColumnInfo columnInfo = sqlClause.getSpecifiedColumnInfoAsOne();
+        if (columnInfo != null) {
+            columnInfo = sqlClause.getSpecifiedDerivingColumnInfoAsOne();
+        }
+        option.xsetTargetColumnInfo(columnInfo);
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void setupScalarSelectOption(ScalarSelectOption option) {
+        if (option != null) {
+            _conditionBean.xacceptScalarSelectOption(option);
+            _conditionBean.localCQ().xregisterParameterOption(option);
+        }
+    }
+
+    protected void assertScalarSelectRequiredSpecifyColumn() {
+        final SqlClause sqlClause = _conditionBean.getSqlClause();
+        final String columnName = sqlClause.getSpecifiedColumnDbNameAsOne();
+        final String subQuery = sqlClause.getSpecifiedDerivingSubQueryAsOne();
+        // should be specified is an only one object (column or sub-query)
+        if ((columnName != null && subQuery != null) || (columnName == null && subQuery == null)) {
+            throwScalarSelectInvalidColumnSpecificationException();
+        }
+    }
+
+    protected void throwScalarSelectInvalidColumnSpecificationException() {
+        createCBExThrower().throwScalarSelectInvalidColumnSpecificationException(_conditionBean, _resultType);
+    }
+
+    protected ConditionBeanExceptionThrower createCBExThrower() {
+        return new ConditionBeanExceptionThrower();
+    }
+
+    protected void assertScalarQuery(ScalarQuery<?> scalarQuery) {
+        if (scalarQuery == null) {
+            String msg = "The argument 'scalarQuery' for ScalarSelect should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertScalarSelectOption(ScalarSelectOption option) {
+        if (option == null) {
+            String msg = "The argument 'option' for ScalarSelect should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    /**
+     * Assert that the object is not null.
+     * @param variableName The variable name for message. (NotNull)
+     * @param value The value the checked variable. (NotNull)
+     * @exception IllegalArgumentException When the variable name or the variable is null.
+     */
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=null value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
     }
 }

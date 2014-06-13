@@ -451,13 +451,13 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     /**
      * {@inheritDoc}
      */
-    public <RESULT> SLFunction<ConditionBean, RESULT> readScalar(Class<RESULT> resultType) {
+    public <RESULT> HpSLSFunction<ConditionBean, RESULT> readScalar(Class<RESULT> resultType) {
         @SuppressWarnings("unchecked")
-        final SLFunction<ConditionBean, RESULT> func = (SLFunction<ConditionBean, RESULT>) doReadScalar(resultType);
+        final HpSLSFunction<ConditionBean, RESULT> func = (HpSLSFunction<ConditionBean, RESULT>) doReadScalar(resultType);
         return func;
     }
 
-    protected abstract <RESULT> SLFunction<? extends ConditionBean, RESULT> doReadScalar(Class<RESULT> resultType);
+    protected abstract <RESULT> HpSLSFunction<? extends ConditionBean, RESULT> doReadScalar(Class<RESULT> resultType);
 
     // use exiting SLFunction for compatible
     public class SLFunction<CB extends ConditionBean, RESULT> extends HpSLSFunction<CB, RESULT> {

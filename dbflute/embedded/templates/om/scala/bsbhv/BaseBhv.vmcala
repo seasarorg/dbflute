@@ -26,6 +26,8 @@ import org.seasar.dbflute.bhv._;
 import org.seasar.dbflute.bhv.AbstractBehaviorReadable._;
 import org.seasar.dbflute.bhv.AbstractBehaviorWritable._;
 import org.seasar.dbflute.cbean._;
+import org.seasar.dbflute.cbean.chelper._;
+import org.seasar.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception._;
 import org.seasar.dbflute.util._;
@@ -437,25 +439,30 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param resultType The type of result. (NotNull)
      * @return The scalar function object to specify function for scalar value. (NotNull)
      */
-    def scalarSelect[RESULT](resultType: Class[RESULT]): SLFunction[${myConditionBeanClassName}, RESULT] = {
-        return facadeScalarSelect(resultType);
+    def scalarSelect[RESULT](resultType: Class[RESULT]): ScrHpSLSFunction[${myConditionBeanClassName}, RESULT] = {
+        return toScalaSLSFunction[RESULT](facadeScalarSelect(resultType));
     }
 
-    protected def facadeScalarSelect[RESULT](resultType: Class[RESULT]): SLFunction[${myConditionBeanClassName}, RESULT] = {
+    protected def toScalaSLSFunction[RESULT](function: HpSLSFunction[${myConditionBeanClassName}, RESULT]): ScrHpSLSFunction[${myConditionBeanClassName}, RESULT] =
+    { new ScrHpSLSFunction[${myConditionBeanClassName}, RESULT](function) }
+
+    protected def facadeScalarSelect[RESULT](resultType: Class[RESULT]): HpSLSFunction[${myConditionBeanClassName}, RESULT] = {
         return doScalarSelect(resultType, newConditionBean());
     }
 
-    protected def doScalarSelect[RESULT, CB <: ${myConditionBeanClassName}](tp: Class[RESULT], cb: CB): SLFunction[CB, RESULT] = {
+    protected def doScalarSelect[RESULT, CB <: ${myConditionBeanClassName}](tp: Class[RESULT], cb: CB): HpSLSFunction[CB, RESULT] = {
         assertObjectNotNull("resultType", tp); assertCBStateValid(cb);
         cb.xsetupForScalarSelect(); cb.getSqlClause().disableSelectIndex(); // for when you use union
-        return createSLFunction[RESULT, CB](cb, tp);
+        return createSLSFunction[CB, RESULT](cb, tp, new HpSLSExecutor[CB, RESULT]() {
+            def execute(lcb: CB, ltp: Class[RESULT], sctp: SelectClauseType): RESULT =
+            { invoke(createSelectScalarCBCommand(lcb, ltp, sctp)) }
+        });
     }
 
-    protected def createSLFunction[RESULT, CB <: ${myConditionBeanClassName}](cb: CB, tp: Class[RESULT]): SLFunction[CB, RESULT] = {
-        return new SLFunction[CB, RESULT](cb, tp);
-    }
+    protected def createSLSFunction[CB <: ${myConditionBeanClassName}, RESULT](cb: CB, tp: Class[RESULT], exec: HpSLSExecutor[CB, RESULT]): HpSLSFunction[CB, RESULT] =
+    { new HpSLSFunction[CB, RESULT](cb, tp, exec) }
 
-    protected def doReadScalar[RESULT](tp: Class[RESULT]): SLFunction[_ <: ConditionBean, RESULT] = {
+    protected def doReadScalar[RESULT](tp: Class[RESULT]): HpSLSFunction[_ <: ConditionBean, RESULT] = {
         return facadeScalarSelect(tp);
     }
 
@@ -1782,13 +1789,11 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return scala.collection.immutable.List.fromArray(javaList.toArray()).asInstanceOf[scala.collection.immutable.List[ENTITY]];
     }
 
-    def toImmutableEntityList(dbleList: Collection[${myExtendedObjectClassName}]): scala.collection.immutable.List[${myImmutableExtendedObjectClassName}] = {
-        return toScalaList(dbleList).map(new ${myImmutableExtendedObjectClassName}(_))
-    }
+    def toImmutableEntityList(dbleList: Collection[${myExtendedObjectClassName}]): scala.collection.immutable.List[${myImmutableExtendedObjectClassName}] =
+    { toScalaList(dbleList).map(new ${myImmutableExtendedObjectClassName}(_)) }
 
-    def toDBableEntityList(immuList: scala.collection.immutable.List[${myImmutableExtendedObjectClassName}]): List[${myExtendedObjectClassName}] = {
-        return immuList.map(new ${myExtendedObjectClassName}().acceptImmutable(_)).asJava
-    }
+    def toDBableEntityList(immuList: scala.collection.immutable.List[${myImmutableExtendedObjectClassName}]): List[${myExtendedObjectClassName}] =
+    { immuList.map(new ${myExtendedObjectClassName}().acceptImmutable(_)).asJava }
 }
 
 /* _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */

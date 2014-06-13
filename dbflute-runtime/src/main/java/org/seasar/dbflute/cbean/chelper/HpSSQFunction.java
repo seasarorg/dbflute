@@ -23,13 +23,18 @@ import org.seasar.dbflute.cbean.SubQuery;
  * @param <CB> The type of condition-bean.
  * @author jflute
  */
-public class HpSSQFunction<CB extends ConditionBean> extends HpSSQProtoFunction<CB> {
+public class HpSSQFunction<CB extends ConditionBean> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final HpSSQSetupper<CB> _setupper;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public HpSSQFunction(HpSSQSetupper<CB> setupper) {
-        super(setupper);
+        _setupper = setupper;
     }
 
     // ===================================================================================
@@ -46,10 +51,13 @@ public class HpSSQFunction<CB extends ConditionBean> extends HpSSQProtoFunction<
      * });
      * </pre> 
      * @param subQuery The sub query of myself. (NotNull)
-     * @return The decorator of ScalarCondition. You can use partition-by. (NotNull)
+     * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
     public HpSSQDecorator<CB> max(SubQuery<CB> subQuery) {
-        return facadeMax(subQuery);
+        assertSubQuery(subQuery);
+        final HpSSQOption<CB> option = createOption();
+        _setupper.setup("max", subQuery, option);
+        return createDecorator(option);
     }
 
     /**
@@ -63,10 +71,13 @@ public class HpSSQFunction<CB extends ConditionBean> extends HpSSQProtoFunction<
      * });
      * </pre> 
      * @param subQuery The sub query of myself. (NotNull)
-     * @return The decorator of ScalarCondition. You can use partition-by. (NotNull)
+     * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
     public HpSSQDecorator<CB> min(SubQuery<CB> subQuery) {
-        return facadeMin(subQuery);
+        assertSubQuery(subQuery);
+        final HpSSQOption<CB> option = createOption();
+        _setupper.setup("min", subQuery, option);
+        return createDecorator(option);
     }
 
     /**
@@ -80,10 +91,13 @@ public class HpSSQFunction<CB extends ConditionBean> extends HpSSQProtoFunction<
      * });
      * </pre> 
      * @param subQuery The sub query of myself. (NotNull)
-     * @return The decorator of ScalarCondition. You can use partition-by. (NotNull)
+     * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
     public HpSSQDecorator<CB> sum(SubQuery<CB> subQuery) {
-        return facadeSum(subQuery);
+        assertSubQuery(subQuery);
+        final HpSSQOption<CB> option = createOption();
+        _setupper.setup("sum", subQuery, option);
+        return createDecorator(option);
     }
 
     /**
@@ -97,9 +111,30 @@ public class HpSSQFunction<CB extends ConditionBean> extends HpSSQProtoFunction<
      * });
      * </pre> 
      * @param subQuery The sub query of myself. (NotNull)
-     * @return The decorator of ScalarCondition. You can use partition-by. (NotNull)
+     * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
     public HpSSQDecorator<CB> avg(SubQuery<CB> subQuery) {
-        return facadeAvg(subQuery);
+        assertSubQuery(subQuery);
+        final HpSSQOption<CB> option = createOption();
+        _setupper.setup("avg", subQuery, option);
+        return createDecorator(option);
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected HpSSQOption<CB> createOption() {
+        return new HpSSQOption<CB>();
+    }
+
+    protected HpSSQDecorator<CB> createDecorator(HpSSQOption<CB> option) {
+        return new HpSSQDecorator<CB>(option);
+    }
+
+    protected void assertSubQuery(SubQuery<?> subQuery) {
+        if (subQuery == null) {
+            String msg = "The argument 'subQuery' for ScalarCondition should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
     }
 }

@@ -22,6 +22,7 @@ import org.seasar.dbflute.*;
 import org.seasar.dbflute.bhv.*;
 import org.seasar.dbflute.cbean.*;
 import org.seasar.dbflute.cbean.chelper.HpSLSExecutor;
+import org.seasar.dbflute.cbean.chelper.HpSLSFunction;
 import org.seasar.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.seasar.dbflute.dbmeta.DBMeta;
 #if ($database.isMakeFlatExpansion())
@@ -96,7 +97,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     //                                                                              ======
     /** {@inheritDoc} */
     public DBMeta getDBMeta() { return ${myDBMetaClassName}.getInstance(); }
-#if ($table.isCompatibleBehaviorNewMyEntityConditionBean())
+#if ($table.isCompatibleNewMyEntityConditionBean())
 
     /** @return The instance of DBMeta as my table type. (NotNull) */
     public ${myDBMetaClassName} getMyDBMeta() { return ${myDBMetaClassName}.getInstance(); }
@@ -110,7 +111,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 
     /** {@inheritDoc} */
     public ${myConditionBeanClassName} newConditionBean() { return new ${myConditionBeanClassName}(); }
-#if ($table.isCompatibleBehaviorNewMyEntityConditionBean())
+#if ($table.isCompatibleNewMyEntityConditionBean())
 
     /** @return The instance of new entity as my table type. (NotNull) */
     public ${myExtendedObjectClassName} newMyEntity() { return new ${myExtendedObjectClassName}(); }
@@ -498,29 +499,29 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param resultType The type of result. (NotNull)
      * @return The scalar function object to specify function for scalar value. (NotNull)
      */
-    public <RESULT> SLFunction<${myConditionBeanClassName}, RESULT> scalarSelect(Class<RESULT> resultType) {
+    public <RESULT> HpSLSFunction<${myConditionBeanClassName}, RESULT> scalarSelect(Class<RESULT> resultType) {
         return facadeScalarSelect(resultType);
     }
 
-    protected <RESULT> SLFunction<${myConditionBeanClassName}, RESULT> facadeScalarSelect(Class<RESULT> resultType) {
+    protected <RESULT> HpSLSFunction<${myConditionBeanClassName}, RESULT> facadeScalarSelect(Class<RESULT> resultType) {
         return doScalarSelect(resultType, newConditionBean());
     }
 
-    protected <RESULT, CB extends ${myConditionBeanClassName}> SLFunction<CB, RESULT> doScalarSelect(final Class<RESULT> tp, final CB cb) {
+    protected <RESULT, CB extends ${myConditionBeanClassName}> HpSLSFunction<CB, RESULT> doScalarSelect(final Class<RESULT> tp, final CB cb) {
         assertObjectNotNull("resultType", tp); assertCBStateValid(cb);
         cb.xsetupForScalarSelect(); cb.getSqlClause().disableSelectIndex(); // for when you use union
-        return createSLFunction(cb, tp, new HpSLSExecutor<CB, RESULT>() {
+        return createSLSFunction(cb, tp, new HpSLSExecutor<CB, RESULT>() {
             public RESULT execute(CB lcb, Class<RESULT> ltp, SelectClauseType sctp) {
                 return invoke(createSelectScalarCBCommand(lcb, ltp, sctp));
             }
         });
     }
 
-    protected <RESULT, CB extends ${myConditionBeanClassName}> SLFunction<CB, RESULT> createSLFunction(CB cb, Class<RESULT> tp, HpSLSExecutor<CB, RESULT> exec) {
-        return new SLFunction<CB, RESULT>(cb, tp, exec);
+    protected <CB extends ${myConditionBeanClassName}, RESULT> HpSLSFunction<CB, RESULT> createSLSFunction(CB cb, Class<RESULT> tp, HpSLSExecutor<CB, RESULT> exec) {
+        return new HpSLSFunction<CB, RESULT>(cb, tp, exec);
     }
 
-    protected <RESULT> SLFunction<? extends ConditionBean, RESULT> doReadScalar(Class<RESULT> tp) {
+    protected <RESULT> HpSLSFunction<? extends ConditionBean, RESULT> doReadScalar(Class<RESULT> tp) {
         return facadeScalarSelect(tp);
     }
 
