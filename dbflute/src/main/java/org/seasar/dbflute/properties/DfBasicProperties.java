@@ -404,6 +404,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return filterPackageBaseForBase(getProperty("baseBehaviorPackage", getPackageInfo().getBaseBehaviorPackage()));
     }
 
+    public String getReferrerLoaderPackage() {
+        return getBaseBehaviorPackage() + "." + getPackageInfo().getReferrerLoaderSimplePackage();
+    }
+
     public String getBaseDaoPackage() {
         return filterPackageBaseForBase(getProperty("baseDaoPackage", getPackageInfo().getBaseDaoPackage()));
     }

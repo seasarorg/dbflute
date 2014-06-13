@@ -31,6 +31,8 @@ public interface DfLanguageClassPackage {
 
     String getCursorSimplePackage();
 
+    String getReferrerLoaderSimplePackage();
+
     String getParameterBeanSimplePackage();
 
     String getBaseEntityPackage();

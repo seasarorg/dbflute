@@ -27,7 +27,6 @@ import org.seasar.dbflute.bhv.AbstractBehaviorReadable._;
 import org.seasar.dbflute.bhv.AbstractBehaviorWritable._;
 import org.seasar.dbflute.cbean._;
 import org.seasar.dbflute.cbean.chelper._;
-import org.seasar.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception._;
 import org.seasar.dbflute.util._;
@@ -40,6 +39,7 @@ import ${database.relationOptionalEntityClassName};
 import org.seasar.dbflute.outsidesql.executor._;
 import ${glPackageBaseCommon}._;
 import ${glPackageExtendedBhv}._;
+import ${myReferrerLoaderPackageName}._;
 import ${glPackageExtendedEntity}._;
 import ${myDBMetaPackageName}._;
 import ${glPackageCB}._;
@@ -177,15 +177,15 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
-    def selectEntity(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myExtendedReferrerLoaderClassName}) => Unit = null): ${table.filterSelectEntityOptionalReturnIfNeeds(${myImmutableExtendedObjectClassName})} = {
+    def selectEntity(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ${table.filterSelectEntityOptionalReturnIfNeeds(${myImmutableExtendedObjectClassName})} = {
         return facadeSelectEntity(callbackCB(cbCall))(loaderCall).map(_.toImmutable);
     }
 
-    protected def facadeSelectEntity(cb: ${myConditionBeanClassName})(loaderCall: (${myExtendedReferrerLoaderClassName}) => Unit = null): ${table.filterSelectEntityOptionalReturnIfNeeds(${myExtendedObjectClassName})} = {
+    protected def facadeSelectEntity(cb: ${myConditionBeanClassName})(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ${table.filterSelectEntityOptionalReturnIfNeeds(${myExtendedObjectClassName})} = {
         return doSelectOptionalEntity(cb, typeOfSelectedEntity())(loaderCall);
     }
 
-    protected def doSelectEntity[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY])(loaderCall: (${myExtendedReferrerLoaderClassName}) => Unit = null): ENTITY = {
+    protected def doSelectEntity[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ENTITY = {
         assertCBStateValid(cb); assertObjectNotNull("entityType", tp);
         val dble = helpSelectEntityInternally(cb, tp, new InternalSelectEntityCallback[ENTITY, ${myConditionBeanClassName}]() {
             def callbackSelectList(lcb: ${myConditionBeanClassName}, ltp: Class[ENTITY]): List[ENTITY] = { return doSelectList(lcb, ltp)(); } });
@@ -195,7 +195,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return dble;
     }
 
-    protected def doSelectOptionalEntity[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY])(loaderCall: (${myExtendedReferrerLoaderClassName}) => Unit = null): ${table.filterSelectEntityOptionalReturn("ENTITY")} = {
+    protected def doSelectOptionalEntity[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ${table.filterSelectEntityOptionalReturn("ENTITY")} = {
         return ${database.basicOptionalEntitySimpleName}.apply(doSelectEntity(cb, tp)(loaderCall));
     }
 
@@ -220,15 +220,15 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
-    ${table.selectEntityWithDeletedCheckModifierAsPrefix}def selectEntityWithDeletedCheck(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myExtendedReferrerLoaderClassName}) => Unit = null): ${myImmutableExtendedObjectClassName} = {
+    ${table.selectEntityWithDeletedCheckModifierAsPrefix}def selectEntityWithDeletedCheck(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ${myImmutableExtendedObjectClassName} = {
         return facadeSelectEntityWithDeletedCheck(callbackCB(cbCall))(loaderCall).toImmutable;
     }
 
-    protected def facadeSelectEntityWithDeletedCheck(cb: ${myConditionBeanClassName})(loaderCall: (${myExtendedReferrerLoaderClassName}) => Unit = null): ${myExtendedObjectClassName} = {
+    protected def facadeSelectEntityWithDeletedCheck(cb: ${myConditionBeanClassName})(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ${myExtendedObjectClassName} = {
         return doSelectEntityWithDeletedCheck(cb, typeOfSelectedEntity())(loaderCall);
     }
 
-    protected def doSelectEntityWithDeletedCheck[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY])(loaderCall: (${myExtendedReferrerLoaderClassName}) => Unit = null): ENTITY = {
+    protected def doSelectEntityWithDeletedCheck[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ENTITY = {
         assertCBStateValid(cb); assertObjectNotNull("entityType", tp);
         val dble = helpSelectEntityWithDeletedCheckInternally(cb, tp, new InternalSelectEntityWithDeletedCheckCallback[ENTITY, ${myConditionBeanClassName}]() {
             def callbackSelectList(lcb: ${myConditionBeanClassName}, ltp: Class[ENTITY]): List[ENTITY] = { return doSelectList(lcb, ltp)(); } });
@@ -316,15 +316,15 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @return The result bean of selected list. (NotNull: if no data, returns empty list)
      * @exception DangerousResultSizeException When the result size is over the specified safety size.
      */
-    def selectList(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myExtendedReferrerLoaderClassName}) => Unit = null): scala.collection.immutable.List[${myImmutableExtendedObjectClassName}] = {
+    def selectList(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): scala.collection.immutable.List[${myImmutableExtendedObjectClassName}] = {
         return toImmutableEntityList(facadeSelectList(callbackCB(cbCall))(loaderCall));
     }
 
-    protected def facadeSelectList(cb: ${myConditionBeanClassName})(loaderCall: (${myExtendedReferrerLoaderClassName}) => Unit = null): ListResultBean[${myExtendedObjectClassName}] = {
+    protected def facadeSelectList(cb: ${myConditionBeanClassName})(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ListResultBean[${myExtendedObjectClassName}] = {
         return doSelectList(cb, typeOfSelectedEntity())(loaderCall);
     }
 
-    protected def doSelectList[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY])(loaderCall: (${myExtendedReferrerLoaderClassName}) => Unit = null): ListResultBean[ENTITY] = {
+    protected def doSelectList[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ListResultBean[ENTITY] = {
         assertCBStateValid(cb); assertObjectNotNull("entityType", tp);
         assertSpecifyDerivedReferrerEntityProperty(cb, tp);
         val dbleList = helpSelectListInternally(cb, tp, new InternalSelectListCallback[ENTITY, ${myConditionBeanClassName}]() {
@@ -364,15 +364,15 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @return The result bean of selected page. (NotNull: if no data, returns bean as empty list)
      * @exception DangerousResultSizeException When the result size is over the specified safety size.
      */
-    def selectPage(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myExtendedReferrerLoaderClassName}) => Unit = null): PagingResultBean[${myExtendedObjectClassName}] = {
+    def selectPage(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): PagingResultBean[${myExtendedObjectClassName}] = {
         return facadeSelectPage(callbackCB(cbCall))(loaderCall); // #pending use toImmutableEntityList()
     }
 
-    protected def facadeSelectPage(cb: ${myConditionBeanClassName})(loaderCall: (${myExtendedReferrerLoaderClassName}) => Unit = null): PagingResultBean[${myExtendedObjectClassName}] = {
+    protected def facadeSelectPage(cb: ${myConditionBeanClassName})(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): PagingResultBean[${myExtendedObjectClassName}] = {
         return doSelectPage(cb, typeOfSelectedEntity())(loaderCall);
     }
 
-    protected def doSelectPage[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY])(loaderCall: (${myExtendedReferrerLoaderClassName}) => Unit = null): PagingResultBean[ENTITY] = {
+    protected def doSelectPage[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): PagingResultBean[ENTITY] = {
         assertCBStateValid(cb); assertObjectNotNull("entityType", tp);
         return helpSelectPageInternally(cb, tp, new InternalSelectPageCallback[ENTITY, ${myConditionBeanClassName}]() {
             def callbackSelectCount(cb: ${myConditionBeanClassName}): Int = { return doSelectCountPlainly(cb); }
@@ -453,14 +453,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     protected def doScalarSelect[RESULT, CB <: ${myConditionBeanClassName}](tp: Class[RESULT], cb: CB): HpSLSFunction[CB, RESULT] = {
         assertObjectNotNull("resultType", tp); assertCBStateValid(cb);
         cb.xsetupForScalarSelect(); cb.getSqlClause().disableSelectIndex(); // for when you use union
-        return createSLSFunction[CB, RESULT](cb, tp, new HpSLSExecutor[CB, RESULT]() {
-            def execute(lcb: CB, ltp: Class[RESULT], sctp: SelectClauseType): RESULT =
-            { invoke(createSelectScalarCBCommand(lcb, ltp, sctp)) }
-        });
+        return createSLSFunction[CB, RESULT](cb, tp, createHpSLSExecutor());
     }
-
-    protected def createSLSFunction[CB <: ${myConditionBeanClassName}, RESULT](cb: CB, tp: Class[RESULT], exec: HpSLSExecutor[CB, RESULT]): HpSLSFunction[CB, RESULT] =
-    { new HpSLSFunction[CB, RESULT](cb, tp, exec) }
 
     protected def doReadScalar[RESULT](tp: Class[RESULT]): HpSLSFunction[_ <: ConditionBean, RESULT] = {
         return facadeScalarSelect(tp);
@@ -555,7 +549,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param setupper The callback to set up referrer condition-bean for loading referrer. (NotNull)
      * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
      */
-    def load${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], setupCall: (${referrerCBClassName}) => Unit): NestedReferrerLoader[${referrerEntityClassName}] = {
+    def load${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], setupCall: (${referrerCBClassName}) => Unit): NestedReferrerHandler[${referrerEntityClassName}] = {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName}); assertObjectNotNull("setupCall", setupCall);
         val setupper = new ReferrerConditionSetupper[${referrerCBClassName}]() { def setup(referrerCB: ${referrerCBClassName}): Unit = { setupCall(referrerCB); } }
         return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]().xinit(setupper));
@@ -592,7 +586,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param setupper The callback to set up referrer condition-bean for loading referrer. (NotNull)
      * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
      */
-    def load${referrer.referrerPropertyNameInitCap}(${myEntityVariableName}: ${myExtendedObjectClassName}, setupCall: (${referrerCBClassName}) => Unit): NestedReferrerLoader[${referrerEntityClassName}] = {
+    def load${referrer.referrerPropertyNameInitCap}(${myEntityVariableName}: ${myExtendedObjectClassName}, setupCall: (${referrerCBClassName}) => Unit): NestedReferrerHandler[${referrerEntityClassName}] = {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); assertObjectNotNull("setupCall", setupCall);
         val setupper = new ReferrerConditionSetupper[${referrerCBClassName}]() { def setup(referrerCB: ${referrerCBClassName}): Unit = { setupCall(referrerCB); } }
         return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), new LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]().xinit(setupper));
@@ -602,7 +596,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 #set ($referrerColumn = ${referrer.localColumnAsOne})
 #set ($localColumn = ${referrer.foreignColumnAsOne})
 #set ($keyJavaNative = "${referrerColumn.javaNative}")
-    protected def doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
+    protected def doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerHandler[${referrerEntityClassName}] = {
         val referrerBhv: ${referrerBhvClassName} = xgetBSFLR().select(classOf[${referrerBhvClassName}]);
         return helpLoadReferrerInternally(${myEntityListVariableName}, option, new InternalLoadReferrerCallback[${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}]() {
             def getPKVal(et: ${myExtendedObjectClassName}): ${keyJavaNative} =
@@ -641,7 +635,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
 #else
 #set ($keyJavaNative = "java.util.Map<String, Object>")
-    protected def doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], option: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerLoader[${referrerEntityClassName}] = {
+    protected def doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], option: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerHandler[${referrerEntityClassName}] = {
         val referrerBhv: ${referrerBhvClassName} = xgetBSFLR().select(classOf[${referrerBhvClassName}]);
         return helpLoadReferrerInternally(${myEntityListVariableName}.asJava, option, new InternalLoadReferrerCallback[${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}]() {
             def getPKVal(et: ${myExtendedObjectClassName}): ${keyJavaNative} = {
@@ -1751,9 +1745,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         val option = new DeleteOption[${myConditionBeanClassName}](); optionCall(option); return option;
     }
 
-    protected def callbackLoader(dbleList: List[${myExtendedObjectClassName}], loaderCall: (${myExtendedReferrerLoaderClassName}) => Unit = null): Unit = {
+    protected def callbackLoader(dbleList: List[${myExtendedObjectClassName}], loaderCall: (${myReferrerLoaderClassName}) => Unit = null): Unit = {
         if (loaderCall == null) { return; }
-        val loader = new ${myExtendedReferrerLoaderClassName}();
+        val loader = new ${myReferrerLoaderClassName}();
         loader.ready(dbleList.asInstanceOf[List[${myExtendedObjectClassName}]], _behaviorSelector);
         loaderCall(loader);
     }
@@ -1794,67 +1788,4 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     def toDBableEntityList(immuList: scala.collection.immutable.List[${myImmutableExtendedObjectClassName}]): List[${myExtendedObjectClassName}] =
     { immuList.map(new ${myExtendedObjectClassName}().acceptImmutable(_)).asJava }
-}
-
-/* _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
-/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
-/* _/_/_/_/_/_/_/_/_/_/_/                  Behavior                                            _/_/_/_/_/_/_/_/_/_/_/ */
-/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
-/* _/_/_/_/_/_/_/_/_/_/_/                                        Loader                        _/_/_/_/_/_/_/_/_/_/_/ */
-/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
-/* _/_/_/_/_/_/_/_/_/_/_/                              Border                                  _/_/_/_/_/_/_/_/_/_/_/ */
-/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
-/* _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
-
-/**
- * The referrer loader of ${table.basicInfoDispString}.
- * @author jflute
- */
-class ${myBaseReferrerLoaderClassName} {
-
-    protected var _selectedList: List[${myExtendedObjectClassName}] = null;
-    protected var _selector: BehaviorSelector = null;
-    protected var _myBhv: ${myExtendedBhvClassName} = null; // lazy-loaded
-
-    def ready(selectedList: List[${myExtendedObjectClassName}], selector: BehaviorSelector): ${myExtendedReferrerLoaderClassName} =
-    { _selectedList = selectedList; _selector = selector; return this.asInstanceOf[${myExtendedReferrerLoaderClassName}]; }
-
-    protected def myBhv: ${myExtendedBhvClassName} =
-    { if (_myBhv != null) { _myBhv } else { _myBhv = _selector.select(classOf[${myExtendedBhvClassName}]); _myBhv } }
-#foreach ($referrer in $table.referrerAsManyList)
-#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
-#set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($referrerLoaderClassName = "${referrer.referrerTableExtendedReferrerLoaderClassName}")
-
-    protected var _referrer${referrer.referrerPropertyNameInitCap}: List[${referrerEntityClassName}] = null;
-    def load${referrer.referrerPropertyNameInitCap}(cbCall: (${referrerCBClassName}) => Unit): ScrNestedReferrerLoader[${referrerLoaderClassName}] = {
-        myBhv.load${referrer.referrerPropertyNameInitCap}(_selectedList, cbCall).withNestedReferrer(new ReferrerListHandler[${referrerEntityClassName}]() {
-            def handle(referrerList: List[${referrerEntityClassName}]): Unit = { _referrer${referrer.referrerPropertyNameInitCap} = referrerList; }
-        });
-        return createNested(() => { new ${referrerLoaderClassName}().ready(_referrer${referrer.referrerPropertyNameInitCap}, _selector); });
-    }
-#end
-#foreach ($fk in $table.foreignKeys)
-#set ($foreignEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
-#set ($foreignImmutableEntityClassName = "${fk.foreignTableImmutableExtendedEntityClassName}")
-#set ($foreignLoaderClassName = "${fk.foreignTableExtendedReferrerLoaderClassName}")
-
-    protected var _foreign${fk.foreignPropertyNameInitCap}List: List[${foreignEntityClassName}] = null;
-    def pullout${fk.foreignPropertyNameInitCap}: ${foreignLoaderClassName} = {
-        if (_foreign${fk.foreignPropertyNameInitCap}List == null)
-        { _foreign${fk.foreignPropertyNameInitCap}List = myBhv.pullout${fk.foreignPropertyNameInitCap}(toScalaList(_selectedList).map(new ${myImmutableExtendedObjectClassName}(_))).map(new ${foreignEntityClassName}().acceptImmutable(_)).asJava }
-        return new ${foreignLoaderClassName}().ready(_foreign${fk.foreignPropertyNameInitCap}List, _selector);
-    }
-#end
-
-    protected def createNested[LOADER](loaderCall: () => LOADER): ScrNestedReferrerLoader[LOADER] =
-    { return new ScrNestedReferrerLoader[LOADER](loaderCall); }
-
-    protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): scala.collection.immutable.List[ENTITY] = {
-        if (javaList == null) { scala.collection.immutable.List() }
-        return scala.collection.immutable.List.fromArray(javaList.toArray()).asInstanceOf[scala.collection.immutable.List[ENTITY]];
-    }
-
-    def selectedList: List[${myExtendedObjectClassName}] = { _selectedList; }
-    def selector: BehaviorSelector = { _selector; }
 }

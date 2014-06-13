@@ -41,6 +41,10 @@ public class DfLanguageClassPackageJava implements DfLanguageClassPackage {
         return "cursor";
     }
 
+    public String getReferrerLoaderSimplePackage() {
+        return "loader";
+    }
+
     public String getParameterBeanSimplePackage() {
         return "pmbean";
     }

@@ -73,6 +73,7 @@ public class DfOldClassHandler {
     public void deleteOldTableClass() {
         info("public void deleteOldTableClass() {");
         deleteOldTableClass_for_BaseBehavior();
+        deleteOldTableClass_for_ReferrerLoader();
         deleteOldTableClass_for_BaseDao();
         deleteOldTableClass_for_BaseEntity();
         deleteOldTableClass_for_DBMeta();
@@ -123,6 +124,22 @@ public class DfOldClassHandler {
 
     protected String getBaseBehaviorPackage() {
         return getBasicProperties().getBaseBehaviorPackage();
+    }
+
+    public void deleteOldTableClass_for_ReferrerLoader() {
+        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
+            public String setup(Table table) {
+                return table.getReferrerLoaderClassName();
+            }
+        };
+        final String packagePath = getReferrerLoaderPackage();
+        final String classPrefix = getProjectPrefix() + "LoaderOf";
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, null, setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    protected String getReferrerLoaderPackage() {
+        return getBasicProperties().getReferrerLoaderPackage();
     }
 
     protected List<String> _deletedOldTableBaseDaoList;

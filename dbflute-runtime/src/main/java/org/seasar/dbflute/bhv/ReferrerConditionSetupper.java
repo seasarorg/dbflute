@@ -20,14 +20,14 @@ import org.seasar.dbflute.cbean.ConditionBean;
 /**
  * The set-upper of condition-bean for referrer.
  * <pre>
- * memberBhv.<span style="color: #DD4747">loadPurchaseList</span>(memberList, referrerCB -&gt; {
+ * loader.<span style="color: #DD4747">loadPurchaseList</span>(memberList, referrerCB -&gt; {
  *     cb.setupSelect_Product();
  *     cb.query().setPurchasePrice_GreaterEqual(2000);
  *     cb.query().addOrderBy_PurchaseDatetime_Desc();
  *     ...
  * }); <span style="color: #3F7E5E">// you can also load nested referrer from here</span>
- * <span style="color: #3F7E5E">//}).withNestedList(referrerList -&gt {</span>
- * <span style="color: #3F7E5E">//    purchaseBhv.loadPurchaseDetailList(...);</span>
+ * <span style="color: #3F7E5E">//}).withNestedList(purchaseLoader -&gt {</span>
+ * <span style="color: #3F7E5E">//    purchaseLoader.loadPurchasePaymentList(...);</span>
  * <span style="color: #3F7E5E">//});</span>
  * for (Member member : memberList) {
  *     List&lt;Purchase&gt; purchaseList = member.<span style="color: #DD4747">getPurchaseList()</span>;
@@ -46,6 +46,23 @@ public interface ReferrerConditionSetupper<CB extends ConditionBean> {
      * Set up condition-bean for referrer. <br />
      * You can call SetupSelect, Query, OrderBy... <br />
      * Ordering by FK is already set up so you should add next order condition here.
+     * <pre>
+     * loader.<span style="color: #DD4747">loadPurchaseList</span>(memberList, referrerCB -&gt; {
+     *     cb.setupSelect_Product();
+     *     cb.query().setPurchasePrice_GreaterEqual(2000);
+     *     cb.query().addOrderBy_PurchaseDatetime_Desc();
+     *     ...
+     * }); <span style="color: #3F7E5E">// you can also load nested referrer from here</span>
+     * <span style="color: #3F7E5E">//}).withNestedList(purchaseLoader -&gt {</span>
+     * <span style="color: #3F7E5E">//    purchaseLoader.loadPurchasePaymentList(...);</span>
+     * <span style="color: #3F7E5E">//});</span>
+     * for (Member member : memberList) {
+     *     List&lt;Purchase&gt; purchaseList = member.<span style="color: #DD4747">getPurchaseList()</span>;
+     *     for (Purchase purchase : purchaseList) {
+     *         ...
+     *     }
+     * }
+     * </pre>
      * @param referrerCB The prepared instance of condition-bean. (NotNull)
      */
     void setup(CB referrerCB);

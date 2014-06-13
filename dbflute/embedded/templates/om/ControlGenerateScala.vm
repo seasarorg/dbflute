@@ -102,7 +102,7 @@ $database.checkProperties()
 ##                                               -------
 #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
 #set ($glPackageBaseBhv = "${database.baseBehaviorPackage}")
-#set ($glPackageBaseCustomizeDao = "${database.baseDaoPackage}.customize" )
+#set ($glPackageBaseReferrerLoader = "${database.referrerLoaderPackage}")
 #set ($glPackageBaseEntity = "${database.baseEntityPackage}")
 #set ($glPackageBaseCustomizeEntity = "${database.baseEntityPackage}.customize" )
 #set ($glPackageExtendedBhv = "${database.extendedBehaviorPackage}")
@@ -115,7 +115,7 @@ $database.checkProperties()
 #set ($glPackageCQ = "${database.extendedConditionBeanPackage}.cq")
 #set ($glPackageCIQ = "${database.conditionBeanPackage}.cq.ciq")
 #set ($glPackageNss = "${database.conditionBeanPackage}.nss")
-#set ($glPackageBaseDBMeta = "${glPackageBaseEntity}.dbmeta")
+#set ($glPackageBaseDBMeta = "${database.DBMetaPackage}")
 #set ($glPackageBaseCustomizeDBMeta = "${glPackageBaseCustomizeEntity}.dbmeta")
 
 ## *****************************************************************************************************************
@@ -256,6 +256,9 @@ $database.info("}")
 #set ($path = $database.getPackageAsPath(${glPackageBaseBhv}))
 $database.makeDirectory($path)
 
+#set ($path = $database.getPackageAsPath(${glPackageBaseReferrerLoader}))
+$database.makeDirectory($path)
+
 #set ($path = $database.getPackageAsPath(${glPackageBaseEntity}))
 $database.makeDirectory($path)
 
@@ -309,10 +312,11 @@ $database.info("public void parseTableClass() {")
 
   #set ($myBaseBhvClassName = "${table.baseBehaviorClassName}")
   #set ($myBaseBhvPackageName = "${glPackageBaseBhv}")
-  #set ($myBaseReferrerLoaderClassName = "${table.baseReferrerLoaderClassName}")
   #set ($myExtendedBhvClassName = "${table.extendedBehaviorClassName}")
   #set ($myExtendedBhvPackageName = "${glPackageExtendedBhv}")
-  #set ($myExtendedReferrerLoaderClassName = "${table.extendedReferrerLoaderClassName}")
+
+  #set ($myReferrerLoaderClassName = "${table.referrerLoaderClassName}")
+  #set ($myReferrerLoaderPackageName = "${glPackageBaseReferrerLoader}")
 
   #set ($myBaseObjectClassName = "${table.baseEntityClassName}")
   #set ($myImmutableBaseObjectClassName = "${table.immutableBaseEntityClassName}")
@@ -355,6 +359,9 @@ $database.info("public void parseTableClass() {")
   #if (!$table.isSuppressDBAccessClass())
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
+
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseReferrerLoader})}${myReferrerLoaderClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/bsbhv/ReferrerLoader.${glTemplateFileExtension}", $path, "table", $table)
   #end
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseEntity})}${myBaseObjectClassName}.${glClassFileExtension}" )
   $generator.parse("om/${glResourceDirectory}/bsentity/BaseEntity.${glTemplateFileExtension}", $path, "table", $table)

@@ -1003,6 +1003,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isCompatibleNestSelectSetupperAlwaysGenerate", false);
     }
 
+    public boolean isCompatibleLoadReferrerConditionBeanSetupper() { // closet
+        return isProperty("isCompatibleLoadReferrerConditionBeanSetupper", false);
+    }
+
     // -----------------------------------------------------
     //                                      Java8 Compatible
     //                                      ----------------
@@ -1028,6 +1032,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public boolean isCompatibleDeleteNonstrictIgnoreDeleted() { // closet
         return isProperty("isCompatibleDeleteNonstrictIgnoreDeleted", isCompatibleBeforeJava8());
+    }
+
+    public boolean isCompatibleLoadReferrerOldOption() { // closet
+        return isProperty("isCompatibleLoadReferrerOldOption", isCompatibleBeforeJava8());
     }
 
     public boolean isCompatibleBeforeJava8() { // closet

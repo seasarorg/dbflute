@@ -1442,6 +1442,10 @@ public class Database {
         return getProperties().getBasicProperties().getBaseBehaviorPackage();
     }
 
+    public String getReferrerLoaderPackage() {
+        return getProperties().getBasicProperties().getReferrerLoaderPackage();
+    }
+
     public String getBaseDaoPackage() {
         return getProperties().getBasicProperties().getBaseDaoPackage();
     }

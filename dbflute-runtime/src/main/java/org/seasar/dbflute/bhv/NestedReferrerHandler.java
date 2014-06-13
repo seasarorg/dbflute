@@ -15,8 +15,10 @@
  */
 package org.seasar.dbflute.bhv;
 
+import org.seasar.dbflute.Entity;
+
 /**
- * The loader of nested referrer.
+ * The handler of nested referrer.
  * <pre>
  * MemberCB cb = new MemberCB();
  * cb.query().set...
@@ -37,14 +39,14 @@ package org.seasar.dbflute.bhv;
  *     }
  * }
  * </pre>
- * @param <LOADER> The type of referrer loader.
+ * @param <REFERRER> The type of referrer entity.
  * @author jflute
- * @since 1.0.5F (2014/05/06 Tuesday)
+ * @since 1.0.6A (2014/06/14 Saturday)
  */
-public interface NestedReferrerLoader<LOADER> {
+public interface NestedReferrerHandler<REFERRER extends Entity> {
 
     /**
-     * Set up nested referrer by the loader.
+     * Set up nested referrer by the handler.
      * <pre>
      * MemberCB cb = new MemberCB();
      * cb.query().set...
@@ -65,7 +67,7 @@ public interface NestedReferrerLoader<LOADER> {
      *     }
      * }
      * </pre>
-     * @param provider The provider of referrer loader to load nested referrer. (NotNull)
+     * @param handler The handler of referrer list to load nested referrer. (NotNull)
      */
-    void withNestedReferrer(ReferrerLoaderHandler<LOADER> provider);
+    void withNestedReferrer(ReferrerListHandler<REFERRER> handler);
 }

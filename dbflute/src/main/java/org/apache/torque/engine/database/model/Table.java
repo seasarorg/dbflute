@@ -2174,9 +2174,10 @@ public class Table {
         return getBaseBehaviorClassName() + suffix;
     }
 
-    public String getBaseReferrerLoaderClassName() {
-        return buildBaseEntityClassName("LoaderOf");
-    }
+    // referrer load has no generation gap
+    //public String getBaseReferrerLoaderClassName() {
+    //    return buildBaseEntityClassName("LoaderOf");
+    //}
 
     public String getBaseBehaviorExtendsClassName() {
         return isWritable() ? "AbstractBehaviorWritable" : "AbstractBehaviorReadable";
@@ -2223,8 +2224,8 @@ public class Table {
         return buildExtendedEntityClassName(projectPrefix, "");
     }
 
-    protected String buildExtendedEntityClassName(String projectPrefix, String mutablePrefix) {
-        return projectPrefix + mutablePrefix + getSchemaClassPrefix() + getJavaName();
+    protected String buildExtendedEntityClassName(String projectPrefix, String nextPrefix) {
+        return projectPrefix + nextPrefix + getSchemaClassPrefix() + getJavaName();
     }
 
     public String getRelationTraceClassName() {
@@ -2272,7 +2273,11 @@ public class Table {
         return extendedBehaviorPackage + "." + getExtendedBehaviorApClassName();
     }
 
-    public String getExtendedReferrerLoaderClassName() {
+    public String getReferrerLoaderClassName() { // referrer load has no generation gap
+        return getExtendedReferrerLoaderClassName();
+    }
+
+    protected String getExtendedReferrerLoaderClassName() {
         final String projectPrefix = getBasicProperties().getProjectPrefix();
         return buildExtendedEntityClassName(projectPrefix, "LoaderOf");
     }
@@ -3550,14 +3555,17 @@ public class Table {
     // ===================================================================================
     //                                                                       Load Referrer
     //                                                                       =============
+    public boolean hasLoadReferrer() {
+        return hasPrimaryKey() && hasReferrerAsMany();
+    }
+
     public boolean isAvailableLoadReferrerByOldOption() {
-        // #later load referrer option is old style so suppress it since 1.1
-        return getLittleAdjustmentProperties().isCompatibleBeforeJava8();
+        return getLittleAdjustmentProperties().isCompatibleLoadReferrerOldOption();
     }
 
     public String getLoadReferrerConditionSetupperName() {
         final Class<?> type;
-        if (isAvailableLoadReferrerByOldOption()) {
+        if (getLittleAdjustmentProperties().isCompatibleLoadReferrerConditionBeanSetupper()) {
             type = ConditionBeanSetupper.class;
         } else {
             type = ReferrerConditionSetupper.class;

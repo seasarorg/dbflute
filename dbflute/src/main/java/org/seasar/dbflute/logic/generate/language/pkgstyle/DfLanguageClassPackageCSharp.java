@@ -39,6 +39,10 @@ public class DfLanguageClassPackageCSharp implements DfLanguageClassPackage {
         return "Cursor";
     }
 
+    public String getReferrerLoaderSimplePackage() {
+        return "Loader";
+    }
+
     public String getParameterBeanSimplePackage() {
         return "PmBean";
     }

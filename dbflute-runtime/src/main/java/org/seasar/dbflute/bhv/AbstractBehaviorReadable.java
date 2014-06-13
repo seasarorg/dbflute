@@ -84,8 +84,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** The empty instance for loader of nested referrer. (wild-card generic for downcast) */
-    protected static final NestedReferrerLoader<?> EMPTY_LOADER = new NestedReferrerLoader<Entity>() {
+    /** The empty instance for handler of nested referrer. (wild-card generic for downcast) */
+    protected static final NestedReferrerHandler<?> EMPTY_NREF = new NestedReferrerHandler<Entity>() {
         public void withNestedReferrer(ReferrerListHandler<Entity> handler) {
             final List<Entity> emptyList = DfCollectionUtil.emptyList();
             handler.handle(emptyList);
@@ -457,14 +457,20 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         return func;
     }
 
-    protected abstract <RESULT> HpSLSFunction<? extends ConditionBean, RESULT> doReadScalar(Class<RESULT> resultType);
-
-    // use exiting SLFunction for compatible
-    public class SLFunction<CB extends ConditionBean, RESULT> extends HpSLSFunction<CB, RESULT> {
-        public SLFunction(CB conditionBean, Class<RESULT> resultType, HpSLSExecutor<CB, RESULT> executor) {
-            super(conditionBean, resultType, executor);
-        }
+    protected <CB extends ConditionBean, RESULT> HpSLSExecutor<CB, RESULT> createHpSLSExecutor() {
+        return new HpSLSExecutor<CB, RESULT>() {
+            public RESULT execute(CB lcb, Class<RESULT> ltp, SelectClauseType sctp) {
+                return invoke(createSelectScalarCBCommand(lcb, ltp, sctp));
+            }
+        };
     }
+
+    protected <CB extends ConditionBean, RESULT> HpSLSFunction<CB, RESULT> createSLSFunction(CB cb, Class<RESULT> tp,
+            HpSLSExecutor<CB, RESULT> exec) {
+        return new HpSLSFunction<CB, RESULT>(cb, tp, exec);
+    }
+
+    protected abstract <RESULT> HpSLSFunction<? extends ConditionBean, RESULT> doReadScalar(Class<RESULT> resultType);
 
     // ===================================================================================
     //                                                                          OutsideSql
@@ -514,7 +520,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param callback The internal callback of loadReferrer. (NotNull) 
      * @return The callback to load nested referrer. (NotNull)
      */
-    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> NestedReferrerLoader<REFERRER_ENTITY> helpLoadReferrerInternally(
+    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> NestedReferrerHandler<REFERRER_ENTITY> helpLoadReferrerInternally(
             List<LOCAL_ENTITY> localEntityList, LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption,
             InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
         return doHelpLoadReferrerInternally(localEntityList, loadReferrerOption, callback);
@@ -532,7 +538,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param callback The internal call-back of loadReferrer. (NotNull) 
      * @return The callback to load nested referrer. (NotNull)
      */
-    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> NestedReferrerLoader<REFERRER_ENTITY> doHelpLoadReferrerInternally(
+    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> NestedReferrerHandler<REFERRER_ENTITY> doHelpLoadReferrerInternally(
             List<LOCAL_ENTITY> localEntityList, LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption,
             final InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
 
@@ -544,7 +550,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         assertObjectNotNull("loadReferrerOption", loadReferrerOption);
         if (localEntityList.isEmpty()) {
             @SuppressWarnings("unchecked")
-            final NestedReferrerLoader<REFERRER_ENTITY> empty = (NestedReferrerLoader<REFERRER_ENTITY>) EMPTY_LOADER;
+            final NestedReferrerHandler<REFERRER_ENTITY> empty = (NestedReferrerHandler<REFERRER_ENTITY>) EMPTY_NREF;
             return empty;
         }
 
@@ -645,7 +651,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         // - - - - - - - - - - - - - - - - - - - -
         // Return callback to load nested referrer
         // - - - - - - - - - - - - - - - - - - - -
-        return new NestedReferrerLoader<REFERRER_ENTITY>() {
+        return new NestedReferrerHandler<REFERRER_ENTITY>() {
             public void withNestedReferrer(ReferrerListHandler<REFERRER_ENTITY> handler) {
                 handler.handle(Collections.unmodifiableList(referrerList));
             }
@@ -725,28 +731,44 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         String getRfPrNm(); // getReferrerPropertyName()
     }
 
+    protected <ELEMENT extends Entity> List<ELEMENT> xnewLRAryLs(ELEMENT entity) {
+        final List<ELEMENT> ls = new ArrayList<ELEMENT>(1);
+        ls.add(entity);
+        return ls;
+    }
+
     // assertLoadReferrerArgument() as Internal
+    protected void xassLRArg(List<? extends Entity> entityList, ReferrerLoaderHandler<?> handler) {
+        assertObjectNotNull("LoadReferrer's entityList", entityList);
+        assertObjectNotNull("LoadReferrer's handler", handler);
+    }
+
+    protected void xassLRArg(Entity entity, ReferrerLoaderHandler<?> handler) {
+        assertObjectNotNull("LoadReferrer's entity", entity);
+        assertObjectNotNull("LoadReferrer's handler", handler);
+    }
+
     protected void xassLRArg(List<? extends Entity> entityList,
             ReferrerConditionSetupper<? extends ConditionBean> setupper) {
-        assertObjectNotNull("List<" + DfTypeUtil.toClassTitle(getDBMeta().getEntityType()) + ">", entityList);
-        assertObjectNotNull("setupper", setupper);
+        assertObjectNotNull("LoadReferrer's entityList", entityList);
+        assertObjectNotNull("LoadReferrer's setupper", setupper);
     }
 
     protected void xassLRArg(Entity entity, ReferrerConditionSetupper<? extends ConditionBean> setupper) {
-        assertObjectNotNull("entity(" + DfTypeUtil.toClassTitle(getDBMeta().getEntityType()) + ")", entity);
-        assertObjectNotNull("setupper", setupper);
+        assertObjectNotNull("LoadReferrer's entity", entity);
+        assertObjectNotNull("LoadReferrer's setupper", setupper);
     }
 
     protected void xassLRArg(List<? extends Entity> entityList,
             LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
-        assertObjectNotNull("List<" + DfTypeUtil.toClassTitle(getDBMeta().getEntityType()) + ">", entityList);
-        assertObjectNotNull("loadReferrerOption", loadReferrerOption);
+        assertObjectNotNull("LoadReferrer's entityList", entityList);
+        assertObjectNotNull("LoadReferrer's loadReferrerOption", loadReferrerOption);
     }
 
     protected void xassLRArg(Entity entity,
             LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
-        assertObjectNotNull("entity(" + DfTypeUtil.toClassTitle(getDBMeta().getEntityType()) + ")", entity);
-        assertObjectNotNull("loadReferrerOption", loadReferrerOption);
+        assertObjectNotNull("LoadReferrer's entity", entity);
+        assertObjectNotNull("lLoadReferrer's oadReferrerOption", loadReferrerOption);
     }
 
     protected BehaviorSelector xgetBSFLR() { // getBehaviorSelectorForLoadReferrer() as Internal
