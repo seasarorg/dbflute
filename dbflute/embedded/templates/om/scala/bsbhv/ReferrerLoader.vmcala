@@ -35,8 +35,29 @@ import ${glPackageCB}._;
 /**
  * The referrer loader of ${table.basicInfoDispString}. <br />
  * <pre>
+ * [primary key]
+ *     ${table.primaryKeyNameCommaString}
+ *
+ * [column]
+ *     ${table.columnNameCommaString}
+ *
+ * [sequence]
+ *     ${table.definedSequenceName}
+ *
+ * [identity]
+ *     ${table.identityColumnName}
+ *
+ * [version-no]
+ *     ${table.versionNoColumnName}
+ *
+ * [foreign table]
+ *     ${table.foreignTableNameCommaString}
+ *
  * [referrer table]
  *     ${table.referrerTableNameCommaString}
+ *
+ * [foreign property]
+ *     ${table.foreignPropertyNameCommaString}
  *
  * [referrer property]
  *     ${table.referrerPropertyNameCommaString}
@@ -61,6 +82,7 @@ class ${myClassName} {
     protected def myBhv: ${myExtendedBhvClassName} =
     { if (_myBhv != null) { _myBhv } else { _myBhv = _selector.select(classOf[${myExtendedBhvClassName}]); _myBhv } }
 
+#if ($table.hasLoadReferrer())
     // ===================================================================================
     //                                                                       Load Referrer
     //                                                                       =============
@@ -68,19 +90,27 @@ class ${myClassName} {
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($referrerLoaderClassName = "${referrer.referrerTableExtendedReferrerLoaderClassName}")
+#set ($loadMethodReturn = "Unit")
+#if ($referrer.table.hasReferrerLoader())
+#set ($loadMethodReturn = "ScrNestedReferrerLoaderGateway[${referrerLoaderClassName}]")
+#end
     protected var _referrer${referrer.referrerPropertyNameInitCap}: List[${referrerEntityClassName}] = null;
-    def load${referrer.referrerPropertyNameInitCap}(cbCall: (${referrerCBClassName}) => Unit): ScrNestedReferrerLoader[${referrerLoaderClassName}] = {
+    def load${referrer.referrerPropertyNameInitCap}(cbCall: (${referrerCBClassName}) => Unit): ${loadMethodReturn} = {
         myBhv.load${referrer.referrerPropertyNameInitCap}(_selectedList, cbCall).withNestedReferrer(new ReferrerListHandler[${referrerEntityClassName}]() {
             def handle(referrerList: List[${referrerEntityClassName}]): Unit = { _referrer${referrer.referrerPropertyNameInitCap} = referrerList; }
         });
+#if ($referrer.table.hasReferrerLoader())
         return createNested(() => { new ${referrerLoaderClassName}().ready(_referrer${referrer.referrerPropertyNameInitCap}, _selector); });
+#end
     }
 
+#end
 #end
     // ===================================================================================
     //                                                                    Pull out Foreign
     //                                                                    ================
 #foreach ($fk in $table.foreignKeys)
+#if ($fk.foreignTable.hasReferrerLoader())
 #set ($foreignEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
 #set ($foreignLoaderClassName = "${fk.foreignTableExtendedReferrerLoaderClassName}")
 #set ($foreignLoaderVariableName = "_foreign${fk.foreignPropertyNameInitCap}Loader")
@@ -93,7 +123,9 @@ class ${myClassName} {
     }
 
 #end
+#end
 #foreach ($referrer in $table.referrerAsOneList)
+#if ($referrer.table.hasReferrerLoader())
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerLoaderClassName = "${referrer.referrerTableExtendedReferrerLoaderClassName}")
@@ -107,11 +139,12 @@ class ${myClassName} {
     }
 
 #end
+#end
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected def createNested[LOADER](loaderCall: () => LOADER): ScrNestedReferrerLoader[LOADER] =
-    { return new ScrNestedReferrerLoader[LOADER](loaderCall); }
+    protected def createNested[LOADER](loaderCall: () => LOADER): ScrNestedReferrerLoaderGateway[LOADER] =
+    { return new ScrNestedReferrerLoaderGateway[LOADER](loaderCall); }
 
     protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): scala.collection.immutable.List[ENTITY] = {
         if (javaList == null) { scala.collection.immutable.List() }

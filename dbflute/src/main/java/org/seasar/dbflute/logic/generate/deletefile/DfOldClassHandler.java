@@ -98,7 +98,7 @@ public class DfOldClassHandler {
     public void deleteOldTableClass_for_BaseBehavior() {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                if (table.isSuppressDBAccessClass()) {
+                if (!table.hasBehavior()) {
                     return null; // delete the class though existing table
                 }
                 if (getBasicProperties().isApplicationBehaviorProject()) {
@@ -147,7 +147,7 @@ public class DfOldClassHandler {
     public void deleteOldTableClass_for_BaseDao() {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                if (table.isSuppressDBAccessClass()) {
+                if (!table.hasBehavior()) {
                     return null; // delete the class though existing table
                 }
                 return table.getBaseDaoClassName();

@@ -108,4 +108,8 @@ public class DfLanguageTypeMappingJava implements DfLanguageTypeMapping {
     public String convertToImmutableJavaNativeDefaultValue(String immutableJavaNative) {
         return "null";
     }
+
+    public String convertToJavaNativeFromImmutable(String immutableJavaNative, String javaNative, String variable) {
+        return variable;
+    }
 }

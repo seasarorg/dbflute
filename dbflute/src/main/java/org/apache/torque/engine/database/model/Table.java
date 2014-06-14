@@ -2753,7 +2753,7 @@ public class Table {
         return false;
     }
 
-    public boolean isSuppressDBAccessClass() {
+    protected boolean isSuppressDBAccessClass() {
         return getClassificationProperties().isSuppressDBAccessClassTable(getTableDbName());
     }
 
@@ -3368,6 +3368,37 @@ public class Table {
     }
 
     // ===================================================================================
+    //                                                                     Behavior Status
+    //                                                                     ===============
+    public boolean hasBehavior() {
+        return !isSuppressDBAccessClass();
+    }
+
+    public boolean hasLoadReferrer() {
+        return hasPrimaryKey() && hasReferrerAsMany();
+    }
+
+    public boolean isAvailableLoadReferrerByOldOption() {
+        return getLittleAdjustmentProperties().isCompatibleLoadReferrerOldOption();
+    }
+
+    public String getLoadReferrerConditionSetupperName() {
+        final Class<?> type;
+        if (getLittleAdjustmentProperties().isCompatibleLoadReferrerConditionBeanSetupper()) {
+            type = ConditionBeanSetupper.class;
+        } else {
+            type = ReferrerConditionSetupper.class;
+        }
+        return type.getSimpleName();
+    }
+
+    public boolean hasReferrerLoader() {
+        // no relation is rare case so simplify
+        //return hasBehavior() && hasRelation();
+        return hasBehavior();
+    }
+
+    // ===================================================================================
     //                                                                 Behavior Adjustment
     //                                                                 ===================
     public boolean isAvailableNonPrimaryKeyWritable() {
@@ -3550,27 +3581,6 @@ public class Table {
     //                                                                 ===================
     public boolean isCursorSelectOptionAllowed() {
         return getLittleAdjustmentProperties().isCursorSelectOptionAllowed();
-    }
-
-    // ===================================================================================
-    //                                                                       Load Referrer
-    //                                                                       =============
-    public boolean hasLoadReferrer() {
-        return hasPrimaryKey() && hasReferrerAsMany();
-    }
-
-    public boolean isAvailableLoadReferrerByOldOption() {
-        return getLittleAdjustmentProperties().isCompatibleLoadReferrerOldOption();
-    }
-
-    public String getLoadReferrerConditionSetupperName() {
-        final Class<?> type;
-        if (getLittleAdjustmentProperties().isCompatibleLoadReferrerConditionBeanSetupper()) {
-            type = ConditionBeanSetupper.class;
-        } else {
-            type = ReferrerConditionSetupper.class;
-        }
-        return type.getSimpleName();
     }
 
     // ===================================================================================

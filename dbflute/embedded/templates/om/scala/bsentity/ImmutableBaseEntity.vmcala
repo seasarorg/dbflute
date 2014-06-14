@@ -108,7 +108,7 @@ abstract class $myClassName(dble: ${myExtendedObjectClassName}) extends Serializ
         newDble.myuniqueDrivenProperties.addAll(dble.myuniqueDrivenProperties) // inherit
         newDble.modifiedProperties.addAll(dble.modifiedProperties) // inherit
 #foreach ($col in $table.columns)
-        if (!${col.uncapitalisedJavaName}.equals(this.${col.uncapitalisedJavaName})) { newDble.set${col.javaName}${col.classificationMethodSuffix}(${col.convertToImmutablePropertyOrElseNull("${col.uncapitalisedJavaName}")}) }
+        if (!${col.uncapitalisedJavaName}.equals(this.${col.uncapitalisedJavaName})) { newDble.set${col.javaName}${col.classificationMethodSuffix}(${col.convertToMutablePropertyValue("${col.uncapitalisedJavaName}")}) }
 #end
         new ${myImmutableExtendedObjectClassName}(newDble)
     }
@@ -483,7 +483,7 @@ abstract class ${myMutableBaseObjectClassName} {
      * @param ${col.uncapitalisedJavaName} The value of the column '${col.name}'. (NullAllowed: null update allowed for no constraint)
 #end
      */
-    ${col.propertySettingModifierAsPrefix}def ${col.uncapitalisedJavaName}_=(${col.uncapitalisedJavaName}: ${col.immutablePropertyDefinitionType}) = { dble.set${col.javaName}${col.classificationMethodSuffix}(${col.convertToImmutablePropertyOrElseNull("${col.uncapitalisedJavaName}")}) }
+    ${col.propertySettingModifierAsPrefix}def ${col.uncapitalisedJavaName}_=(${col.uncapitalisedJavaName}: ${col.immutablePropertyDefinitionType}) = { dble.set${col.javaName}${col.classificationMethodSuffix}(${col.convertToMutablePropertyValue("${col.uncapitalisedJavaName}")}) }
 #set ($propertyLoopIndex = $propertyLoopIndex + 1)
 #end
 }

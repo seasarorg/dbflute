@@ -26,10 +26,10 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final String SCALA_NATIVE_INTEGER = "Int";
-    protected static final String SCALA_NATIVE_LONG = "Long";
-    protected static final String SCALA_NATIVE_BIGINTEGER = "scala.math.BigInt";
-    protected static final String SCALA_NATIVE_BIGDECIMAL = "scala.math.BigDecimal";
+    public static final String SCALA_NATIVE_INTEGER = "Int";
+    public static final String SCALA_NATIVE_LONG = "Long";
+    public static final String SCALA_NATIVE_BIGINTEGER = "scala.math.BigInt";
+    public static final String SCALA_NATIVE_BIGDECIMAL = "scala.math.BigDecimal";
     protected final DfLanguageTypeMapping _mappingJava = new DfLanguageTypeMappingJava();
 
     // ===================================================================================
@@ -107,5 +107,18 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
             defaultValue = "null";
         }
         return defaultValue;
+    }
+
+    public String convertToJavaNativeFromImmutable(String immutableJavaNative, String javaNative, String variable) {
+        if (DfLanguageTypeMappingScala.SCALA_NATIVE_INTEGER.equals(immutableJavaNative)) {
+            return "int2Integer(" + variable + ")";
+        }
+        if (DfLanguageTypeMappingScala.SCALA_NATIVE_LONG.equals(immutableJavaNative)) {
+            return "long2Long(" + variable + ")";
+        }
+        if (DfLanguageTypeMappingScala.SCALA_NATIVE_BIGDECIMAL.equals(immutableJavaNative)) {
+            return variable + ".asInstanceOf[" + javaNative + "]";
+        }
+        return variable;
     }
 }

@@ -84,8 +84,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** The empty instance for handler of nested referrer. (wild-card generic for downcast) */
-    protected static final NestedReferrerHandler<?> EMPTY_NREF = new NestedReferrerHandler<Entity>() {
+    /** The empty instance for provider of list handling for nested referrer. (wild-card generic for downcast) */
+    protected static final NestedReferrerListGateway<?> EMPTY_NREF_LGWAY = new NestedReferrerListGateway<Entity>() {
         public void withNestedReferrer(ReferrerListHandler<Entity> handler) {
             final List<Entity> emptyList = DfCollectionUtil.emptyList();
             handler.handle(emptyList);
@@ -520,7 +520,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param callback The internal callback of loadReferrer. (NotNull) 
      * @return The callback to load nested referrer. (NotNull)
      */
-    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> NestedReferrerHandler<REFERRER_ENTITY> helpLoadReferrerInternally(
+    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> NestedReferrerListGateway<REFERRER_ENTITY> helpLoadReferrerInternally(
             List<LOCAL_ENTITY> localEntityList, LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption,
             InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
         return doHelpLoadReferrerInternally(localEntityList, loadReferrerOption, callback);
@@ -538,7 +538,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param callback The internal call-back of loadReferrer. (NotNull) 
      * @return The callback to load nested referrer. (NotNull)
      */
-    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> NestedReferrerHandler<REFERRER_ENTITY> doHelpLoadReferrerInternally(
+    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> NestedReferrerListGateway<REFERRER_ENTITY> doHelpLoadReferrerInternally(
             List<LOCAL_ENTITY> localEntityList, LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption,
             final InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
 
@@ -550,7 +550,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         assertObjectNotNull("loadReferrerOption", loadReferrerOption);
         if (localEntityList.isEmpty()) {
             @SuppressWarnings("unchecked")
-            final NestedReferrerHandler<REFERRER_ENTITY> empty = (NestedReferrerHandler<REFERRER_ENTITY>) EMPTY_NREF;
+            final NestedReferrerListGateway<REFERRER_ENTITY> empty = (NestedReferrerListGateway<REFERRER_ENTITY>) EMPTY_NREF_LGWAY;
             return empty;
         }
 
@@ -651,7 +651,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         // - - - - - - - - - - - - - - - - - - - -
         // Return callback to load nested referrer
         // - - - - - - - - - - - - - - - - - - - -
-        return new NestedReferrerHandler<REFERRER_ENTITY>() {
+        return new NestedReferrerListGateway<REFERRER_ENTITY>() {
             public void withNestedReferrer(ReferrerListHandler<REFERRER_ENTITY> handler) {
                 handler.handle(Collections.unmodifiableList(referrerList));
             }

@@ -99,4 +99,12 @@ public interface DfLanguageTypeMapping {
      * @return The default value of java native type for immutable entity. (NotNull)
      */
     String convertToImmutableJavaNativeDefaultValue(String immutableJavaNative);
+
+    /**
+     * @param immutableJavaNative The java native type for immutable entity. (NotNull)
+     * @param javaNative The java native type for mutable (normal) entity. (NotNull)
+     * @param variable The expression of variable for the column. (NotNull)
+     * @return The converted value to java native. (NotNull)
+     */
+    String convertToJavaNativeFromImmutable(String immutableJavaNative, String javaNative, String variable);
 }

@@ -154,7 +154,7 @@ $database.info("public void parseTableClass() {")
   #set ($myExtendedBhvApClassName = "${table.extendedBehaviorApClassName}")
   #set ($myExtendedBhvLibClassName = "${table.extendedBehaviorLibClassName}")
 
-  #if (!$table.isSuppressDBAccessClass())
+  #if ($table.hasBehavior())
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhvAp})}${myBaseBhvApClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/plugin/bhvap/BhvApBaseBhv.${glTemplateFileExtension}", $path, "table", $table)
 

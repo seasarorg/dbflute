@@ -356,13 +356,16 @@ $database.info("public void parseTableClass() {")
   #set ($isExistBehavior = true)
   #set ($isExistDao = false)
 
-  #if (!$table.isSuppressDBAccessClass())
+  #if ($table.hasBehavior())
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
+  #end
 
+  #if ($table.hasReferrerLoader())
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseReferrerLoader})}${myReferrerLoaderClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/bsbhv/ReferrerLoader.${glTemplateFileExtension}", $path, "table", $table)
   #end
+
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseEntity})}${myBaseObjectClassName}.${glClassFileExtension}" )
   $generator.parse("om/${glResourceDirectory}/bsentity/BaseEntity.${glTemplateFileExtension}", $path, "table", $table)
 
@@ -374,7 +377,7 @@ $database.info("public void parseTableClass() {")
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseDBMeta})}${myDBMetaClassName}.${glClassFileExtension}" )
   $generator.parse("om/${glResourceDirectory}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
 
-  #if (!$table.isSuppressDBAccessClass())
+  #if ($table.hasBehavior())
     #if (!$database.isStopGenerateExtendedBhv())
       #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
       #if (!$files.file(${generator.outputPath},$path).exists())

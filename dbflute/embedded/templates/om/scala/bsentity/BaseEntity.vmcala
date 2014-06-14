@@ -146,7 +146,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
      */
     def acceptImmutable(immu: ${myImmutableExtendedObjectClassName}): ${myExtendedObjectClassName} = {
 #foreach ($col in $table.columns)
-        set${col.javaName}${col.classificationMethodSuffix}(${col.convertToImmutablePropertyOrElseNull("immu.${col.uncapitalisedJavaName}")});
+        set${col.javaName}${col.classificationMethodSuffix}(${col.convertToMutablePropertyValue("immu.${col.uncapitalisedJavaName}")});
 #end
 #foreach ($fk in $table.foreignKeys)
         set${fk.foreignJavaBeansRulePropertyNameInitCap}(immu.${fk.foreignPropertyName}.map(new ${fk.foreignTableExtendedEntityClassName}().acceptImmutable(_)))

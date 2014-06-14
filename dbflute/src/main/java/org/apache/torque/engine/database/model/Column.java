@@ -1843,14 +1843,22 @@ public class Column {
         return converted;
     }
 
-    public String convertToImmutablePropertyOrElseNull(String variable) {
+    public String convertToImmutablePropertyOrElseNull(String propertyExp) {
         final String converted;
         if (isImmutablePropertyOptional()) {
-            converted = getLanguageImplStyle().adjustImmutablePropertyOptionalOrElseNull(variable);
+            converted = getLanguageImplStyle().adjustImmutablePropertyOptionalOrElseNull(propertyExp);
         } else {
-            converted = variable;
+            converted = propertyExp;
         }
         return converted;
+    }
+
+    public String convertToMutablePropertyValue(String propertyExp) {
+        final String resolvedOption = convertToImmutablePropertyOrElseNull(propertyExp);
+        final DfLanguageTypeMapping mapping = getLanguageTypeMapping();
+        final String immutableJavaNative = getImmutableJavaNative();
+        final String javaNative = getJavaNative();
+        return mapping.convertToJavaNativeFromImmutable(immutableJavaNative, javaNative, resolvedOption);
     }
 
     // ===================================================================================

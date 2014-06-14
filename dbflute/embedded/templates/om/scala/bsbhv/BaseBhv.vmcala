@@ -20,6 +20,7 @@ import scala.collection.JavaConverters._;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.ArrayList;
 
 import org.seasar.dbflute._;
 import org.seasar.dbflute.bhv._;
@@ -39,7 +40,9 @@ import ${database.relationOptionalEntityClassName};
 import org.seasar.dbflute.outsidesql.executor._;
 import ${glPackageBaseCommon}._;
 import ${glPackageExtendedBhv}._;
+#if ($table.hasReferrerLoader())
 import ${myReferrerLoaderPackageName}._;
+#end
 import ${glPackageExtendedEntity}._;
 import ${myDBMetaPackageName}._;
 import ${glPackageCB}._;
@@ -549,7 +552,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param setupper The callback to set up referrer condition-bean for loading referrer. (NotNull)
      * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
      */
-    def load${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], setupCall: (${referrerCBClassName}) => Unit): NestedReferrerHandler[${referrerEntityClassName}] = {
+    def load${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], setupCall: (${referrerCBClassName}) => Unit): NestedReferrerListGateway[${referrerEntityClassName}] = {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName}); assertObjectNotNull("setupCall", setupCall);
         val setupper = new ReferrerConditionSetupper[${referrerCBClassName}]() { def setup(referrerCB: ${referrerCBClassName}): Unit = { setupCall(referrerCB); } }
         return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]().xinit(setupper));
@@ -586,7 +589,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param setupper The callback to set up referrer condition-bean for loading referrer. (NotNull)
      * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
      */
-    def load${referrer.referrerPropertyNameInitCap}(${myEntityVariableName}: ${myExtendedObjectClassName}, setupCall: (${referrerCBClassName}) => Unit): NestedReferrerHandler[${referrerEntityClassName}] = {
+    def load${referrer.referrerPropertyNameInitCap}(${myEntityVariableName}: ${myExtendedObjectClassName}, setupCall: (${referrerCBClassName}) => Unit): NestedReferrerListGateway[${referrerEntityClassName}] = {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); assertObjectNotNull("setupCall", setupCall);
         val setupper = new ReferrerConditionSetupper[${referrerCBClassName}]() { def setup(referrerCB: ${referrerCBClassName}): Unit = { setupCall(referrerCB); } }
         return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), new LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]().xinit(setupper));
@@ -596,7 +599,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 #set ($referrerColumn = ${referrer.localColumnAsOne})
 #set ($localColumn = ${referrer.foreignColumnAsOne})
 #set ($keyJavaNative = "${referrerColumn.javaNative}")
-    protected def doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerHandler[${referrerEntityClassName}] = {
+    protected def doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerListGateway[${referrerEntityClassName}] = {
         val referrerBhv: ${referrerBhvClassName} = xgetBSFLR().select(classOf[${referrerBhvClassName}]);
         return helpLoadReferrerInternally(${myEntityListVariableName}, option, new InternalLoadReferrerCallback[${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}]() {
             def getPKVal(et: ${myExtendedObjectClassName}): ${keyJavaNative} =
@@ -635,7 +638,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
 #else
 #set ($keyJavaNative = "java.util.Map<String, Object>")
-    protected def doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], option: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerHandler[${referrerEntityClassName}] = {
+    protected def doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], option: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerListGateway[${referrerEntityClassName}] = {
         val referrerBhv: ${referrerBhvClassName} = xgetBSFLR().select(classOf[${referrerBhvClassName}]);
         return helpLoadReferrerInternally(${myEntityListVariableName}.asJava, option, new InternalLoadReferrerCallback[${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}]() {
             def getPKVal(et: ${myExtendedObjectClassName}): ${keyJavaNative} = {
@@ -961,6 +964,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * if (the entity has no PK) { insert() } else { update(), but no data, insert() } <br />
      * <p><span style="color: #DD4747; font-size: 120%">Attention, you cannot update by unique keys instead of PK.</span></p>
      * @param entityCall The callback for entity of insert or update. (NotNull, ...depends on insert or update)
+     * @param insertOptionCall The callback for option of insert. (NoArgAllowed: then no option)
+     * @param updateOptionCall The callback for option of update. (NoArgAllowed: then no option)
 #if ($table.hasOptimisticLock())
      * @exception EntityAlreadyUpdatedException When the entity has already been updated.
 #else
@@ -969,8 +974,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    def insertOrUpdate(entityCall: (${myMutableExtendedObjectClassName}) => Unit): Unit = {
-        doInsertOrUpdate(callbackMbleEntityToDBable(entityCall), null, null);
+    def insertOrUpdate(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit insertOptionCall: (InsertOption[${myConditionBeanClassName}]) => Unit = null, updateOptionCall: (UpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+        doInsertOrUpdate(callbackMbleEntityToDBable(entityCall), callbackInsertOption(insertOptionCall), callbackUpdateOption(updateOptionCall));
     }
 
     protected def doInsertOrUpdate(et: ${myExtendedObjectClassName}, iop: InsertOption[${myConditionBeanClassName}], uop: UpdateOption[${myConditionBeanClassName}]): Unit = {
@@ -993,12 +998,14 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * if (the entity has no PK) { insert() } else { update(), but no data, insert() }
      * <p><span style="color: #DD4747; font-size: 120%">Attention, you cannot update by unique keys instead of PK.</span></p>
      * @param entityCall The callback for entity of insert or update. (NotNull, ...depends on insert or update)
+     * @param insertOptionCall The callback for option of insert. (NoArgAllowed: then no option)
+     * @param updateOptionCall The callback for option of update. (NoArgAllowed: then no option)
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    def insertOrUpdateNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit): Unit = {
-        doInsertOrUpdateNonstrict(callbackMbleEntityToDBable(entityCall), null, null);
+    def insertOrUpdateNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit insertOptionCall: (InsertOption[${myConditionBeanClassName}]) => Unit = null, updateOptionCall: (UpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+        doInsertOrUpdateNonstrict(callbackMbleEntityToDBable(entityCall), callbackInsertOption(insertOptionCall), callbackUpdateOption(updateOptionCall));
     }
 
     protected def doInsertOrUpdateNonstrict(et: ${myExtendedObjectClassName}, iop: InsertOption[${myConditionBeanClassName}], uop: UpdateOption[${myConditionBeanClassName}]): Unit = {
@@ -1127,8 +1134,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNullAllowed: when auto-increment)
      * @return The array of inserted count. (NotNull, EmptyAllowed)
      */
-    def batchInsert(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}]): Array[Int] = {
-        return doBatchInsert(${myEntityListVariableName}.asJava, null);
+    def batchInsert(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (InsertOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
+        return doBatchInsert(callbackBatch(batchCall), callbackInsertOption(optionCall));
     }
 
     protected def doBatchInsert(ls: List[${myExtendedObjectClassName}], op: InsertOption[${myConditionBeanClassName}]): Array[Int] = {
@@ -1186,8 +1193,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
-    def batchUpdate(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}]): Array[Int] = {
-        return doBatchUpdate(${myEntityListVariableName}.asJava, null);
+    def batchUpdate(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (UpdateOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
+        return doBatchUpdate(callbackBatch(batchCall), callbackUpdateOption(optionCall));
     }
 
     protected def doBatchUpdate(ls: List[${myExtendedObjectClassName}], op: UpdateOption[${myConditionBeanClassName}]): Array[Int] = {
@@ -1211,46 +1218,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     @Override
     protected def doLumpModify(ls: List[Entity], op: UpdateOption[_ <: ConditionBean]): Array[Int] = {
         doBatchUpdate(downcast(ls), downcast(op));
-    }
-
-    /**
-#if ($table.hasOptimisticLock())
-     * Batch-update the entity list specified-only. (ExclusiveControl) <br />
-#else
-     * Batch-update the entity list specified-only. (NonExclusiveControl) <br />
-#end
-     * This method uses executeBatch() of java.sql.PreparedStatement.
-     * <pre>
-     * <span style="color: #3F7E5E">// e.g. update two columns only</span>
-     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">batchUpdate</span>(${myEntityListVariableName}, new SpecifyQuery[${myConditionBeanClassName}]() {
-     *     public void specify(${myConditionBeanClassName} cb) { <span style="color: #3F7E5E">// the two only updated</span>
-     *         cb.specify().<span style="color: #DD4747">columnFooStatusCode()</span>; <span style="color: #3F7E5E">// should be modified in any entities</span>
-     *         cb.specify().<span style="color: #DD4747">columnBarDate()</span>; <span style="color: #3F7E5E">// should be modified in any entities</span>
-     *     }
-     * });
-     * <span style="color: #3F7E5E">// e.g. update every column in the table</span>
-     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">batchUpdate</span>(${myEntityListVariableName}, new SpecifyQuery[${myConditionBeanClassName}]() {
-     *     public void specify(${myConditionBeanClassName} cb) { <span style="color: #3F7E5E">// all columns are updated</span>
-     *         cb.specify().<span style="color: #DD4747">columnEveryColumn()</span>; <span style="color: #3F7E5E">// no check of modified properties</span>
-     *     }
-     * });
-     * </pre>
-     * <p>You can specify update columns used on set clause of update statement.
-     * However you do not need to specify common columns for update
-     * and an optimistic lock column because they are specified implicitly.</p>
-     * <p>And you should specify columns that are modified in any entities (at least one entity).
-     * But if you specify every column, it has no check.</p>
-     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
-     * @param updateColumnSpec The specification of update columns. (NotNull)
-     * @return The array of updated count. (NotNull, EmptyAllowed)
-#if ($table.hasOptimisticLock())
-     * @exception BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
-#else
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-#end
-     */
-    def batchUpdate(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], updateColumnSpec: SpecifyQuery[${myConditionBeanClassName}]): Array[Int] = {
-        return doBatchUpdate(${myEntityListVariableName}.asJava, createSpecifiedUpdateOption(updateColumnSpec));
     }
 #if ($table.hasOptimisticLock())
 
@@ -1278,8 +1245,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @return The array of updated count. (NotNull, EmptyAllowed)
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
-    def batchUpdateNonstrict(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}]): Array[Int] = {
-        return doBatchUpdateNonstrict(${myEntityListVariableName}.asJava, null);
+    def batchUpdateNonstrict(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (UpdateOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
+        return doBatchUpdateNonstrict(callbackBatch(batchCall), callbackUpdateOption(optionCall));
     }
 
     protected def doBatchUpdateNonstrict(ls: List[${myExtendedObjectClassName}], op: UpdateOption[${myConditionBeanClassName}]): Array[Int] = {
@@ -1287,37 +1254,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         val rlop: UpdateOption[${myConditionBeanClassName}] = if (op != null) { op } else { createPlainUpdateOption() }
         prepareBatchUpdateOption(ls, rlop);
         return delegateBatchUpdateNonstrict(ls, rlop);
-    }
-
-    /**
-     * Batch-update the entity list non-strictly specified-only. (NonExclusiveControl) <br />
-     * This method uses executeBatch() of java.sql.PreparedStatement.
-     * <pre>
-     * <span style="color: #3F7E5E">// e.g. update two columns only</span>
-     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">batchUpdateNonstrict</span>(${myEntityListVariableName}, new SpecifyQuery[${myConditionBeanClassName}]() {
-     *     public void specify(${myConditionBeanClassName} cb) { <span style="color: #3F7E5E">// the two only updated</span>
-     *         cb.specify().<span style="color: #DD4747">columnFooStatusCode()</span>; <span style="color: #3F7E5E">// should be modified in any entities</span>
-     *         cb.specify().<span style="color: #DD4747">columnBarDate()</span>; <span style="color: #3F7E5E">// should be modified in any entities</span>
-     *     }
-     * });
-     * <span style="color: #3F7E5E">// e.g. update every column in the table</span>
-     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">batchUpdateNonstrict</span>(${myEntityListVariableName}, new SpecifyQuery[${myConditionBeanClassName}]() {
-     *     public void specify(${myConditionBeanClassName} cb) { <span style="color: #3F7E5E">// all columns are updated</span>
-     *         cb.specify().<span style="color: #DD4747">columnEveryColumn()</span>; <span style="color: #3F7E5E">// no check of modified properties</span>
-     *     }
-     * });
-     * </pre>
-     * <p>You can specify update columns used on set clause of update statement.
-     * However you do not need to specify common columns for update
-     * and an optimistic lock column because they are specified implicitly.</p>
-     * <p>And you should specify columns that are modified in any entities (at least one entity).</p>
-     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
-     * @param updateColumnSpec The specification of update columns. (NotNull)
-     * @return The array of updated count. (NotNull, EmptyAllowed)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     */
-    def batchUpdateNonstrict(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}], updateColumnSpec: SpecifyQuery[${myConditionBeanClassName}]): Array[Int] = {
-        return doBatchUpdateNonstrict(${myEntityListVariableName}.asJava, createSpecifiedUpdateOption(updateColumnSpec));
     }
 #end
 
@@ -1345,8 +1281,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
-    def batchDelete(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}]): Array[Int] = {
-        return doBatchDelete(${myEntityListVariableName}.asJava, null);
+    def batchDelete(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (DeleteOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
+        return doBatchDelete(callbackBatch(batchCall), callbackDeleteOption(optionCall));
     }
 
     protected def doBatchDelete(ls: List[${myExtendedObjectClassName}], op: DeleteOption[${myConditionBeanClassName}]): Array[Int] = {
@@ -1368,8 +1304,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @return The array of deleted count. (NotNull, EmptyAllowed)
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
-    def batchDeleteNonstrict(${myEntityListVariableName}: scala.collection.immutable.List[${myExtendedObjectClassName}]): Array[Int] = {
-        return doBatchDeleteNonstrict(${myEntityListVariableName}.asJava, null);
+    def batchDeleteNonstrict(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (DeleteOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
+        return doBatchDeleteNonstrict(callbackBatch(batchCall), callbackDeleteOption(optionCall));
     }
 
     protected def doBatchDeleteNonstrict(ls: List[${myExtendedObjectClassName}], op: DeleteOption[${myConditionBeanClassName}]): Array[Int] = {
@@ -1719,6 +1655,16 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     protected def callbackCB(cbCall: (${myConditionBeanClassName}) => Unit): ${myConditionBeanClassName} = {
         assertObjectNotNull("cbCall", cbCall);
         val cb = newConditionBean(); cbCall(cb); return cb;
+    }
+
+    protected def callbackBatch(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit): List[${myExtendedObjectClassName}] = {
+        assertObjectNotNull("batchCall", batchCall);
+        val batch = new ScrBatchEntityList[${myMutableExtendedObjectClassName}]();
+        val entityList: List[${myExtendedObjectClassName}] = new ArrayList[${myExtendedObjectClassName}]();
+        batch.entityCallList.asScala.map { entityCall =>
+            val entity = newMbleEntity(); entityCall(entity); entity.toDBableEntity;
+        }
+        return entityList;
     }
 
     protected def callbackMbleEntity(entityCall: (${myMutableExtendedObjectClassName}) => Unit): ${myMutableExtendedObjectClassName} = {

@@ -31,8 +31,29 @@ import ${glPackageCB}.*;
 /**
  * The referrer loader of ${table.basicInfoDispString}. <br />
  * <pre>
+ * [primary key]
+ *     ${table.primaryKeyNameCommaString}
+ *
+ * [column]
+ *     ${table.columnNameCommaString}
+ *
+ * [sequence]
+ *     ${table.definedSequenceName}
+ *
+ * [identity]
+ *     ${table.identityColumnName}
+ *
+ * [version-no]
+ *     ${table.versionNoColumnName}
+ *
+ * [foreign table]
+ *     ${table.foreignTableNameCommaString}
+ *
  * [referrer table]
  *     ${table.referrerTableNameCommaString}
+ *
+ * [foreign property]
+ *     ${table.foreignPropertyNameCommaString}
  *
  * [referrer property]
  *     ${table.referrerPropertyNameCommaString}
@@ -57,6 +78,7 @@ public class ${myClassName} {
     protected ${myExtendedBhvClassName} myBhv()
     { if (_myBhv != null) { return _myBhv; } else { _myBhv = _selector.select(${myExtendedBhvClassName}.class); return _myBhv; } }
 
+#if ($table.hasLoadReferrer())
     // ===================================================================================
     //                                                                       Load Referrer
     //                                                                       =============
@@ -64,23 +86,31 @@ public class ${myClassName} {
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($referrerLoaderClassName = "${referrer.referrerTableExtendedReferrerLoaderClassName}")
+#set ($loadMethodReturn = "void")
+#if ($referrer.table.hasReferrerLoader())
+#set ($loadMethodReturn = "NestedReferrerLoaderGateway<${referrerLoaderClassName}>")
+#end
     protected List<${referrerEntityClassName}> _referrer${referrer.referrerPropertyNameInitCap};
-    public NestedReferrerLoader<${referrerLoaderClassName}> load${referrer.referrerPropertyNameInitCap}(${table.loadReferrerConditionSetupperName}<${referrerCBClassName}> setupper) {
+    public ${loadMethodReturn} load${referrer.referrerPropertyNameInitCap}(${table.loadReferrerConditionSetupperName}<${referrerCBClassName}> setupper) {
         myBhv().load${referrer.referrerPropertyNameInitCap}(_selectedList, setupper).withNestedReferrer(new ReferrerListHandler<${referrerEntityClassName}>() {
             public void handle(List<${referrerEntityClassName}> referrerList) { _referrer${referrer.referrerPropertyNameInitCap} = referrerList; }
         });
-        return new NestedReferrerLoader<${referrerLoaderClassName}>() {
+#if ($referrer.table.hasReferrerLoader())
+        return new NestedReferrerLoaderGateway<${referrerLoaderClassName}>() {
             public void withNestedReferrer(ReferrerLoaderHandler<${referrerLoaderClassName}> handler) {
                 handler.handle(new ${referrerLoaderClassName}().ready(_referrer${referrer.referrerPropertyNameInitCap}, _selector));
             }
         };
+#end
     }
 
+#end
 #end
     // ===================================================================================
     //                                                                    Pull out Foreign
     //                                                                    ================
 #foreach ($fk in $table.foreignKeys)
+#if ($fk.foreignTable.hasReferrerLoader())
 #set ($foreignEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
 #set ($foreignImmutableEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
 #set ($foreignLoaderClassName = "${fk.foreignTableExtendedReferrerLoaderClassName}")
@@ -94,8 +124,9 @@ public class ${myClassName} {
     }
 
 #end
+#end
 #foreach ($referrer in $table.referrerAsOneList)
-#set ($referrerTable = $referrer.table)
+#if ($referrer.table.hasReferrerLoader())
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerLoaderClassName = "${referrer.referrerTableExtendedReferrerLoaderClassName}")
 #set ($referrerLoaderVariableName = "_foreign${referrer.referrerPropertyNameInitCapAsOne}Loader")
@@ -107,6 +138,7 @@ public class ${myClassName} {
         return ${referrerLoaderVariableName};
     }
 
+#end
 #end
     // ===================================================================================
     //                                                                            Accessor
