@@ -106,11 +106,13 @@ class ${myClassName} extends AbstractConditionBean {
     /**
      * Accept the query condition of primary key as equal.
      * ${table.primaryKeyArgsJavaDocString}
+     * @return this. (NotNull)
      */
-    def acceptPrimaryKey(${table.primaryKeyArgsString}): Unit = {
+    def acceptPK(${table.primaryKeyArgsString}): ${myConditionBeanClassName} = {
         ${table.primaryKeyArgsAssertString}
         val cb: ${myClassName} = this;
         ${table.primaryKeyArgsConditionSetupString}
+        return this.asInstanceOf[${myConditionBeanClassName}];
     }
 
 #end
@@ -118,11 +120,13 @@ class ${myClassName} extends AbstractConditionBean {
     /**
      * Accept the query condition of unique key as equal.
      * ${uq.argsJavaDocString}
+     * @return this. (NotNull)
      */
-    def acceptUniqueOf${uq.javaNameKeyword}(${uq.argsString}): Unit = {
+    def acceptUniqueOf${uq.javaNameKeyword}(${uq.argsString}): ${myConditionBeanClassName} = {
         ${uq.argsAssertString}
         val cb: ${myClassName} = this;
         ${uq.argsConditionSetupString}
+        return this.asInstanceOf[${myConditionBeanClassName}];
     }
 
 #end

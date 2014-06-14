@@ -1038,6 +1038,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isCompatibleLoadReferrerOldOption", isCompatibleBeforeJava8());
     }
 
+    public boolean isCompatibleConditionBeanAcceptPKOldStyle() { // closet
+        return isProperty("isCompatibleConditionBeanAcceptPKOldStyle", isCompatibleBeforeJava8());
+    }
+
     public boolean isCompatibleBeforeJava8() { // closet
         final boolean defaultValue = getLanguageDependency().getLanguageImplStyle().isCompatibleBeforeJava8();
         return isProperty("isCompatibleBeforeJava8", defaultValue);

@@ -344,7 +344,7 @@ abstract class ${myMutableBaseObjectClassName} {
     // ===================================================================================
     //                                                                      DB-able Entity
     //                                                                      ==============
-    def toDBableEntity(): ${myExtendedObjectClassName} = { dble }
+    def toDBable(): ${myExtendedObjectClassName} = { dble }
 
     // ===================================================================================
     //                                                                          Unique Key

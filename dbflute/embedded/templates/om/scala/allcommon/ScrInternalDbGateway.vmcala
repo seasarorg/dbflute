@@ -20,7 +20,7 @@ import org.seasar.dbflute.s2dao.extension.TnRelationOptionalFactory;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 
 /**
- * @author jflute
+ * @author ${database.classAuthor}
  */
 class ScrBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryExtension {
 
@@ -30,7 +30,7 @@ class ScrBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryExtension {
 }
 
 /**
- * @author jflute
+ * @author ${database.classAuthor}
  */
 class ScrRelationOptionalFactory extends TnRelationOptionalFactory {
 

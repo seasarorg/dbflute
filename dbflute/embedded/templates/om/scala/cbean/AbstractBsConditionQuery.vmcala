@@ -331,8 +331,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch. (NullAllowed: if null (or empty), no condition)
      * @param optionCall The callback for option of like-search. (NotNull)
      */
-    def set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}: ${col.javaNative})(optionCall: (LikeSearchOption) => Unit): Unit = {
-        val op = createLikeSearchOption(); optionCall(op);
+    def set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}: ${col.javaNative})(optionCall: (ScrLikeSearchOption) => Unit): Unit = {
         regLSQ(CK_LS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", callbackLSOP(optionCall));
     }
 #end
@@ -345,7 +344,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notLikeSearch. (NullAllowed: if null (or empty), no condition)
      * @param optionCall The callback for option of not-like-search. (NotNull)
      */
-    def set${tmpJavaName}_NotLikeSearch(${tmpUncapitalisedJavaName}: ${col.javaNative})(optionCall: (LikeSearchOption) => Unit): Unit = {
+    def set${tmpJavaName}_NotLikeSearch(${tmpUncapitalisedJavaName}: ${col.javaNative})(optionCall: (ScrLikeSearchOption) => Unit): Unit = {
         regLSQ(CK_NLS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", callbackLSOP(optionCall));
     }
 #end
@@ -734,10 +733,10 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param minNumber The min number of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
      * @param maxNumber The max number of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
-     * @param rangeOfOption The option of range-of. (NotNull)
+     * @param optionCall The callback for option of range-of. (NotNull)
      */
-    def set${tmpJavaName}_RangeOf(minNumber: ${col.javaNative}, maxNumber: ${col.javaNative}, rangeOfOption: RangeOfOption): Unit = {
-        regROO(minNumber, maxNumber, getCValue${tmpJavaName}(), "${col.name}", rangeOfOption);
+    def set${tmpJavaName}_RangeOf(minNumber: ${col.javaNative}, maxNumber: ${col.javaNative})(optionCall: (RangeOfOption) => Unit): Unit = {
+        regROO(minNumber, maxNumber, getCValue${tmpJavaName}(), "${col.name}", callbackROOP(optionCall));
     }
 #end
 #if (${col.isAvailableNumberInScope()})
@@ -1125,7 +1124,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      * @param fromToOption The option of from-to. (NotNull)
      */
-    def set${tmpJavaName}_FromTo(fromDatetime: Date, toDatetime: Date)(optionCall: (FromToOption) => Unit): Unit = {
+    def set${tmpJavaName}_FromTo(fromDatetime: Date, toDatetime: Date)(optionCall: (ScrFromToOption) => Unit): Unit = {
 #if ($col.isJavaNativeUtilDate())
         regFTQ(fCTPD(fromDatetime), fCTPD(toDatetime), getCValue${tmpJavaName}(), "${col.name}", callbackFTOP(optionCall));
 #else
@@ -1596,7 +1595,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * <p>The order values are bound (treated as bind parameter).</p>
      * @param mob The bean of manual order containing order values. (NotNull)
      */
-    def withManualOrder(mobCall: (ManualOrderBean) => Unit): Unit = { // is user public!
+    def withManualOrder(mobCall: (ScrManualOrderBean) => Unit): Unit = { // is user public!
         assertObjectNotNull("withManualOrder(mobCall)", mobCall);
         xdoWithManualOrder(callbackMOB(mobCall));
     }
@@ -1604,17 +1603,21 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
     // ===================================================================================
     //                                                                       Create Option
     //                                                                       =============
-    protected def callbackLSOP(optionCall: (LikeSearchOption) => Unit): LikeSearchOption =
+    protected def callbackLSOP(optionCall: (ScrLikeSearchOption) => Unit): LikeSearchOption =
     { val op = createLikeSearchOption(); optionCall(op); return op; }
-    protected def createLikeSearchOption(): LikeSearchOption = { new LikeSearchOption() }
+    protected def createLikeSearchOption(): ScrLikeSearchOption = { new ScrLikeSearchOption() }
 
-    protected def callbackFTOP(optionCall: (FromToOption) => Unit): FromToOption =
+    protected def callbackFTOP(optionCall: (ScrFromToOption) => Unit): FromToOption =
     { val op = createFromToOption(); optionCall(op); return op; }
-    protected def createFromToOption(): FromToOption = { new FromToOption() }
+    protected def createFromToOption(): ScrFromToOption = { new ScrFromToOption() }
 
-    protected def callbackMOB(mobCall: (ManualOrderBean) => Unit): ManualOrderBean =
+    protected def callbackROOP(optionCall: (ScrRangeOfOption) => Unit): RangeOfOption =
+    { val op = createRangeOfOption(); optionCall(op); return op; }
+    protected def createRangeOfOption(): ScrRangeOfOption = { new ScrRangeOfOption() }
+
+    protected def callbackMOB(mobCall: (ScrManualOrderBean) => Unit): ManualOrderBean =
     { val mob = createManualOrderBean(); mobCall(mob); return mob; }
-    protected def createManualOrderBean(): ManualOrderBean = { new ManualOrderBean() }
+    protected def createManualOrderBean(): ScrManualOrderBean = { new ScrManualOrderBean() }
 
     // ===================================================================================
     //                                                                        Scala Helper

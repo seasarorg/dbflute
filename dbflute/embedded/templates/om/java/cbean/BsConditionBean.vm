@@ -103,6 +103,19 @@ public class ${myClassName} extends AbstractConditionBean {
     /**
      * Accept the query condition of primary key as equal.
      * ${table.primaryKeyArgsJavaDocString}
+     * @return this. (NotNull)
+     */
+    public ${myConditionBeanClassName} acceptPK(${table.primaryKeyArgsString}) {
+        ${table.primaryKeyArgsAssertString}
+        ${myClassName} cb = this;
+        ${table.primaryKeyArgsConditionSetupString}
+        return (${myConditionBeanClassName})this;
+    }
+
+#if ($table.isCompatibleConditionBeanAcceptPKOldStyle())
+    /**
+     * Accept the query condition of primary key as equal. (old style)
+     * ${table.primaryKeyArgsJavaDocString}
      */
     public void acceptPrimaryKey(${table.primaryKeyArgsString}) {
         ${table.primaryKeyArgsAssertString}
@@ -111,15 +124,18 @@ public class ${myClassName} extends AbstractConditionBean {
     }
 
 #end
+#end
 #foreach ($uq in $table.keyableUniqueList)
     /**
      * Accept the query condition of unique key as equal.
      * ${uq.argsJavaDocString}
+     * @return this. (NotNull)
      */
-    public void acceptUniqueOf${uq.javaNameKeyword}(${uq.argsString}) {
+    public ${myConditionBeanClassName} acceptUniqueOf${uq.javaNameKeyword}(${uq.argsString}) {
         ${uq.argsAssertString}
         ${myClassName} cb = this;
         ${uq.argsConditionSetupString}
+        return (${myConditionBeanClassName})this;
     }
 
 #end

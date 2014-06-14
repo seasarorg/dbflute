@@ -267,8 +267,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     protected def xprepareCBAsPK(${table.primaryKeyArgsString}): ${myConditionBeanClassName} = {
         ${table.primaryKeyArgsAssertString}
-        val cb = newConditionBean(); cb.acceptPrimaryKey(${table.primaryKeyArgsCallingString});
-        return cb;
+        return newConditionBean().acceptPK(${table.primaryKeyArgsCallingString});
     }
 #end
 #foreach ($uq in $table.keyableUniqueList)
@@ -295,8 +294,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     protected def xprepareCBAsUniqueOf${uq.javaNameKeyword}(${uq.argsString}): ${myConditionBeanClassName} = {
         ${uq.argsAssertString}
-        val cb: ${myConditionBeanClassName} = newConditionBean(); cb.acceptUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString});
-        return cb;
+        return newConditionBean().acceptUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString});
     }
 #end
 
@@ -367,8 +365,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @return The result bean of selected page. (NotNull: if no data, returns bean as empty list)
      * @exception DangerousResultSizeException When the result size is over the specified safety size.
      */
-    def selectPage(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): PagingResultBean[${myExtendedObjectClassName}] = {
-        return facadeSelectPage(callbackCB(cbCall))(loaderCall); // #pending use toImmutableEntityList()
+    def selectPage(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): PagingView[${myImmutableExtendedObjectClassName}] = {
+        return newPagingView(facadeSelectPage(callbackCB(cbCall))(loaderCall));
     }
 
     protected def facadeSelectPage(cb: ${myConditionBeanClassName})(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): PagingResultBean[${myExtendedObjectClassName}] = {
@@ -824,7 +822,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param optionCall The callback for option of insert. (NoArgAllowed: then no option)
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    def insert(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (InsertOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+    def insert(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         assertObjectNotNull("entityCall", entityCall);
         doInsert(callbackMbleEntityToDBable(entityCall), callbackInsertOption(optionCall));
     }
@@ -883,7 +881,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    def update(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (UpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+    def update(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         assertObjectNotNull("entityCall", entityCall);
         doUpdate(callbackMbleEntityToDBable(entityCall), callbackUpdateOption(optionCall));
     }
@@ -934,7 +932,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    def updateNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (UpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+    def updateNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         doUpdateNonstrict(callbackMbleEntityToDBable(entityCall), callbackUpdateOption(optionCall));
     }
 
@@ -974,7 +972,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    def insertOrUpdate(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit insertOptionCall: (InsertOption[${myConditionBeanClassName}]) => Unit = null, updateOptionCall: (UpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+    def insertOrUpdate(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit insertOptionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit = null, updateOptionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         doInsertOrUpdate(callbackMbleEntityToDBable(entityCall), callbackInsertOption(insertOptionCall), callbackUpdateOption(updateOptionCall));
     }
 
@@ -1004,7 +1002,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    def insertOrUpdateNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit insertOptionCall: (InsertOption[${myConditionBeanClassName}]) => Unit = null, updateOptionCall: (UpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+    def insertOrUpdateNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit insertOptionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit = null, updateOptionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         doInsertOrUpdateNonstrict(callbackMbleEntityToDBable(entityCall), callbackInsertOption(insertOptionCall), callbackUpdateOption(updateOptionCall));
     }
 
@@ -1051,7 +1049,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 #end
      * @exception EntityDuplicatedException When the entity has been duplicated.
      */
-    def delete(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (DeleteOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+    def delete(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         doDelete(callbackMbleEntityToDBable(entityCall), callbackDeleteOption(optionCall));
     }
 
@@ -1086,7 +1084,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      * @exception EntityDuplicatedException When the entity has been duplicated.
      */
-    def deleteNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (DeleteOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+    def deleteNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         doDeleteNonstrict(callbackMbleEntityToDBable(entityCall), callbackDeleteOption(optionCall));
     }
 
@@ -1134,7 +1132,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNullAllowed: when auto-increment)
      * @return The array of inserted count. (NotNull, EmptyAllowed)
      */
-    def batchInsert(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (InsertOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
+    def batchInsert(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
         return doBatchInsert(callbackBatch(batchCall), callbackInsertOption(optionCall));
     }
 
@@ -1193,7 +1191,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
-    def batchUpdate(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (UpdateOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
+    def batchUpdate(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
         return doBatchUpdate(callbackBatch(batchCall), callbackUpdateOption(optionCall));
     }
 
@@ -1245,7 +1243,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @return The array of updated count. (NotNull, EmptyAllowed)
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
-    def batchUpdateNonstrict(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (UpdateOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
+    def batchUpdateNonstrict(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
         return doBatchUpdateNonstrict(callbackBatch(batchCall), callbackUpdateOption(optionCall));
     }
 
@@ -1281,7 +1279,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
-    def batchDelete(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (DeleteOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
+    def batchDelete(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
         return doBatchDelete(callbackBatch(batchCall), callbackDeleteOption(optionCall));
     }
 
@@ -1304,7 +1302,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @return The array of deleted count. (NotNull, EmptyAllowed)
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
-    def batchDeleteNonstrict(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (DeleteOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
+    def batchDeleteNonstrict(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
         return doBatchDeleteNonstrict(callbackBatch(batchCall), callbackDeleteOption(optionCall));
     }
 
@@ -1651,6 +1649,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     //                                                                       =============
     protected def typeOfSelectedEntity(): Class[${myExtendedObjectClassName}] = { classOf[${myExtendedObjectClassName}] }
     protected def newMbleEntity(): ${myMutableExtendedObjectClassName} = { new ${myMutableExtendedObjectClassName}() }
+    protected def newPagingView(rb: PagingResultBean[${myExtendedObjectClassName}]): PagingView[${myImmutableExtendedObjectClassName}] =
+    { new PagingView(toImmutableEntityList(rb), rb) }
 
     protected def callbackCB(cbCall: (${myConditionBeanClassName}) => Unit): ${myConditionBeanClassName} = {
         assertObjectNotNull("cbCall", cbCall);
@@ -1662,7 +1662,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         val batch = new ScrBatchEntityList[${myMutableExtendedObjectClassName}]();
         val entityList: List[${myExtendedObjectClassName}] = new ArrayList[${myExtendedObjectClassName}]();
         batch.entityCallList.asScala.map { entityCall =>
-            val entity = newMbleEntity(); entityCall(entity); entity.toDBableEntity;
+            val entity = newMbleEntity(); entityCall(entity); entity.toDBable;
         }
         return entityList;
     }
@@ -1673,22 +1673,23 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     }
 
     protected def callbackMbleEntityToDBable(entityCall: (${myMutableExtendedObjectClassName}) => Unit): ${myExtendedObjectClassName} = {
-        return callbackMbleEntity(entityCall).toDBableEntity;
+        return callbackMbleEntity(entityCall).toDBable;
     }
 
-    protected def callbackInsertOption(optionCall: (InsertOption[${myConditionBeanClassName}]) => Unit): InsertOption[${myConditionBeanClassName}] = {
+    protected def callbackInsertOption(optionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit): InsertOption[${myConditionBeanClassName}] = {
         if (optionCall == null) { return null; }
-        val option = new InsertOption[${myConditionBeanClassName}](); optionCall(option); return option;
+        val option = new ScrInsertOption[${myConditionBeanClassName}](new InsertOption[${myConditionBeanClassName}]());
+        optionCall(option); return option.toNative;
     }
 
-    protected def callbackUpdateOption(optionCall: (UpdateOption[${myConditionBeanClassName}]) => Unit): UpdateOption[${myConditionBeanClassName}] = {
+    protected def callbackUpdateOption(optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit): UpdateOption[${myConditionBeanClassName}] = {
         if (optionCall == null) { return null; }
-        val option = new UpdateOption[${myConditionBeanClassName}](); optionCall(option); return option;
+        val option = new ScrUpdateOption[${myConditionBeanClassName}](new UpdateOption[${myConditionBeanClassName}]()); optionCall(option); return option.toNative;
     }
 
-    protected def callbackDeleteOption(optionCall: (DeleteOption[${myConditionBeanClassName}]) => Unit): DeleteOption[${myConditionBeanClassName}] = {
+    protected def callbackDeleteOption(optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit): DeleteOption[${myConditionBeanClassName}] = {
         if (optionCall == null) { return null; }
-        val option = new DeleteOption[${myConditionBeanClassName}](); optionCall(option); return option;
+        val option = new ScrDeleteOption[${myConditionBeanClassName}](new DeleteOption[${myConditionBeanClassName}]()); optionCall(option); return option.toNative;
     }
 
     protected def callbackLoader(dbleList: List[${myExtendedObjectClassName}], loaderCall: (${myReferrerLoaderClassName}) => Unit = null): Unit = {

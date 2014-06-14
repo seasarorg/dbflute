@@ -3502,16 +3502,18 @@ public class Table {
     }
 
     // ===================================================================================
-    //                                                           ConditionQuery Adjustment
-    //                                                           =========================
+    //                                                            ConditionBean Adjustment
+    //                                                            ========================
     public boolean isCompatibleOrScopeQueryPurposeNoCheck() {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         return prop.isCompatibleOrScopeQueryPurposeNoCheck();
     }
 
-    // ===================================================================================
-    //                                                           ConditionQuery Adjustment
-    //                                                           =========================
+    public boolean isCompatibleConditionBeanAcceptPKOldStyle() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isCompatibleConditionBeanAcceptPKOldStyle();
+    }
+
     public boolean isMakeConditionQueryPlainListManualOrder() {
         return getLittleAdjustmentProperties().isMakeConditionQueryPlainListManualOrder();
     }

@@ -84,7 +84,9 @@ $database.checkProperties()
 #set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
 #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
 #set ($glScrBhvHelper = "${glProjectPrefix}ScrBhvHelper")
+#set ($glScrBhvOption = "${glProjectPrefix}ScrBhvOption")
 #set ($glScrCBeanHelper = "${glProjectPrefix}ScrCBeanHelper")
+#set ($glScrCBeanOption = "${glProjectPrefix}ScrCBeanOption")
 #set ($glScrInternalDbGateway = "${glProjectPrefix}ScrInternalDbGateway")
 
 ## ===================================================================================
@@ -179,9 +181,17 @@ $database.info("    parse('ScrBhvHelper');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glScrBhvHelper}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/ScrBhvHelper.${glTemplateFileExtension}",$path ,"" ,"")
 
+$database.info("    parse('ScrBhvOption');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glScrBhvOption}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/ScrBhvOption.${glTemplateFileExtension}",$path ,"" ,"")
+
 $database.info("    parse('ScrCBeanHelper');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glScrCBeanHelper}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/ScrCBeanHelper.${glTemplateFileExtension}",$path ,"" ,"")
+
+$database.info("    parse('ScrCBeanOption');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glScrCBeanOption}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/ScrCBeanOption.${glTemplateFileExtension}",$path ,"" ,"")
 
 $database.info("    parse('ScrInternalDbGateway');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glScrInternalDbGateway}.${glClassFileExtension}" )
