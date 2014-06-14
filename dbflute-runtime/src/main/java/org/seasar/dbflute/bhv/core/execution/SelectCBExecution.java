@@ -141,9 +141,6 @@ public class SelectCBExecution extends AbstractFixedArgExecution {
         }
         final ColumnInfo pkColumn = primaryUniqueInfo.getFirstColumn();
         final SqlClause sqlClause = cb.getSqlClause();
-        if (sqlClause.hasSpecifiedDerivedOrderByClause()) { // too complex so unsupported
-            return null;
-        }
         final List<Object> pkList = doSplitSelectFirst(args, cb, dbmeta, sqlClause);
         if (pkList == null) { // no way just in case
             return null;

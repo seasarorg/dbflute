@@ -675,14 +675,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected void processSelectClauseDerivedReferrer(StringBuilder sb) {
-        if (_pkOnlySelectForcedly) {
-            return;
-        }
         if (_specifiedDerivingSubQueryMap == null || _specifiedDerivingSubQueryMap.isEmpty()) {
             return;
         }
         for (Entry<String, HpDerivingSubQueryInfo> entry : _specifiedDerivingSubQueryMap.entrySet()) {
             final String subQueryAlias = entry.getKey();
+            if (_pkOnlySelectForcedly && !isSpecifiedDerivedOrderBy(subQueryAlias)) {
+                // even if PK only add one used as specified derived order-by
+                // (because it needs in order-by)
+                continue;
+            }
             final String derivingSubQuery = entry.getValue().getDerivingSubQuery();
             sb.append(ln()).append("     ");
             sb.append(", ").append(derivingSubQuery);
@@ -2073,6 +2075,21 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         for (OrderByElement orderByElement : orderByList) {
             if (orderByElement.isDerivedOrderBy()) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    protected boolean isSpecifiedDerivedOrderBy(String derivedAliasName) {
+        if (!hasOrderByClause()) {
+            return false;
+        }
+        final List<OrderByElement> orderByList = _orderByClause.getOrderByList();
+        for (OrderByElement orderByElement : orderByList) {
+            if (orderByElement.isDerivedOrderBy()) {
+                if (orderByElement.getColumnName().equals(derivedAliasName)) {
+                    return true;
+                }
             }
         }
         return false;

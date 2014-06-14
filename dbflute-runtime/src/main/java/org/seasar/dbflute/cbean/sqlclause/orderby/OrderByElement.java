@@ -44,7 +44,7 @@ public class OrderByElement implements Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The value of alias name. (NullAllowed) */
+    /** The value of alias name. (NullAllowed: when e.g. derived order-by) */
     protected final String _aliasName;
 
     /** The value of column name. (NotNull) */
