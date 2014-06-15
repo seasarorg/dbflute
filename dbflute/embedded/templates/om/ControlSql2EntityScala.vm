@@ -114,11 +114,17 @@ $database.deleteOldCustomizeClass();
 
 $database.info("public void parseCustomizeEntity() {")
 #foreach ($table in $database.tableList)
-  #set ($myBaseObjectClassName = "${glProjectPrefix}${glBasePrefix}${table.javaName}")
+  #set ($myBaseObjectClassName = "${table.baseEntityClassName}")
+  #set ($myImmutableBaseObjectClassName = "${table.immutableBaseEntityClassName}")
+  #set ($myMutableBaseObjectClassName = "${table.mutableBaseEntityClassName}")
   #set ($myBaseEntityPackageName = "${glPackageBaseCustomizeEntity}")
-  #set ($myExtendedObjectClassName = "${glProjectPrefix}${table.javaName}")
+
+  #set ($myExtendedObjectClassName = "${table.extendedEntityClassName}")
+  #set ($myImmutableExtendedObjectClassName = "${table.immutableExtendedEntityClassName}")
+  #set ($myMutableExtendedObjectClassName = "${table.mutableExtendedEntityClassName}")
   #set ($myExtendedEntityPackageName = "${glPackageExtendedCustomizeEntity}")
-  #set ($myDBMetaClassName = "${glProjectPrefix}${table.javaName}Dbm")
+
+  #set ($myDBMetaClassName = "${table.DBMetaClassName}")
   #set ($myDBMetaPackageName = "${glPackageCustomizeDBMeta}")
 
   #set ($myEntityVariableName = "${table.uncapitalisedJavaName}")
@@ -173,6 +179,11 @@ $database.info("public void parseCustomizeEntity() {")
     #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/bsentity/BaseEntity.${glTemplateFileExtension}",$path ,"" ,"")
 
+    #if ($table.isMakeImmutableEntity())
+      #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myImmutableBaseObjectClassName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/bsentity/ImmutableBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+    #end
+
     #set ( $path = "${database.getPackageAsPath(${myDBMetaPackageName})}${myDBMetaClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
 
@@ -182,6 +193,14 @@ $database.info("public void parseCustomizeEntity() {")
       $generator.parse("om/${glResourceDirectory}/exentity/ExtendedEntity.${glTemplateFileExtension}",$path ,"" ,"")
     #end
     $database.reflectAllExCopyright($path)
+
+    #if ($table.isMakeImmutableEntity())
+      #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myImmutableExtendedObjectClassName}.${glClassFileExtension}" )
+      #if (!$files.file(${generator.outputPath},$path).exists())
+        $generator.parse("om/${glResourceDirectory}/exentity/ImmutableExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+      #end
+      $database.reflectAllExCopyright($path)
+    #end
   #end
 #end
 $database.info("}")
@@ -224,121 +243,3 @@ $database.info("}")
 
 ## because it might be switched
 $database.backToSql2EntityOutputDirectory()
-
-## ===================================================================================
-##                                                                          Simple Dto
-##                                                                          ==========
-#if ($database.hasSimpleDtoDefinition())
-  $database.enableSimpleDtoOutputDirectory()
-  $database.deleteOldSimpleDtoCustomizeClass()
-  $database.info("parseSimpleDto() {")
-
-  #set ($myDomainEntityPackageName = "${glPackageExtendedEntity}.customize")
-  #set ($myBaseEntityPackageName = "${database.simpleDtoBaseDtoPackage}.customize")
-  #set ($myExtendedEntityPackageName = "${database.simpleDtoExtendedDtoPackage}.customize")
-
-  #foreach ($table in $database.tableList)
-    #if (!$table.isSql2EntityTypeSafeCursor())
-      #set ($myBaseObjectClassName = "${table.simpleDtoBaseDtoClassName}")
-      #set ($myExtendedObjectClassName = "${table.simpleDtoExtendedDtoClassName}")
-
-      $table.switchSql2EntitySimpleDtoOutputDirectory()
-      #set ($path = $database.getPackageAsPath(${myBaseEntityPackageName}))
-      $database.makeDirectory($path)
-      #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
-      $database.makeDirectory($path)
-
-      $database.info("    parse('${myExtendedObjectClassName}');")
-
-      #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/plugin/simpledto/SimpleDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
-
-      #if (!$database.isStopGenerateExtendedEntity())
-        #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
-        #if (!$files.file(${generator.outputPath},$path).exists())
-          $generator.parse("om/${glResourceDirectory}/plugin/simpledto/SimpleDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
-        #end
-        $database.reflectAllExCopyright($path)
-      #end
-    #end
-  #end
-  $database.info("}")
-
-  #if ($database.isSimpleDtoUseDtoMapper())
-  $database.enableDtoMapperOutputDirectory()
-  $database.deleteOldSimpleDtoMapperCustomizeClass()
-  $database.info("parseSimpleDtoMapper() {")
-
-  #set ($myBaseDtoMapperPackageName = "${database.simpleDtoBaseMapperPackage}.customize")
-  #set ($myExtendedDtoMapperPackageName = "${database.simpleDtoExtendedMapperPackage}.customize")
-
-  #foreach ($table in $database.tableList)
-    #if (!$table.isSql2EntityTypeSafeCursor())
-      $table.switchSql2EntityDtoMapperOutputDirectory()
-      #set ($path = $database.getPackageAsPath(${myBaseDtoMapperPackageName}))
-      $database.makeDirectory($path)
-      #set ($path = $database.getPackageAsPath(${myExtendedDtoMapperPackageName}))
-      $database.makeDirectory($path)
-
-      #set ($myBaseObjectClassName = "${table.simpleDtoBaseDtoClassName}")
-      #set ($myExtendedObjectClassName = "${table.simpleDtoExtendedDtoClassName}")
-      #set ($myBaseDtoMapperClassName = "${table.simpleDtoBaseMapperClassName}")
-      #set ($myExtendedDtoMapperClassName = "${table.simpleDtoExtendedMapperClassName}")
-
-      $database.info("    parse('${myExtendedDtoMapperClassName}');")
-
-      #set ( $path = "${database.getPackageAsPath(${myBaseDtoMapperPackageName})}${myBaseDtoMapperClassName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/plugin/simpledto/mapper/SimpleDtoBaseMapper.${glTemplateFileExtension}", $path, "table", $table)
-
-      #if (!$database.isStopGenerateExtendedEntity())
-        #set ( $path = "${database.getPackageAsPath(${myExtendedDtoMapperPackageName})}${myExtendedDtoMapperClassName}.${glClassFileExtension}" )
-        #if (!$files.file(${generator.outputPath},$path).exists())
-          $generator.parse("om/${glResourceDirectory}/plugin/simpledto/mapper/SimpleDtoExtendedMapper.${glTemplateFileExtension}", $path, "table", $table)
-        #end
-        $database.reflectAllExCopyright($path)
-      #end
-    #end
-  #end
-  $database.info("}")
-  #end
-  $database.backToSql2EntityOutputDirectory()
-#end
-
-## ===================================================================================
-##                                                                            Flex Dto
-##                                                                            ========
-#if ($database.hasFlexDtoDefinition())
-  $database.enableFlexDtoOutputDirectory()
-  $database.info("parseFlexDto() {")
-  #set ($myBaseEntityPackageName = "${database.flexDtoBaseDtoPackage}.customize")
-  #set ($myExtendedEntityPackageName = "${database.flexDtoExtendedDtoPackage}.customize")
-
-  #set ($path = $database.getPackageAsPath(${myBaseEntityPackageName}))
-  $database.makeDirectory($path)
-
-  #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
-  $database.makeDirectory($path)
-
-  #foreach ($table in $database.tableList)
-    #if (!$table.isSql2EntityTypeSafeCursor())
-    #set ($myBaseObjectClassName = "${database.flexDtoBaseDtoPrefix}${table.javaName}${database.flexDtoBaseDtoSuffix}")
-    #set ($myExtendedObjectClassName = "${database.flexDtoExtendedDtoPrefix}${table.javaName}${database.flexDtoExtendedDtoSuffix}")
-    #set ($myRemoteSimpleDtoClassName = "${database.simpleDtoExtendedDtoPackage}.customize.${myExtendedObjectClassName}")
-
-    $database.info("    parse('${myExtendedObjectClassName}');")
-
-    #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.as" )
-    $generator.parse("om/${glResourceDirectory}/plugin/flexdto/FlexDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
-
-    #if (!$database.isStopGenerateExtendedEntity())
-      #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.as" )
-      #if ($database.isFlexDtoOverrideExtended() || !$files.file(${generator.outputPath},$path).exists())
-        $generator.parse("om/${glResourceDirectory}/plugin/flexdto/FlexDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
-      #end
-      $database.reflectAllExCopyright($path)
-    #end
-    #end
-  #end
-  $database.info("}")
-  $database.backToSql2EntityOutputDirectory()
-#end

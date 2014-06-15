@@ -17,9 +17,9 @@ package org.seasar.dbflute.outsidesql.typed;
 
 /**
  * The parameter-bean for cursor handling.
- * @author jflute
  * @param <BEHAVIOR> The type of a corresponding behavior.
  * @param <ENTITY> The type of an entity (might be void) for result.
+ * @author jflute
  */
 public interface CursorHandlingPmb<BEHAVIOR, ENTITY> extends TypedSelectPmb<BEHAVIOR, ENTITY> {
 }

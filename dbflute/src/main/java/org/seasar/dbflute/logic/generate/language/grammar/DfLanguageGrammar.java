@@ -33,14 +33,25 @@ public interface DfLanguageGrammar {
     String getClassFileExtension();
 
     /**
-     * @return The string mark of 'extends'. (NotNull)
+     * @return The mark of 'extends'. (NotNull)
      */
-    String getExtendsStringMark();
+    String getExtendsMark();
 
     /**
-     * @return The string mark of 'implements'. (NotNull)
+     * @return The mark of 'implements'. (NotNull)
      */
-    String getImplementsStringMark();
+    String getImplementsMark();
+
+    /**
+     * @return The delimiter of 'implements'. (NotNull)
+     */
+    String getImplementsDelimiter();
+
+    /**
+     * Is the 'extends' area same as 'implements' area?
+     * @return The determination, true or false.
+     */
+    boolean isSameAreaExtendsImplements();
 
     /**
      * @return The modifier of 'public'. e.g. 'public' (NotNull)
@@ -95,7 +106,7 @@ public interface DfLanguageGrammar {
      * @return The type literal of the class. (NotNull)
      */
     String buildClassTypeLiteral(String className);
-    
+
     /**
      * @param element The element type for list generic. (NotNull)
      * @return The definition of 'List&lt;element&gt;'. (NotNull)
@@ -121,6 +132,14 @@ public interface DfLanguageGrammar {
      * @return The definition of '&lt;first, second&gt;'. (NotNull)
      */
     String buildGenericTwoClassHint(String first, String second);
+
+    /**
+     * @param first The first type name for the generic. (NotNull)
+     * @param second The second type name for the generic. (NotNull)
+     * @param third The third type name for the generic. (NotNull)
+     * @return The definition of '&lt;first, second, third&gt;'. (NotNull)
+     */
+    String buildGenericThreeClassHint(String first, String second, String third);
 
     /**
      * @param fromCol The column object to get. (NotNull)

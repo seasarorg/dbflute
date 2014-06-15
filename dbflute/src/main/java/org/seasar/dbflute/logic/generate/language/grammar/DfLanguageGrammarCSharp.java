@@ -47,12 +47,20 @@ public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
         return "cs";
     }
 
-    public String getExtendsStringMark() {
+    public String getExtendsMark() {
         return ":";
     }
 
-    public String getImplementsStringMark() {
+    public String getImplementsMark() {
         return ":";
+    }
+
+    public String getImplementsDelimiter() {
+        return ", ";
+    }
+
+    public boolean isSameAreaExtendsImplements() {
+        return false;
     }
 
     public String getPublicModifier() {
@@ -108,6 +116,10 @@ public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
 
     public String buildGenericTwoClassHint(String first, String second) {
         return "<" + first + ", " + second + ">";
+    }
+
+    public String buildGenericThreeClassHint(String first, String second, String third) {
+        return "<" + first + ", " + second + ", " + third + ">";
     }
 
     public String buildEntityPropertyGetSet(Column fromCol, Column toCol) {

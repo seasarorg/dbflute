@@ -281,8 +281,7 @@ public class DfBehaviorQueryPathSetupper {
         final Map<String, File> bsbhvFileMap = createBsBhvFileMap(bsbhvDir);
 
         final Map<File, Map<String, Map<String, String>>> reflectResourceMap = new HashMap<File, Map<String, Map<String, String>>>();
-        final Set<Entry<String, Map<String, String>>> entrySet = behaviorQueryPathMap.entrySet();
-        for (Entry<String, Map<String, String>> entry : entrySet) {
+        for (Entry<String, Map<String, String>> entry : behaviorQueryPathMap.entrySet()) {
             final Map<String, String> behaviorQueryElementMap = entry.getValue();
             final String behaviorName = behaviorQueryElementMap.get(KEY_BEHAVIOR_NAME); // on SQL file
             final String behaviorQueryPath = behaviorQueryElementMap.get(KEY_BEHAVIOR_QUERY_PATH);
@@ -297,13 +296,13 @@ public class DfBehaviorQueryPathSetupper {
                 if (isApplicationBehaviorProject()) {
                     final String projectPrefixLib = getLibraryProjectPrefix();
                     String retryName = behaviorName;
-                    if (retryName.startsWith(projectPrefixLib)) { // ex) LbFooBhv --> FooBhv
+                    if (retryName.startsWith(projectPrefixLib)) { // e.g. LbFooBhv --> FooBhv
                         retryName.substring(projectPrefixLib.length());
                     }
                     final String projectPrefixAp = getBasicProperties().getProjectPrefix();
-                    retryName = projectPrefixAp + retryName; // ex) FooBhv --> BpFooBhv
+                    retryName = projectPrefixAp + retryName; // e.g. FooBhv --> BpFooBhv
                     final String additionalSuffix = getApplicationBehaviorAdditionalSuffix();
-                    retryName = retryName + additionalSuffix; // ex) BpFooBhv --> BpFooBhvAp
+                    retryName = retryName + additionalSuffix; // e.g. BpFooBhv --> BpFooBhvAp
                     bsbhvFile = bsbhvFileMap.get(retryName);
                 }
                 if (bsbhvFile == null) {

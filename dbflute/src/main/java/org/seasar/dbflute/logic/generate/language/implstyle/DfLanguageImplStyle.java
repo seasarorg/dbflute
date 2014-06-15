@@ -56,7 +56,7 @@ public interface DfLanguageImplStyle {
 
     String adjustImmutablePropertyOptionalValue(String nativeExp);
 
-    String adjustImmutablePropertyOptionalOrElseNull(String variable);
+    String adjustImmutablePropertyOptionalOrElseNull(String immutableJavaNative, String variable);
 
     boolean isCompatibleBeforeJava8();
 }

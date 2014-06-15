@@ -17,9 +17,9 @@ package org.seasar.dbflute.outsidesql.typed;
 
 /**
  * The interface of typed parameter-bean for select.
- * @author jflute
  * @param <BEHAVIOR> The type of a corresponding behavior.
  * @param <ENTITY> The type of an entity (may be scalar) for result.
+ * @author jflute
  */
 public interface TypedSelectPmb<BEHAVIOR, ENTITY> extends TypedParameterBean<BEHAVIOR> {
 

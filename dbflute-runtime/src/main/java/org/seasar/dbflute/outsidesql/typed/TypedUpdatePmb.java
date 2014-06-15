@@ -17,8 +17,8 @@ package org.seasar.dbflute.outsidesql.typed;
 
 /**
  * The interface of typed parameter-bean for update.
- * @author jflute
  * @param <BEHAVIOR> The type of a corresponding behavior.
+ * @author jflute
  */
 public interface TypedUpdatePmb<BEHAVIOR> extends TypedParameterBean<BEHAVIOR> {
 }

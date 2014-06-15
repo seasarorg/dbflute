@@ -13,10 +13,10 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${database.allClassCopyright}package ${glPackageExtendedBhv};
+${database.allClassCopyright}package ${myExtendedBhvPackageName};
 #set ($myClassName = "${myExtendedBhvClassName}")
 
-import ${glPackageBaseBhv}.${myBaseBhvClassName};
+import ${myBaseBhvPackageName}.${myBaseBhvClassName};
 
 /**
  * The behavior of ${table.tableDbName}.

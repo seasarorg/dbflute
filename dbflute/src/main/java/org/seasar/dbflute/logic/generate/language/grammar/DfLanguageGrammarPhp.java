@@ -32,12 +32,20 @@ public class DfLanguageGrammarPhp implements DfLanguageGrammar {
         return "php";
     }
 
-    public String getExtendsStringMark() {
+    public String getExtendsMark() {
         return "extends";
     }
 
-    public String getImplementsStringMark() {
+    public String getImplementsMark() {
         return "implements";
+    }
+
+    public String getImplementsDelimiter() {
+        return ", ";
+    }
+
+    public boolean isSameAreaExtendsImplements() {
+        return false;
     }
 
     public String getPublicModifier() {
@@ -92,6 +100,10 @@ public class DfLanguageGrammarPhp implements DfLanguageGrammar {
     }
 
     public String buildGenericTwoClassHint(String first, String second) {
+        return "";
+    }
+
+    public String buildGenericThreeClassHint(String first, String second, String third) {
         return "";
     }
 

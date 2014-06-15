@@ -459,6 +459,25 @@ public class DfPmbMetaData {
         return logSb.toString();
     }
 
+    public String getImmutableCustomizeEntityType() {
+        if (!isRelatedToCustomizeEntity()) {
+            String msg = "This parameter-bean was not related to immutable customize entity.";
+            throw new IllegalStateException(msg);
+        }
+        if (_customizeEntityInfo.isCursorHandling() && !isTypedPagingHandling()) { // pure cursor
+            return "Void";
+        }
+        if (_customizeEntityInfo.isScalarHandling()) {
+            return _customizeEntityInfo.getScalarJavaNative();
+        }
+        final String entityClassName = _customizeEntityInfo.getImmutableEntityClassName();
+        if (entityClassName == null) {
+            String msg = "The class name of the immutable customize entity was not found.";
+            throw new IllegalStateException(msg);
+        }
+        return entityClassName;
+    }
+
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======

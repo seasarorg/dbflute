@@ -296,13 +296,13 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
     }
 
     @SuppressWarnings("unchecked")
-    protected <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) {
+    protected <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) { // might be called by option handling
         Object obj = DfCollectionUtil.newArrayList(elements);
         return (ArrayList<ELEMENT>)obj; // to avoid the warning between JDK6 and JDK7
     }
 
     @SuppressWarnings("unchecked")
-    protected <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) {
+    protected <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) { // might be called by option handling
         return (NUMBER)DfTypeUtil.toNumber(obj, type);
     }
 
@@ -363,29 +363,34 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
         sb.append(xbuildColumnString());
         return sb.toString();
     }
-    private String xbuildColumnString() {
-        final String c = ", ";
+    protected String xbuildColumnString() {
+        final String dm = ", ";
         final StringBuilder sb = new StringBuilder();
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($propertyType.equals("Date") || $propertyType.equals("java.util.Date"))
-        sb.append(c).append(formatUtilDate(${variableName}));
+        sb.append(dm).append(formatUtilDate(${variableName}));
 #elseif ($propertyType.equals("byte[]"))
-        sb.append(c).append(formatByteArray(${variableName}));
+        sb.append(dm).append(formatByteArray(${variableName}));
 #else
-        sb.append(c).append(${variableName});
+        sb.append(dm).append(${variableName});
 #end
 #end
-        if (sb.length() > 0) { sb.delete(0, c.length()); }
+        if (sb.length() > 0) { sb.delete(0, dm.length()); }
         sb.insert(0, "{").append("}");
         return sb.toString();
     }
 
+#set ($propertyLoopIndex = 0)
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#if ($propertyLoopIndex == 0)
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#else
+
+#end
 #set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($argumentName = "$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
@@ -567,6 +572,6 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
     }
 #end
 #end
-
+#set ($propertyLoopIndex = $propertyLoopIndex + 1)
 #end
 }

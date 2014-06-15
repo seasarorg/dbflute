@@ -1846,7 +1846,8 @@ public class Column {
     public String convertToImmutablePropertyOrElseNull(String propertyExp) {
         final String converted;
         if (isImmutablePropertyOptional()) {
-            converted = getLanguageImplStyle().adjustImmutablePropertyOptionalOrElseNull(propertyExp);
+            final String immutableJavaNative = getImmutableJavaNative();
+            converted = getLanguageImplStyle().adjustImmutablePropertyOptionalOrElseNull(immutableJavaNative, propertyExp);
         } else {
             converted = propertyExp;
         }

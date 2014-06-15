@@ -19,8 +19,8 @@ import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 
 /**
  * The interface of typed parameter-bean.
- * @author jflute
  * @param <BEHAVIOR> The type of a corresponding behavior.
+ * @author jflute
  */
 public interface TypedParameterBean<BEHAVIOR> extends ParameterBean {
 

@@ -46,12 +46,20 @@ public class DfLanguageGrammarJava implements DfLanguageGrammar {
         return "java";
     }
 
-    public String getExtendsStringMark() {
+    public String getExtendsMark() {
         return "extends";
     }
 
-    public String getImplementsStringMark() {
+    public String getImplementsMark() {
         return "implements";
+    }
+
+    public String getImplementsDelimiter() {
+        return ", ";
+    }
+
+    public boolean isSameAreaExtendsImplements() {
+        return false;
     }
 
     public String getPublicModifier() {
@@ -107,6 +115,10 @@ public class DfLanguageGrammarJava implements DfLanguageGrammar {
 
     public String buildGenericTwoClassHint(String first, String second) {
         return "<" + first + ", " + second + ">";
+    }
+
+    public String buildGenericThreeClassHint(String first, String second, String third) {
+        return "<" + first + ", " + second + ", " + third + ">";
     }
 
     public String buildEntityPropertyGetSet(Column fromCol, Column toCol) {

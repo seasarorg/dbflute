@@ -169,16 +169,19 @@ public class DfBqpBehaviorFile {
                         defSb.append(grammar.getPublicStaticFinal());
                         final String keySubDirectoryPath = DfBehaviorQueryPathSetupper.KEY_SUB_DIRECTORY_PATH;
                         final String subDirectoryPath = behaviorQueryElementMap.get(keySubDirectoryPath);
+                        final String pathJavaNativeType = "String";
+                        defSb.append(" ");
                         if (Srl.is_NotNull_and_NotTrimmedEmpty(subDirectoryPath)) {
                             final String subDirectoryName = Srl.replace(subDirectoryPath, "/", "_");
                             final String subDirectoryValue = Srl.replace(subDirectoryPath, "/", ":");
-                            defSb.append(" String PATH_");
-                            defSb.append(subDirectoryName).append("_").append(behaviorQueryPath);
+                            String variable = "PATH_" + subDirectoryName + "_" + behaviorQueryPath;
+                            defSb.append(grammar.buildVariableSimpleDefinition(pathJavaNativeType, variable));
                             defSb.append(" = \"");
                             defSb.append(subDirectoryValue).append(":").append(behaviorQueryPath);
                             defSb.append("\";");
                         } else {
-                            defSb.append(" String PATH_").append(behaviorQueryPath);
+                            String variable = "PATH_" + behaviorQueryPath;
+                            defSb.append(grammar.buildVariableSimpleDefinition(pathJavaNativeType, variable));
                             defSb.append(" = \"").append(behaviorQueryPath).append("\";");
                         }
 

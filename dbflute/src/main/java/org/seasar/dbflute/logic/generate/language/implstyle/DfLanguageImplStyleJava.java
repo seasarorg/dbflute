@@ -83,7 +83,7 @@ public class DfLanguageImplStyleJava implements DfLanguageImplStyle {
         return "OptionalProperty.of(" + nativeExp + ")";
     }
 
-    public String adjustImmutablePropertyOptionalOrElseNull(String variable) {
+    public String adjustImmutablePropertyOptionalOrElseNull(String immutableJavaNative, String variable) {
         return variable + ".orElseNull()";
     }
 

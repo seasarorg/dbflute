@@ -17,9 +17,9 @@ package org.seasar.dbflute.outsidesql.typed;
 
 /**
  * The parameter-bean for list handling.
- * @author jflute
  * @param <BEHAVIOR> The type of a corresponding behavior.
  * @param <ENTITY> The type of an entity (may be scalar) for result.
+ * @author jflute
  */
 public interface ListHandlingPmb<BEHAVIOR, ENTITY> extends TypedSelectPmb<BEHAVIOR, ENTITY> {
 }

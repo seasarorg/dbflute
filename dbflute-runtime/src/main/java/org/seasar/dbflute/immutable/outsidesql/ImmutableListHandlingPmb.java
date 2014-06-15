@@ -13,15 +13,19 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.outsidesql.typed;
+package org.seasar.dbflute.immutable.outsidesql;
 
-import org.seasar.dbflute.cbean.PagingBean;
+import org.seasar.dbflute.immutable.DBableEntity;
+import org.seasar.dbflute.outsidesql.typed.ListHandlingPmb;
 
 /**
- * The parameter-bean for manual-paging handling.
+ * The parameter-bean for immutable list handling.
  * @param <BEHAVIOR> The type of a corresponding behavior.
- * @param <ENTITY> The type of an entity (may be scalar) for result.
+ * @param <IMMU> The type of immutable entity (may be scalar) for result.
+ * @param <DBLE> The type of entity (may be scalar) for result.
  * @author jflute
+ * @since 1.0.6A (2014/06/15 Sunday)
  */
-public interface ManualPagingHandlingPmb<BEHAVIOR, ENTITY> extends TypedSelectPmb<BEHAVIOR, ENTITY>, PagingBean {
+public interface ImmutableListHandlingPmb<BEHAVIOR, IMMU, DBLE extends DBableEntity<IMMU>> extends
+        ListHandlingPmb<BEHAVIOR, DBLE> {
 }

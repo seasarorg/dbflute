@@ -255,13 +255,13 @@ abstract class $myClassName(dble: ${myExtendedObjectClassName}) extends Serializ
         obj match {
             case obj: $myClassName => {
                 val other: $myClassName = obj.asInstanceOf[$myClassName];
-                {
+                {(
 #set ($equalsCount = 0)
 #foreach ($col in $table.equalsHashcodeColumnList)
                     #if ($equalsCount > 0)&&#end xSV(${col.uncapitalisedJavaName}, other.${col.uncapitalisedJavaName})
 #set ($equalsCount = $equalsCount + 1)
 #end
-                }
+                )}
             }
             case _ => false
         }

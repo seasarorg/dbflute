@@ -369,6 +369,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 // initialize a class name of the entity for typed parameter-bean
                 database.addTable(tbl); // should be before getting names
                 entityInfo.setEntityClassName(tbl.getExtendedEntityClassName());
+                entityInfo.setImmutableClassName(tbl.getImmutableExtendedEntityClassName());
             }
             logSb.append(ln());
         }

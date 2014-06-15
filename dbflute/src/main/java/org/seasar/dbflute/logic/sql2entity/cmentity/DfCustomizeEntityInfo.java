@@ -47,6 +47,7 @@ public class DfCustomizeEntityInfo {
     protected boolean _domainHandling;
     protected DfPmbMetaData _pmbMetaData; // is a related parameter-bean
     protected String _entityClassName; // is set immediately before generation
+    protected String _immutableEntityClassName; // is set immediately before generation
 
     // only when scalar handling
     protected String _scalarJavaNative;
@@ -167,7 +168,7 @@ public class DfCustomizeEntityInfo {
     }
 
     public void setSqlFile(File sqlFile) {
-        this._sqlFile = sqlFile;
+        _sqlFile = sqlFile;
     }
 
     public List<String> getPrimaryKeyList() {
@@ -175,7 +176,7 @@ public class DfCustomizeEntityInfo {
     }
 
     public void setPrimaryKeyList(List<String> primaryKeyList) {
-        this._primaryKeyList = primaryKeyList;
+        _primaryKeyList = primaryKeyList;
     }
 
     public boolean isCursorHandling() {
@@ -183,7 +184,7 @@ public class DfCustomizeEntityInfo {
     }
 
     public void setCursorHandling(boolean cursorHandling) {
-        this._cursorHandling = cursorHandling;
+        _cursorHandling = cursorHandling;
     }
 
     public boolean isScalarHandling() {
@@ -191,7 +192,7 @@ public class DfCustomizeEntityInfo {
     }
 
     public void setScalarHandling(boolean scalarHandling) {
-        this._scalarHandling = scalarHandling;
+        _scalarHandling = scalarHandling;
     }
 
     public boolean isDomainHandling() {
@@ -199,7 +200,7 @@ public class DfCustomizeEntityInfo {
     }
 
     public void setDomainHandling(boolean domainHandling) {
-        this._domainHandling = domainHandling;
+        _domainHandling = domainHandling;
     }
 
     public DfPmbMetaData getPmbMetaData() {
@@ -207,7 +208,7 @@ public class DfCustomizeEntityInfo {
     }
 
     public void setPmbMetaData(DfPmbMetaData pmbMetaData) {
-        this._pmbMetaData = pmbMetaData;
+        _pmbMetaData = pmbMetaData;
     }
 
     public String getEntityClassName() {
@@ -215,7 +216,15 @@ public class DfCustomizeEntityInfo {
     }
 
     public void setEntityClassName(String entityClassName) {
-        this._entityClassName = entityClassName;
+        _entityClassName = entityClassName;
+    }
+
+    public String getImmutableEntityClassName() {
+        return _immutableEntityClassName;
+    }
+
+    public void setImmutableClassName(String immutableEntityClassName) {
+        _immutableEntityClassName = immutableEntityClassName;
     }
 
     public String getScalarJavaNative() {
@@ -223,7 +232,7 @@ public class DfCustomizeEntityInfo {
     }
 
     public void setScalarJavaNative(String scalarJavaNative) {
-        this._scalarJavaNative = scalarJavaNative;
+        _scalarJavaNative = scalarJavaNative;
     }
 
     public String getScalarColumnDisp() {
@@ -231,7 +240,7 @@ public class DfCustomizeEntityInfo {
     }
 
     public void setScalarColumnDisp(String scalarColumnDisp) {
-        this._scalarColumnDisp = scalarColumnDisp;
+        _scalarColumnDisp = scalarColumnDisp;
     }
 
     public boolean isProcedureHandling() {
@@ -239,7 +248,7 @@ public class DfCustomizeEntityInfo {
     }
 
     public void setProcedureHandling(boolean procedureHandling) {
-        this._procedureHandling = procedureHandling;
+        _procedureHandling = procedureHandling;
     }
 
     public DfOutsideSqlFile getOutsideSqlFile() {
@@ -247,7 +256,7 @@ public class DfCustomizeEntityInfo {
     }
 
     public void setOutsideSqlFile(DfOutsideSqlFile outsideSqlFile) {
-        this._outsideSqlFile = outsideSqlFile;
+        _outsideSqlFile = outsideSqlFile;
     }
 
     public Map<String, String> getSelectColumnCommentMap() {
@@ -255,6 +264,6 @@ public class DfCustomizeEntityInfo {
     }
 
     public void setSelectColumnCommentMap(Map<String, String> selectColumnCommentMap) {
-        this._selectColumnCommentMap = selectColumnCommentMap;
+        _selectColumnCommentMap = selectColumnCommentMap;
     }
 }

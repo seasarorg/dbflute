@@ -110,12 +110,13 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
     }
 
     public String convertToJavaNativeFromImmutable(String immutableJavaNative, String javaNative, String variable) {
-        if (DfLanguageTypeMappingScala.SCALA_NATIVE_INTEGER.equals(immutableJavaNative)) {
-            return "int2Integer(" + variable + ")";
-        }
-        if (DfLanguageTypeMappingScala.SCALA_NATIVE_LONG.equals(immutableJavaNative)) {
-            return "long2Long(" + variable + ")";
-        }
+        // quit because variable might have orNull
+        //if (DfLanguageTypeMappingScala.SCALA_NATIVE_INTEGER.equals(immutableJavaNative)) {
+        //    return "int2Integer(" + variable + ")";
+        //}
+        //if (DfLanguageTypeMappingScala.SCALA_NATIVE_LONG.equals(immutableJavaNative)) {
+        //    return "long2Long(" + variable + ")";
+        //}
         if (DfLanguageTypeMappingScala.SCALA_NATIVE_BIGDECIMAL.equals(immutableJavaNative)) {
             return variable + ".asInstanceOf[" + javaNative + "]";
         }

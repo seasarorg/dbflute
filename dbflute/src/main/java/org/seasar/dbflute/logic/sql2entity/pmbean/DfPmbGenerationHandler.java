@@ -86,9 +86,9 @@ public class DfPmbGenerationHandler {
         }
         final DfPmbMetaData metaData = findPmbMetaData(className);
         final String superClassName = metaData.getSuperClassName();
-        final DfLanguageDependency languageDependencyInfo = getBasicProperties().getLanguageDependency();
-        final String extendsStringMark = languageDependencyInfo.getLanguageGrammar().getExtendsStringMark();
-        return " " + extendsStringMark + " " + superClassName;
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final String extendsMark = lang.getLanguageGrammar().getExtendsMark();
+        return " " + extendsMark + " " + superClassName;
     }
 
     public String getInterfaceDefinition(String className) {
@@ -97,35 +97,53 @@ public class DfPmbGenerationHandler {
         if (!lang.getLanguageImplStyle().isTypedParameterBeanEnabled()) {
             return "";
         }
+        final boolean immutable = lang.getLanguageImplStyle().isMakeImmutableEntity();
+        final String immuPrefix = immutable ? "Immutable" : "";
         final DfLanguageGrammar grammar = lang.getLanguageGrammar();
+        final String delimiter = grammar.getImplementsDelimiter();
         final StringBuilder sb = new StringBuilder();
         if (isTypedParameterBean(className)) {
-            final String behaviorClassName = getBehaviorClassName(className);
-            final String customizeEntityType;
-            if (isRelatedToCustomizeEntity(className)) {
-                customizeEntityType = getCustomizeEntityType(className);
-            } else {
-                customizeEntityType = null; // no used
+            final String bhvType = getBehaviorClassName(className);
+            final String entityGenericDef;
+            {
+                final String customizeType;
+                final String immuType;
+                if (isRelatedToCustomizeEntity(className)) {
+                    customizeType = getCustomizeEntityType(className);
+                    immuType = getImmutableCustomizeEntityType(className);
+                } else { // these are no used
+                    customizeType = null;
+                    immuType = null;
+                }
+                if (immutable) { // e.g. Scala, ImmutableListHandlingPmb<BEHAVIOR, IMMU, DBLE>
+                    entityGenericDef = grammar.buildGenericThreeClassHint(bhvType, immuType, customizeType);
+                } else { // normally here in Java
+                    entityGenericDef = grammar.buildGenericTwoClassHint(bhvType, customizeType);
+                }
             }
-            final String entityGenericDef = grammar.buildGenericTwoClassHint(behaviorClassName, customizeEntityType);
-            final String voidResultGenericDef = grammar.buildGenericTwoClassHint(behaviorClassName, "Void");
-            final String noResultGenericDef = grammar.buildGenericOneClassHint(behaviorClassName);
+            final String voidResultGenericDef = grammar.buildGenericTwoClassHint(bhvType, "Void");
+            final String noResultGenericDef = grammar.buildGenericOneClassHint(bhvType);
 
             // several typed interfaces can be implemented
             if (isTypedListHandling(className)) {
-                sb.append(", ").append("ListHandlingPmb").append(entityGenericDef);
+                sb.append(delimiter).append(immuPrefix);
+                sb.append("ListHandlingPmb").append(entityGenericDef);
             }
             if (isTypedEntityHandling(className)) {
-                sb.append(", ").append("EntityHandlingPmb").append(entityGenericDef);
+                sb.append(delimiter).append(immuPrefix);
+                sb.append("EntityHandlingPmb").append(entityGenericDef);
             }
             if (isTypedManualPagingHandling(className)) {
-                sb.append(", ").append("ManualPagingHandlingPmb").append(entityGenericDef);
+                sb.append(delimiter).append(immuPrefix);
+                sb.append("ManualPagingHandlingPmb").append(entityGenericDef);
             }
             if (isTypedAutoPagingHandling(className)) {
-                sb.append(", ").append("AutoPagingHandlingPmb").append(entityGenericDef);
+                sb.append(delimiter).append(immuPrefix);
+                sb.append("AutoPagingHandlingPmb").append(entityGenericDef);
             }
             if (isTypedCursorHandling(className)) {
-                sb.append(", ").append("CursorHandlingPmb");
+                sb.append(delimiter).append(immuPrefix);
+                sb.append("CursorHandlingPmb");
                 if (isTypedPagingHandling(className)) { // cursor with paging
                     sb.append(entityGenericDef);
                 } else { // pure cursor
@@ -133,17 +151,31 @@ public class DfPmbGenerationHandler {
                 }
             }
             if (isTypedExecuteHandling(className)) {
-                sb.append(", ").append("ExecuteHandlingPmb").append(noResultGenericDef);
+                sb.append(delimiter).append(immuPrefix);
+                sb.append("ExecuteHandlingPmb").append(noResultGenericDef);
             }
         }
         if (sb.length() > 0) {
-            sb.delete(0, ", ".length());
+            sb.delete(0, delimiter.length());
         } else {
             sb.append("ParameterBean");
         }
-        sb.append(", ").append("FetchBean");
-        final String implementsStringMark = grammar.getImplementsStringMark();
-        return " " + implementsStringMark + " " + sb.toString();
+        sb.append(delimiter).append("FetchBean");
+
+        final String implementsMark = grammar.getImplementsMark();
+        final String implementsPrefix;
+        if (grammar.isSameAreaExtendsImplements()) {
+            final String superClassDefinition = getSuperClassDefinition(className);
+            final boolean hasSuperClassDefinition = Srl.is_NotNull_and_NotTrimmedEmpty(superClassDefinition);
+            if (hasSuperClassDefinition) {
+                implementsPrefix = "";
+            } else {
+                implementsPrefix = " " + implementsMark;
+            }
+        } else {
+            implementsPrefix = " " + implementsMark;
+        }
+        return implementsPrefix + " " + sb.toString();
     }
 
     public boolean hasSuperClassDefinition(String className) {
@@ -229,6 +261,10 @@ public class DfPmbGenerationHandler {
 
     public String getCustomizeEntityType(String className) {
         return findPmbMetaData(className).getCustomizeEntityType();
+    }
+
+    public String getImmutableCustomizeEntityType(String className) {
+        return findPmbMetaData(className).getImmutableCustomizeEntityType();
     }
 
     public String getCustomizeEntityLineDisp(String className) {

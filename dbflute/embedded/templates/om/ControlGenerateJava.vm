@@ -332,16 +332,16 @@ $database.info("public void parseTableClass() {")
   #set ($isExistDao = false)
 
   #if ($table.hasBehavior())
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvClassName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${myBaseBhvPackageName})}${myBaseBhvClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
   #end
 
   #if ($table.hasReferrerLoader())
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseReferrerLoader})}${myReferrerLoaderClassName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${myReferrerLoaderPackageName})}${myReferrerLoaderClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/bsbhv/ReferrerLoader.${glTemplateFileExtension}", $path, "table", $table)
   #end
 
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseEntity})}${myBaseObjectClassName}.${glClassFileExtension}" )
+  #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
   $generator.parse("om/${glResourceDirectory}/bsentity/BaseEntity.${glTemplateFileExtension}", $path, "table", $table)
 
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseDBMeta})}${myDBMetaClassName}.${glClassFileExtension}" )
@@ -349,7 +349,7 @@ $database.info("public void parseTableClass() {")
 
   #if ($table.hasBehavior())
     #if (!$database.isStopGenerateExtendedBhv())
-      #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
+      #set ( $path = "${database.getPackageAsPath(${myExtendedBhvPackageName})}${myExtendedBhvClassName}.${glClassFileExtension}" )
       #if (!$files.file(${generator.outputPath},$path).exists())
         $generator.parse("om/${glResourceDirectory}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
       #end
@@ -358,7 +358,7 @@ $database.info("public void parseTableClass() {")
   #end
 
   #if (!$database.isStopGenerateExtendedEntity())
-    #set ( $path = "${database.getPackageAsPath(${glPackageExtendedEntity})}${myExtendedObjectClassName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
     #if (!$files.file(${generator.outputPath},$path).exists())
       $generator.parse("om/${glResourceDirectory}/exentity/ExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
     #end

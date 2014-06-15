@@ -16,6 +16,7 @@
 package org.seasar.dbflute.logic.generate.language.implstyle;
 
 import org.apache.torque.engine.database.model.Column;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingScala;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -87,8 +88,16 @@ public class DfLanguageImplStyleScala implements DfLanguageImplStyle {
         return "Option(" + nativeExp + ")";
     }
 
-    public String adjustImmutablePropertyOptionalOrElseNull(String variable) {
-        return variable + ".orNull";
+    public String adjustImmutablePropertyOptionalOrElseNull(String immutableJavaNative, String variable) {
+        final String exp;
+        if (immutableJavaNative.equals(DfLanguageTypeMappingScala.SCALA_NATIVE_INTEGER)) {
+            exp = variable + ".map(int2Integer(_)).orNull";
+        } else if (immutableJavaNative.equals(DfLanguageTypeMappingScala.SCALA_NATIVE_LONG)) {
+            exp = variable + ".map(long2Long(_)).orNull";
+        } else {
+            exp = variable + ".orNull";
+        }
+        return exp;
     }
 
     public boolean isCompatibleBeforeJava8() {

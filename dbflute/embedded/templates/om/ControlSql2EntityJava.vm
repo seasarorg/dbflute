@@ -114,11 +114,11 @@ $database.deleteOldCustomizeClass();
 
 $database.info("public void parseCustomizeEntity() {")
 #foreach ($table in $database.tableList)
-  #set ($myBaseObjectClassName = "${glProjectPrefix}${glBasePrefix}${table.javaName}")
+  #set ($myBaseObjectClassName = "${table.baseEntityClassName}")
   #set ($myBaseEntityPackageName = "${glPackageBaseCustomizeEntity}")
-  #set ($myExtendedObjectClassName = "${glProjectPrefix}${table.javaName}")
+  #set ($myExtendedObjectClassName = "${table.extendedEntityClassName}")
   #set ($myExtendedEntityPackageName = "${glPackageExtendedCustomizeEntity}")
-  #set ($myDBMetaClassName = "${glProjectPrefix}${table.javaName}Dbm")
+  #set ($myDBMetaClassName = "${table.DBMetaClassName}")
   #set ($myDBMetaPackageName = "${glPackageCustomizeDBMeta}")
 
   #set ($myEntityVariableName = "${table.uncapitalisedJavaName}")

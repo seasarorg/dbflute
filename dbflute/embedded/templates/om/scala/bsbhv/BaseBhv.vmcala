@@ -13,7 +13,7 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${database.allClassCopyright}package ${glPackageBaseBhv};
+${database.allClassCopyright}package ${myBaseBhvPackageName};
 #set ($myClassName = "${myBaseBhvClassName}")
 
 import scala.collection.JavaConverters._;

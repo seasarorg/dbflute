@@ -13,7 +13,7 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${database.allClassCopyright}package ${glPackageBaseBhv};
+${database.allClassCopyright}package ${myBaseBhvPackageName};
 #set ($myClassName = "${myBaseBhvClassName}")
 
 import java.util.List;
@@ -332,8 +332,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 
     protected ${myConditionBeanClassName} xprepareCBAsPK(${table.primaryKeyArgsString}) {
         ${table.primaryKeyArgsAssertString}
-        ${myConditionBeanClassName} cb = newConditionBean(); cb.acceptPrimaryKey(${table.primaryKeyArgsCallingString});
-        return cb;
+        return newConditionBean().acceptPK(${table.primaryKeyArgsCallingString});
     }
 #end
 #foreach ($uq in $table.keyableUniqueList)
@@ -360,8 +359,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 
     protected ${myConditionBeanClassName} xprepareCBAsUniqueOf${uq.javaNameKeyword}(${uq.argsString}) {
         ${uq.argsAssertString}
-        ${myConditionBeanClassName} cb = newConditionBean(); cb.acceptUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString});
-        return cb;
+        return newConditionBean().acceptUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString});
     }
 #end
 

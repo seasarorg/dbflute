@@ -652,13 +652,13 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
         obj match {
             case obj: $myClassName => {
                 val other: $myClassName = obj.asInstanceOf[$myClassName];
-                {
+                {(
 #set ($equalsCount = 0)
 #foreach ($col in $table.equalsHashcodeColumnList)
                     #if ($equalsCount > 0)&&#end xSV(get${col.javaName}(), other.get${col.javaName}())
 #set ($equalsCount = $equalsCount + 1)
 #end
-                }
+                )}
             }
             case _ => false
         }
