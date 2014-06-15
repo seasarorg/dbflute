@@ -39,6 +39,7 @@ import org.seasar.dbflute.Entity.EntityUniqueDrivenProperties;
 import org.seasar.dbflute.Entity.EntityModifiedProperties;
 import org.seasar.dbflute.Entity.FunCustodial;
 import org.seasar.dbflute.helper.beans.DfCoupleProperties;
+import org.seasar.dbflute.immutable.DBableEntity;
 #if ($table.hasAllCommonColumn())
 import ${glPackageBaseCommon}.${glEntityDefinedCommonColumn};
 #end
@@ -107,7 +108,7 @@ import ${table.relationalNullObjectProviderPackage}._;
  * </pre>
  * @author ${database.classAuthor}
  */
-abstract class $myClassName extends ${myEntityInterfaceName} with Serializable with Cloneable with DfCoupleProperties {
+abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[${myImmutableExtendedObjectClassName}] with Serializable with Cloneable with DfCoupleProperties {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -141,8 +142,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
     //                                                                           Immutable
     //                                                                           =========
     /**
-     * Accept immutable entity to initialize this.
-     * @return this. (NotNull)
+     * {@inheritDoc}
      */
     def acceptImmutable(immu: ${myImmutableExtendedObjectClassName}): ${myExtendedObjectClassName} = {
 #foreach ($col in $table.columns)
@@ -162,6 +162,13 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
         __modifiedProperties.clear();
         immu.getModifiedProperties().foreach(__modifiedProperties.addPropertyName(_))
         return this.asInstanceOf[${myExtendedObjectClassName}];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    def toImmutable(): ${myImmutableExtendedObjectClassName} = {
+        return new ${myImmutableExtendedObjectClassName}(this.asInstanceOf[${myExtendedObjectClassName}]);
     }
 
     // ===================================================================================
@@ -619,15 +626,6 @@ abstract class $myClassName extends ${myEntityInterfaceName} with Serializable w
      */
     def canCommonColumnAutoSetup(): Boolean = {
         return __canCommonColumnAutoSetup;
-    }
-#end
-#if ($table.isMakeImmutableEntity())
-
-    // ===================================================================================
-    //                                                                    Immutable Entity
-    //                                                                    ================
-    def toImmutable(): ${myImmutableExtendedObjectClassName} = {
-        return new ${myImmutableExtendedObjectClassName}(this.asInstanceOf[${myExtendedObjectClassName}]);
     }
 #end
 

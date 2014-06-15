@@ -16,6 +16,8 @@
 ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 #set ($myClassName = "${myBaseParameterBeanClassName}")
 
+import scala.collection.JavaConverters._;
+
 import java.util._;
 
 #if ($database.hasPmbMetaDataPagingExtension($pmbClassName))
@@ -25,7 +27,7 @@ import org.seasar.dbflute.cbean.SimplePagingBean;
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 #else
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
-import org.seasar.dbflute.outsidesql.typed._;
+import org.seasar.dbflute.immutable.outsidesql._;
 #else
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 #end
@@ -167,26 +169,13 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-#if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
-     * Constructor for the typed parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br />
-     * This is related to "<span style="color: #AD4747">${database.getPmbMetaDataBehaviorQueryPath($pmbClassName)}</span>" on ${database.getPmbMetaDataBehaviorClassName($pmbClassName)}.
-#else
-#if ($database.isPmbMetaDataForProcedure($pmbClassName))
-     * Constructor for the procedure parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br />
-     * This is related to "<span style="color: #AD4747">${database.getPmbMetaDataProcedureName($pmbClassName)}</span>".
-#else
-     * Constructor for the parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}.
-#end
-#end
-     */
-    {
 #if ($database.hasPmbMetaDataPagingExtension($pmbClassName))
+    {
         if (${glDBFluteConfig}.isPagingCountLater()) {
             enablePagingCountLater();
         }
-#end
     }
+#end
 
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
     // ===================================================================================
@@ -195,18 +184,14 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
     /**
      * {@inheritDoc}
      */
-    def getOutsideSqlPath(): String = {
-        return "${database.getPmbMetaDataBehaviorQueryPath($pmbClassName)}";
-    }
+    def getOutsideSqlPath(): String = { "${database.getPmbMetaDataBehaviorQueryPath($pmbClassName)}" }
 
 #if ($database.isPmbMetaDataTypedSelectPmb($pmbClassName))
     /**
      * Get the type of an entity for result. (implementation)
      * @return The type instance of an entity, ${database.getPmbMetaDataCustomizeEntityLineDisp($pmbClassName)}. (NotNull)
      */
-    def getEntityType(): Class[${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}] = {
-        return classOf[${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}];
-    }
+    def getEntityType(): Class[${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}] = { classOf[${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}] }
 
 #end
 #end
@@ -217,23 +202,17 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
     /**
      * {@inheritDoc}
      */
-    def getProcedureName(): String = {
-        return "${database.getPmbMetaDataProcedureName($pmbClassName)}";
-    }
+    def getProcedureName(): String = { "${database.getPmbMetaDataProcedureName($pmbClassName)}" }
 
     /**
      * {@inheritDoc}
      */
-     def isEscapeStatement(): Boolean = {
-         return true; // as default
-     }
+     def isEscapeStatement(): Boolean = { true } // as default
 
     /**
      * {@inheritDoc}
      */
-     def isCalledBySelect(): Boolean = {
-         return ${database.isPmbMetaDataProcedureCalledBySelect($pmbClassName)}; // resolved by generator
-     }
+     def isCalledBySelect(): Boolean = { ${database.isPmbMetaDataProcedureCalledBySelect($pmbClassName)} } // resolved by generator
 
 #end
 #if (!$database.hasPmbMetaDataCheckSafetyResult($pmbClassName))
@@ -243,16 +222,12 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
     /**
      * {@inheritDoc}
      */
-    def checkSafetyResult(safetyMaxResultSize: Int): Unit = {
-        _safetyMaxResultSize = safetyMaxResultSize;
-    }
+    def checkSafetyResult(safetyMaxResultSize: Int): Unit = { _safetyMaxResultSize = safetyMaxResultSize }
 
     /**
      * {@inheritDoc}
      */
-    def getSafetyMaxResultSize(): Int = {
-        return _safetyMaxResultSize;
-    }
+    def getSafetyMaxResultSize(): Int = { _safetyMaxResultSize }
 
 #end
 #if ($database.existsPmbMetaDataAlternateBooleanMethodNameSet($pmbClassName))
@@ -272,9 +247,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
     //                                                                       Assist Helper
     //                                                                       =============
     protected def filterStringParameter(value: String): String = {
-        if (isEmptyStringParameterAllowed()) {
-            return value;
-        }
+        if (isEmptyStringParameterAllowed()) { return value; }
         return convertEmptyToNull(value);
     }
 
@@ -293,6 +266,14 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 
     protected def getShortCharHandlingMode(propertyName: String, value: String, size: Integer): ShortCharHandlingMode = {
         return ShortCharHandlingMode.${database.shortCharHandlingMode};
+    }
+
+    protected def newArrayList[ELEMENT](elements: ELEMENT*): List[ELEMENT] = { // might be called by option handling
+        return elements.asJava
+    }
+
+    protected def toNumber[NUMBER <: Number](obj: Object, tp: Class[NUMBER]): NUMBER = { // might be called by option handling
+        return DfTypeUtil.toNumber(obj, tp).asInstanceOf[NUMBER];
     }
 
     protected def toBoolean(obj: Object): Boolean = {
@@ -351,7 +332,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
         sb.append(xbuildColumnString());
         return sb.toString();
     }
-    private def xbuildColumnString(): String = {
+    protected def xbuildColumnString(): String = {
         val dm: String = ", ";
         val sb: StringBuilder = new StringBuilder();
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
@@ -370,10 +351,15 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
         return sb.toString();
     }
 
+#set ($propertyLoopIndex = 0)
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#if ($propertyLoopIndex == 0)
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#else
+
+#end
 #set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($argumentName = "$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
@@ -555,6 +541,6 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
     }
 #end
 #end
-
+#set ($propertyLoopIndex = $propertyLoopIndex + 1)
 #end
 }

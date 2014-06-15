@@ -110,7 +110,7 @@ public class DfPmbGenerationHandler {
                 final String immuType;
                 if (isRelatedToCustomizeEntity(className)) {
                     customizeType = getCustomizeEntityType(className);
-                    immuType = getImmutableCustomizeEntityType(className);
+                    immuType = immutable ? getImmutableCustomizeEntityType(className) : null;
                 } else { // these are no used
                     customizeType = null;
                     immuType = null;

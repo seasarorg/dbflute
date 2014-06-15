@@ -760,6 +760,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             }
         }
         entityInfo.setEntityClassName(domainTable.getExtendedEntityClassName());
+        entityInfo.setEntityClassName(domainTable.getImmutableExtendedEntityClassName());
     }
 
     protected void processScalarHandling(DfCustomizeEntityInfo entityInfo, Table tbl) {

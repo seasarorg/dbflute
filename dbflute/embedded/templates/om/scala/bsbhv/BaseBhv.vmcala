@@ -365,7 +365,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @return The result bean of selected page. (NotNull: if no data, returns bean as empty list)
      * @exception DangerousResultSizeException When the result size is over the specified safety size.
      */
-    def selectPage(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): PagingView[${myImmutableExtendedObjectClassName}] = {
+    def selectPage(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ScrPagingView[${myImmutableExtendedObjectClassName}] = {
         return newPagingView(facadeSelectPage(callbackCB(cbCall))(loaderCall));
     }
 
@@ -1493,9 +1493,12 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * </pre>
      * @return The basic executor of outside-SQL. (NotNull)
      */
-    def outsideSql(): OutsideSqlBasicExecutor[${myExtendedBhvClassName}] = {
-        return doOutsideSql();
+    def outsideSql(): ScrOutsideSqlBasicExecutor[${myExtendedBhvClassName}] = {
+        return toImmutableOutsideSqlBasicExecutor(doOutsideSql());
     }
+
+    protected def toImmutableOutsideSqlBasicExecutor(executor: OutsideSqlBasicExecutor[${myExtendedBhvClassName}]): ScrOutsideSqlBasicExecutor[${myExtendedBhvClassName}] =
+    { new ScrOutsideSqlBasicExecutor(executor) }
 
     // ===================================================================================
     //                                                                     Delegate Method
@@ -1649,8 +1652,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     //                                                                       =============
     protected def typeOfSelectedEntity(): Class[${myExtendedObjectClassName}] = { classOf[${myExtendedObjectClassName}] }
     protected def newMbleEntity(): ${myMutableExtendedObjectClassName} = { new ${myMutableExtendedObjectClassName}() }
-    protected def newPagingView(rb: PagingResultBean[${myExtendedObjectClassName}]): PagingView[${myImmutableExtendedObjectClassName}] =
-    { new PagingView(toImmutableEntityList(rb), rb) }
+    protected def newPagingView(rb: PagingResultBean[${myExtendedObjectClassName}]): ScrPagingView[${myImmutableExtendedObjectClassName}] =
+    { new ScrPagingView(toImmutableEntityList(rb), rb) }
 
     protected def callbackCB(cbCall: (${myConditionBeanClassName}) => Unit): ${myConditionBeanClassName} = {
         assertObjectNotNull("cbCall", cbCall);

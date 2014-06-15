@@ -15,10 +15,18 @@
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.seasar.dbflute.cbean.ListResultBean;
 import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.immutable.DBableEntity;
+import org.seasar.dbflute.immutable.outsidesql.ImmutableListHandlingPmb;
+import org.seasar.dbflute.outsidesql._;
+import org.seasar.dbflute.outsidesql.executor._;
+import org.seasar.dbflute.outsidesql.typed._;
+import org.seasar.dbflute.jdbc.StatementConfig;
 
 /**
  * The gateway of loader handling for nested referrer as Scala runtime.
@@ -57,7 +65,7 @@ class ScrBatchEntityList[ENTITY] {
  * @param <ENTITY> The type of immutable entity to be selected.
  * @author ${database.classAuthor}
  */
-class PagingView[ENTITY](val selectedList: scala.collection.immutable.List[ENTITY], bean: PagingResultBean[_]) {
+class ScrPagingView[ENTITY](val selectedList: scala.collection.immutable.List[ENTITY], bean: PagingResultBean[_]) {
 
     def allRecordCount: Int = { bean.getAllRecordCount() }
     def allPageCount: Int = { bean.getAllPageCount() }
@@ -71,3 +79,314 @@ class PagingView[ENTITY](val selectedList: scala.collection.immutable.List[ENTIT
 
     override def toString(): String = { bean.toString() }
 }
+
+/* _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                  OutsideSql                                          _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                   Basic Executor                     _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
+
+/**
+ * The executor of outside-SQL.
+ * <pre>
+ * {Basic}
+ *   o selectList()
+ *   o execute()
+ *   o call()
+ *
+ * {Entity}
+ *   o entityHandling().selectEntity()
+ *   o entityHandling().selectEntityWithDeletedCheck()
+ *
+ * {Paging}
+ *   o autoPaging().selectList()
+ *   o autoPaging().selectPage()
+ *   o manualPaging().selectList()
+ *   o manualPaging().selectPage()
+ *
+ * {Cursor}
+ *   o cursorHandling().selectCursor()
+ *
+ * {Option}
+ *   o dynamicBinding().selectList()
+ *   o removeBlockComment().selectList()
+ *   o removeLineComment().selectList()
+ *   o formatSql().selectList()
+ * </pre>
+ * @param [BEHAVIOR] The type of behavior.
+ * @author ${database.classAuthor}
+ */
+class ScrOutsideSqlBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecutor[BEHAVIOR]) {
+
+    // ===================================================================================
+    //                                                                              Select
+    //                                                                              ======
+    /**
+     * Select the list of the entity by the outsideSql. <span style="color: #AD4747">{Typed Interface}</span><br />
+     * You can call this method by only a typed parameter-bean
+     * which is related to its own (outside-SQL) path and entity-type.
+     * <pre>
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberName_PrefixSearch("S");
+     * ListResultBean&lt;SimpleMember&gt; memberList
+     *     = memberBhv.outsideSql().<span style="color: #DD4747">selectList</span>(pmb);
+     * for (SimpleMember member : memberList) {
+     *     ... = member.get...();
+     * }
+     * </pre>
+     * It needs to use customize-entity and parameter-bean.
+     * The way to generate them is following:
+     * <pre>
+     * -- #df:entity#
+     * -- !df:pmb!
+     * -- !!Integer memberId!!
+     * -- !!String memberName!!
+     * -- !!...!!
+     * </pre>
+     * @param <ENTITY> The type of entity for element.
+     * @param pmb The typed parameter-bean for list handling. (NotNull)
+     * @return The result bean of selected list. (NotNull)
+     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     */
+    def selectList[IMMU, DBLE <: DBableEntity[IMMU]](pmb: ImmutableListHandlingPmb[BEHAVIOR, IMMU, DBLE]): scala.collection.immutable.List[IMMU] = {
+        return toScalaList(executor.selectList(pmb)).map(_.toImmutable);
+    }
+
+    /**
+     * Select the list of the entity by the outsideSql. {FreeStyle Interface}<br />
+     * This method can accept each element: path, parameter-bean(Object type), entity-type.
+     * <pre>
+     * String path = MemberBhv.PATH_selectSimpleMember;
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberName_PrefixSearch("S");
+     * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
+     * ListResultBean&lt;SimpleMember&gt; memberList
+     *     = memberBhv.outsideSql().<span style="color: #DD4747">selectList</span>(path, pmb, entityType);
+     * for (SimpleMember member : memberList) {
+     *     ... = member.get...();
+     * }
+     * </pre>
+     * It needs to use customize-entity and parameter-bean.
+     * The way to generate them is following:
+     * <pre>
+     * -- #df:entity#
+     * -- !df:pmb!
+     * -- !!Integer memberId!!
+     * -- !!String memberName!!
+     * -- !!...!!
+     * </pre>
+     * @param <ENTITY> The type of entity for element.
+     * @param path The path of SQL file. (NotNull)
+     * @param pmb The object as parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
+     * @param entityType The element type of entity. (NotNull)
+     * @return The result bean of selected list. (NotNull)
+     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     */
+    def selectList[ENTITY](path: String, pmb: Object, entityType: Class[ENTITY]): ListResultBean[ENTITY] = {
+        return executor.selectList(path, pmb, entityType);
+    }
+
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    /**
+     * Execute the outsideSql. (insert, update, delete, etc...) <span style="color: #AD4747">{Typed Interface}</span><br />
+     * You can call this method by only a typed parameter-bean
+     * which is related to its own (outside-SQL) path.
+     * <pre>
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberId(3);
+     * int count = memberBhv.outsideSql().<span style="color: #DD4747">execute</span>(pmb);
+     * </pre>
+     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
+     * @return The count of execution.
+     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     */
+    def execute(pmb: ExecuteHandlingPmb[BEHAVIOR]): Int = {
+        return executor.execute(pmb);
+    }
+
+    /**
+     * Execute the outsideSql. (insert, update, delete, etc...) {FreeStyle Interface}<br />
+     * This method can accept each element: path, parameter-bean(Object type).
+     * <pre>
+     * String path = MemberBhv.PATH_selectSimpleMember;
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberId(3);
+     * int count = memberBhv.outsideSql().<span style="color: #DD4747">execute</span>(path, pmb);
+     * </pre>
+     * @param path The path of SQL file. (NotNull)
+     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
+     * @return The count of execution.
+     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     */
+    def execute(path: String, pmb: Object): Int = {
+        return executor.execute(path, pmb);
+    }
+
+    // [DBFlute-0.7.5]
+    // ===================================================================================
+    //                                                                      Procedure Call
+    //                                                                      ==============
+    /**
+     * Call the procedure.
+     * <pre>
+     * SpInOutParameterPmb pmb = new SpInOutParameterPmb();
+     * pmb.setVInVarchar("foo");
+     * pmb.setVInOutVarchar("bar");
+     * memberBhv.outsideSql().<span style="color: #DD4747">call</span>(pmb);
+     * String outVar = pmb.getVOutVarchar();
+     * </pre>
+     * It needs to use parameter-bean for procedure (ProcedurePmb).
+     * The way to generate is to set the option of DBFlute property and execute Sql2Entity.
+     * @param pmb The parameter-bean for procedure. (NotNull)
+     */
+    def call(pmb: ProcedurePmb): Unit = {
+        return executor.call(pmb);
+    }
+
+    // ===================================================================================
+    //                                                                              Entity
+    //                                                                              ======
+    /**
+     * Prepare entity handling.
+     * <pre>
+     * memberBhv.outsideSql().<span style="color: #DD4747">entityHandling()</span>.selectEntityWithDeletedCheck(pmb);
+     * </pre>
+     * @return The cursor executor of outsideSql. (NotNull)
+     */
+    // #pending
+    //def entityHandling(): ScrOutsideSqlEntityExecutor[BEHAVIOR] = {
+    //    executor.entityHandling(); return this;
+    //}
+
+    // ===================================================================================
+    //                                                                              Paging
+    //                                                                              ======
+    /**
+     * Prepare the paging as manual-paging.
+     * <pre>
+     * memberBhv.outsideSql().<span style="color: #DD4747">manualPaging()</span>.selectPage(pmb);
+     * </pre>
+     * If you call this, you need to write paging condition on your SQL.
+     * <pre>
+     * e.g. MySQL
+     * select member.MEMBER_ID, member...
+     *   from Member member
+     *  where ...
+     *  order by ...
+     *  limit 40, 20 <span style="color: #3F7E5E">-- is necessary!</span>
+     * </pre>
+     * @return The executor of paging that the paging mode is manual. (NotNull)
+     */
+    // #pending
+    //def manualPaging(): ScrOutsideSqlManualPagingExecutor[BEHAVIOR] = {
+    //    executor.manualPaging(); return this;
+    //}
+
+    /**
+     * Prepare the paging as auto-paging.
+     * <pre>
+     * memberBhv.outsideSql().<span style="color: #DD4747">autoPaging()</span>.selectPage(pmb);
+     * </pre>
+     * If you call this, you don't need to write paging condition on your SQL.
+     * <pre>
+     * e.g. MySQL
+     * select member.MEMBER_ID, member...
+     *   from Member member
+     *  where ...
+     *  order by ...
+     * <span style="color: #3F7E5E">-- limit 40, 20 -- is unnecessary!</span>
+     * </pre>
+     * @return The executor of paging that the paging mode is auto. (NotNull)
+     */
+    // #pending
+    //def autoPaging(): ScrOutsideSqlAutoPagingExecutor[BEHAVIOR] = {
+    //    executor.autoPaging(); return this;
+    //}
+
+    // ===================================================================================
+    //                                                                              Cursor
+    //                                                                              ======
+    /**
+     * Prepare cursor handling.
+     * <pre>
+     * memberBhv.outsideSql().<span style="color: #DD4747">cursorHandling()</span>.selectCursor(pmb);
+     * </pre>
+     * @return The cursor executor of outsideSql. (NotNull)
+     */
+    // #pending
+    //def cursorHandling(): ScrOutsideSqlCursorExecutor[BEHAVIOR] = {
+    //    executor.cursorHandling(); return this;
+    //}
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    // -----------------------------------------------------
+    //                                       Remove from SQL
+    //                                       ---------------
+    /**
+     * Set up remove-block-comment for this outsideSql.
+     * @return this. (NotNull)
+     */
+    def removeBlockComment(): ScrOutsideSqlBasicExecutor[BEHAVIOR] = {
+        executor.removeBlockComment(); return this;
+    }
+
+    /**
+     * Set up remove-line-comment for this outsideSql.
+     * @return this. (NotNull)
+     */
+    def removeLineComment(): ScrOutsideSqlBasicExecutor[BEHAVIOR] = {
+        executor.removeLineComment(); return this;
+    }
+
+    // -----------------------------------------------------
+    //                                            Format SQL
+    //                                            ----------
+    /**
+     * Set up format-SQL for this outsideSql. <br />
+     * (For example, empty lines removed)
+     * @return this. (NotNull)
+     */
+    def formatSql(): ScrOutsideSqlBasicExecutor[BEHAVIOR] = {
+        executor.formatSql(); return this;
+    }
+
+    // -----------------------------------------------------
+    //                                       StatementConfig
+    //                                       ---------------
+    /**
+     * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
+     * @param statementConfig The configuration of statement. (NullAllowed)
+     * @return this. (NotNull)
+     */
+    def configure(statementConfig: StatementConfig): ScrOutsideSqlBasicExecutor[BEHAVIOR] = {
+        executor.configure(statementConfig); return this;
+    }
+
+    // ===================================================================================
+    //                                                                        Scala Helper
+    //                                                                        ============
+    protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): scala.collection.immutable.List[ENTITY] = {
+        if (javaList == null) { scala.collection.immutable.List() }
+        return scala.collection.immutable.List.fromArray(javaList.toArray()).asInstanceOf[scala.collection.immutable.List[ENTITY]];
+    }
+}
+
+/* _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                  OutsideSql                                          _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                   Entity Executor                    _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
