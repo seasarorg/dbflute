@@ -22,13 +22,13 @@ import java.util.Collection;
 import java.util.List;
 
 import org.seasar.dbflute._;
-#if ($table.hasReferrerAsMany())
+#if ($table.hasLoadReferrer())
 import org.seasar.dbflute.bhv._;
 #end
 import ${glPackageBaseCommon}._;
 import ${glPackageExtendedBhv}._;
 import ${glPackageExtendedEntity}._;
-#if ($table.hasReferrerAsMany())
+#if ($table.hasLoadReferrer())
 import ${glPackageCB}._;
 #end
 
