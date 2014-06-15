@@ -2153,6 +2153,7 @@ public class Table {
     }
 
     protected String buildBaseEntityClassName(String symbolPrefix) {
+        // there is same logic in old class handler too
         final String projectPrefix = getDatabase().getProjectPrefix();
         final String basePrefix = getDatabase().getBasePrefix();
         final String schemaClassPrefix = getSchemaClassPrefix();
@@ -2224,8 +2225,9 @@ public class Table {
         return buildExtendedEntityClassName(projectPrefix, "");
     }
 
-    protected String buildExtendedEntityClassName(String projectPrefix, String nextPrefix) {
-        return projectPrefix + nextPrefix + getSchemaClassPrefix() + getJavaName();
+    protected String buildExtendedEntityClassName(String projectPrefix, String symbolPrefix) {
+        // there is same logic in old class handler too
+        return projectPrefix + symbolPrefix + getSchemaClassPrefix() + getJavaName();
     }
 
     public String getRelationTraceClassName() {
