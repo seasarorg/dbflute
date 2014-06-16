@@ -64,6 +64,14 @@ public class DfLanguageGrammarPhp implements DfLanguageGrammar {
         return "const";
     }
 
+    public String getGenericBeginMark() {
+        return "";
+    }
+
+    public String getGenericEndMark() {
+        return "";
+    }
+
     // ===================================================================================
     //                                                              Programming Expression
     //                                                              ======================
@@ -105,6 +113,14 @@ public class DfLanguageGrammarPhp implements DfLanguageGrammar {
 
     public String buildGenericThreeClassHint(String first, String second, String third) {
         return "";
+    }
+
+    public boolean hasGenericClassElement(String className, String genericExp) {
+        return false;
+    }
+
+    public String extractGenericClassElement(String className, String genericExp) {
+        throw new UnsupportedOperationException("Unsupported at Php");
     }
 
     public String buildEntityPropertyGetSet(Column fromCol, Column toCol) {

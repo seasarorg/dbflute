@@ -1660,8 +1660,12 @@ public class Column {
     }
 
     public boolean isJavaNativeUtilList() { // only for array type
-        return getJavaNative().equals("java.util.List")
-                || (Srl.startsWith(getJavaNative(), "List<") && Srl.endsWith(getJavaNative(), ">"));
+        final String javaNative = getJavaNative();
+        final DfLanguageGrammar grammar = getLanguageDependency().getLanguageGrammar();
+        final String beginMark = grammar.getGenericBeginMark();
+        final String endMark = grammar.getGenericEndMark();
+        return javaNative.equals("java.util.List")
+                || (Srl.startsWith(javaNative, "List" + beginMark) && Srl.endsWith(javaNative, endMark));
     }
 
     public boolean isJavaNativeValueOfAbleObject() { // Java Only: valueOf-able by String
@@ -1847,7 +1851,8 @@ public class Column {
         final String converted;
         if (isImmutablePropertyOptional()) {
             final String immutableJavaNative = getImmutableJavaNative();
-            converted = getLanguageImplStyle().adjustImmutablePropertyOptionalOrElseNull(immutableJavaNative, propertyExp);
+            converted = getLanguageImplStyle().adjustImmutablePropertyOptionalOrElseNull(immutableJavaNative,
+                    propertyExp);
         } else {
             converted = propertyExp;
         }

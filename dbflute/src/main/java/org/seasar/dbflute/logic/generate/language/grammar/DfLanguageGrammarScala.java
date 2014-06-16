@@ -18,6 +18,7 @@ package org.seasar.dbflute.logic.generate.language.grammar;
 import java.util.List;
 
 import org.apache.torque.engine.database.model.Column;
+import org.seasar.dbflute.logic.generate.language.DfLanguageSmallHelper;
 
 /**
  * @author jflute
@@ -28,6 +29,7 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfLanguageGrammarJava _grammarJava = new DfLanguageGrammarJava();
+    protected final DfLanguageSmallHelper _simpleHelper = new DfLanguageSmallHelper();
 
     // ===================================================================================
     //                                                                       Basic Keyword
@@ -66,6 +68,14 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
 
     public String getPublicStaticFinal() {
         return "val"; // it has no static
+    }
+
+    public String getGenericBeginMark() {
+        return "[";
+    }
+
+    public String getGenericEndMark() {
+        return "]";
     }
 
     // ===================================================================================
@@ -118,6 +128,14 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
 
     public String buildGenericThreeClassHint(String first, String second, String third) {
         return "[" + first + ", " + second + ", " + third + "]";
+    }
+
+    public boolean hasGenericClassElement(String className, String genericExp) {
+        return _simpleHelper.hasGenericClassElement(className, genericExp, "[", "]");
+    }
+
+    public String extractGenericClassElement(String className, String genericExp) {
+        return _simpleHelper.extractGenericClassElement(className, genericExp, "[", "]");
     }
 
     public String buildEntityPropertyGetSet(Column fromCol, Column toCol) {

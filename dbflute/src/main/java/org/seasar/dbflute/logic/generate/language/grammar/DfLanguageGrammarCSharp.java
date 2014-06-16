@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.logic.generate.language.DfLanguageSmallHelper;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -39,6 +40,11 @@ public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
         stringSet.addAll(list);
         _pgReservColumnSet = stringSet;
     }
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final DfLanguageSmallHelper _simpleHelper = new DfLanguageSmallHelper();
 
     // ===================================================================================
     //                                                                       Basic Keyword
@@ -77,6 +83,14 @@ public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
 
     public String getPublicStaticFinal() {
         return "public static readonly";
+    }
+
+    public String getGenericBeginMark() {
+        return "<";
+    }
+
+    public String getGenericEndMark() {
+        return ">";
     }
 
     // ===================================================================================
@@ -120,6 +134,14 @@ public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
 
     public String buildGenericThreeClassHint(String first, String second, String third) {
         return "<" + first + ", " + second + ", " + third + ">";
+    }
+
+    public boolean hasGenericClassElement(String className, String genericExp) {
+        return _simpleHelper.hasGenericClassElement(className, genericExp, "<", ">");
+    }
+
+    public String extractGenericClassElement(String className, String genericExp) {
+        return _simpleHelper.extractGenericClassElement(className, genericExp, "<", ">");
     }
 
     public String buildEntityPropertyGetSet(Column fromCol, Column toCol) {

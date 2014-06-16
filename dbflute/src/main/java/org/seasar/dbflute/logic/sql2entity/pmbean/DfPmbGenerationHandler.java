@@ -168,14 +168,14 @@ public class DfPmbGenerationHandler {
             final String superClassDefinition = getSuperClassDefinition(className);
             final boolean hasSuperClassDefinition = Srl.is_NotNull_and_NotTrimmedEmpty(superClassDefinition);
             if (hasSuperClassDefinition) {
-                implementsPrefix = "";
+                implementsPrefix = delimiter; // e.g. extends SimplePagingBean| with |Immutable...
             } else {
-                implementsPrefix = " " + implementsMark;
+                implementsPrefix = " " + implementsMark + " ";
             }
         } else {
-            implementsPrefix = " " + implementsMark;
+            implementsPrefix = " " + implementsMark + " ";
         }
-        return implementsPrefix + " " + sb.toString();
+        return implementsPrefix + sb.toString();
     }
 
     public boolean hasSuperClassDefinition(String className) {

@@ -35,6 +35,7 @@ import org.seasar.dbflute.exception.DfCustomizeEntityDuplicateException;
 import org.seasar.dbflute.exception.DfParameterBeanDuplicateException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
 import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
@@ -369,6 +370,7 @@ public class DfParameterBeanResolver {
             String msg = "The argument 'testValue' should be not null.";
             throw new IllegalArgumentException(msg);
         }
+        final DfLanguageGrammar grammar = getLanguageGrammar();
         final String plainTypeName;
         if (Srl.startsWithIgnoreCase(testValue, "date '", "date'")) {
             plainTypeName = "Date";
@@ -408,13 +410,13 @@ public class DfParameterBeanResolver {
                     final String firstElement = elementList.get(0);
                     // InScope for Date is unsupported at this analyzing
                     if (Srl.isQuotedSingle(firstElement)) {
-                        plainTypeName = "List<String>";
+                        plainTypeName = "List" + grammar.buildGenericOneClassHint("String");
                     } else {
                         final String elementType = doDeriveNonQuotedLiteralTypeFromTestValue(firstElement);
-                        plainTypeName = "List<" + elementType + ">";
+                        plainTypeName = "List" + grammar.buildGenericOneClassHint(elementType);
                     }
                 } else {
-                    plainTypeName = "List<String>";
+                    plainTypeName = "List" + grammar.buildGenericOneClassHint("String");
                 }
             } else {
                 plainTypeName = doDeriveNonQuotedLiteralTypeFromTestValue(testValue);
@@ -606,6 +608,7 @@ public class DfParameterBeanResolver {
         if (isPmCommentNestedProperty(propertyName) || isPmCommentMethodCall(propertyName)) {
             return null;
         }
+        final DfLanguageGrammar grammar = getLanguageGrammar();
         DetectedPropertyInfo detected = null;
         for (int i = 0; i < node.getChildSize(); i++) {
             final Node childNode = node.getChild(i);
@@ -627,7 +630,8 @@ public class DfParameterBeanResolver {
                 final String propertyOption = derivePropertyOptionFromTestValue(testValue);
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(propertyType)) {
                     detected = new DetectedPropertyInfo();
-                    detected.setPropertyType("List<" + propertyType + ">");
+                    final String generic = grammar.buildGenericOneClassHint(propertyType);
+                    detected.setPropertyType("List" + generic);
                     detected.setPropertyOption(propertyOption);
                 }
             } else if (childNode instanceof ForNode) {
@@ -640,7 +644,8 @@ public class DfParameterBeanResolver {
                 final String nestedForPropName = substringPmCommentCurrentRear(expression);
                 detected = analyzeForNodeElementType(nestedNode, nestedForPropName); // recursive call
                 if (detected != null) {
-                    detected.setPropertyType("List<" + detected.getPropertyType() + ">");
+                    final String generic = grammar.buildGenericOneClassHint(detected.getPropertyType());
+                    detected.setPropertyType("List" + generic);
                 }
             } else if (childNode instanceof ScopeNode) { // IF, Begin, First, ...
                 detected = analyzeForNodeElementType(childNode, propertyName); // recursive call
@@ -797,6 +802,10 @@ public class DfParameterBeanResolver {
 
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
+    }
+
+    protected DfLanguageGrammar getLanguageGrammar() {
+        return getBasicProperties().getLanguageDependency().getLanguageGrammar();
     }
 
     protected DfDatabaseProperties getDatabaseProperties() {

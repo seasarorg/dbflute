@@ -236,12 +236,14 @@ public class DfPmbMetaData {
             return null;
         }
         final String propertyType = getPropertyType(propertyName);
-        return Srl.substringLastFront(Srl.substringFirstRear(propertyType, "List<"), ">");
+        final DfLanguageGrammar grammar = getLanguageGrammar();
+        return grammar.extractGenericClassElement("List", propertyType);
     }
 
     public boolean isPropertyTypeList(String propertyName) {
         final String propertyType = getPropertyType(propertyName);
-        return Srl.containsAll(propertyType, "List<", ">");
+        final DfLanguageGrammar grammar = getLanguageGrammar();
+        return grammar.hasGenericClassElement("List", propertyType);
     }
 
     public String getPropertyTypeRemovedCSharpNullable(String propertyName) {
@@ -640,7 +642,7 @@ public class DfPmbMetaData {
                         classificationName, fixedElement);
                 elementList.add(valueExp);
             }
-            final DfLanguageGrammar grammar = getBasicProperties().getLanguageDependency().getLanguageGrammar();
+            final DfLanguageGrammar grammar = getLanguageGrammar();
             return grammar.buildOneLinerListNewBackStage(elementList);
         } else {
             if (isPropertyOptionClassificationFixedElementList(propertyName)) {
@@ -689,7 +691,7 @@ public class DfPmbMetaData {
             valueType = getPropertyType(propertyName);
         }
         final String cdefBase = projectPrefix + "CDef." + classificationName + "." + element;
-        final DfLanguageGrammar grammar = getBasicProperties().getLanguageDependency().getLanguageGrammar();
+        final DfLanguageGrammar grammar = getLanguageGrammar();
         final boolean toNumber = isPropertyJavaNativeNumberObjectIncludingListElement(propertyName);
         final boolean toBoolean = isPropertyJavaNativeBooleanObjectIncludingListElement(propertyName);
         return grammar.buildCDefElementValue(cdefBase, propertyName, valueType, toNumber, toBoolean);
@@ -1033,8 +1035,8 @@ public class DfPmbMetaData {
 
     public String getProcedureParameterOracleArrayElementJavaNativeTypeLiteral(String propertyName) {
         final String javaNative = getProcedureParameterOracleArrayElementJavaNative(propertyName);
-        final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency().getLanguageGrammar();
-        return grammarInfo.buildClassTypeLiteral(Srl.substringFirstFrontIgnoreCase(javaNative, "<"));
+        final DfLanguageGrammar grammar = getLanguageGrammar();
+        return grammar.buildClassTypeLiteral(Srl.substringFirstFrontIgnoreCase(javaNative, "<"));
     }
 
     public String getProcedureParameterOracleStructTypeName(String propertyName) {
@@ -1057,7 +1059,7 @@ public class DfPmbMetaData {
 
     public String getProcedureParameterOracleStructEntityTypeTypeLiteral(String propertyName) {
         final String entityType = getProcedureParameterOracleStructEntityType(propertyName);
-        final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency().getLanguageGrammar();
+        final DfLanguageGrammar grammarInfo = getLanguageGrammar();
         return grammarInfo.buildClassTypeLiteral(Srl.substringFirstFrontIgnoreCase(entityType, "<"));
     }
 
@@ -1111,9 +1113,12 @@ public class DfPmbMetaData {
             if (afterType != null) {
                 final String finalType;
                 if (isPropertyTypeList(propertyName)) {
-                    final String prefix = Srl.substringFirstFront(beforeType, "List<");
-                    final String suffix = Srl.substringLastRear(beforeType, ">");
-                    finalType = prefix + "List<" + afterType + ">" + suffix;
+                    final DfLanguageGrammar grammar = getLanguageGrammar();
+                    final String beginMark = grammar.getGenericBeginMark();
+                    final String endMark = grammar.getGenericEndMark();
+                    final String prefix = Srl.substringFirstFront(beforeType, "List" + beginMark);
+                    final String suffix = Srl.substringLastRear(beforeType, endMark);
+                    finalType = prefix + "List" + beginMark + afterType + endMark + suffix;
                 } else {
                     finalType = afterType;
                 }
@@ -1165,6 +1170,10 @@ public class DfPmbMetaData {
 
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
+    }
+
+    protected DfLanguageGrammar getLanguageGrammar() {
+        return getBasicProperties().getLanguageDependency().getLanguageGrammar();
     }
 
     protected DfOutsideSqlProperties getOutsideSqlProperties() {

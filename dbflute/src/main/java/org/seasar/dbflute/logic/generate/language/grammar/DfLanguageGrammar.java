@@ -73,6 +73,16 @@ public interface DfLanguageGrammar {
      */
     String getPublicStaticFinal();
 
+    /**
+     * @return The begin mark of generic. e.g. '<' (NotNull)
+     */
+    String getGenericBeginMark();
+
+    /**
+     * @return The end mark of generic. e.g. '>' (NotNull)
+     */
+    String getGenericEndMark();
+
     // ===================================================================================
     //                                                              Programming Expression
     //                                                              ======================
@@ -140,6 +150,20 @@ public interface DfLanguageGrammar {
      * @return The definition of '&lt;first, second, third&gt;'. (NotNull)
      */
     String buildGenericThreeClassHint(String first, String second, String third);
+
+    /**
+     * @param className The class name that has generic element. (NotNull)
+     * @param genericExp The expression of generic to be split. (NotNull)
+     * @return The determination, true or false.
+     */
+    boolean hasGenericClassElement(String className, String genericExp);
+
+    /**
+     * @param className The class name that has generic element. (NotNull)
+     * @param genericExp The expression of generic to be split. (NotNull)
+     * @return The string of extracted generic element. (NullAllowed: when not found)
+     */
+    String extractGenericClassElement(String className, String genericExp);
 
     /**
      * @param fromCol The column object to get. (NotNull)
