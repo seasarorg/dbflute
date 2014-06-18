@@ -39,8 +39,17 @@ public interface DfBeanDesc {
     // ===================================================================================
     //                                                                            Property
     //                                                                            ========
-    boolean hasPropertyDesc(String propertyName);
+    /**
+     * @param propertyName The property name of the bean, case insensitive. (NotNull)
+     * @return The determination, true or false.
+     */
+    boolean hasPropertyDesc(String propertyName); // case insensitive
 
+    /**
+     * @param propertyName The property name of the bean, case insensitive. (NotNull)
+     * @return The description object for the property. (NotNull)
+     * @throws DfBeanPropertyNotFoundException When the property is not found.
+     */
     DfPropertyDesc getPropertyDesc(String propertyName) throws DfBeanPropertyNotFoundException;
 
     int getPropertyDescSize();
@@ -50,7 +59,7 @@ public interface DfBeanDesc {
     // ===================================================================================
     //                                                                               Field
     //                                                                               =====
-    boolean hasField(String fieldName);
+    boolean hasField(String fieldName); // case sensitive
 
     Field getField(String fieldName) throws DfBeanFieldNotFoundException;
 
@@ -59,6 +68,8 @@ public interface DfBeanDesc {
     // ===================================================================================
     //                                                                              Method
     //                                                                              ======
+    boolean hasMethod(String methodName); // case sensitive
+
     Method getMethod(String methodName) throws DfBeanMethodNotFoundException;
 
     Method getMethod(String methodName, Class<?>[] paramTypes) throws DfBeanMethodNotFoundException;
@@ -68,6 +79,4 @@ public interface DfBeanDesc {
     Method getMethodNoException(String methodName, Class<?>[] paramTypes);
 
     Method[] getMethods(String methodName) throws DfBeanMethodNotFoundException;
-
-    boolean hasMethod(String methodName);
 }

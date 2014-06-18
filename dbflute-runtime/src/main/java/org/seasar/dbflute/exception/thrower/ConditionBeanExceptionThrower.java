@@ -618,38 +618,35 @@ public class ConditionBeanExceptionThrower {
     }
 
     public void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "A property for derived-referrer was NOT FOUND in the entity!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "You should implement a property(setter and getter) in the entity." + ln();
-        msg = msg + "Or you should confirm whether the alias name has typo or not." + ln();
-        msg = msg + "For example:" + ln();
-        msg = msg + "  (ConditionBean):" + ln();
-        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-        msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
-        msg = msg + "        public void query(PurchaseCB subCB) {" + ln();
-        msg = msg + "            subCB.specify().columnPurchaseDatetime();" + ln();
-        msg = msg + "        }" + ln();
-        msg = msg + "    }, Member.ALIAS_latestPurchaseDatetime);" + ln();
-        msg = msg + ln();
-        msg = msg + "  (Extended Entity):" + ln();
-        msg = msg + "    // At the entity of Member..." + ln();
-        msg = msg + "    public static final String ALIAS_latestPurchaseDatetime = \"LATEST_PURCHASE_DATETIME\";"
-                + ln();
-        msg = msg + "    protected Date _latestPurchaseDatetime;" + ln();
-        msg = msg + "    public Date getLatestPurchaseDatetime() {" + ln();
-        msg = msg + "        return _latestPurchaseDatetime;" + ln();
-        msg = msg + "    }" + ln();
-        msg = msg + "    public void setLatestPurchaseDatetime(Date latestPurchaseDatetime) {" + ln();
-        msg = msg + "        _latestPurchaseDatetime = latestPurchaseDatetime;" + ln();
-        msg = msg + "    }" + ln();
-        msg = msg + ln();
-        msg = msg + "[Alias Name]" + ln() + aliasName + ln();
-        msg = msg + ln();
-        msg = msg + "[Target Entity]" + ln() + entityType + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The property for derived-referrer was NOT FOUND in the entity!");
+        br.addItem("Advice");
+        br.addElement("You should implement a property (setter and getter) in the entity.");
+        br.addElement("Or you should confirm whether the alias name has typo or not.");
+        br.addElement("For example:");
+        br.addElement("  (ConditionBean):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {");
+        br.addElement("        public void query(PurchaseCB subCB) {");
+        br.addElement("            subCB.specify().columnPurchaseDatetime();");
+        br.addElement("        }");
+        br.addElement("    }, Member.ALIAS_latestPurchaseDatetime);");
+        br.addElement("");
+        br.addElement("  (Extended Entity):");
+        br.addElement("    // in the entity of Member...");
+        br.addElement("    public static final String ALIAS_latestPurchaseDatetime = \"LATEST_PURCHASE_DATETIME\";");
+        br.addElement("    protected Date _latestPurchaseDatetime;");
+        br.addElement("    public Date getLatestPurchaseDatetime() {");
+        br.addElement("        return _latestPurchaseDatetime;");
+        br.addElement("    }");
+        br.addElement("    public void setLatestPurchaseDatetime(Date latestPurchaseDatetime) {");
+        br.addElement("        _latestPurchaseDatetime = latestPurchaseDatetime;");
+        br.addElement("    }");
+        br.addItem("Alias Name");
+        br.addElement(aliasName);
+        br.addItem("Target Entity");
+        br.addElement(entityType);
+        final String msg = br.buildExceptionMessage();
         throw new SpecifyDerivedReferrerEntityPropertyNotFoundException(msg);
     }
 

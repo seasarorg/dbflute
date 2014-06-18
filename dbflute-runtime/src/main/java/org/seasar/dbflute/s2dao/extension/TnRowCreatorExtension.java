@@ -133,14 +133,16 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         }
         try {
             if (dbmeta != null) { // mainly here
+                final boolean isEntity = row instanceof Entity; // almost always true
+                final Entity entityRow = isEntity ? (Entity) row : null;
                 for (Entry<String, TnPropertyMapping> entry : propertyCache.entrySet()) {
                     columnName = entry.getKey();
                     mapping = entry.getValue();
                     propertyName = mapping.getPropertyName();
                     selectedValue = getValue(rs, columnName, mapping.getValueType(), selectIndexMap);
                     final ColumnInfo columnInfo = mapping.getEntityColumnInfo();
-                    if (columnInfo != null) {
-                        columnInfo.write((Entity) row, selectedValue);
+                    if (columnInfo != null && isEntity) {
+                        columnInfo.write(entityRow, selectedValue);
                     } else {
                         mapping.getPropertyAccessor().setValue(row, selectedValue);
                     }

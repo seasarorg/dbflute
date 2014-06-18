@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.bhv;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -67,6 +66,9 @@ import org.seasar.dbflute.exception.PagingOverSafetySizeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.optional.OptionalEntity;
 import org.seasar.dbflute.optional.OptionalObjectExceptionThrower;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
@@ -274,20 +276,24 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected <ENTITY extends Entity> void assertSpecifyDerivedReferrerEntityProperty(ConditionBean cb,
             Class<ENTITY> entityType) {
         final List<String> aliasList = cb.getSqlClause().getSpecifiedDerivingAliasList();
-        for (String alias : aliasList) { // if derived referrer does not exist, empty loop
-            final Method[] methods = entityType.getMethods();
-            final String expectedName = "set" + Srl.replace(alias, "_", "");
-            boolean exists = false;
-            for (Method method : methods) {
-                final String methodName = method.getName();
-                if (methodName.startsWith("set") && expectedName.equalsIgnoreCase(methodName)) {
-                    exists = true;
-                    break;
+        if (aliasList.isEmpty()) {
+            return;
+        }
+        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(entityType);
+        for (String alias : aliasList) {
+            DfPropertyDesc pd = null;
+            if (beanDesc.hasPropertyDesc(alias)) { // case insensitive
+                pd = beanDesc.getPropertyDesc(alias);
+            } else {
+                final String noUnsco = Srl.replace(alias, "_", "");
+                if (beanDesc.hasPropertyDesc(noUnsco)) { // flexible name
+                    pd = beanDesc.getPropertyDesc(noUnsco);
                 }
             }
-            if (!exists) {
-                throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
+            if (pd != null && pd.hasWriteMethod()) {
+                continue;
             }
+            throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
         }
     }
 

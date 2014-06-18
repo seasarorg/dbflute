@@ -143,6 +143,10 @@ public class DfBeanDescImpl implements DfBeanDesc {
     // ===================================================================================
     //                                                                     Method Handling
     //                                                                     ===============
+    public boolean hasMethod(String methodName) {
+        return _methodsMap.get(methodName) != null;
+    }
+
     public Method getMethod(String methodName) throws DfBeanMethodNotFoundException {
         return getMethod(methodName, EMPTY_PARAM_TYPES);
     }
@@ -178,10 +182,6 @@ public class DfBeanDescImpl implements DfBeanDesc {
             throw new DfBeanMethodNotFoundException(_beanClass, methodName, null);
         }
         return methods;
-    }
-
-    public boolean hasMethod(String methodName) {
-        return _methodsMap.get(methodName) != null;
     }
 
     protected Method[] findMethods(String methodName) {
