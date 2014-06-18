@@ -842,6 +842,12 @@ public interface SqlClause {
     void specifyDerivingSubQuery(HpDerivingSubQueryInfo subQueryInfo);
 
     /**
+     * Does it have the specified deriving sub-query at least one?
+     * @return the determination, true or false.
+     */
+    boolean hasSpecifiedDerivingSubQuery();
+
+    /**
      * Does it have the specified deriving sub-query by the alias name?
      * @param aliasName The alias name of specified deriving sub-query. (NotNull)
      * @return the determination, true or false.

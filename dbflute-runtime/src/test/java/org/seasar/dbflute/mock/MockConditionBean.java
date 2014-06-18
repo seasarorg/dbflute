@@ -31,6 +31,7 @@ import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.DerivedTypeHandler;
 import org.seasar.dbflute.jdbc.StatementConfig;
 
 /**
@@ -371,6 +372,10 @@ public class MockConditionBean implements ConditionBean {
 
     public boolean isCheckCountBeforeQueryUpdate() {
         return false;
+    }
+
+    public DerivedTypeHandler xgetDerivedTypeHandler() {
+        return null;
     }
 
     public HpCBPurpose getPurpose() {

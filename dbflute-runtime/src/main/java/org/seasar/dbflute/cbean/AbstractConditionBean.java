@@ -16,6 +16,7 @@
 package org.seasar.dbflute.cbean;
 
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
+import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.coption.CursorSelectOption;
@@ -41,6 +43,7 @@ import org.seasar.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.dbmeta.DerivedTypeHandler;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
@@ -137,6 +140,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /** The option of cursor select. {Internal} (NullAllowed) */
     protected CursorSelectOption _cursorSelectOption; // set by sub-class
+
+    /** The handler of derived type. {Internal} (NullAllowed: lazy-loaded) */
+    protected DerivedTypeHandler _derivedTypeHandler;
 
     // ===================================================================================
     //                                                                              DBMeta
@@ -1414,6 +1420,78 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected String decryptIfNeeds(ColumnInfo columnInfo, String valueExp) {
         final ColumnFunctionCipher cipher = getSqlClause().findColumnFunctionCipher(columnInfo);
         return cipher != null ? cipher.decrypt(valueExp) : valueExp;
+    }
+
+    // ===================================================================================
+    //                                                                    Derived Mappable
+    //                                                                    ================
+    /**
+     * {@inheritDoc}
+     */
+    public DerivedTypeHandler xgetDerivedTypeHandler() {
+        if (_derivedTypeHandler != null) {
+            return _derivedTypeHandler;
+        }
+        _derivedTypeHandler = xcreateDerivedTypeHandler();
+        return _derivedTypeHandler;
+    }
+
+    protected DerivedTypeHandler xcreateDerivedTypeHandler() {
+        return new DerivedTypeHandler() {
+            public Class<?> findMappingType(HpDerivingSubQueryInfo derivingInfo) {
+                // [default]
+                // count   : Integer
+                // max/min : (column type)
+                // sum/avg : BigDecimal
+                final Class<?> mappingType;
+                if (derivingInfo.isFunctionCountFamily()) { // count() or count(distinct)
+                    mappingType = xfindDerivedMappingTypeOfCount(derivingInfo);
+                } else if (derivingInfo.isFunctionMax()) {
+                    mappingType = xfindDerivedMappingTypeOfMax(derivingInfo);
+                } else if (derivingInfo.isFunctionMin()) {
+                    mappingType = xfindDerivedMappingTypeOfMin(derivingInfo);
+                } else if (derivingInfo.isFunctionSum()) {
+                    mappingType = xfindDerivedMappingTypeOfSum(derivingInfo);
+                } else if (derivingInfo.isFunctionAvg()) {
+                    mappingType = xfindDerivedMappingTypeOfAvg(derivingInfo);
+                } else { // basically no way, just in case
+                    mappingType = xfindDerivedMappingTypeOfDefault(derivingInfo);
+                }
+                return mappingType;
+            }
+
+            public Object convertToMapValue(HpDerivingSubQueryInfo derivingInfo, Object selectedValue) {
+                return xconvertToDerivedMapValue(derivingInfo, selectedValue);
+            }
+        };
+    }
+
+    protected Class<?> xfindDerivedMappingTypeOfCount(HpDerivingSubQueryInfo derivingInfo) {
+        return Integer.class; // fixedly
+    }
+
+    protected Class<?> xfindDerivedMappingTypeOfMax(HpDerivingSubQueryInfo derivingInfo) {
+        return derivingInfo.extractDerivingColumn().getObjectNativeType(); // plainly
+    }
+
+    protected Class<?> xfindDerivedMappingTypeOfMin(HpDerivingSubQueryInfo derivingInfo) {
+        return derivingInfo.extractDerivingColumn().getObjectNativeType(); // plainly
+    }
+
+    protected Class<?> xfindDerivedMappingTypeOfSum(HpDerivingSubQueryInfo derivingInfo) {
+        return BigDecimal.class; // fixedly
+    }
+
+    protected Class<?> xfindDerivedMappingTypeOfAvg(HpDerivingSubQueryInfo derivingInfo) {
+        return BigDecimal.class; // fixedly
+    }
+
+    protected Class<?> xfindDerivedMappingTypeOfDefault(HpDerivingSubQueryInfo derivingInfo) {
+        return String.class; // fixedly
+    }
+
+    public Object xconvertToDerivedMapValue(HpDerivingSubQueryInfo derivingInfo, Object value) {
+        return value; // no convert as default
     }
 
     // [DBFlute-0.7.4]

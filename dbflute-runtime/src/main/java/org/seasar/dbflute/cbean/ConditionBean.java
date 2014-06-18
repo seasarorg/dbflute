@@ -24,6 +24,7 @@ import org.seasar.dbflute.cbean.coption.CursorSelectOption;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.DerivedTypeHandler;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.jdbc.StatementConfig;
 
@@ -485,6 +486,16 @@ public interface ConditionBean extends PagingBean {
      * @param unionQuerySynchronizer The synchronizer of union query. (NullAllowed)
      */
     void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer);
+
+    // ===================================================================================
+    //                                                                    Derived Mappable
+    //                                                                    ================
+    /**
+     * Get the handler of derived type for derived mappable entity (for (Specify)DerivedReferrer). <br />
+     * Called by internal mapping process, so should be fixed instance.
+     * @return The handler of derived type. (NotNull)
+     */
+    DerivedTypeHandler xgetDerivedTypeHandler();
 
     // ===================================================================================
     //                                                                        Purpose Type

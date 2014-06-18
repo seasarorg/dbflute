@@ -28,6 +28,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 public interface TnRowCreator {
 
     /**
+     * Create row instance of base point table.
      * @param rs Result set. (NotNull)
      * @param selectIndexMap The map of select index. map:{selectColumnKeyName = selectIndex} (NullAllowed: null means select index is disabled)
      * @param columnPropertyTypeMap The map of row property cache. The key is String(columnName) and the value is a PropertyMapping. (NotNull)
@@ -39,7 +40,9 @@ public interface TnRowCreator {
             Map<String, TnPropertyMapping> columnPropertyTypeMap, Class<?> beanClass) throws SQLException;
 
     /**
-     * @param selectColumnMap The name map of select column. {flexible-name = column-DB-name} (NotNull)
+     * Create property cache as map. <br />
+     * The map key is column DB-name or alias name when derived-referrer.
+     * @param selectColumnMap The name map of select column. {case-insensitive-name = column-DB-name} (NotNull)
      * @param beanMetaData Bean meta data. (NotNull)
      * @return The map of row property cache. The key is String(columnName) and the value is a PropertyMapping. (NotNull)
      * @throws SQLException

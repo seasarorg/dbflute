@@ -18,15 +18,23 @@ package org.seasar.dbflute.s2dao.extension;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.ConditionBeanContext;
+import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.DerivedMappable;
+import org.seasar.dbflute.dbmeta.DerivedTypeHandler;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.MappingClassCastException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.resource.InternalMapContext;
@@ -34,6 +42,7 @@ import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.rowcreator.impl.TnRowCreatorImpl;
+import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -114,10 +123,14 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             String msg = "The propertyCache should not be empty: bean=" + beanClass.getName();
             throw new IllegalStateException(msg);
         }
+
+        // temporary variable, for performance(!?) just in case
         String columnName = null;
         TnPropertyMapping mapping = null;
         String propertyName = null;
         Object selectedValue = null;
+        ColumnInfo columnInfo = null;
+
         final Object row;
         final DBMeta dbmeta;
         if (_fixedDBMeta != null) {
@@ -140,12 +153,15 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
                     mapping = entry.getValue();
                     propertyName = mapping.getPropertyName();
                     selectedValue = getValue(rs, columnName, mapping.getValueType(), selectIndexMap);
-                    final ColumnInfo columnInfo = mapping.getEntityColumnInfo();
+                    columnInfo = mapping.getEntityColumnInfo();
                     if (columnInfo != null && isEntity) {
                         columnInfo.write(entityRow, selectedValue);
                     } else {
                         mapping.getPropertyAccessor().setValue(row, selectedValue);
                     }
+                }
+                if (canHandleDerivedMap(row)) {
+                    processDerivedMap(rs, selectIndexMap, propertyCache, row);
                 }
             } else { // not DBFlute entity
                 for (Entry<String, TnPropertyMapping> entry : propertyCache.entrySet()) {
@@ -170,6 +186,40 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         }
     }
 
+    protected boolean canHandleDerivedMap(final Object row) {
+        return row instanceof DerivedMappable && ConditionBeanContext.isExistConditionBeanOnThread();
+    }
+
+    protected void processDerivedMap(ResultSet rs, Map<String, Integer> selectIndexMap,
+            Map<String, TnPropertyMapping> propertyCache, Object row) throws SQLException {
+        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+        final SqlClause sqlClause = cb.getSqlClause();
+        if (!sqlClause.hasSpecifiedDerivingSubQuery()) {
+            return;
+        }
+        final DerivedMappable mappable = (DerivedMappable) row;
+        final List<String> derivingAliasList = sqlClause.getSpecifiedDerivingAliasList();
+        DerivedTypeHandler typeHandler = null;
+        for (String derivingAlias : derivingAliasList) {
+            // propertyCache has alias name when derived-referrer as case-insensitive
+            if (propertyCache.containsKey(derivingAlias)) { // already handled
+                continue;
+            }
+            if (typeHandler == null) {
+                typeHandler = cb.xgetDerivedTypeHandler(); // basically fixed instance returned
+                if (typeHandler == null) { // no way, just in case
+                    String msg = "Not found the type handler from condition-bean: " + cb.getTableDbName();
+                    throw new IllegalStateException(msg);
+                }
+            }
+            final HpDerivingSubQueryInfo derivingInfo = sqlClause.getSpecifiedDerivingInfo(derivingAlias);
+            final ValueType valueType = TnValueTypes.getValueType(typeHandler.findMappingType(derivingInfo));
+            Object selectedValue = getValue(rs, derivingAlias, valueType, selectIndexMap);
+            selectedValue = typeHandler.convertToMapValue(derivingInfo, selectedValue);
+            mappable.registerDerivedValue(derivingAlias, selectedValue);
+        }
+    }
+
     protected Object getValue(ResultSet rs, String columnName, ValueType valueType, Map<String, Integer> selectIndexMap)
             throws SQLException {
         final Object value;
@@ -183,36 +233,33 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
 
     protected void throwMappingClassCastException(Object entity, DBMeta dbmeta, TnPropertyMapping mapping,
             Object selectedValue, ClassCastException e) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "Failed to cast a class while data mapping!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "If you use Seasar(S2Container), this exception may be" + ln();
-        msg = msg + "from ClassLoader Headache about HotDeploy." + ln();
-        msg = msg + "Add the ignore-package setting to convention.dicon like this:" + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    <initMethod name=”addIgnorePackageName”>" + ln();
-        msg = msg + "        <arg>”com.example.xxx.dbflute”</arg>" + ln();
-        msg = msg + "    </initMethod>" + ln();
-        msg = msg + "If you use an other DI container, this exception may be" + ln();
-        msg = msg + "from illegal state about your settings of DBFlute." + ln();
-        msg = msg + "Confirm your settings: for example, typeMappingMap.dfprop." + ln();
-        msg = msg + ln();
-        msg = msg + "[Exception Message]" + ln() + e.getMessage() + ln();
-        msg = msg + ln();
-        msg = msg + "[Target Entity]" + ln() + entity + ln();
-        msg = msg + "classLoader: " + entity.getClass().getClassLoader() + ln();
-        msg = msg + ln();
-        msg = msg + "[Target DBMeta]" + ln() + dbmeta + ln();
-        msg = msg + "classLoader: " + dbmeta.getClass().getClassLoader() + ln();
-        msg = msg + ln();
-        msg = msg + "[Property Mapping]" + ln() + mapping + ln();
-        msg = msg + "type: " + (mapping != null ? mapping.getClass() : null) + ln();
-        msg = msg + ln();
-        msg = msg + "[Selected Value]" + ln() + selectedValue + ln();
-        msg = msg + "type: " + (selectedValue != null ? selectedValue.getClass() : null) + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to cast a class while data mapping.");
+        br.addItem("Advice");
+        br.addElement("If you use Seasar(S2Container), this exception may be");
+        br.addElement("from ClassLoader Headache about HotDeploy.");
+        br.addElement("Add the ignore-package setting to convention.dicon like this:");
+        br.addElement("    <initMethod name=”addIgnorePackageName”>");
+        br.addElement("        <arg>”com.example.xxx.dbflute”</arg>");
+        br.addElement("    </initMethod>");
+        br.addElement("If you use an other DI container, this exception may be");
+        br.addElement("from illegal state about your settings of DBFlute.");
+        br.addElement("Confirm your settings: for example, typeMappingMap.dfprop.");
+        br.addItem("Exception Message");
+        br.addElement(e.getMessage());
+        br.addItem("Target Entity");
+        br.addElement(entity);
+        br.addElement("classLoader: " + entity.getClass().getClassLoader());
+        br.addItem("Target DBMeta");
+        br.addElement(dbmeta);
+        br.addElement("classLoader: " + dbmeta.getClass().getClassLoader());
+        br.addItem("Property Mapping");
+        br.addElement(mapping);
+        br.addElement("type: " + (mapping != null ? mapping.getClass() : null));
+        br.addItem("Selected Value");
+        br.addElement(selectedValue);
+        br.addElement("type: " + (selectedValue != null ? selectedValue.getClass() : null));
+        final String msg = br.buildExceptionMessage();
         throw new MappingClassCastException(msg, e);
     }
 

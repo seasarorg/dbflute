@@ -15,7 +15,9 @@
  */
 package org.seasar.dbflute.cbean.chelper;
 
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.subquery.DerivedReferrer;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 
 /**
  * @author jflute
@@ -25,6 +27,7 @@ public class HpDerivingSubQueryInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final String _function;
     protected final String _aliasName;
     protected final String _derivingSubQuery;
     protected final DerivedReferrer _derivedReferrer;
@@ -32,15 +35,53 @@ public class HpDerivingSubQueryInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public HpDerivingSubQueryInfo(String aliasName, String derivingSubQuery, DerivedReferrer derivedReferrer) {
+    public HpDerivingSubQueryInfo(String function, String aliasName, String derivingSubQuery,
+            DerivedReferrer derivedReferrer) {
+        _function = function;
         _aliasName = aliasName;
         _derivingSubQuery = derivingSubQuery;
         _derivedReferrer = derivedReferrer;
     }
 
     // ===================================================================================
+    //                                                                       Meta Provider
+    //                                                                       =============
+    public ColumnInfo extractDerivingColumn() {
+        final SqlClause subQuerySqlClause = _derivedReferrer.getSubQuerySqlClause();
+        final ColumnInfo columnInfo = subQuerySqlClause.getSpecifiedColumnInfoAsOne();
+        if (columnInfo != null) {
+            return columnInfo;
+        }
+        return subQuerySqlClause.getSpecifiedDerivingColumnInfoAsOne(); // nested
+    }
+
+    public boolean isFunctionCountFamily() {
+        return _function.toLowerCase().startsWith("count"); // count() or count(distinct)
+    }
+
+    public boolean isFunctionMax() {
+        return _function.equalsIgnoreCase("max");
+    }
+
+    public boolean isFunctionMin() {
+        return _function.equalsIgnoreCase("min");
+    }
+
+    public boolean isFunctionSum() {
+        return _function.equalsIgnoreCase("sum");
+    }
+
+    public boolean isFunctionAvg() {
+        return _function.equalsIgnoreCase("avg");
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public String getFunction() {
+        return _function;
+    }
+
     public String getAliasName() {
         return _aliasName;
     }

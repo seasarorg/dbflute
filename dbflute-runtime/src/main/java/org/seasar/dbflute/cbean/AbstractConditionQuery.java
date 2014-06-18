@@ -1237,12 +1237,18 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String correlatedFixedCondition = xbuildReferrerCorrelatedFixedCondition(subQuery, referrerPropertyName);
         final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName,
                 correlatedFixedCondition, option);
-        final HpDerivingSubQueryInfo subQueryInfo = new HpDerivingSubQueryInfo(aliasName, clause, derivedReferrer);
+        final HpDerivingSubQueryInfo subQueryInfo = xcreateDerivingSubQueryInfo(function, aliasName, clause,
+                derivedReferrer);
         xgetSqlClause().specifyDerivingSubQuery(subQueryInfo);
     }
 
     protected boolean isDerivedReferrerSelectAllPossible(final ConditionQuery subQuery, DerivedReferrerOption option) {
         return option.isSuppressCorrelation() && subQuery.xgetBaseCB().hasSelectAllPossible();
+    }
+
+    protected HpDerivingSubQueryInfo xcreateDerivingSubQueryInfo(String function, String aliasName, String clause,
+            SpecifyDerivedReferrer derivedReferrer) {
+        return new HpDerivingSubQueryInfo(function, aliasName, clause, derivedReferrer);
     }
 
     protected void registerSpecifyMyselfDerived(String function, ConditionQuery subQuery, String columnDbName,

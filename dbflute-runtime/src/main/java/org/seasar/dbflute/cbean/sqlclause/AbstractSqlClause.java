@@ -1987,7 +1987,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             String msg = "The deriving column was not found by the property: " + orderByProperty;
             throw new IllegalStateException(msg);
         }
-        final ColumnInfo columnInfo = extractSpecifiedDerivingColumnInfo(specifiedDerivingInfo);
+        final ColumnInfo columnInfo = specifiedDerivingInfo.extractDerivingColumn();
         doRegisterOrderBy(orderByProperty, ascOrDesc, columnInfo, true);
     }
 
@@ -2606,6 +2606,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _specifiedDerivingSubQueryMap.put(aliasName, subQueryInfo);
     }
 
+    public boolean hasSpecifiedDerivingSubQuery() {
+        return _specifiedDerivingSubQueryMap != null && !_specifiedDerivingSubQueryMap.isEmpty();
+    }
+
     public boolean hasSpecifiedDerivingSubQuery(String aliasName) {
         return _specifiedDerivingSubQueryMap != null && _specifiedDerivingSubQueryMap.containsKey(aliasName);
     }
@@ -2628,16 +2632,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public ColumnInfo getSpecifiedDerivingColumnInfo(String aliasName) {
         final HpDerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfo(aliasName);
-        return derivingInfo != null ? extractSpecifiedDerivingColumnInfo(derivingInfo) : null;
-    }
-
-    protected ColumnInfo extractSpecifiedDerivingColumnInfo(HpDerivingSubQueryInfo derivingInfo) {
-        final SqlClause subQuerySqlClause = derivingInfo.getDerivedReferrer().getSubQuerySqlClause();
-        final ColumnInfo columnInfo = subQuerySqlClause.getSpecifiedColumnInfoAsOne();
-        if (columnInfo != null) {
-            return columnInfo;
-        }
-        return subQuerySqlClause.getSpecifiedDerivingColumnInfoAsOne(); // nested
+        return derivingInfo != null ? derivingInfo.extractDerivingColumn() : null;
     }
 
     public void clearSpecifiedDerivingSubQuery() {
@@ -2652,7 +2647,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                       ---------------
     public ColumnInfo getSpecifiedDerivingColumnInfoAsOne() {
         final HpDerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
-        return derivingInfo != null ? extractSpecifiedDerivingColumnInfo(derivingInfo) : null;
+        return derivingInfo != null ? derivingInfo.extractDerivingColumn() : null;
     }
 
     public String getSpecifiedDerivingAliasNameAsOne() {
