@@ -348,6 +348,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
                 setupTorqueType(metaMap, columnName, column, allCommonColumn);
                 setupDbType(metaMap, columnName, column);
+                setupNotNull(metaMap, columnName, column);
                 setupColumnSizeContainsDigit(metaMap, columnName, column);
                 setupColumnComment(metaMap, columnName, column);
                 setupSql2EntityElement(entityName, metaMap, columnName, column, pkRelatedTableName, logSb);
@@ -475,15 +476,15 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 return;
             }
         }
-        final DfColumnMeta columnMetaInfo = metaMap.get(columnName);
-        final String columnTorqueType = getColumnTorqueType(columnMetaInfo);
+        final DfColumnMeta columnMeta = metaMap.get(columnName);
+        final String columnTorqueType = getColumnTorqueType(columnMeta);
         column.setJdbcType(columnTorqueType);
     }
 
     protected void setupDbType(Map<String, DfColumnMeta> metaMap, String columnName, Column column) {
-        final DfColumnMeta columnMetaInfo = metaMap.get(columnName);
+        final DfColumnMeta columnMeta = metaMap.get(columnName);
         final String dbTypeName;
-        final String plainName = columnMetaInfo.getDbTypeName();
+        final String plainName = columnMeta.getDbTypeName();
         if (Srl.contains(plainName, ".")) { // basically for ARRAY and STRUCT type
             final String catalogSchema = Srl.substringLastFront(plainName, ".");
             final UnifiedSchema unifiedSchema = UnifiedSchema.createAsDynamicSchema(catalogSchema);
@@ -503,7 +504,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected Map<String, String> getCommonColumnMap() {
-        DfCommonColumnProperties prop = getProperties().getCommonColumnProperties();
+        final DfCommonColumnProperties prop = getProperties().getCommonColumnProperties();
         return prop.getCommonColumnMap();
     }
 
@@ -516,28 +517,33 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
     }
 
-    protected void setupColumnSizeContainsDigit(Map<String, DfColumnMeta> metaMap, String columnName,
-            final Column column) {
-        final DfColumnMeta metaInfo = metaMap.get(columnName);
-        final int columnSize = metaInfo.getColumnSize();
-        final int decimalDigits = metaInfo.getDecimalDigits();
+    protected void setupNotNull(Map<String, DfColumnMeta> metaMap, String columnName, Column column) {
+        // basically not meta data so false, true might be from select column specification
+        final DfColumnMeta columnMeta = metaMap.get(columnName);
+        column.setNotNull(columnMeta.isRequired());
+    }
+
+    protected void setupColumnSizeContainsDigit(Map<String, DfColumnMeta> metaMap, String columnName, Column column) {
+        final DfColumnMeta columnMeta = metaMap.get(columnName);
+        final int columnSize = columnMeta.getColumnSize();
+        final int decimalDigits = columnMeta.getDecimalDigits();
         column.setupColumnSize(columnSize, decimalDigits);
     }
 
     protected void setupColumnComment(Map<String, DfColumnMeta> metaMap, String columnName, Column column) {
-        final DfColumnMeta metaInfo = metaMap.get(columnName);
-        final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
+        final DfColumnMeta columnMeta = metaMap.get(columnName);
+        final String sql2EntityRelatedTableName = columnMeta.getSql2EntityRelatedTableName();
         final Table relatedTable = getRelatedTable(sql2EntityRelatedTableName);
         String relatedComment = null;
         if (relatedTable != null) {
-            final String relatedColumnName = metaInfo.getSql2EntityRelatedColumnName();
+            final String relatedColumnName = columnMeta.getSql2EntityRelatedColumnName();
             final Column relatedColumn = relatedTable.getColumn(relatedColumnName);
             if (relatedColumn != null) {
                 relatedComment = relatedColumn.getPlainComment();
             }
         }
         // the meta has its select column comment
-        final String selectColumnComment = metaInfo.getColumnComment();
+        final String selectColumnComment = columnMeta.getColumnComment();
         final String commentMark = "// ";
         final String delimiter = getAliasDelimiterInDbComment();
         final StringBuilder sb = new StringBuilder();
@@ -593,8 +599,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected Table setupSql2EntityRelatedTable(String entityName, Map<String, DfColumnMeta> metaMap,
             String columnName, Column column, String pkRelatedTableName) {
-        final DfColumnMeta metaInfo = metaMap.get(columnName);
-        final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
+        final DfColumnMeta columnMeta = metaMap.get(columnName);
+        final String sql2EntityRelatedTableName = columnMeta.getSql2EntityRelatedTableName();
         Table relatedTable = getRelatedTable(sql2EntityRelatedTableName); // first attack
         if (relatedTable == null) {
             if (pkRelatedTableName != null) { // second attack using PK-related

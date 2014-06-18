@@ -122,8 +122,8 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
                 alreadyIncrementGoodSqlCount = true;
 
                 // for Customize Entity
-                final Map<String, DfColumnMeta> columnMetaInfoMap = extractColumnMetaInfoMap(sql, rs);
-                customizeEntityInfo = processCustomizeEntity(sql, columnMetaInfoMap);
+                final Map<String, DfColumnMeta> columnMetaMap = extractColumnMetaMap(sql, rs);
+                customizeEntityInfo = processCustomizeEntity(sql, columnMetaMap);
             }
             if (isTargetParameterBeanMakingSql(sql)) {
                 if (customizeEntityInfo == null) {
@@ -172,7 +172,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     // -----------------------------------------------------
     //                                       CustomizeEntity
     //                                       ---------------
-    protected Map<String, DfColumnMeta> extractColumnMetaInfoMap(String sql, ResultSet rs) throws SQLException {
+    protected Map<String, DfColumnMeta> extractColumnMetaMap(String sql, ResultSet rs) throws SQLException {
         final Map<String, String> columnForcedJavaNativeMap = createColumnForcedJavaNativeMap(sql);
         final DfCustomizeEntityMetaExtractor extractor = new DfCustomizeEntityMetaExtractor();
         return extractor.extractColumnMetaInfoMap(rs, sql, new DfForcedJavaNativeProvider() {
@@ -209,7 +209,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
         return resolver.resolvePackageName(typeName);
     }
 
-    protected DfCustomizeEntityInfo processCustomizeEntity(String sql, Map<String, DfColumnMeta> columnMetaInfoMap) {
+    protected DfCustomizeEntityInfo processCustomizeEntity(String sql, Map<String, DfColumnMeta> columnMetaMap) {
         String entityName = getCustomizeEntityName(sql);
         if (entityName == null) {
             return null;
@@ -217,20 +217,20 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
         entityName = resolveEntityNameIfNeeds(entityName, _sqlFile);
         assertDuplicateEntity(entityName, _sqlFile);
         // saves for setting to pmbMetaData
-        DfCustomizeEntityInfo customizeEntityInfo = new DfCustomizeEntityInfo(entityName, columnMetaInfoMap);
-        customizeEntityInfo.setSqlFile(_sqlFile);
+        DfCustomizeEntityInfo entityInfo = new DfCustomizeEntityInfo(entityName, columnMetaMap);
+        entityInfo.setSqlFile(_sqlFile);
         if (isDomain(sql)) {
-            customizeEntityInfo.setDomainHandling(true);
+            entityInfo.setDomainHandling(true);
         } else if (isCursor(sql)) {
-            customizeEntityInfo.setCursorHandling(true);
+            entityInfo.setCursorHandling(true);
         } else if (isScalar(sql)) {
-            customizeEntityInfo.setScalarHandling(true);
+            entityInfo.setScalarHandling(true);
         }
-        customizeEntityInfo.setPrimaryKeyList(getPrimaryKeyColumnNameList(sql));
-        customizeEntityInfo.setOutsideSqlFile(getCurrentOutsideSqlFile());
-        customizeEntityInfo.acceptSelectColumnComment(getSelectColumnCommentMap(sql));
-        _sql2entityMeta.addEntityInfo(entityName, customizeEntityInfo);
-        return customizeEntityInfo;
+        entityInfo.setPrimaryKeyList(getPrimaryKeyColumnNameList(sql));
+        entityInfo.setOutsideSqlFile(getCurrentOutsideSqlFile());
+        entityInfo.acceptSelectColumnComment(getSelectColumnCommentMap(sql));
+        _sql2entityMeta.addEntityInfo(entityName, entityInfo);
+        return entityInfo;
     }
 
     // -----------------------------------------------------

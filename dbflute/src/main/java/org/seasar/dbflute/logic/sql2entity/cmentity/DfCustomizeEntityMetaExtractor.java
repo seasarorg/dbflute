@@ -45,22 +45,21 @@ public class DfCustomizeEntityMetaExtractor {
         final Map<String, DfColumnMeta> columnMetaInfoMap = StringKeyMap.createAsFlexibleOrdered();
         final ResultSetMetaData md = rs.getMetaData();
         for (int i = 1; i <= md.getColumnCount(); i++) {
-            final DfColumnMeta metaInfo = new DfColumnMeta();
+            final DfColumnMeta columnMeta = new DfColumnMeta();
 
             String sql2EntityRelatedTableName = null;
             try {
                 sql2EntityRelatedTableName = md.getTableName(i);
-            } catch (SQLException ignored) {
-                // Because this table name is not required. This is for classification.
-                String msg = "ResultSetMetaData.getTableName(" + i + ") threw the exception:";
-                msg = msg + " " + ignored.getMessage();
+            } catch (SQLException continued) {
+                // because this table name is not required, basically only for classification
+                String msg = "ResultSetMetaData.getTableName(" + i + ") threw the exception: " + continued.getMessage();
                 _log.info(msg);
             }
-            metaInfo.setSql2EntityRelatedTableName(sql2EntityRelatedTableName);
+            columnMeta.setSql2EntityRelatedTableName(sql2EntityRelatedTableName);
 
             String columnName = md.getColumnLabel(i);
             final String relatedColumnName = md.getColumnName(i);
-            metaInfo.setSql2EntityRelatedColumnName(relatedColumnName);
+            columnMeta.setSql2EntityRelatedColumnName(relatedColumnName);
             if (columnName == null || columnName.trim().length() == 0) {
                 columnName = relatedColumnName;
             }
@@ -71,33 +70,50 @@ public class DfCustomizeEntityMetaExtractor {
                 msg = msg + "sql=" + sql;
                 throw new IllegalStateException(msg);
             }
-            metaInfo.setColumnName(columnName);
+            columnMeta.setColumnName(columnName);
 
             final int columnType = md.getColumnType(i);
-            metaInfo.setJdbcDefValue(columnType);
+            columnMeta.setJdbcDefValue(columnType);
 
             final String columnTypeName = md.getColumnTypeName(i);
-            metaInfo.setDbTypeName(columnTypeName);
+            columnMeta.setDbTypeName(columnTypeName);
 
             int columnSize = md.getPrecision(i);
             if (!DfColumnExtractor.isColumnSizeValid(columnSize)) {
-                // ex) sum(COLUMN)
-                columnSize = md.getColumnDisplaySize(i);
+                columnSize = md.getColumnDisplaySize(i); // e.g. sum(COLUMN)
             }
-            metaInfo.setColumnSize(columnSize);
+            columnMeta.setColumnSize(columnSize);
 
             final int scale = md.getScale(i);
-            metaInfo.setDecimalDigits(scale);
+            columnMeta.setDecimalDigits(scale);
 
             if (forcedJavaNativeProvider != null) {
                 final String sql2entityForcedJavaNative = forcedJavaNativeProvider.provide(columnName);
-                metaInfo.setSql2EntityForcedJavaNative(sql2entityForcedJavaNative);
+                columnMeta.setSql2EntityForcedJavaNative(sql2entityForcedJavaNative);
             }
+
+            // not use meta data because it might be not accuracy
+            // and it is unneeded in outside-SQL first
+            // but only used as optional determination for Scala
+            // so you can specify not-null mark at select column comment e.g. -- // *Member Name
+            // (see DfCustomizeEntityInfo#acceptSelectColumnComment())
+            //try {
+            //    // basically it is unneeded in outside-SQL and might be not accuracy
+            //    // but get it here just in case (use-or-not depends on Sql2Entity handling)
+            //    final int nullable = md.isNullable(i);
+            //    if (ResultSetMetaData.columnNoNulls == nullable) {
+            //        columnMeta.setRequired(true);
+            //    }
+            //} catch (SQLException continued) {
+            //    // because this is added after production so for compatible just in case
+            //    String msg = "ResultSetMetaData.isNullable(" + i + ") threw the exception: " + continued.getMessage();
+            //    _log.info(msg);
+            //}
 
             // column comment is not set here (no comment on meta data)
             // if select column comment is specified, comment will be set later
 
-            columnMetaInfoMap.put(columnName, metaInfo);
+            columnMetaInfoMap.put(columnName, columnMeta);
         }
         return columnMetaInfoMap;
     }

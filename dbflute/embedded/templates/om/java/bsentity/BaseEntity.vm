@@ -831,7 +831,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         checkImplicitSet("${col.name}", ${glCDef}.DefMeta.${col.classificationName}, ${col.uncapitalisedJavaName});
 #end
         __modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
-        this._${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
+        _${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
     }
 #set ($propertyLoopIndex = $propertyLoopIndex + 1)
 #end

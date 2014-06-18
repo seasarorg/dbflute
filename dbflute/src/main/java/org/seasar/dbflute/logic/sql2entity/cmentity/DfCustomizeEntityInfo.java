@@ -118,7 +118,10 @@ public class DfCustomizeEntityInfo {
             final String selectColumnComment = commentMap.get(columnName); // commentMap should be flexible
             if (Srl.is_NotNull_and_NotTrimmedEmpty(selectColumnComment)) {
                 final DfColumnMeta meta = entry.getValue();
-                meta.setColumnComment(selectColumnComment); // override here
+                meta.setColumnComment(selectColumnComment); // basically new-set (get no meta comment)
+                if (selectColumnComment.startsWith("*")) { // means not-null e.g. -- // *Member Name
+                    meta.setRequired(true);
+                }
             }
         }
     }
