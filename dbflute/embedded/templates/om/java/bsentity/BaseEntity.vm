@@ -28,6 +28,9 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 #if (!$table.hasAllCommonColumn() || $table.hasRelation())
 import org.seasar.dbflute.Entity;
 #end
+#if ($table.isEntityDerivedMappable())
+import org.seasar.dbflute.dbmeta.DerivedMappable;
+#end
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
 #end
@@ -99,7 +102,7 @@ import ${table.relationalNullObjectProviderPackage}.*;
  * </pre>
  * @author ${database.classAuthor}
  */
-public abstract class $myClassName implements ${myEntityInterfaceName}, Serializable, Cloneable {
+public abstract class $myClassName implements ${myEntityInterfaceName}, Serializable, Cloneable${table.derivedMappableDefinition} {
 
     // ===================================================================================
     //                                                                          Definition
@@ -126,6 +129,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
     /** The modified properties for this entity. (NotNull) */
     protected final EntityModifiedProperties __modifiedProperties = newModifiedProperties();
+#if ($table.isEntityDerivedMappable())
+
+    /** The map of derived value, key is alias name. (NullAllowed: lazy-loaded) */
+    protected EntityDerivedMap __derivedMap;
+#end
 #if ($table.hasAllCommonColumn())
 
     /** Is common column auto set up effective? */
@@ -601,6 +609,34 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      */
     public boolean canCommonColumnAutoSetup() {
         return __canCommonColumnAutoSetup;
+    }
+#end
+#if ($table.isEntityDerivedMappable())
+
+    // ===================================================================================
+    //                                                                    Derived Mappable
+    //                                                                    ================
+    /**
+     * {@inheritDoc}
+     */
+    public void registerDerivedValue(String aliasName, Object selectedValue) {
+        if (__derivedMap == null) { __derivedMap = newDerivedMap(); }
+        __derivedMap.registerDerivedValue(aliasName, selectedValue);
+    }
+
+    /**
+     * Find the derived value from derived map.
+     * @param <VALUE> The type of the value.
+     * @param aliasName The alias name of derived-referrer. (NotNull)
+     * @return The derived value found in the map. (NullAllowed: when null selected)
+     */
+    public <VALUE> VALUE derived(String aliasName) {
+        if (__derivedMap == null) { __derivedMap = newDerivedMap(); }
+        return __derivedMap.findDerivedValue(aliasName);
+    }
+
+    protected EntityDerivedMap newDerivedMap() {
+        return new EntityDerivedMap();
     }
 #end
 

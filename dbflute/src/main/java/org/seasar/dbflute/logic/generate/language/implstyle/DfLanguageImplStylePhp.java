@@ -90,4 +90,8 @@ public class DfLanguageImplStylePhp implements DfLanguageImplStyle {
     public boolean isCompatibleBeforeJava8() {
         return false;
     }
+
+    public boolean isEntityDerivedMappable() {
+        return false;
+    }
 }

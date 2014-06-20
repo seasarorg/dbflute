@@ -610,6 +610,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
         getSqlClause().makeOrScopeQueryEffective();
         final HpCBPurpose originalPurpose = xhandleOrSQPurposeChange();
         try {
+            // cannot lock base condition-bean for now
+            // because it uses same instance in or-scope query
             orQuery.query(cb);
         } finally {
             xhandleOrSQPurposeClose(originalPurpose);

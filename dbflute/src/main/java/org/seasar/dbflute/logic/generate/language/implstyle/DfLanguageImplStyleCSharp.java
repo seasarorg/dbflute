@@ -94,4 +94,8 @@ public class DfLanguageImplStyleCSharp implements DfLanguageImplStyle {
     public boolean isCompatibleBeforeJava8() {
         return true; // #later false since 1.1
     }
+
+    public boolean isEntityDerivedMappable() {
+        return false;
+    }
 }

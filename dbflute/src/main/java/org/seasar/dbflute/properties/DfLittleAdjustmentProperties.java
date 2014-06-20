@@ -158,6 +158,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isEntityConvertEmptyStringToNull", false);
     }
 
+    public boolean isEntityDerivedMappable() { // closet
+        final boolean defaultValue = getLanguageDependency().getLanguageImplStyle().isEntityDerivedMappable();
+        return isProperty("isEntityDerivedMappable", defaultValue);
+    }
+
     // -----------------------------------------------------
     //                                        Basic Optional
     //                                        --------------

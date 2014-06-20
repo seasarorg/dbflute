@@ -59,4 +59,6 @@ public interface DfLanguageImplStyle {
     String adjustImmutablePropertyOptionalOrElseNull(String immutableJavaNative, String variable);
 
     boolean isCompatibleBeforeJava8();
+
+    boolean isEntityDerivedMappable();
 }

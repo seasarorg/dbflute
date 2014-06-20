@@ -103,4 +103,8 @@ public class DfLanguageImplStyleScala implements DfLanguageImplStyle {
     public boolean isCompatibleBeforeJava8() {
         return false;
     }
+
+    public boolean isEntityDerivedMappable() {
+        return true;
+    }
 }

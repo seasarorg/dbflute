@@ -275,6 +275,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     // for selectList() and selectCursor() (on sub class)
     protected <ENTITY extends Entity> void assertSpecifyDerivedReferrerEntityProperty(ConditionBean cb,
             Class<ENTITY> entityType) {
+        if (isSuppressSpecifyDerivedReferrerEntityPropertyCheck()) {
+            return;
+        }
         final List<String> aliasList = cb.getSqlClause().getSpecifiedDerivingAliasList();
         if (aliasList.isEmpty()) {
             return;
@@ -295,6 +298,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             }
             throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
         }
+    }
+
+    protected boolean isSuppressSpecifyDerivedReferrerEntityPropertyCheck() {
+        return false;
     }
 
     protected void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String alias, Class<?> entityType) {

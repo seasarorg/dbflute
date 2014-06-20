@@ -400,6 +400,13 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     protected ListResultBean<? extends Entity> doReadList(ConditionBean cb) {
         return facadeSelectList(downcast(cb));
     }
+#if ($table.isEntityDerivedMappable())
+
+    @Override
+    protected boolean isSuppressSpecifyDerivedReferrerEntityPropertyCheck() {
+        return true;
+    }
+#end
 
     // ===================================================================================
     //                                                                         Page Select
