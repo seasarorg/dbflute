@@ -16,6 +16,7 @@
 package org.seasar.dbflute.s2dao.metadata.impl;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -23,6 +24,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.MappingValueType;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
@@ -205,15 +207,32 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
             return null;
         }
         if (_fieldBeanAnnotationReader != null) {
-            return _fieldBeanAnnotationReader.getValueType(pd);
+            final String fieldAnnoName = _fieldBeanAnnotationReader.getValueType(pd);
+            if (fieldAnnoName != null) {
+                return fieldAnnoName;
+            }
         }
+        return findCustomValueTypeName(pd);
+    }
 
-        // ValueType is for user customization so this should not be handled by DBMeta.
+    protected String findCustomValueTypeName(DfPropertyDesc pd) {
+        // for user customization so this should not be handled by DBMeta.
+        MappingValueType mappingValueType = findMappingValueType(pd.isReadable() ? pd.getReadMethod() : null);
+        if (mappingValueType == null) {
+            mappingValueType = findMappingValueType(pd.isWritable() ? pd.getWriteMethod() : null);
+        }
+        if (mappingValueType != null) {
+            return mappingValueType.keyName();
+        }
         final String valueTypeKey = pd.getPropertyName() + VALUE_TYPE_SUFFIX;
         if (_beanDesc.hasField(valueTypeKey)) {
-            Field field = _beanDesc.getField(valueTypeKey);
+            final Field field = _beanDesc.getField(valueTypeKey);
             return (String) DfReflectionUtil.getValue(field, null);
         }
         return null;
+    }
+
+    protected MappingValueType findMappingValueType(Method readMethod) {
+        return readMethod != null ? readMethod.getAnnotation(MappingValueType.class) : null;
     }
 }

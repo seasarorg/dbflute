@@ -22,7 +22,6 @@ import java.util.List;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SubQuery;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
-import org.seasar.dbflute.cbean.coption.DateFromToOption;
 import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.cbean.coption.FromToOption;
 
@@ -68,7 +67,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      *     }
      * }).equal(123); <span style="color: #3F7E5E">// This parameter should be Integer!</span>
      * </pre>
-     * @param value The value of parameter for the specified column. (NotNull) 
+     * @param value The value of parameter for the specified column. (NotNull)
      */
     public void equal(PARAMETER value) {
         assertParameterNotNull(value);
@@ -87,7 +86,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      *     }
      * }).notEqual(123); <span style="color: #3F7E5E">// This parameter should be Integer!</span>
      * </pre>
-     * @param value The value of parameter for the specified column. (NotNull) 
+     * @param value The value of parameter for the specified column. (NotNull)
      */
     public void notEqual(PARAMETER value) {
         assertParameterNotNull(value);
@@ -106,7 +105,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      *     }
      * }).greaterThan(123); <span style="color: #3F7E5E">// This parameter should be Integer!</span>
      * </pre>
-     * @param value The value of parameter for the specified column. (NotNull) 
+     * @param value The value of parameter for the specified column. (NotNull)
      */
     public void greaterThan(PARAMETER value) {
         assertParameterNotNull(value);
@@ -125,7 +124,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      *     }
      * }).lessThan(123); <span style="color: #3F7E5E">// This parameter should be Integer!</span>
      * </pre>
-     * @param value The value of parameter for the specified column. (NotNull) 
+     * @param value The value of parameter for the specified column. (NotNull)
      */
     public void lessThan(PARAMETER value) {
         assertParameterNotNull(value);
@@ -144,7 +143,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      *     }
      * }).greaterEqual(123); <span style="color: #3F7E5E">// This parameter should be Integer!</span>
      * </pre>
-     * @param value The value of parameter for the specified column. (NotNull) 
+     * @param value The value of parameter for the specified column. (NotNull)
      */
     public void greaterEqual(PARAMETER value) {
         assertParameterNotNull(value);
@@ -163,7 +162,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      *     }
      * }).lessEqual(123); <span style="color: #3F7E5E">// This parameter should be Integer!</span>
      * </pre>
-     * @param value The value of parameter for the specified column. (NotNull) 
+     * @param value The value of parameter for the specified column. (NotNull)
      */
     public void lessEqual(PARAMETER value) {
         assertParameterNotNull(value);
@@ -214,16 +213,38 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      *     }
      * }).between(53, 123); <span style="color: #3F7E5E">// This parameter should be Integer!</span>
      * </pre>
-     * @param fromValue The 'from' value of parameter for the specified column. (NotNull) 
-     * @param toValue The 'to' value of parameter for the specified column. (NotNull) 
+     * @param fromValue The 'from' value of parameter for the specified column. (NotNull)
+     * @param toValue The 'to' value of parameter for the specified column. (NotNull)
+     * @deprecated use rangeOf() for Number or fromTo() for Date
      */
     public void between(PARAMETER fromValue, PARAMETER toValue) {
-        assertParameterFromNotNull(fromValue);
-        assertParameterToNotNull(toValue);
-        final List<PARAMETER> fromToValueList = new ArrayList<PARAMETER>();
-        fromToValueList.add(fromValue);
-        fromToValueList.add(toValue);
-        _setupper.setup(_function, _subQuery, "between", fromToValueList, _option);
+        doBetween(fromValue, toValue);
+    }
+
+    /**
+     * Set up the comparison 'RangeOf' and the values of parameter. <br />
+     * The type of the parameter should be same as the type of target column. <br />
+     * <pre>
+     * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
+     *     protected void query(PurchaseCB subCB) {
+     *         subCB.specify().columnPurchasePrice();
+     *         subCB.query().setPaymentCompleteFlg_Equal_True();
+     *     }
+     * }).rangeOf(2000, 2999);
+     * <span style="color: #3F7E5E">// PURCHASE_PRICE between 2000 and 2999</span>
+     * </pre>
+     * @param fromNumber The 'from' number of parameter for the specified column. (NullAllowed: if null, from-number condition is ignored)
+     * @param toNumber The 'to' number of parameter for the specified column. (NullAllowed: if null, to-number condition is ignored)
+     */
+    public void rangeOf(Number fromNumber, Number toNumber) {
+        if (fromNumber == null && toNumber == null) {
+            return;
+        }
+        @SuppressWarnings("unchecked")
+        final PARAMETER fromValue = (PARAMETER) fromNumber;
+        @SuppressWarnings("unchecked")
+        final PARAMETER toValue = (PARAMETER) toNumber;
+        dispatchFromTo(fromValue, toValue);
     }
 
     /**
@@ -237,13 +258,13 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * }).dateFromTo(toTimestamp("2012/03/05"), toTimestamp("2012/03/07"));
-     * <span style="color: #3F7E5E">// PURCHASE_DATE between 2012/03/05 00:00:00 and 2012/03/07 23:59:59.999</span>
+     * <span style="color: #3F7E5E">// PURCHASE_DATETIME between 2012/03/05 00:00:00 and 2012/03/07 23:59:59.999</span>
      * </pre>
      * @param fromDate The 'from' date of parameter for the specified column. (NullAllowed: if null, from-date condition is ignored) 
      * @param toDate The 'to' date of parameter for the specified column. (NullAllowed: if null, to-date condition is ignored) 
      */
     public void dateFromTo(Date fromDate, Date toDate) {
-        doFromTo(fromDate, toDate, new DateFromToOption());
+        doFromTo(fromDate, toDate, new FromToOption().compareAsDate());
     }
 
     /**
@@ -257,7 +278,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * }).fromTo(toTimestamp("2012/02/05"), toTimestamp("2012/04/07"), new FromToOption().compareAsMonth());
-     * <span style="color: #3F7E5E">// PURCHASE_DATE between 2012/02/01 00:00:00 and 2012/04/30 23:59:59.999</span>
+     * <span style="color: #3F7E5E">// PURCHASE_DATETIME between 2012/02/01 00:00:00 and 2012/04/30 23:59:59.999</span>
      * </pre>
      * @param fromDate The 'from' date of parameter for the specified column. (NullAllowed: if null, from-date condition is ignored) 
      * @param toDate The 'to' date of parameter for the specified column. (NullAllowed: if null, to-date condition is ignored) 
@@ -290,12 +311,21 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
 
     protected void dispatchFromTo(PARAMETER fromValue, PARAMETER toValue) {
         if (fromValue != null && toValue != null) {
-            between(fromValue, toValue);
+            doBetween(fromValue, toValue);
         } else if (fromValue != null) {
             greaterEqual(fromValue);
         } else if (toValue != null) {
             lessEqual(toValue);
         }
+    }
+
+    protected void doBetween(PARAMETER fromValue, PARAMETER toValue) {
+        assertParameterFromNotNull(fromValue);
+        assertParameterToNotNull(toValue);
+        final List<PARAMETER> fromToValueList = new ArrayList<PARAMETER>(2);
+        fromToValueList.add(fromValue);
+        fromToValueList.add(toValue);
+        _setupper.setup(_function, _subQuery, "between", fromToValueList, _option);
     }
 
     // ===================================================================================
