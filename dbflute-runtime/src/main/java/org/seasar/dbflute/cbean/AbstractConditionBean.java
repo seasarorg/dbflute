@@ -52,6 +52,8 @@ import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
@@ -1319,21 +1321,19 @@ public abstract class AbstractConditionBean implements ConditionBean {
             }
             final Class<?> targetType = currentObj.getClass();
             final String methodName = (count == 0 ? "setupSelect_" : "with") + initCap(propertyName);
-            final Method method = DfReflectionUtil.getPublicMethod(targetType, methodName, new Class<?>[] {});
+            final Method method = xhelpGettingCBChainMethod(targetType, methodName, (Class<?>[]) null);
             if (method == null) {
                 String msg = "Not found the method for setupSelect:";
                 msg = msg + " foreignPropertyNamePath=" + foreignPropertyNamePath;
-                msg = msg + " targetType=" + targetType;
-                msg = msg + " methodName=" + methodName;
+                msg = msg + " targetType=" + targetType + " methodName=" + methodName;
                 throw new ConditionInvokingFailureException(msg);
             }
             try {
-                currentObj = DfReflectionUtil.invoke(method, currentObj, new Object[] {});
+                currentObj = DfReflectionUtil.invoke(method, currentObj, (Object[]) null);
             } catch (ReflectionFailureException e) {
                 String msg = "Failed to invoke the method:";
                 msg = msg + " foreignPropertyNamePath=" + foreignPropertyNamePath;
-                msg = msg + " targetType=" + targetType;
-                msg = msg + " methodName=" + methodName;
+                msg = msg + " targetType=" + targetType + " methodName=" + methodName;
                 throw new ConditionInvokingFailureException(msg, e);
             }
             ++count;
@@ -1363,21 +1363,19 @@ public abstract class AbstractConditionBean implements ConditionBean {
             }
             final Class<?> targetType = currentObj.getClass();
             final String methodName = (last ? "column" : "specify") + initCap(propertyName);
-            final Method method = DfReflectionUtil.getPublicMethod(targetType, methodName, new Class<?>[] {});
+            final Method method = xhelpGettingCBChainMethod(targetType, methodName, (Class<?>[]) null);
             if (method == null) {
                 String msg = "Not found the method for SpecifyColumn:";
                 msg = msg + " columnNamePath=" + columnNamePath;
-                msg = msg + " targetType=" + targetType;
-                msg = msg + " methodName=" + methodName;
+                msg = msg + " targetType=" + targetType + " methodName=" + methodName;
                 throw new ConditionInvokingFailureException(msg);
             }
             try {
-                currentObj = DfReflectionUtil.invoke(method, currentObj, new Object[] {});
+                currentObj = DfReflectionUtil.invoke(method, currentObj, (Object[]) null);
             } catch (ReflectionFailureException e) {
                 String msg = "Failed to invoke the method:";
                 msg = msg + " columnNamePath=" + columnNamePath;
-                msg = msg + " targetType=" + targetType;
-                msg = msg + " methodName=" + methodName;
+                msg = msg + " targetType=" + targetType + " methodName=" + methodName;
                 throw new ConditionInvokingFailureException(msg, e);
             }
             if (last) {
@@ -1385,6 +1383,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
             }
         }
         return (HpSpecifiedColumn) currentObj;
+    }
+
+    protected Method xhelpGettingCBChainMethod(Class<?> type, String methodName, Class<?>[] argTypes) {
+        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(type);
+        return beanDesc.getMethodNoException(methodName, argTypes);
+    }
+
+    protected Object xhelpInvokingCBChainMethod(Class<?> type, Method method, Object[] args) {
+        return DfReflectionUtil.invokeForcedly(method, type, args);
     }
 
     // ===================================================================================

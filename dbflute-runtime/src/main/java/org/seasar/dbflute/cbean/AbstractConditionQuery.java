@@ -85,6 +85,8 @@ import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ParameterUtil;
 import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
@@ -1718,13 +1720,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta dbmeta = xgetLocalDBMeta();
         final String columnCapPropName = initCap(dbmeta.findColumnInfo(columnFlexibleName).getPropertyName());
         final String methodName = "get" + columnCapPropName;
-        final Method method = xhelpGettingCQMethod(this, methodName, new Class<?>[] {});
+        final Method method = xhelpGettingCQMethod(this, methodName, (Class<?>[]) null);
         if (method == null) {
             throwConditionInvokingGetMethodNotFoundException(columnFlexibleName, methodName);
             return null; // unreachable
         }
         try {
-            return (ConditionValue) xhelpInvokingCQMethod(this, method, new Object[] {});
+            return (ConditionValue) xhelpInvokingCQMethod(this, method, (Object[]) null);
         } catch (ReflectionFailureException e) {
             throwConditionInvokingGetReflectionFailureException(columnFlexibleName, methodName, e);
             return null; // unreachable
@@ -1815,7 +1817,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (option != null) {
             typeList.add(option.getClass());
         }
-        final Class<?>[] parameterTypes = typeList.toArray(new Class<?>[] {});
+        final Class<?>[] parameterTypes = typeList.toArray(new Class<?>[typeList.size()]);
         final Method method = xhelpGettingCQMethod(cq, methodName, parameterTypes);
         if (method == null) {
             throwConditionInvokingSetMethodNotFoundException(colName, ckey, value, option, methodName, parameterTypes);
@@ -1937,13 +1939,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findColumnInfo(flexibleName).getPropertyName());
         final String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
-        final Method method = xhelpGettingCQMethod(cq, methodName, new Class<?>[] {});
+        final Method method = xhelpGettingCQMethod(cq, methodName, (Class<?>[]) null);
         if (method == null) {
             throwConditionInvokingOrderMethodNotFoundException(columnFlexibleName, isAsc, methodName);
         }
-        xhelpInvokingCQMethod(cq, method, new Object[] {});
         try {
-            xhelpInvokingCQMethod(cq, method, new Object[] {});
+            xhelpInvokingCQMethod(cq, method, (Object[]) null);
         } catch (ReflectionFailureException e) {
             throwConditionInvokingOrderReflectionFailureException(columnFlexibleName, isAsc, methodName, e);
         }
@@ -1997,13 +1998,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected ConditionQuery doInvokeForeignCQ(ConditionQuery cq, String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         final String methodName = "query" + initCap(foreignPropertyName);
-        final Method method = xhelpGettingCQMethod(cq, methodName, new Class<?>[] {});
+        final Method method = xhelpGettingCQMethod(cq, methodName, (Class<?>[]) null);
         if (method == null) {
             throwConditionInvokingForeignQueryMethodNotFoundException(cq, foreignPropertyName, methodName);
             return null; // unreachable
         }
         try {
-            return (ConditionQuery) xhelpInvokingCQMethod(cq, method, new Object[] {});
+            return (ConditionQuery) xhelpInvokingCQMethod(cq, method, (Object[]) null);
         } catch (ReflectionFailureException e) {
             throwConditionInvokingForeignQueryReflectionFailureException(cq, foreignPropertyName, methodName, e);
             return null; // unreachable
@@ -2062,7 +2063,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected boolean doInvokeHasForeignCQ(ConditionQuery cq, String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         final String methodName = "hasConditionQuery" + initCap(foreignPropertyName);
-        final Method method = xhelpGettingCQMethod(cq, methodName, new Class<?>[] {});
+        final Method method = xhelpGettingCQMethod(cq, methodName, (Class<?>[]) null);
         if (method == null) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Not found the method for determining a foreign condition query.");
@@ -2078,7 +2079,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             throw new ConditionInvokingFailureException(msg);
         }
         try {
-            return (Boolean) xhelpInvokingCQMethod(cq, method, new Object[] {});
+            return (Boolean) xhelpInvokingCQMethod(cq, method, (Object[]) null);
         } catch (ReflectionFailureException e) {
             String msg = "Failed to invoke the method for determining a condition(query):";
             msg = msg + " foreignPropertyName=" + foreignPropertyName;
@@ -2123,7 +2124,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected Method xhelpGettingCQMethod(ConditionQuery cq, String methodName, Class<?>[] argTypes) {
-        return DfReflectionUtil.getAccessibleMethodFlexibly(cq.getClass(), methodName, argTypes);
+        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(cq.getClass());
+        return beanDesc.getMethodNoException(methodName, argTypes);
     }
 
     protected Object xhelpInvokingCQMethod(ConditionQuery cq, Method method, Object[] args) {
