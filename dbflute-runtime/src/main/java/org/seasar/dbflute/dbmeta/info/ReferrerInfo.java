@@ -18,7 +18,6 @@ package org.seasar.dbflute.dbmeta.info;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -155,12 +154,12 @@ public class ReferrerInfo implements RelationInfo {
     /**
      * Read the value to the entity. <br />
      * It returns plain value in entity as property access type.
+     * @param <PROPERTY> The type of property, basically entity list.
      * @param localEntity The local entity of this column to read. (NotNull)
-     * @param <PROPERTY> The type of property
      * @return The read instance of referrer entity. (NullAllowed)
      */
     @SuppressWarnings("unchecked")
-    public <PROPERTY extends List<? extends Entity>> PROPERTY read(Entity localEntity) {
+    public <PROPERTY> PROPERTY read(Entity localEntity) {
         return (PROPERTY) invokeMethod(getReadMethod(), localEntity, new Object[] {});
     }
 
@@ -181,7 +180,7 @@ public class ReferrerInfo implements RelationInfo {
      * @param localEntity The local entity of this column to write. (NotNull)
      * @param referrerEntityList The written list of referrer entity. (NullAllowed: if null, null written)
      */
-    public void write(Entity localEntity, List<? extends Entity> referrerEntityList) {
+    public void write(Entity localEntity, Object referrerEntityList) {
         invokeMethod(getWriteMethod(), localEntity, new Object[] { referrerEntityList });
     }
 

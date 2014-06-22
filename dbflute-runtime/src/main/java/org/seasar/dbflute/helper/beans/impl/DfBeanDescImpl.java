@@ -47,8 +47,8 @@ public class DfBeanDescImpl implements DfBeanDesc {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final Object[] EMPTY_ARGS = new Object[0];
-    protected static final Class<?>[] EMPTY_PARAM_TYPES = new Class<?>[0];
+    protected static final Object[] EMPTY_ARGS = new Object[] {};
+    protected static final Class<?>[] EMPTY_PARAM_TYPES = new Class<?>[] {};
 
     // ===================================================================================
     //                                                                           Attribute
@@ -168,12 +168,30 @@ public class DfBeanDescImpl implements DfBeanDesc {
         if (methods == null) {
             return null;
         }
+        // you can also specify null parameter types (null means empty types)
+        final Class<?>[] specifiedTypes = paramTypes != null ? paramTypes : EMPTY_PARAM_TYPES;
         for (Method method : methods) {
-            if (Arrays.equals(paramTypes, method.getParameterTypes())) {
+            if (Arrays.equals(specifiedTypes, method.getParameterTypes())) {
+                return method;
+            }
+            if (isAssignableParameterTypes(specifiedTypes, method)) {
                 return method;
             }
         }
         return null;
+    }
+
+    protected boolean isAssignableParameterTypes(Class<?>[] specifiedTypes, Method method) {
+        final Class<?>[] definedTypes = method.getParameterTypes();
+        if (specifiedTypes.length != definedTypes.length) {
+            return false;
+        }
+        for (int i = 0; i < specifiedTypes.length; i++) {
+            if (!definedTypes[i].isAssignableFrom(specifiedTypes[i])) {
+                return false;
+            }
+        }
+        return true; // all types are assignable
     }
 
     public Method[] getMethods(String methodName) throws DfBeanMethodNotFoundException {

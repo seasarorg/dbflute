@@ -324,6 +324,12 @@ public interface DBMeta {
     //                                                                 OptimisticLock Info
     //                                                                 ===================
     /**
+     * Does the table have optimistic lock? (basically has version no or update date?)
+     * @return The determination, true or false.
+     */
+    boolean hasOptimisticLock();
+
+    /**
      * Does the table have a column for version no?
      * @return The determination, true or false.
      */

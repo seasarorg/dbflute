@@ -16,6 +16,7 @@
 package org.seasar.dbflute.bhv;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -58,7 +59,6 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
-import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
@@ -71,6 +71,7 @@ import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.optional.OptionalEntity;
 import org.seasar.dbflute.optional.OptionalObjectExceptionThrower;
+import org.seasar.dbflute.optional.RelationOptionalFactory;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -147,19 +148,17 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     protected abstract Entity doReadEntityWithDeletedCheck(ConditionBean cb);
 
-    // -----------------------------------------------------
-    //                                       Internal Helper
-    //                                       ---------------
     protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityInternally(CB cb,
-            Class<ENTITY> entityType, InternalSelectEntityCallback<ENTITY, CB> callback) {
+            Class<ENTITY> entityType) {
+        assertConditionBeanSelectResource(cb, entityType);
         if (cb.hasSelectAllPossible() && cb.getFetchSize() != 1) { // if no condition for one
             throwSelectEntityConditionNotFoundException(cb);
         }
         final int preSafetyMaxResultSize = xcheckSafetyResultAsOne(cb);
         final List<ENTITY> ls;
         try {
-            ls = callback.callbackSelectList(cb, entityType);
-        } catch (DangerousResultSizeException e) {
+            ls = delegateSelectList(cb, entityType);
+        } catch (FetchingOverSafetySizeException e) {
             throwSelectEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
             return null; // unreachable
         } finally {
@@ -172,24 +171,11 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         return (ENTITY) ls.get(0);
     }
 
-    protected static interface InternalSelectEntityCallback<ENTITY extends Entity, CB extends ConditionBean> {
-        public List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType);
-    }
-
     protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityWithDeletedCheckInternally(
-            CB cb, Class<ENTITY> entityType, final InternalSelectEntityWithDeletedCheckCallback<ENTITY, CB> callback) {
-        final ENTITY entity = helpSelectEntityInternally(cb, entityType,
-                new InternalSelectEntityCallback<ENTITY, CB>() {
-                    public List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType) {
-                        return callback.callbackSelectList(cb, entityType);
-                    }
-                });
+            CB cb, Class<ENTITY> entityType) {
+        final ENTITY entity = helpSelectEntityInternally(cb, entityType);
         assertEntityNotDeleted(entity, cb);
         return entity;
-    }
-
-    protected static interface InternalSelectEntityWithDeletedCheckCallback<ENTITY extends Entity, CB extends ConditionBean> {
-        public List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType);
     }
 
     protected int xcheckSafetyResultAsOne(ConditionBean cb) {
@@ -272,34 +258,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     protected abstract ListResultBean<? extends Entity> doReadList(ConditionBean cb);
 
-    // for selectList() and selectCursor() (on sub class)
-    protected <ENTITY extends Entity> void assertSpecifyDerivedReferrerEntityProperty(ConditionBean cb,
-            Class<ENTITY> entityType) {
-        if (isSuppressSpecifyDerivedReferrerEntityPropertyCheck()) {
-            return;
-        }
-        final List<String> aliasList = cb.getSqlClause().getSpecifiedDerivingAliasList();
-        if (aliasList.isEmpty()) {
-            return;
-        }
-        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(entityType);
-        for (String alias : aliasList) {
-            DfPropertyDesc pd = null;
-            if (beanDesc.hasPropertyDesc(alias)) { // case insensitive
-                pd = beanDesc.getPropertyDesc(alias);
-            } else {
-                final String noUnsco = Srl.replace(alias, "_", "");
-                if (beanDesc.hasPropertyDesc(noUnsco)) { // flexible name
-                    pd = beanDesc.getPropertyDesc(noUnsco);
-                }
-            }
-            if (pd != null && pd.hasWriteMethod()) {
-                continue;
-            }
-            throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
-        }
-    }
-
     protected boolean isSuppressSpecifyDerivedReferrerEntityPropertyCheck() {
         return false;
     }
@@ -308,22 +266,16 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         createCBExThrower().throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
     }
 
-    // -----------------------------------------------------
-    //                                       Internal Helper
-    //                                       ---------------
     protected <ENTITY extends Entity, CB extends ConditionBean> ListResultBean<ENTITY> helpSelectListInternally(CB cb,
-            Class<ENTITY> entityType, InternalSelectListCallback<ENTITY, CB> callback) {
-        assertCBNotDreamCruise(cb);
+            Class<ENTITY> entityType) {
+        assertConditionBeanSelectResource(cb, entityType);
         try {
-            return createListResultBean(cb, callback.callbackSelectList(cb, entityType));
+            final List<ENTITY> selectedList = delegateSelectList(cb, entityType);
+            return createListResultBean(cb, selectedList);
         } catch (FetchingOverSafetySizeException e) {
             createBhvExThrower().throwDangerousResultSizeException(cb, e);
             return null; // unreachable
         }
-    }
-
-    protected static interface InternalSelectListCallback<ENTITY extends Entity, CB extends ConditionBean> {
-        List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType);
     }
 
     protected <ENTITY extends Entity> ListResultBean<ENTITY> createListResultBean(ConditionBean cb,
@@ -346,14 +298,11 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     protected abstract PagingResultBean<? extends Entity> doReadPage(ConditionBean cb);
 
-    // -----------------------------------------------------
-    //                                       Internal Helper
-    //                                       ---------------
     protected <ENTITY extends Entity, CB extends ConditionBean> PagingResultBean<ENTITY> helpSelectPageInternally(
-            CB cb, Class<ENTITY> entityType, InternalSelectPageCallback<ENTITY, CB> callback) {
-        assertCBNotDreamCruise(cb);
+            CB cb, Class<ENTITY> entityType) {
+        assertConditionBeanSelectResource(cb, entityType);
         try {
-            final PagingHandler<ENTITY> handler = createPagingHandler(cb, entityType, callback);
+            final PagingHandler<ENTITY> handler = createPagingHandler(cb, entityType);
             final PagingInvoker<ENTITY> invoker = createPagingInvoker(cb);
             return invoker.invokePaging(handler);
         } catch (PagingOverSafetySizeException e) {
@@ -362,14 +311,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
     }
 
-    protected static interface InternalSelectPageCallback<ENTITY extends Entity, CB extends ConditionBean> {
-        int callbackSelectCount(CB cb);
-
-        List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType);
-    }
-
     protected <ENTITY extends Entity, CB extends ConditionBean> PagingHandler<ENTITY> createPagingHandler(final CB cb,
-            final Class<ENTITY> entityType, final InternalSelectPageCallback<ENTITY, CB> callback) {
+            final Class<ENTITY> entityType) {
         return new PagingHandler<ENTITY>() {
             public PagingBean getPagingBean() {
                 return cb;
@@ -378,7 +321,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             public int count() {
                 try {
                     cb.getSqlClause().makePagingAdjustmentEffective();
-                    return callback.callbackSelectCount(cb);
+                    return delegateSelectCountPlainly(cb);
                 } finally {
                     cb.getSqlClause().ignorePagingAdjustment();
                 }
@@ -387,7 +330,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             public List<ENTITY> paging() {
                 try {
                     cb.getSqlClause().makePagingAdjustmentEffective();
-                    return callback.callbackSelectList(cb, entityType);
+                    return delegateSelectList(cb, entityType);
                 } finally {
                     cb.getSqlClause().ignorePagingAdjustment();
                 }
@@ -403,33 +346,26 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                         Cursor Read
     //                                                                         ===========
     protected <ENTITY extends Entity, CB extends ConditionBean> void helpSelectCursorInternally(CB cb,
-            EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType,
-            InternalSelectCursorCallback<ENTITY, CB> callback) {
-        assertCBNotDreamCruise(cb);
+            EntityRowHandler<ENTITY> handler, Class<ENTITY> entityType) {
+        assertObjectNotNull("entityRowHandler", handler);
+        assertConditionBeanSelectResource(cb, entityType);
         final CursorSelectOption option = cb.getCursorSelectOption();
         if (option != null && option.isByPaging()) {
-            helpSelectCursorHandlingByPaging(cb, entityRowHandler, entityType, callback, option);
+            helpSelectCursorHandlingByPaging(cb, handler, entityType, option);
         } else { // basically here
-            callback.callbackSelectCursor(cb, entityRowHandler, entityType);
+            delegateSelectCursor(cb, handler, entityType);
         }
     }
 
-    protected static interface InternalSelectCursorCallback<ENTITY extends Entity, CB extends ConditionBean> {
-        void callbackSelectCursor(CB cb, EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType);
-
-        List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType);
-    }
-
     protected <ENTITY extends Entity, CB extends ConditionBean> void helpSelectCursorHandlingByPaging(CB cb,
-            EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType,
-            InternalSelectCursorCallback<ENTITY, CB> callback, CursorSelectOption option) {
+            EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType, CursorSelectOption option) {
         helpSelectCursorCheckingByPagingAllowed(cb, option);
         helpSelectCursorCheckingOrderByPK(cb, option);
         final int pageSize = option.getPageSize();
         int pageNumber = 1;
         while (true) {
             cb.paging(pageSize, pageNumber);
-            List<ENTITY> pageList = callback.callbackSelectList(cb, entityType);
+            List<ENTITY> pageList = delegateSelectList(cb, entityType);
             for (ENTITY entity : pageList) {
                 entityRowHandler.handle(entity);
             }
@@ -781,7 +717,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected void xassLRArg(Entity entity,
             LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
         assertObjectNotNull("LoadReferrer's entity", entity);
-        assertObjectNotNull("lLoadReferrer's oadReferrerOption", loadReferrerOption);
+        assertObjectNotNull("LoadReferrer's loadReferrerOption", loadReferrerOption);
     }
 
     protected BehaviorSelector xgetBSFLR() { // getBehaviorSelectorForLoadReferrer() as Internal
@@ -817,14 +753,19 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                   Pull out Relation
     //                                                                   =================
     protected <LOCAL_ENTITY extends Entity, FOREIGN_ENTITY extends Entity> List<FOREIGN_ENTITY> helpPulloutInternally(
-            List<LOCAL_ENTITY> localEntityList, InternalPulloutCallback<LOCAL_ENTITY, FOREIGN_ENTITY> callback) {
+            List<LOCAL_ENTITY> localEntityList, String foreignPropertyName) {
         assertObjectNotNull("localEntityList", localEntityList);
-        assertObjectNotNull("callback", callback);
+        assertObjectNotNull("foreignPropertyName", foreignPropertyName);
+        final DBMeta dbmeta = getDBMeta();
+        final ForeignInfo foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
+        final RelationInfo reverseInfo = foreignInfo.getReverseRelation();
+        final boolean existsReferrer = reverseInfo != null;
+        final RelationOptionalFactory optionalFactory = _behaviorCommandInvoker.getRelationOptionalFactory();
         final Set<FOREIGN_ENTITY> foreignSet = new LinkedHashSet<FOREIGN_ENTITY>();
         final Map<FOREIGN_ENTITY, List<LOCAL_ENTITY>> foreignReferrerMap = new LinkedHashMap<FOREIGN_ENTITY, List<LOCAL_ENTITY>>();
-        final boolean existsReferrer = callback.hasRf();
-        for (LOCAL_ENTITY entity : localEntityList) {
-            final FOREIGN_ENTITY foreignEntity = callback.getFr(entity);
+        for (LOCAL_ENTITY localEntity : localEntityList) {
+            final FOREIGN_ENTITY foreignEntity = xextractPulloutForeignEntity(foreignInfo, reverseInfo,
+                    optionalFactory, localEntity);
             if (foreignEntity == null) {
                 continue;
             }
@@ -835,57 +776,86 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
                 if (!foreignReferrerMap.containsKey(foreignEntity)) {
                     foreignReferrerMap.put(foreignEntity, new ArrayList<LOCAL_ENTITY>());
                 }
-                foreignReferrerMap.get(foreignEntity).add(entity);
+                foreignReferrerMap.get(foreignEntity).add(localEntity);
             }
         }
-        final Set<Entry<FOREIGN_ENTITY, List<LOCAL_ENTITY>>> entrySet = foreignReferrerMap.entrySet();
-        for (Entry<FOREIGN_ENTITY, List<LOCAL_ENTITY>> entry : entrySet) {
-            callback.setRfLs(entry.getKey(), entry.getValue());
+        if (existsReferrer) {
+            for (Entry<FOREIGN_ENTITY, List<LOCAL_ENTITY>> entry : foreignReferrerMap.entrySet()) {
+                final FOREIGN_ENTITY foreignEntity = entry.getKey();
+                final List<LOCAL_ENTITY> mappedLocalList = entry.getValue();
+                final Object writtenObj = xextractPulloutReverseWrittenObject(foreignInfo, reverseInfo,
+                        optionalFactory, mappedLocalList);
+                reverseInfo.write(foreignEntity, writtenObj);
+            }
         }
         return new ArrayList<FOREIGN_ENTITY>(foreignSet);
     }
 
-    protected static interface InternalPulloutCallback<LOCAL_ENTITY extends Entity, FOREIGN_ENTITY extends Entity> {
-        FOREIGN_ENTITY getFr(LOCAL_ENTITY entity); // getForeignEntity()
+    @SuppressWarnings("unchecked")
+    protected <LOCAL_ENTITY extends Entity, FOREIGN_ENTITY extends Entity> FOREIGN_ENTITY xextractPulloutForeignEntity(
+            ForeignInfo foreignInfo, RelationInfo reverseInfo, RelationOptionalFactory optionalFactory,
+            LOCAL_ENTITY localEntity) {
+        final Object mightBeOptional = foreignInfo.read(localEntity); // non-reflection
+        final FOREIGN_ENTITY foreignEntity;
+        if (optionalFactory.isOptional(mightBeOptional)) {
+            foreignEntity = (FOREIGN_ENTITY) optionalFactory.orElseNull(mightBeOptional);
+        } else {
+            foreignEntity = (FOREIGN_ENTITY) mightBeOptional;
+        }
+        return foreignEntity;
+    }
 
-        boolean hasRf(); // hasReferrer()
-
-        void setRfLs(FOREIGN_ENTITY foreignEntity, List<LOCAL_ENTITY> localList); // setReferrerList()
+    protected <LOCAL_ENTITY> Object xextractPulloutReverseWrittenObject(ForeignInfo foreignInfo,
+            RelationInfo reverseInfo, RelationOptionalFactory optionalFactory, List<LOCAL_ENTITY> mappedLocalList) {
+        final Object writtenObj;
+        if (foreignInfo.isOneToOne()) {
+            if (mappedLocalList != null && !mappedLocalList.isEmpty()) { // should have only one element
+                final LOCAL_ENTITY plainFirstElement = mappedLocalList.get(0);
+                if (plainFirstElement != null && optionalFactory.isOptionalType(reverseInfo.getPropertyAccessType())) {
+                    writtenObj = optionalFactory.createOptionalPresentEntity(plainFirstElement);
+                } else {
+                    writtenObj = plainFirstElement;
+                }
+            } else {
+                writtenObj = null;
+            }
+        } else { // many-to-one so reverse is list
+            writtenObj = mappedLocalList;
+        }
+        return writtenObj;
     }
 
     // ===================================================================================
     //                                                                      Extract Column
     //                                                                      ==============
     protected <LOCAL_ENTITY extends Entity, COLUMN> List<COLUMN> helpExtractListInternally(
-            List<LOCAL_ENTITY> localEntityList, InternalExtractCallback<LOCAL_ENTITY, COLUMN> callback) {
+            List<LOCAL_ENTITY> localEntityList, String propertyName) {
         assertObjectNotNull("localEntityList", localEntityList);
-        assertObjectNotNull("callback", callback);
+        assertObjectNotNull("propertyName", propertyName);
         final List<COLUMN> valueList = new ArrayList<COLUMN>();
-        for (LOCAL_ENTITY entity : localEntityList) {
-            final COLUMN column = callback.getCV(entity);
-            if (column != null) {
-                valueList.add(column);
-            }
-        }
-        return valueList;
+        return xdoHelpExtractSetInternally(localEntityList, propertyName, valueList);
     }
 
     protected <LOCAL_ENTITY extends Entity, COLUMN> Set<COLUMN> helpExtractSetInternally(
-            List<LOCAL_ENTITY> localEntityList, InternalExtractCallback<LOCAL_ENTITY, COLUMN> callback) {
+            List<LOCAL_ENTITY> localEntityList, String propertyName) {
         assertObjectNotNull("localEntityList", localEntityList);
-        assertObjectNotNull("callback", callback);
+        assertObjectNotNull("propertyName", propertyName);
         final Set<COLUMN> valueSet = new LinkedHashSet<COLUMN>();
-        for (LOCAL_ENTITY entity : localEntityList) {
-            final COLUMN column = callback.getCV(entity);
-            if (column != null) {
-                valueSet.add(column);
-            }
-        }
-        return valueSet;
+        return xdoHelpExtractSetInternally(localEntityList, propertyName, valueSet);
     }
 
-    protected static interface InternalExtractCallback<LOCAL_ENTITY extends Entity, COLUMN> {
-        COLUMN getCV(LOCAL_ENTITY entity); // getColumnValue()
+    protected <LOCAL_ENTITY extends Entity, COLUMN, COLLECTION extends Collection<COLUMN>> COLLECTION xdoHelpExtractSetInternally(
+            List<LOCAL_ENTITY> localEntityList, String propertyName, COLLECTION collection) {
+        assertObjectNotNull("localEntityList", localEntityList);
+        assertObjectNotNull("propertyName", propertyName);
+        final ColumnInfo columnInfo = getDBMeta().findColumnInfo(propertyName);
+        for (LOCAL_ENTITY entity : localEntityList) {
+            final COLUMN column = columnInfo.read(entity);
+            if (column != null) {
+                collection.add(column);
+            }
+        }
+        return collection;
     }
 
     // ===================================================================================
@@ -898,6 +868,35 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param option The option of insert. (NullAllowed)
      */
     protected void filterEntityOfInsert(Entity targetEntity, InsertOption<? extends ConditionBean> option) {
+    }
+
+    // ===================================================================================
+    //                                                                      Delegate Entry
+    //                                                                      ==============
+    protected int delegateSelectCountUniquely(ConditionBean cb) {
+        return invoke(createSelectCountCBCommand(cb, true));
+    }
+
+    protected int delegateSelectCountPlainly(ConditionBean cb) {
+        return invoke(createSelectCountCBCommand(cb, false));
+    }
+
+    protected <ENTITY extends Entity> void delegateSelectCursor(ConditionBean cb, EntityRowHandler<ENTITY> handler,
+            Class<ENTITY> entityType) {
+        invoke(createSelectCursorCBCommand(cb, handler, entityType));
+    }
+
+    protected <ENTITY extends Entity> List<ENTITY> delegateSelectList(ConditionBean cb, Class<ENTITY> entityType) {
+        return invoke(createSelectListCBCommand(cb, entityType));
+    }
+
+    protected <RESULT> RESULT delegateSelectNextVal(Class<RESULT> resultType) {
+        return invoke(createSelectNextValCommand(resultType));
+    }
+
+    protected <RESULT> RESULT delegateSelectNextValSub(Class<RESULT> resultType, String columnDbName,
+            String sequenceName, Integer incrementSize, Integer cacheSize) {
+        return invoke(createSelectNextValSubCommand(resultType, columnDbName, sequenceName, incrementSize, cacheSize));
     }
 
     // ===================================================================================
@@ -1085,14 +1084,31 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param entity The instance of entity. (NotNull)
      * @return The determination, true or false.
      */
-    protected abstract boolean hasVersionNoValue(Entity entity);
+    protected boolean hasVersionNoValue(Entity entity) {
+        return false; // as default
+    }
 
     /**
      * Does the entity have a value of update-date? 
      * @param entity The instance of entity. (NotNull)
      * @return The determination, true or false.
      */
-    protected abstract boolean hasUpdateDateValue(Entity entity);
+    protected boolean hasUpdateDateValue(Entity entity) {
+        return false; // as default
+    }
+
+    // ===================================================================================
+    //                                                                   Optional Handling
+    //                                                                   =================
+    /**
+     * Create present or null entity as relation optional.
+     * @param relationRow The entity instance of relation row. (NullAllowed)
+     * @return The optional object for the entity, which has present or null entity. (NotNull)
+     */
+    protected Object toRelationOptional(Object relationRow) {
+        final RelationOptionalFactory factory = _behaviorCommandInvoker.getRelationOptionalFactory();
+        return factory.createOptionalPresentEntity(relationRow);
+    }
 
     // ===================================================================================
     //                                                                     Downcast Helper
@@ -1104,8 +1120,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         try {
             return (ENTITY) entity;
         } catch (ClassCastException e) {
-            String msg = "The entity should be " + DfTypeUtil.toClassTitle(clazz);
-            msg = msg + " but it was: " + entity.getClass();
+            String classTitle = DfTypeUtil.toClassTitle(clazz);
+            String msg = "The entity should be " + classTitle + " but it was: " + entity.getClass();
             throw new IllegalStateException(msg, e);
         }
     }
@@ -1117,8 +1133,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         try {
             return (CB) cb;
         } catch (ClassCastException e) {
-            String msg = "The condition-bean should be " + DfTypeUtil.toClassTitle(clazz);
-            msg = msg + " but it was: " + cb.getClass();
+            String classTitle = DfTypeUtil.toClassTitle(clazz);
+            String msg = "The condition-bean should be " + classTitle + " but it was: " + cb.getClass();
             throw new IllegalStateException(msg, e);
         }
     }
@@ -1171,6 +1187,30 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     /**
+     * Assert that the entity has primary-key value. e.g. insert(), update(), delete()
+     * @param entity The instance of entity to be checked. (NotNull)
+     */
+    protected void assertEntityNotNullAndHasPrimaryKeyValue(Entity entity) {
+        assertEntityNotNull(entity);
+        final Set<String> uniqueDrivenPropSet = entity.myuniqueDrivenProperties();
+        if (uniqueDrivenPropSet.isEmpty()) { // PK, basically here
+            if (!entity.hasPrimaryKeyValue()) {
+                createBhvExThrower().throwEntityPrimaryKeyNotFoundException(entity);
+            }
+        } else { // unique-driven
+            for (String prop : uniqueDrivenPropSet) {
+                final ColumnInfo columnInfo = getDBMeta().findColumnInfo(prop);
+                if (columnInfo != null) {
+                    final Object value = columnInfo.read(entity);
+                    if (value == null) {
+                        createBhvExThrower().throwEntityUniqueKeyNotFoundException(entity);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Assert that the condition-bean state is valid.
      * @param cb The instance of condition-bean to be checked. (NotNull)
      */
@@ -1198,27 +1238,37 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
     }
 
-    /**
-     * Assert that the entity has primary-key value. e.g. insert(), update(), delete()
-     * @param entity The instance of entity to be checked. (NotNull)
-     */
-    protected void assertEntityNotNullAndHasPrimaryKeyValue(Entity entity) {
-        assertEntityNotNull(entity);
-        final Set<String> uniqueDrivenPropSet = entity.myuniqueDrivenProperties();
-        if (uniqueDrivenPropSet.isEmpty()) { // PK, basically here
-            if (!entity.hasPrimaryKeyValue()) {
-                createBhvExThrower().throwEntityPrimaryKeyNotFoundException(entity);
-            }
-        } else { // unique-driven
-            for (String prop : uniqueDrivenPropSet) {
-                final ColumnInfo columnInfo = getDBMeta().findColumnInfo(prop);
-                if (columnInfo != null) {
-                    final Object value = columnInfo.read(entity);
-                    if (value == null) {
-                        createBhvExThrower().throwEntityUniqueKeyNotFoundException(entity);
-                    }
+    protected <ENTITY extends Entity, CB extends ConditionBean> void assertConditionBeanSelectResource(CB cb,
+            Class<ENTITY> entityType) {
+        assertCBStateValid(cb);
+        assertObjectNotNull("entityType", entityType);
+        assertSpecifyDerivedReferrerEntityProperty(cb, entityType);
+    }
+
+    protected <ENTITY extends Entity> void assertSpecifyDerivedReferrerEntityProperty(ConditionBean cb,
+            Class<ENTITY> entityType) {
+        if (isSuppressSpecifyDerivedReferrerEntityPropertyCheck()) {
+            return;
+        }
+        final List<String> aliasList = cb.getSqlClause().getSpecifiedDerivingAliasList();
+        if (aliasList.isEmpty()) {
+            return;
+        }
+        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(entityType);
+        for (String alias : aliasList) {
+            DfPropertyDesc pd = null;
+            if (beanDesc.hasPropertyDesc(alias)) { // case insensitive
+                pd = beanDesc.getPropertyDesc(alias);
+            } else {
+                final String noUnsco = Srl.replace(alias, "_", "");
+                if (beanDesc.hasPropertyDesc(noUnsco)) { // flexible name
+                    pd = beanDesc.getPropertyDesc(noUnsco);
                 }
             }
+            if (pd != null && pd.hasWriteMethod()) {
+                continue;
+            }
+            throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
         }
     }
 

@@ -17,6 +17,7 @@ package org.seasar.dbflute.dbmeta.info;
 
 import java.util.Map;
 
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
 
 /**
@@ -92,4 +93,21 @@ public interface RelationInfo {
      * @return The instance of relation info. (NullAllowed: if null, means one-way reference)
      */
     RelationInfo getReverseRelation();
+
+    /**
+     * Read the value to the entity by its gateway (means no reflection). <br />
+     * It returns plain value in entity as property access type.
+     * @param <PROPERTY> The type of property, might be optional or list.
+     * @param localEntity The local entity of this column to read. (NotNull)
+     * @return The read instance of relation entity, might be optional or list. (NotNull: when optional or list, NullAllowed: when native type)
+     */
+    <PROPERTY> PROPERTY read(Entity localEntity);
+
+    /**
+     * Write the value to the entity by its gateway (means no reflection). <br />
+     * No converting to optional so check the property access type.
+     * @param localEntity The local entity of this column to write. (NotNull)
+     * @param foreignEntity The written instance of relation entity, might be optional or list. (NullAllowed: if null, null written)
+     */
+    void write(Entity localEntity, Object foreignEntity);
 }

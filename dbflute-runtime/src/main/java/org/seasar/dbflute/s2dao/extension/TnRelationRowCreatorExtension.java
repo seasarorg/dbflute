@@ -45,16 +45,16 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final TnRelationOptionalFactory _optionalFactory;
+    protected final TnRelationRowOptionalHandler _optionalFactory;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnRelationRowCreatorExtension(TnRelationOptionalFactory optionalFactory) {
+    public TnRelationRowCreatorExtension(TnRelationRowOptionalHandler optionalFactory) {
         _optionalFactory = optionalFactory;
     }
 
-    public static TnRelationRowCreatorExtension createRelationRowCreator(TnRelationOptionalFactory optionalFactory) {
+    public static TnRelationRowCreatorExtension createRelationRowCreator(TnRelationRowOptionalHandler optionalFactory) {
         return new TnRelationRowCreatorExtension(optionalFactory);
     }
 

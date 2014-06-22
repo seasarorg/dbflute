@@ -34,6 +34,7 @@ import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.jdbc.LazyDatabaseMetaDataWrapper;
 import org.seasar.dbflute.jdbc.MetaDataConnectionProvider;
+import org.seasar.dbflute.optional.RelationOptionalFactory;
 import org.seasar.dbflute.resource.ManualThreadDataSourceHandler;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
@@ -65,14 +66,24 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The map of bean meta data for cache. */
+    /** The cached instance of relation optional factory. (NotNull) */
+    protected final TnRelationRowOptionalHandler _relationRowOptionalHandler;
+
+    /** The map of bean meta data for cache. (NotNull) */
     protected final Map<Class<?>, TnBeanMetaData> _metaMap = newConcurrentHashMap();
 
     /** Is internal debug enabled? */
     protected boolean _internalDebug;
 
-    /** The cached instance of relation optional factory. (NotNull) */
-    protected final TnRelationOptionalFactory _relationOptionalFactory = createRelationOptionalFactory();
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * @param relationOptionalFactory The factory of relation optional. (NotNull)
+     */
+    public TnBeanMetaDataFactoryExtension(RelationOptionalFactory relationOptionalFactory) {
+        _relationRowOptionalHandler = createRelationRowOptionalHandler(relationOptionalFactory);
+    }
 
     // ===================================================================================
     //                                                                  Override for Cache
@@ -286,7 +297,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     }
 
     protected Class<?> getRelationOptionalEntityType() {
-        return _relationOptionalFactory.getOptionalEntityType();
+        return _relationRowOptionalHandler.getOptionalEntityType();
     }
 
     // ===================================================================================
@@ -306,14 +317,14 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     }
 
     // ===================================================================================
-    //                                                           Relation Optional Factory
-    //                                                           =========================
-    public TnRelationOptionalFactory getRelationOptionalFactory() {
-        return _relationOptionalFactory;
+    //                                                                   Optional Handling
+    //                                                                   =================
+    public TnRelationRowOptionalHandler getRelationRowOptionalHandler() {
+        return _relationRowOptionalHandler;
     }
 
-    protected TnRelationOptionalFactory createRelationOptionalFactory() {
-        return new TnRelationOptionalFactory();
+    protected TnRelationRowOptionalHandler createRelationRowOptionalHandler(RelationOptionalFactory factory) {
+        return new TnRelationRowOptionalHandler(factory);
     }
 
     // ===================================================================================

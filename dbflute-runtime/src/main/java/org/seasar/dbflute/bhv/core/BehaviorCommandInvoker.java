@@ -43,6 +43,7 @@ import org.seasar.dbflute.jdbc.SqlLogInfo;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.jdbc.SqlResultInfo;
 import org.seasar.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.optional.RelationOptionalFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
@@ -679,7 +680,8 @@ public class BehaviorCommandInvoker {
     //                                                                 SQLException Digger
     //                                                                 ===================
     /**
-     * @return The digger of SQLException. (NotNull)
+     * Get the digger of SQLException.
+     * @return The digger assisted by invoker assistant. (NotNull)
      */
     public SQLExceptionDigger getSQLExceptionDigger() {
         return _invokerAssistant.assistSQLExceptionDigger();
@@ -690,17 +692,29 @@ public class BehaviorCommandInvoker {
     //                                                                      ==============
     /**
      * Get the handler of sequence cache.
-     * @return The handler of sequence cache. (NotNull)
+     * @return The handler assisted by invoker assistant. (NotNull)
      */
     public SequenceCacheHandler getSequenceCacheHandler() {
         return _invokerAssistant.assistSequenceCacheHandler();
     }
 
     // ===================================================================================
+    //                                                                   Relation Optional
+    //                                                                   =================
+    /**
+     * Get the factory of relation optional.
+     * @return The factory assisted by invoker assistant. (NotNull)
+     */
+    public RelationOptionalFactory getRelationOptionalFactory() {
+        return _invokerAssistant.assistRelationOptionalFactory();
+    }
+
+    // ===================================================================================
     //                                                                   Exception Thrower
     //                                                                   =================
     /**
-     * @return The thrower of behavior exception. (NotNull)
+     * Get the thrower of behavior exception.
+     * @return The thrower of assisted by invoker assistant. (NotNull)
      */
     public BehaviorExceptionThrower createBehaviorExceptionThrower() {
         return _invokerAssistant.assistBehaviorExceptionThrower();

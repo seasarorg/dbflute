@@ -17,7 +17,7 @@ package org.seasar.dbflute.s2dao.metadata;
 
 import java.sql.DatabaseMetaData;
 
-import org.seasar.dbflute.s2dao.extension.TnRelationOptionalFactory;
+import org.seasar.dbflute.s2dao.extension.TnRelationRowOptionalHandler;
 
 /**
  * The factory of bean meta data.
@@ -55,5 +55,5 @@ public interface TnBeanMetaDataFactory {
      * Basically always return the same instance.
      * @return The instance of factory. (NotNull)
      */
-    TnRelationOptionalFactory getRelationOptionalFactory();
+    TnRelationRowOptionalHandler getRelationRowOptionalHandler();
 }

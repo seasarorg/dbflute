@@ -27,6 +27,7 @@ import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.SQLExceptionDigger;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.optional.RelationOptionalFactory;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
@@ -100,6 +101,11 @@ public interface InvokerAssistant {
      * @return The instance of handler. (NotNull)
      */
     SequenceCacheHandler assistSequenceCacheHandler();
+
+    /**
+     * @return The factory of relation optional. (NotNull)
+     */
+    RelationOptionalFactory assistRelationOptionalFactory();
 
     /**
      * @return The encoding of SQL file. (NotNull)

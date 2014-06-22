@@ -143,10 +143,11 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     // -----------------------------------------------------
     //                                                Update
     //                                                ------
-    protected <ENTITY extends Entity> void helpUpdateInternally(ENTITY entity, InternalUpdateCallback<ENTITY> callback) {
+    protected <ENTITY extends Entity> void helpUpdateInternally(ENTITY entity,
+            UpdateOption<? extends ConditionBean> option) {
         assertEntityNotNull(entity);
         assertEntityHasOptimisticLockValue(entity);
-        final int updatedCount = callback.callbackDelegateUpdate(entity);
+        final int updatedCount = delegateUpdate(entity, option);
         if (updatedCount == 0) {
             throwUpdateEntityAlreadyDeletedException(entity);
         } else if (updatedCount > 1) {
@@ -154,14 +155,10 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         }
     }
 
-    protected static interface InternalUpdateCallback<ENTITY extends Entity> {
-        public int callbackDelegateUpdate(ENTITY entity);
-    }
-
     protected <ENTITY extends Entity> void helpUpdateNonstrictInternally(ENTITY entity,
-            InternalUpdateNonstrictCallback<ENTITY> callback) {
+            UpdateOption<? extends ConditionBean> option) {
         assertEntityNotNull(entity);
-        final int updatedCount = callback.callbackDelegateUpdateNonstrict(entity);
+        final int updatedCount = delegateUpdateNonstrict(entity, option);
         if (updatedCount == 0) {
             throwUpdateEntityAlreadyDeletedException(entity);
         } else if (updatedCount > 1) {
@@ -185,15 +182,15 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     //                                        InsertOrUpdate
     //                                        --------------
     protected <ENTITY extends Entity, CB_TYPE extends ConditionBean> void helpInsertOrUpdateInternally(ENTITY entity,
-            InternalInsertOrUpdateCallback<ENTITY, CB_TYPE> callback) {
+            InsertOption<? extends ConditionBean> insOption, UpdateOption<? extends ConditionBean> updOption) {
         assertEntityNotNull(entity);
         if (helpDetermineInsertOrUpdateDirectInsert(entity)) {
-            callback.callbackInsert(entity);
+            doCreate(entity, insOption);
             return;
         }
         RuntimeException updateException = null;
         try {
-            callback.callbackUpdate(entity);
+            doModify(entity, updOption);
         } catch (EntityAlreadyUpdatedException e) { // already updated (or means not found)
             updateException = e;
         } catch (EntityAlreadyDeletedException e) { // means not found
@@ -204,7 +201,8 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         if (updateException == null) {
             return;
         }
-        final CB_TYPE cb = callback.callbackNewMyConditionBean();
+        @SuppressWarnings("unchecked")
+        final CB_TYPE cb = (CB_TYPE) newConditionBean();
         final Set<String> uniqueDrivenProperties = entity.myuniqueDrivenProperties();
         if (uniqueDrivenProperties != null && !uniqueDrivenProperties.isEmpty()) {
             for (String prop : uniqueDrivenProperties) {
@@ -216,10 +214,24 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         } else {
             cb.acceptPrimaryKeyMap(getDBMeta().extractPrimaryKeyMap(entity));
         }
-        if (callback.callbackSelectCount(cb) == 0) { // anyway if not found, insert
-            callback.callbackInsert(entity);
+        if (readCount(cb) == 0) { // anyway if not found, insert
+            doCreate(entity, insOption);
         } else {
             throw updateException;
+        }
+    }
+
+    protected <ENTITY extends Entity> void helpInsertOrUpdateNonstrictInternally(ENTITY entity,
+            InsertOption<? extends ConditionBean> insOption, UpdateOption<? extends ConditionBean> updOption) {
+        assertEntityNotNull(entity);
+        if (helpDetermineInsertOrUpdateDirectInsert(entity)) {
+            doCreate(entity, insOption);
+        } else {
+            try {
+                doModifyNonstrict(entity, updOption);
+            } catch (EntityAlreadyDeletedException ignored) { // means not found
+                doCreate(entity, insOption);
+            }
         }
     }
 
@@ -231,58 +243,25 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         return !entity.hasPrimaryKeyValue();
     }
 
-    protected static interface InternalInsertOrUpdateCallback<ENTITY extends Entity, CB_TYPE extends ConditionBean> {
-        public void callbackInsert(ENTITY entity);
-
-        public void callbackUpdate(ENTITY entity);
-
-        public CB_TYPE callbackNewMyConditionBean();
-
-        public int callbackSelectCount(CB_TYPE cb);
-    }
-
-    protected <ENTITY extends Entity> void helpInsertOrUpdateInternally(ENTITY entity,
-            InternalInsertOrUpdateNonstrictCallback<ENTITY> callback) {
-        assertEntityNotNull(entity);
-        if (helpDetermineInsertOrUpdateDirectInsert(entity)) {
-            callback.callbackInsert(entity);
-        } else {
-            try {
-                callback.callbackUpdateNonstrict(entity);
-            } catch (EntityAlreadyDeletedException ignored) { // means not found
-                callback.callbackInsert(entity);
-            }
-        }
-    }
-
-    protected static interface InternalInsertOrUpdateNonstrictCallback<ENTITY extends Entity> {
-        public void callbackInsert(ENTITY entity);
-
-        public void callbackUpdateNonstrict(ENTITY entity);
-    }
-
     // -----------------------------------------------------
     //                                                Delete
     //                                                ------
-    protected <ENTITY extends Entity> void helpDeleteInternally(ENTITY entity, InternalDeleteCallback<ENTITY> callback) {
+    protected <ENTITY extends Entity> void helpDeleteInternally(ENTITY entity,
+            DeleteOption<? extends ConditionBean> option) {
         assertEntityNotNull(entity);
         assertEntityHasOptimisticLockValue(entity);
-        final int deletedCount = callback.callbackDelegateDelete(entity);
+        final int deletedCount = delegateDelete(entity, option);
         if (deletedCount == 0) {
             throwUpdateEntityAlreadyDeletedException(entity);
         } else if (deletedCount > 1) {
             throwUpdateEntityDuplicatedException(entity, deletedCount);
         }
-    }
-
-    protected static interface InternalDeleteCallback<ENTITY extends Entity> {
-        public int callbackDelegateDelete(ENTITY entity);
     }
 
     protected <ENTITY extends Entity> void helpDeleteNonstrictInternally(ENTITY entity,
-            InternalDeleteNonstrictCallback<ENTITY> callback) {
+            DeleteOption<? extends ConditionBean> option) {
         assertEntityNotNull(entity);
-        final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
+        final int deletedCount = delegateDeleteNonstrict(entity, option);
         if (deletedCount == 0) {
             throwUpdateEntityAlreadyDeletedException(entity);
         } else if (deletedCount > 1) {
@@ -290,23 +269,15 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         }
     }
 
-    protected static interface InternalDeleteNonstrictCallback<ENTITY extends Entity> {
-        public int callbackDelegateDeleteNonstrict(ENTITY entity);
-    }
-
     protected <ENTITY extends Entity> void helpDeleteNonstrictIgnoreDeletedInternally(ENTITY entity,
-            InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY> callback) {
+            DeleteOption<? extends ConditionBean> option) {
         assertEntityNotNull(entity);
-        final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
+        final int deletedCount = delegateDeleteNonstrict(entity, option);
         if (deletedCount == 0) {
             return;
         } else if (deletedCount > 1) {
             throwUpdateEntityDuplicatedException(entity, deletedCount);
         }
-    }
-
-    protected static interface InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY extends Entity> {
-        public int callbackDelegateDeleteNonstrict(ENTITY entity);
     }
 
     // ===================================================================================
@@ -875,6 +846,136 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
             filteredList.add(entity);
         }
         return filteredList;
+    }
+
+    // ===================================================================================
+    //                                                                      Delegate Entry
+    //                                                                      ==============
+    // -----------------------------------------------------
+    //                                         Entity Update
+    //                                         -------------
+    protected int delegateInsert(Entity entity, InsertOption<? extends ConditionBean> option) {
+        if (!processBeforeInsert(entity, option)) {
+            return 0;
+        }
+        return invoke(createInsertEntityCommand(entity, option));
+    }
+
+    protected int delegateUpdate(Entity entity, UpdateOption<? extends ConditionBean> option) {
+        if (!processBeforeUpdate(entity, option)) {
+            return 0;
+        }
+        if (getDBMeta().hasOptimisticLock()) {
+            return invoke(createUpdateEntityCommand(entity, option));
+        } else {
+            return delegateUpdateNonstrict(entity, option);
+        }
+    }
+
+    protected int delegateUpdateNonstrict(Entity entity, UpdateOption<? extends ConditionBean> option) {
+        if (!processBeforeUpdate(entity, option)) {
+            return 0;
+        }
+        return invoke(createUpdateNonstrictEntityCommand(entity, option));
+    }
+
+    protected int delegateDelete(Entity entity, DeleteOption<? extends ConditionBean> option) {
+        if (!processBeforeDelete(entity, option)) {
+            return 0;
+        }
+        if (getDBMeta().hasOptimisticLock()) {
+            return invoke(createDeleteEntityCommand(entity, option));
+        } else {
+            return delegateDeleteNonstrict(entity, option);
+        }
+    }
+
+    protected int delegateDeleteNonstrict(Entity entity, DeleteOption<? extends ConditionBean> option) {
+        if (!processBeforeDelete(entity, option)) {
+            return 0;
+        }
+        return invoke(createDeleteNonstrictEntityCommand(entity, option));
+    }
+
+    // -----------------------------------------------------
+    //                                          Batch Update
+    //                                          ------------
+    protected int[] delegateBatchInsert(List<? extends Entity> ls, InsertOption<? extends ConditionBean> option) {
+        if (ls.isEmpty()) {
+            return new int[] {};
+        }
+        return invoke(createBatchInsertCommand(processBatchInternally(ls, option), option));
+    }
+
+    protected int[] delegateBatchUpdate(List<? extends Entity> ls, UpdateOption<? extends ConditionBean> option) {
+        if (ls.isEmpty()) {
+            return new int[] {};
+        }
+        if (getDBMeta().hasOptimisticLock()) {
+            return invoke(createBatchUpdateCommand(processBatchInternally(ls, option, false), option));
+        } else {
+            return delegateBatchUpdateNonstrict(ls, option);
+        }
+    }
+
+    protected int[] delegateBatchUpdateNonstrict(List<? extends Entity> ls, UpdateOption<? extends ConditionBean> option) {
+        if (ls.isEmpty()) {
+            return new int[] {};
+        }
+        return invoke(createBatchUpdateNonstrictCommand(processBatchInternally(ls, option, true), option));
+    }
+
+    protected int[] delegateBatchDelete(List<? extends Entity> ls, DeleteOption<? extends ConditionBean> option) {
+        if (ls.isEmpty()) {
+            return new int[] {};
+        }
+        if (getDBMeta().hasOptimisticLock()) {
+            return invoke(createBatchDeleteCommand(processBatchInternally(ls, option, false), option));
+        } else {
+            return delegateBatchDeleteNonstrict(ls, option);
+        }
+    }
+
+    protected int[] delegateBatchDeleteNonstrict(List<? extends Entity> ls, DeleteOption<? extends ConditionBean> option) {
+        if (ls.isEmpty()) {
+            return new int[] {};
+        }
+        return invoke(createBatchDeleteNonstrictCommand(processBatchInternally(ls, option, true), option));
+    }
+
+    // -----------------------------------------------------
+    //                                          Query Update
+    //                                          ------------
+    protected int delegateQueryInsert(Entity entity, ConditionBean inCB, ConditionBean resCB,
+            InsertOption<? extends ConditionBean> option) {
+        if (!processBeforeQueryInsert(entity, inCB, resCB, option)) {
+            return 0;
+        }
+        return invoke(createQueryInsertCBCommand(entity, inCB, resCB, option));
+    }
+
+    protected int delegateQueryUpdate(Entity entity, ConditionBean cb, UpdateOption<? extends ConditionBean> option) {
+        if (!processBeforeQueryUpdate(entity, cb, option)) {
+            return 0;
+        }
+        return invoke(createQueryUpdateCBCommand(entity, cb, option));
+    }
+
+    protected int delegateQueryDelete(ConditionBean cb, DeleteOption<? extends ConditionBean> option) {
+        if (!processBeforeQueryDelete(cb, option)) {
+            return 0;
+        }
+        return invoke(createQueryDeleteCBCommand(cb, option));
+    }
+
+    // -----------------------------------------------------
+    //                                           Compound PK
+    //                                           -----------
+    protected int delegateInsertNoPK(Entity entity, InsertOption<? extends ConditionBean> option) {
+        // only filtering for extension is supported (filtering for common columns is unsupported)
+        assertEntityNotNull(entity);
+        filterEntityOfInsert(entity, option);
+        return invoke(createInsertEntityCommand(entity, option));
     }
 
     // ===================================================================================

@@ -823,6 +823,10 @@ public abstract class AbstractDBMeta implements DBMeta {
         return null;
     }
 
+    public boolean hasOptimisticLock() {
+        return hasVersionNo() || hasUpdateDate();
+    }
+
     public boolean hasVersionNo() {
         return false;
     }

@@ -26,8 +26,8 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.RelationEntityNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.optional.OptionalEntity;
 import org.seasar.dbflute.optional.OptionalObjectExceptionThrower;
+import org.seasar.dbflute.optional.RelationOptionalFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 
@@ -35,12 +35,24 @@ import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
  * @author jflute
  * @since 1.0.5G (2014/05/20 Tuesday)
  */
-public class TnRelationOptionalFactory {
+public class TnRelationRowOptionalHandler {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(TnRelationOptionalFactory.class);
+    private static final Log _log = LogFactory.getLog(TnRelationRowOptionalHandler.class);
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final RelationOptionalFactory _relationOptionalFactory;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public TnRelationRowOptionalHandler(RelationOptionalFactory relationOptionalFactory) {
+        _relationOptionalFactory = relationOptionalFactory;
+    }
 
     // ===================================================================================
     //                                                                           Filtering
@@ -76,7 +88,7 @@ public class TnRelationOptionalFactory {
      * @return The optional object for the relation. (NotNull)
      */
     protected Object createOptionalNullEntity(Object row, TnRelationPropertyType rpt) { // object for override
-        return OptionalEntity.ofNullable(null, createOptionalNullableThrower(row, rpt));
+        return _relationOptionalFactory.createOptionalNullEntity(createOptionalNullableThrower(row, rpt));
     }
 
     protected OptionalObjectExceptionThrower createOptionalNullableThrower(final Object row, TnRelationPropertyType rpt) {
@@ -178,7 +190,7 @@ public class TnRelationOptionalFactory {
      * @return The optional object for the relation. (NotNull)
      */
     protected Object createOptionalPresentEntity(Object relationRow) { // object for override
-        return OptionalEntity.of(relationRow);
+        return _relationOptionalFactory.createOptionalPresentEntity(relationRow);
     }
 
     // ===================================================================================
@@ -189,6 +201,6 @@ public class TnRelationOptionalFactory {
      * @return The class type of optional entity. (NotNull)
      */
     public Class<?> getOptionalEntityType() {
-        return OptionalEntity.class;
+        return _relationOptionalFactory.getOptionalEntityType();
     }
 }

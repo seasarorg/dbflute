@@ -174,12 +174,12 @@ public class ForeignInfo implements RelationInfo {
     /**
      * Read the value to the entity by its gateway (means no reflection). <br />
      * It returns plain value in entity as property access type.
+     * @param <PROPERTY> The type of property, might be optional.
      * @param localEntity The local entity of this column to read. (NotNull)
-     * @param <PROPERTY> The type of property.
      * @return The read instance of foreign entity, might be optional. (NotNull: when optional, NullAllowed: when native type)
      */
     @SuppressWarnings("unchecked")
-    public <PROPERTY extends Entity> PROPERTY read(Entity localEntity) {
+    public <PROPERTY> PROPERTY read(Entity localEntity) {
         return (PROPERTY) _propertyGateway.read(localEntity);
     }
 

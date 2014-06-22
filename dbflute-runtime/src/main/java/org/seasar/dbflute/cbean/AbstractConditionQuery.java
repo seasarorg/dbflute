@@ -189,9 +189,18 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         _nestLevel = nestLevel;
     }
 
-    // constructor can not be changed so set it up later
+    // *constructor can not be changed so set it up later
+
     public void xsetBaseCB(ConditionBean baseCB) {
         _baseCB = baseCB;
+    }
+
+    protected <CQ extends AbstractConditionQuery> CQ xinitRelCQ(CQ cq, ConditionBean baseCB, String foreignPropertyName,
+            String nestRelationPath) {
+        cq.xsetBaseCB(_baseCB);
+        cq.xsetForeignPropertyName(foreignPropertyName);
+        cq.xsetRelationPath(nestRelationPath);
+        return cq;
     }
 
     // ===================================================================================
