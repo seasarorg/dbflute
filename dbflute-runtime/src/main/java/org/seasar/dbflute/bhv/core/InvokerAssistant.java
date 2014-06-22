@@ -72,6 +72,11 @@ public interface InvokerAssistant {
     TnBeanMetaDataFactory assistBeanMetaDataFactory();
 
     /**
+     * @return The factory of relation optional. (NotNull)
+     */
+    RelationOptionalFactory assistRelationOptionalFactory();
+
+    /**
      * Assist the factory of SQL analyzer. <br />
      * This factory is also used on ConditionBean.toDisplaySql().
      * So this method should be state-less.
@@ -101,11 +106,6 @@ public interface InvokerAssistant {
      * @return The instance of handler. (NotNull)
      */
     SequenceCacheHandler assistSequenceCacheHandler();
-
-    /**
-     * @return The factory of relation optional. (NotNull)
-     */
-    RelationOptionalFactory assistRelationOptionalFactory();
 
     /**
      * @return The encoding of SQL file. (NotNull)

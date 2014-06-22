@@ -512,10 +512,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
     protected def xcreateQuery${fk.foreignPropertyNameInitCap}(): ${foreignCQClassName} = {
         val nrp: String = resolveNextRelationPath("${table.tableDbName}",  "${fk.foreignPropertyName}");
         val jan: String = resolveJoinAliasName(nrp,  xgetNextNestLevel());
-        val cq: ${foreignCQClassName} = new ${foreignCQClassName}(this,  xgetSqlClause(),  jan,  xgetNextNestLevel());
-        cq.xsetBaseCB(_baseCB);
-        cq.xsetForeignPropertyName("${fk.foreignPropertyName}");
-        cq.xsetRelationPath(nrp); return cq;
+        return xinitRelCQ(new ${foreignCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel()), _baseCB, "${fk.foreignPropertyName}", nrp);
     }
     protected def xsetupOuterJoin${fk.foreignPropertyNameInitCap}(): Unit = {
         val cq: ${foreignCQClassName} = getConditionQuery${fk.foreignPropertyNameInitCap}();
@@ -527,9 +524,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #end
         registerOuterJoin(cq, joinOnMap, "${fk.foreignPropertyName}");
     }
-    def hasConditionQuery${fk.ForeignPropertyNameInitCap}(): Boolean = {
-        return _conditionQuery${fk.ForeignPropertyNameInitCap} != null;
-    }
+    def hasConditionQuery${fk.ForeignPropertyNameInitCap}(): Boolean = { _conditionQuery${fk.ForeignPropertyNameInitCap} != null }
 
 #end
 #foreach ($referrer in $table.joinableReferrerAsOneList)
@@ -553,10 +548,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
     protected def xcreateQuery${referrer.referrerPropertyNameInitCapAsOne}(): ${relatedCQClassName} = {
         val nrp: String = resolveNextRelationPath("${table.tableDbName}",  "${referrer.referrerPropertyNameAsOne}");
         val jan: String = resolveJoinAliasName(nrp,  xgetNextNestLevel());
-        val cq: ${relatedCQClassName} = new ${relatedCQClassName}(this,  xgetSqlClause(),  jan,  xgetNextNestLevel());
-        cq.xsetBaseCB(_baseCB);
-        cq.xsetForeignPropertyName("${referrer.referrerPropertyNameAsOne}");
-        cq.xsetRelationPath(nrp); return cq;
+        return xinitRelCQ(new ${relatedCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel()), _baseCB, "${referrer.referrerPropertyNameAsOne}", nrp);
     }
     protected def xsetupOuterJoin${referrer.referrerPropertyNameInitCapAsOne}(): Unit = {
         val cq: ${relatedCQClassName} = getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}();
@@ -568,9 +560,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #end
         registerOuterJoin(cq, joinOnMap, "${referrer.referrerPropertyNameAsOne}");
     }
-    def hasConditionQuery${referrer.referrerPropertyNameInitCapAsOne}(): Boolean = {
-        return _conditionQuery${referrer.referrerPropertyNameInitCapAsOne} != null;
-    }
+    def hasConditionQuery${referrer.referrerPropertyNameInitCapAsOne}(): Boolean = { _conditionQuery${referrer.referrerPropertyNameInitCapAsOne} != null }
 
 #end
     protected def xfindFixedConditionDynamicParameterMap(property: String): Map[String, Object] = {

@@ -662,6 +662,17 @@ public class BehaviorCommandInvoker {
     }
 
     // ===================================================================================
+    //                                                                   Relation Optional
+    //                                                                   =================
+    /**
+     * Get the factory of relation optional.
+     * @return The factory assisted by invoker assistant. (NotNull)
+     */
+    public RelationOptionalFactory getRelationOptionalFactory() {
+        return _invokerAssistant.assistRelationOptionalFactory();
+    }
+
+    // ===================================================================================
     //                                                                          OutsideSql
     //                                                                          ==========
     /**
@@ -696,17 +707,6 @@ public class BehaviorCommandInvoker {
      */
     public SequenceCacheHandler getSequenceCacheHandler() {
         return _invokerAssistant.assistSequenceCacheHandler();
-    }
-
-    // ===================================================================================
-    //                                                                   Relation Optional
-    //                                                                   =================
-    /**
-     * Get the factory of relation optional.
-     * @return The factory assisted by invoker assistant. (NotNull)
-     */
-    public RelationOptionalFactory getRelationOptionalFactory() {
-        return _invokerAssistant.assistRelationOptionalFactory();
     }
 
     // ===================================================================================
