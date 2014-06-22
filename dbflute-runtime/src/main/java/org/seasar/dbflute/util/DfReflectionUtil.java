@@ -214,8 +214,7 @@ public class DfReflectionUtil {
         try {
             return field.get(target);
         } catch (IllegalAccessException e) {
-            String msg = "Illegal access to the field:";
-            msg = msg + " field=" + field + " target=" + target;
+            String msg = "Illegal access to the field: field=" + field + " target=" + target;
             throw new ReflectionFailureException(msg, e);
         }
     }
@@ -231,9 +230,7 @@ public class DfReflectionUtil {
         try {
             field.set(target, value);
         } catch (IllegalAccessException e) {
-            String msg = "Illegal access to the field:";
-            msg = msg + " field=" + field + " target=" + target;
-            msg = msg + " value=" + value;
+            String msg = "Illegal access to the field: field=" + field + " target=" + target + " value=" + value;
             throw new ReflectionFailureException(msg, e);
         }
     }

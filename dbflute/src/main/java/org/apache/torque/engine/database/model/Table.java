@@ -3704,6 +3704,19 @@ public class Table {
     }
 
     // ===================================================================================
+    //                                                                          Value Type
+    //                                                                          ==========
+    public boolean needsMappingValueType() {
+        final List<Column> columnList = getColumnList();
+        for (Column column : columnList) {
+            if (column.needsMappingValueType()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
     //                                                                     Behavior Filter
     //                                                                     ===============
     public boolean hasBehaviorFilterBeforeColumn() {

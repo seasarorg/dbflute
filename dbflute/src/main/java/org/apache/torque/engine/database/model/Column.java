@@ -1710,6 +1710,10 @@ public class Column {
     // -----------------------------------------------------
     //                                    ValueType Handling
     //                                    ------------------
+    public boolean needsMappingValueType() {
+        return needsStringClobHandling() || needsBytesOidHandling();
+    }
+
     public boolean needsStringClobHandling() {
         return isDbTypeStringClob();
     }

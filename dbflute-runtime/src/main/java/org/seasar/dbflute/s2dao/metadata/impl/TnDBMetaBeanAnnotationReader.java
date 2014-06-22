@@ -17,6 +17,7 @@ package org.seasar.dbflute.s2dao.metadata.impl;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -224,10 +225,13 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
         if (mappingValueType != null) {
             return mappingValueType.keyName();
         }
+        // e.g. public static String memberName_VALUE_TYPE = "fooType";
         final String valueTypeKey = pd.getPropertyName() + VALUE_TYPE_SUFFIX;
         if (_beanDesc.hasField(valueTypeKey)) {
             final Field field = _beanDesc.getField(valueTypeKey);
-            return (String) DfReflectionUtil.getValue(field, null);
+            if (Modifier.isStatic(field.getModifiers())) {
+                return (String) DfReflectionUtil.getValue(field, null);
+            }
         }
         return null;
     }

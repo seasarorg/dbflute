@@ -86,7 +86,7 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
             return valueType;
         }
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found a plug-in value type by the name.");
+        br.addNotice("Not found the plug-in value type by the name.");
         br.addItem("Bean Type");
         br.addElement(_beanClass.getName());
         br.addItem("Property");

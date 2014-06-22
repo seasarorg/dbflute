@@ -24,9 +24,10 @@ import java.lang.annotation.Target;
  * The annotation of value type for mapping. <br />
  * You can specify your value type at your extended entity.
  * <pre>
- * @MappingValueType("memberNameValueType")
+ * &#064;Override
+ * &#064;MappingValueType("memberNameValueType")
  * public String getMemberName() {
- *     ...
+ *     return super.getMemberName();
  * }
  * </pre>
  * @author jflute

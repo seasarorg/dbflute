@@ -32,6 +32,9 @@ import java.util.Date;
 import org.seasar.dbflute.Entity;
 #end
 import org.seasar.dbflute.dbmeta.DBMeta;
+#if ($table.needsMappingValueType())
+import org.seasar.dbflute.dbmeta.MappingValueType;
+#end
 #if ($table.isEntityDerivedMappable())
 import org.seasar.dbflute.dbmeta.DerivedMappable;
 #end
@@ -866,16 +869,6 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
 #else
 
 #end
-#if ($col.needsStringClobHandling())
-    /** The value type annotation. {${col.columnDefinitionLineDisp}} */
-    val ${col.javaBeansRulePropertyName}_VALUE_TYPE: String = "stringClobType"; // #pending non-static OK?
-
-#end
-#if ($col.needsBytesOidHandling())
-    /** The value type annotation. {${col.columnDefinitionLineDisp}} */
-    val ${col.javaBeansRulePropertyName}_VALUE_TYPE: String = "bytesOidType";
-
-#end
     /**
      * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($col.isCommentForJavaDocValid())
@@ -887,6 +880,12 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
      * @return The value of the column '${col.name}'. (NullAllowed even if selected: for no constraint)
 #end
      */
+#if ($col.needsStringClobHandling())
+    @MappingValueType(keyName = "stringClobType")
+#end
+#if ($col.needsBytesOidHandling())
+    @MappingValueType(keyName = "bytesOidType")
+#end
     def get${col.javaName}(): ${col.javaNative} = {
 #if ($col.isEntityConvertEmptyStringToNull())
         return convertEmptyToNull(_${col.uncapitalisedJavaName});

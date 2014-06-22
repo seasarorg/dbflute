@@ -24,9 +24,12 @@ import java.util.Set;
 import java.util.Date;
 #end
 
-import org.seasar.dbflute.dbmeta.DBMeta;
 #if (!$table.hasAllCommonColumn() || $table.hasRelation())
 import org.seasar.dbflute.Entity;
+#end
+import org.seasar.dbflute.dbmeta.DBMeta;
+#if ($table.needsMappingValueType())
+import org.seasar.dbflute.dbmeta.MappingValueType;
 #end
 #if ($table.isEntityDerivedMappable())
 import org.seasar.dbflute.dbmeta.DerivedMappable;
@@ -822,16 +825,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #else
 
 #end
-#if ($col.needsStringClobHandling())
-    /** The value type annotation. {${col.columnDefinitionLineDisp}} */
-    public static final String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "stringClobType";
-
-#end
-#if ($col.needsBytesOidHandling())
-    /** The value type annotation. {${col.columnDefinitionLineDisp}} */
-    public static final String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "bytesOidType";
-
-#end
     /**
      * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($col.isCommentForJavaDocValid())
@@ -843,6 +836,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * @return The value of the column '${col.name}'. (NullAllowed even if selected: for no constraint)
 #end
      */
+#if ($col.needsStringClobHandling())
+    @MappingValueType(keyName = "stringClobType");
+#end
+#if ($col.needsBytesOidHandling())
+    @MappingValueType(keyName = "bytesOidType");
+#end
     public ${col.javaNative} get${col.javaName}() {
 #if ($col.isEntityConvertEmptyStringToNull())
         return convertEmptyToNull(_${col.uncapitalisedJavaName});
