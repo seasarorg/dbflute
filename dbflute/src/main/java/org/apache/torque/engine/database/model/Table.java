@@ -3210,6 +3210,15 @@ public class Table {
         return Srl.initUncap(versionNoJavaName);
     }
 
+    public boolean isVersionNoHasValueMethodValid() {
+        if (!isUseVersionNo()) {
+            return false;
+        }
+        // basically other types are not used as version no
+        final Column col = getVersionNoColumn();
+        return !col.isJavaNativePrimitiveInt() && !col.isJavaNativePrimitiveLong();
+    }
+
     // ===================================================================================
     //                                                                       Common Column
     //                                                                       =============

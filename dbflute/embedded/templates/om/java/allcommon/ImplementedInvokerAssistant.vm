@@ -32,6 +32,7 @@ import org.seasar.dbflute.jdbc.HandlingDataSourceWrapper;
 import org.seasar.dbflute.jdbc.SQLExceptionDigger;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.optional.RelationOptionalFactory;
 import org.seasar.dbflute.outsidesql.factory.DefaultOutsideSqlExecutorFactory;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
@@ -85,6 +86,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     protected volatile OutsideSqlExecutorFactory _outsideSqlExecutorFactory;
     protected volatile SQLExceptionHandlerFactory _sqlExceptionHandlerFactory;
     protected volatile SequenceCacheHandler _sequenceCacheHandler;
+    protected volatile RelationOptionalFactory _relationOptionalFactory;
 
     // -----------------------------------------------------
     //                                       Disposable Flag
@@ -153,7 +155,11 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         if (creator != null) {
             return creator;
         }
-        return new ${glImplementedSqlClauseCreator}(); // as default
+        return newImplementedSqlClauseCreator(); // as default
+    }
+
+    protected ${glImplementedSqlClauseCreator} newImplementedSqlClauseCreator() {
+        return new ${glImplementedSqlClauseCreator}();
     }
 
     // -----------------------------------------------------
@@ -173,11 +179,15 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     }
 
     protected StatementFactory createStatementFactory() {
-        final TnStatementFactoryImpl factory = new TnStatementFactoryImpl();
+        final TnStatementFactoryImpl factory = newStatementFactoryImpl();
         factory.setDefaultStatementConfig(assistDefaultStatementConfig());
         factory.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         factory.setCursorSelectFetchSize(${glDBFluteConfig}.getInstance().getCursorSelectFetchSize());
         return factory;
+    }
+
+    protected TnStatementFactoryImpl newStatementFactoryImpl() {
+        return new TnStatementFactoryImpl();
     }
 
     // -----------------------------------------------------
@@ -197,10 +207,15 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     }
 
     protected TnBeanMetaDataFactory createBeanMetaDataFactory() {
-        final TnBeanMetaDataFactoryExtension factory = new TnBeanMetaDataFactoryExtension();
+        RelationOptionalFactory relationOptionalFactory = assistRelationOptionalFactory();
+        final TnBeanMetaDataFactoryExtension factory = newBeanMetaDataFactoryExtension(relationOptionalFactory);
         factory.setDataSource(_dataSource);
         factory.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return factory;
+    }
+
+    protected TnBeanMetaDataFactoryExtension newBeanMetaDataFactoryExtension(RelationOptionalFactory relationOptionalFactory) {
+        return new TnBeanMetaDataFactoryExtension(relationOptionalFactory);
     }
 
     // -----------------------------------------------------
@@ -223,6 +238,10 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     }
 
     protected SqlAnalyzerFactory createSqlAnalyzerFactory() {
+        return newDefaultSqlAnalyzerFactory();
+    }
+
+    protected DefaultSqlAnalyzerFactory newDefaultSqlAnalyzerFactory() {
         return new DefaultSqlAnalyzerFactory();
     }
 
@@ -250,6 +269,10 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         if (factory != null) {
             return factory;
         }
+        return newDefaultOutsideSqlExecutorFactory(); // as default
+    }
+
+    protected DefaultOutsideSqlExecutorFactory newDefaultOutsideSqlExecutorFactory() {
         return new DefaultOutsideSqlExecutorFactory();
     }
 
@@ -260,6 +283,10 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
      * {@inheritDoc}
      */
     public SQLExceptionDigger assistSQLExceptionDigger() {
+        return createSQLExceptionDigger();
+    }
+
+    protected SQLExceptionDigger createSQLExceptionDigger() {
         return ${glDBFluteConfig}.getInstance().getSQLExceptionDigger();
     }
 
@@ -283,6 +310,10 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     }
 
     protected SQLExceptionHandlerFactory createSQLExceptionHandlerFactory() {
+        return newDefaultSQLExceptionHandlerFactory();
+    }
+
+    protected DefaultSQLExceptionHandlerFactory newDefaultSQLExceptionHandlerFactory() {
         return new DefaultSQLExceptionHandlerFactory();
     }
 
@@ -306,13 +337,44 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     }
 
     protected SequenceCacheHandler createSequenceCacheHandler() {
-        SequenceCacheHandler handler = new SequenceCacheHandler();
+        SequenceCacheHandler handler = newSequenceCacheHandler();
         SequenceCacheKeyGenerator generator = ${glDBFluteConfig}.getInstance().getSequenceCacheKeyGenerator();
         if (generator != null) {
             handler.setSequenceCacheKeyGenerator(generator);
         }
         handler.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return handler;
+    }
+
+    protected SequenceCacheHandler newSequenceCacheHandler() {
+        return new SequenceCacheHandler();
+    }
+
+    // -----------------------------------------------------
+    //                             Relation Optional Factory
+    //                             -------------------------
+    /**
+     * {@inheritDoc}
+     */
+    public RelationOptionalFactory assistRelationOptionalFactory() {
+        if (_relationOptionalFactory != null) {
+            return _relationOptionalFactory;
+        }
+        synchronized (this) {
+            if (_relationOptionalFactory != null) {
+                return _relationOptionalFactory;
+            }
+            _relationOptionalFactory = createRelationOptionalFactory();
+        }
+        return _relationOptionalFactory;
+    }
+
+    protected RelationOptionalFactory createRelationOptionalFactory() {
+        return newRelationOptionalFactory();
+    }
+
+    protected RelationOptionalFactory newRelationOptionalFactory() {
+        return new RelationOptionalFactory();
     }
 
     // -----------------------------------------------------
@@ -347,12 +409,20 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     //                                    Resource Parameter
     //                                    ------------------
     public ResourceParameter assistResourceParameter() {
-        ResourceParameter resourceParameter = new ResourceParameter();
-        resourceParameter.setOutsideSqlPackage(${glDBFluteConfig}.getInstance().getOutsideSqlPackage());
-        resourceParameter.setLogDateFormat(${glDBFluteConfig}.getInstance().getLogDateFormat());
-        resourceParameter.setLogTimestampFormat(${glDBFluteConfig}.getInstance().getLogTimestampFormat());
-        resourceParameter.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
-        return resourceParameter;
+        return createResourceParameter();
+    }
+
+    protected ResourceParameter createResourceParameter() {
+        ResourceParameter parameter = newResourceParameter();
+        parameter.setOutsideSqlPackage(${glDBFluteConfig}.getInstance().getOutsideSqlPackage());
+        parameter.setLogDateFormat(${glDBFluteConfig}.getInstance().getLogDateFormat());
+        parameter.setLogTimestampFormat(${glDBFluteConfig}.getInstance().getLogTimestampFormat());
+        parameter.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
+        return parameter;
+    }
+
+    protected ResourceParameter newResourceParameter() {
+        return new ResourceParameter();
     }
 
     // -----------------------------------------------------

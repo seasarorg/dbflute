@@ -1675,6 +1675,14 @@ public class Column {
         // BigDecimal does not have valueOf(String)
     }
 
+    public boolean isJavaNativePrimitiveInt() { // as pinpoint
+        return getJavaNative().equals("int");
+    }
+
+    public boolean isJavaNativePrimitiveLong() { // as pinpoint
+        return getJavaNative().equals("long");
+    }
+
     // - - - - - - -
     // [CSharp Only]
     // - - - - - - -

@@ -515,22 +515,16 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if ($fk.hasDynamicFixedCondition())
     protected Map<String, Object> _parameterMap${fk.foreignPropertyNameInitCap};
     public Map<String, Object> getParameterMap${fk.foreignPropertyNameInitCap}() {
-        if (_parameterMap${fk.foreignPropertyNameInitCap} == null) {
-            _parameterMap${fk.foreignPropertyNameInitCap} = newLinkedHashMapSized(4);
-        }
+        if (_parameterMap${fk.foreignPropertyNameInitCap} == null) { _parameterMap${fk.foreignPropertyNameInitCap} = newLinkedHashMapSized(4); }
         return _parameterMap${fk.foreignPropertyNameInitCap};
     }
-    public void xsetParameterMap${fk.foreignPropertyNameInitCap}(Map<String, Object> parameterMap) {
-        _parameterMap${fk.foreignPropertyNameInitCap} = parameterMap; // for UnionQuery
-    }
+    public void xsetParameterMap${fk.foreignPropertyNameInitCap}(Map<String, Object> parameterMap)
+    { _parameterMap${fk.foreignPropertyNameInitCap} = parameterMap; } // for UnionQuery
 #end
     protected ${foreignCQClassName} xcreateQuery${fk.foreignPropertyNameInitCap}() {
         String nrp = resolveNextRelationPath("${table.tableDbName}", "${fk.foreignPropertyName}");
         String jan = resolveJoinAliasName(nrp, xgetNextNestLevel());
-        ${foreignCQClassName} cq = new ${foreignCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel());
-        cq.xsetBaseCB(_baseCB);
-        cq.xsetForeignPropertyName("${fk.foreignPropertyName}");
-        cq.xsetRelationPath(nrp); return cq;
+        return xinitRelCQ(new ${foreignCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel()), _baseCB, "${fk.foreignPropertyName}", nrp);
     }
     protected void xsetupOuterJoin${fk.foreignPropertyNameInitCap}() {
         ${foreignCQClassName} cq = getConditionQuery${fk.foreignPropertyNameInitCap}();
@@ -542,9 +536,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
         registerOuterJoin(cq, joinOnMap, "${fk.foreignPropertyName}");
     }
-    public boolean hasConditionQuery${fk.ForeignPropertyNameInitCap}() {
-        return _conditionQuery${fk.ForeignPropertyNameInitCap} != null;
-    }
+    public boolean hasConditionQuery${fk.ForeignPropertyNameInitCap}() { return _conditionQuery${fk.ForeignPropertyNameInitCap} != null; }
 
 #end
 #foreach ($referrer in $table.joinableReferrerAsOneList)
@@ -568,10 +560,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected ${relatedCQClassName} xcreateQuery${referrer.referrerPropertyNameInitCapAsOne}() {
         String nrp = resolveNextRelationPath("${table.tableDbName}", "${referrer.referrerPropertyNameAsOne}");
         String jan = resolveJoinAliasName(nrp, xgetNextNestLevel());
-        ${relatedCQClassName} cq = new ${relatedCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel());
-        cq.xsetBaseCB(_baseCB);
-        cq.xsetForeignPropertyName("${referrer.referrerPropertyNameAsOne}");
-        cq.xsetRelationPath(nrp); return cq;
+        return xinitRelCQ(new ${relatedCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel()), _baseCB, "${referrer.referrerPropertyNameAsOne}", nrp);
     }
     protected void xsetupOuterJoin${referrer.referrerPropertyNameInitCapAsOne}() {
         ${relatedCQClassName} cq = getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}();
@@ -583,9 +572,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
         registerOuterJoin(cq, joinOnMap, "${referrer.referrerPropertyNameAsOne}");
     }
-    public boolean hasConditionQuery${referrer.referrerPropertyNameInitCapAsOne}() {
-        return _conditionQuery${referrer.referrerPropertyNameInitCapAsOne} != null;
-    }
+    public boolean hasConditionQuery${referrer.referrerPropertyNameInitCapAsOne}() { return _conditionQuery${referrer.referrerPropertyNameInitCapAsOne} != null; }
 
 #end
     protected Map<String, Object> xfindFixedConditionDynamicParameterMap(String property) {

@@ -28,15 +28,21 @@ import java.util.Set;
 import java.util.Date;
 #end
 
-import org.seasar.dbflute.dbmeta.DBMeta;
 #if (!$table.hasAllCommonColumn() || $table.hasRelation())
 import org.seasar.dbflute.Entity;
+#end
+import org.seasar.dbflute.dbmeta.DBMeta;
+#if ($table.isEntityDerivedMappable())
+import org.seasar.dbflute.dbmeta.DerivedMappable;
 #end
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
 #end
 import org.seasar.dbflute.Entity.EntityUniqueDrivenProperties;
 import org.seasar.dbflute.Entity.EntityModifiedProperties;
+#if ($table.isEntityDerivedMappable())
+import org.seasar.dbflute.Entity.EntityDerivedMap;
+#end
 import org.seasar.dbflute.Entity.FunCustodial;
 import org.seasar.dbflute.helper.beans.DfCoupleProperties;
 import org.seasar.dbflute.immutable.DBableEntity;
@@ -108,7 +114,7 @@ import ${table.relationalNullObjectProviderPackage}._;
  * </pre>
  * @author ${database.classAuthor}
  */
-abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[${myImmutableExtendedObjectClassName}] with Serializable with Cloneable with DfCoupleProperties {
+abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[${myImmutableExtendedObjectClassName}] with Serializable with Cloneable${table.derivedMappableDefinition} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -129,6 +135,11 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
 
     /** The modified properties for this entity. (NotNull) */
     protected val __modifiedProperties: EntityModifiedProperties = newModifiedProperties();
+#if ($table.isEntityDerivedMappable())
+
+    /** The map of derived value, key is alias name. (NullAllowed: lazy-loaded) */
+    protected var __derivedMap: EntityDerivedMap = null;
+#end
 #if ($table.hasAllCommonColumn())
 
     /** Is common column auto set up effective? */
@@ -628,6 +639,34 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
         return __canCommonColumnAutoSetup;
     }
 #end
+#if ($table.isEntityDerivedMappable())
+
+    // ===================================================================================
+    //                                                                    Derived Mappable
+    //                                                                    ================
+    /**
+     * {@inheritDoc}
+     */
+    def registerDerivedValue(aliasName: String, selectedValue: Object): Unit = {
+        if (__derivedMap == null) { __derivedMap = newDerivedMap(); }
+        __derivedMap.registerDerivedValue(aliasName, selectedValue);
+    }
+
+    /**
+     * Find the derived value from derived map.
+     * @param <VALUE> The type of the value.
+     * @param aliasName The alias name of derived-referrer. (NotNull)
+     * @return The derived value found in the map. (NullAllowed: when null selected)
+     */
+    def derived[VALUE](aliasName: String): VALUE = {
+        if (__derivedMap == null) { __derivedMap = newDerivedMap(); }
+        return __derivedMap.findDerivedValue(aliasName);
+    }
+
+    protected def newDerivedMap(): EntityDerivedMap = {
+        return new EntityDerivedMap();
+    }
+#end
 
     // ===================================================================================
     //                                                                        Scala Helper
@@ -872,7 +911,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
         checkImplicitSet("${col.name}", ${glCDef}.DefMeta.${col.classificationName}, ${col.uncapitalisedJavaName});
 #end
         __modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
-        this._${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
+        _${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
     }
 #set ($propertyLoopIndex = $propertyLoopIndex + 1)
 #end
