@@ -1385,6 +1385,20 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return (HpSpecifiedColumn) currentObj;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void invokeOrScopeQuery(OrQuery<ConditionBean> orQuery) {
+        xorSQ(this, orQuery);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void invokeOrScopeQueryAndPart(AndQuery<ConditionBean> andQuery) {
+        xorSQAP(this, andQuery);
+    }
+
     protected Method xhelpGettingCBChainMethod(Class<?> type, String methodName, Class<?>[] argTypes) {
         final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(type);
         return beanDesc.getMethodNoException(methodName, argTypes);

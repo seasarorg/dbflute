@@ -477,6 +477,20 @@ public interface ConditionBean extends PagingBean {
      */
     HpSpecifiedColumn invokeSpecifyColumn(String columnNamePath);
 
+    /**
+     * Invoke the method 'orScopeQuery()' by the query callback. <br />
+     * @param orQuery The callback for or-query. (NotNull)
+     * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
+     */
+    void invokeOrScopeQuery(OrQuery<ConditionBean> orQuery);
+
+    /**
+     * Invoke the method 'orScopeQueryAndPart()' by the query callback. <br />
+     * @param andQuery The callback for and-query. (NotNull)
+     * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
+     */
+    void invokeOrScopeQueryAndPart(AndQuery<ConditionBean> andQuery);
+
     // ===================================================================================
     //                                                                  Query Synchronizer
     //                                                                  ==================

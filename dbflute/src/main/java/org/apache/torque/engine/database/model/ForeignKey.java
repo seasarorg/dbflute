@@ -1725,8 +1725,9 @@ public class ForeignKey implements Constraint {
         return false;
     }
 
-    // /- - - - - - - - - - - - - -
+    // /- - - - - - - - - - - - - - - - - - -
     // attention: local is referrer
+    // *but resolved in runtime after 1.0.6A
     // - - - - - - - - - -/
 
     public boolean isConvertToReferrerByToString() {

@@ -15,9 +15,11 @@
  */
 package org.seasar.dbflute.bhv;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -38,9 +40,11 @@ import org.seasar.dbflute.bhv.core.command.SelectListCBCommand;
 import org.seasar.dbflute.bhv.core.command.SelectNextValCommand;
 import org.seasar.dbflute.bhv.core.command.SelectNextValSubCommand;
 import org.seasar.dbflute.bhv.core.command.SelectScalarCBCommand;
+import org.seasar.dbflute.cbean.AndQuery;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.EntityRowHandler;
 import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.cbean.OrQuery;
 import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.PagingHandler;
 import org.seasar.dbflute.cbean.PagingInvoker;
@@ -50,6 +54,7 @@ import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.cbean.chelper.HpSLSExecutor;
 import org.seasar.dbflute.cbean.chelper.HpSLSFunction;
+import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.CursorSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
@@ -59,6 +64,7 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
+import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
@@ -75,6 +81,7 @@ import org.seasar.dbflute.optional.RelationOptionalFactory;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -457,11 +464,253 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     // ===================================================================================
     //                                                                       Load Referrer
     //                                                                       =============
+    // -----------------------------------------------------
+    //                                       New Entry Point
+    //                                       ---------------
     /**
-     * Help load referrer internally.
+     * Help load referrer internally. (new entry point) <br />
      * About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * @param <LOCAL_ENTITY> The type of base entity.
      * @param <PK> The type of primary key.
+     * @param <REFERRER_CB> The type of referrer condition-bean.
+     * @param <REFERRER_ENTITY> The type of referrer entity.
+     * @param localEntityList The list of local entity. (NotNull)
+     * @param loadReferrerOption The option of loadReferrer. (NotNull)
+     * @param referrerProperty The property name of referrer. (NotNull) 
+     * @return The callback to load nested referrer. (NotNull)
+     */
+    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> // generic
+    NestedReferrerListGateway<REFERRER_ENTITY> helpLoadReferrerInternally(List<LOCAL_ENTITY> localEntityList,
+            LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption, String referrerProperty) {
+        return doHelpLoadReferrerInternally(localEntityList, loadReferrerOption, referrerProperty);
+    }
+
+    protected <LOCAL_ENTITY extends Entity, KEY, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> // generic
+    NestedReferrerListGateway<REFERRER_ENTITY> doHelpLoadReferrerInternally(List<LOCAL_ENTITY> localEntityList,
+            LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption, final String referrerProperty) {
+        final DBMeta dbmeta = getDBMeta();
+        final ReferrerInfo referrerInfo = dbmeta.findReferrerInfo(referrerProperty);
+        final BehaviorReadable referrerBhv = xfindReferrerBehavior(referrerInfo);
+        final Set<ColumnInfo> pkColSet = referrerInfo.getLocalReferrerColumnInfoMap().keySet(); // might be unique key
+        final Map<ColumnInfo, ColumnInfo> mappingColMap = referrerInfo.getReferrerLocalColumnInfoMap(); // key is referrer's
+        final InternalLoadReferrerCallback<LOCAL_ENTITY, KEY, REFERRER_CB, REFERRER_ENTITY> callback;
+        if (pkColSet.size() == 1) { // simple key
+            final ColumnInfo pkCol = pkColSet.iterator().next();
+            final ColumnInfo fkCol = mappingColMap.keySet().iterator().next();
+            callback = xcreateLoadReferrerCallback(referrerProperty, dbmeta, referrerInfo, referrerBhv, pkCol, fkCol);
+        } else { // compound key
+            final Set<ColumnInfo> fkColSet = mappingColMap.keySet();
+            callback = xcreateLoadReferrerCallback(referrerProperty, dbmeta, referrerInfo, referrerBhv, pkColSet,
+                    fkColSet, mappingColMap);
+        }
+        return helpLoadReferrerInternally(localEntityList, loadReferrerOption, callback);
+    }
+
+    protected BehaviorReadable xfindReferrerBehavior(final ReferrerInfo referrerInfo) {
+        final String behaviorName = referrerInfo.getReferrerDBMeta().getBehaviorTypeName();
+        @SuppressWarnings("unchecked")
+        final Class<BehaviorReadable> behaviorType = (Class<BehaviorReadable>) DfReflectionUtil.forName(behaviorName);
+        return xgetBSFLR().select(behaviorType);
+    }
+
+    // -----------------------------------------------------
+    //                                      Loading Callback
+    //                                      ----------------
+    protected <LOCAL_ENTITY extends Entity, KEY, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> // generic
+    InternalLoadReferrerCallback<LOCAL_ENTITY, KEY, REFERRER_CB, REFERRER_ENTITY> // return
+    xcreateLoadReferrerCallback(final String referrerProperty, final DBMeta dbmeta, final ReferrerInfo referrerInfo,
+            final BehaviorReadable referrerBhv, final ColumnInfo pkCol, final ColumnInfo fkCol) {
+        return new InternalLoadReferrerCallback<LOCAL_ENTITY, KEY, REFERRER_CB, REFERRER_ENTITY>() { // for simple key
+            public KEY getPKVal(LOCAL_ENTITY entity) {
+                return pkCol.read(entity); // (basically) PK cannot be optional because of not-null
+            }
+
+            public void setRfLs(LOCAL_ENTITY entity, List<REFERRER_ENTITY> referrerList) {
+                referrerInfo.write(entity, referrerList);
+            }
+
+            @SuppressWarnings("unchecked")
+            public REFERRER_CB newMyCB() {
+                return (REFERRER_CB) referrerBhv.newConditionBean();
+            }
+
+            public void qyFKIn(REFERRER_CB cb, List<KEY> pkList) {
+                final String conditionKey = ConditionKey.CK_IN_SCOPE.getConditionKey();
+                cb.localCQ().invokeQuery(fkCol.getColumnDbName(), conditionKey, pkList);
+            }
+
+            public void qyOdFKAsc(REFERRER_CB cb) {
+                cb.localCQ().invokeOrderBy(fkCol.getColumnDbName(), true);
+            }
+
+            public void spFKCol(REFERRER_CB cb) {
+                cb.localSp().xspecifyColumn(fkCol.getColumnDbName());
+            }
+
+            public List<REFERRER_ENTITY> selRfLs(REFERRER_CB cb) {
+                return referrerBhv.readList(cb);
+            }
+
+            public KEY getFKVal(REFERRER_ENTITY entity) {
+                final Class<?> fkType = fkCol.getObjectNativeType();
+                final Class<?> pkType = pkCol.getObjectNativeType();
+                final Object fkValue = fkCol.read(entity);
+                return xconvertFK2PKImplicitly(referrerProperty, fkType, pkType, fkValue);
+            }
+
+            public void setlcEt(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity) {
+                final RelationInfo reverseInfo = referrerInfo.getReverseRelation();
+                final Object written = xconvertToRelationOptionalEntityIfNeeds(localEntity, reverseInfo);
+                reverseInfo.write(referrerEntity, written);
+            }
+
+            public String getRfPrNm() {
+                return referrerProperty;
+            }
+        };
+    }
+
+    protected <LOCAL_ENTITY extends Entity, KEY, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> // generic
+    InternalLoadReferrerCallback<LOCAL_ENTITY, KEY, REFERRER_CB, REFERRER_ENTITY> // return
+    xcreateLoadReferrerCallback(final String referrerProperty, final DBMeta dbmeta, final ReferrerInfo referrerInfo,
+            final BehaviorReadable referrerBhv, final Set<ColumnInfo> pkColSet, final Set<ColumnInfo> fkColSet,
+            final Map<ColumnInfo, ColumnInfo> mappingColMap) {
+        return new InternalLoadReferrerCallback<LOCAL_ENTITY, KEY, REFERRER_CB, REFERRER_ENTITY>() { // for compound key
+            @SuppressWarnings("unchecked")
+            public KEY getPKVal(LOCAL_ENTITY entity) {
+                final Map<String, Object> keyMap = xnewLoadReferrerCompoundKeyMap();
+                for (ColumnInfo pkCol : pkColSet) {
+                    keyMap.put(pkCol.getColumnDbName(), pkCol.read(entity)); // key is DB name
+                }
+                return (KEY) keyMap;
+                // cannot use because it might be unique key
+                //return (KEY) dbmeta.extractPrimaryKeyMap(entity);
+            }
+
+            public void setRfLs(LOCAL_ENTITY entity, List<REFERRER_ENTITY> referrerList) {
+                referrerInfo.write(entity, referrerList);
+            }
+
+            @SuppressWarnings("unchecked")
+            public REFERRER_CB newMyCB() {
+                return (REFERRER_CB) referrerBhv.newConditionBean();
+            }
+
+            public void qyFKIn(REFERRER_CB cb, final List<KEY> pkList) {
+                // compound key doesn't use InScope so OrScopeQuery 
+                cb.invokeOrScopeQuery(new OrQuery<ConditionBean>() {
+                    public void query(ConditionBean orCB) {
+                        for (final KEY pkKey : pkList) {
+                            @SuppressWarnings("unchecked")
+                            final Map<String, Object> pkMap = (Map<String, Object>) pkKey;
+                            orCB.invokeOrScopeQueryAndPart(new AndQuery<ConditionBean>() {
+                                public void query(ConditionBean andCB) {
+                                    for (ColumnInfo fkCol : fkColSet) {
+                                        final ColumnInfo pkCol = mappingColMap.get(fkCol);
+                                        final Object pkValue = pkMap.get(pkCol.getColumnDbName()); // key is DB name
+                                        andCB.localCQ().invokeQueryEqual(fkCol.getColumnDbName(), pkValue);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+
+            public void qyOdFKAsc(REFERRER_CB cb) {
+                for (ColumnInfo fkCol : fkColSet) {
+                    cb.localCQ().invokeOrderBy(fkCol.getColumnDbName(), true);
+                }
+            }
+
+            public void spFKCol(REFERRER_CB cb) {
+                for (ColumnInfo fkCol : fkColSet) {
+                    cb.localSp().xspecifyColumn(fkCol.getColumnDbName());
+                }
+            }
+
+            public List<REFERRER_ENTITY> selRfLs(REFERRER_CB cb) {
+                return referrerBhv.readList(cb);
+            }
+
+            @SuppressWarnings("unchecked")
+            public KEY getFKVal(REFERRER_ENTITY entity) {
+                final Map<String, Object> fkMap = xnewLoadReferrerCompoundKeyMap();
+                for (ColumnInfo fkCol : fkColSet) {
+                    final Object fkValue = fkCol.read(entity);
+                    final ColumnInfo pkCol = mappingColMap.get(fkCol);
+                    final String mapKey = pkCol.getColumnDbName(); // key is DB name
+                    final Class<?> fkType = fkCol.getObjectNativeType();
+                    final Class<?> pkType = pkCol.getObjectNativeType();
+                    final Object realValue;
+                    if (fkType.equals(pkType)) { // basically true
+                        realValue = fkValue;
+                    } else { // different type (needs implicit conversion)
+                        realValue = xconvertFK2PKImplicitly(referrerProperty, fkType, pkType, fkValue);
+                    }
+                    fkMap.put(mapKey, realValue);
+                }
+                return (KEY) fkMap;
+            }
+
+            public void setlcEt(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity) {
+                final RelationInfo reverseInfo = referrerInfo.getReverseRelation(); // always exists
+                final Object written = xconvertToRelationOptionalEntityIfNeeds(localEntity, reverseInfo);
+                reverseInfo.write(referrerEntity, written);
+            }
+
+            public String getRfPrNm() {
+                return referrerProperty;
+            }
+        };
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <KEY> KEY xconvertFK2PKImplicitly(String referrerProperty, Class<?> fkType, Class<?> pkType,
+            Object fkValue) {
+        // DB-able entity does not support optional for property
+        // only supported in immutable entity
+        final KEY realValue;
+        if (fkType.equals(pkType)) { // basically true
+            realValue = (KEY) fkValue;
+        } else { // different type (needs implicit conversion)
+            if (String.class.equals(pkType)) { // e.g. Integer to String
+                realValue = (KEY) fkValue.toString();
+            } else if (Number.class.isAssignableFrom(pkType)) { // e.g. Long to Integer
+                realValue = (KEY) DfTypeUtil.toNumber(fkValue, pkType);
+            } else if (Date.class.isAssignableFrom(fkType)) {
+                if (Date.class.equals(pkType)) { // e.g. Timestamp to Date
+                    realValue = (KEY) new Date(((Date) fkValue).getTime());
+                } else if (Timestamp.class.equals(pkType)) { // e.g. Date to Timestamp
+                    realValue = (KEY) new Timestamp(((Date) fkValue).getTime());
+                } else { // cannot conversion
+                    realValue = (KEY) fkValue;
+                }
+            } else { // cannot conversion
+                realValue = (KEY) fkValue;
+            }
+        }
+        return realValue;
+    }
+
+    protected Object xconvertToRelationOptionalEntityIfNeeds(Object localEntity, RelationInfo reverseInfo) {
+        final Object writtenObj;
+        if (isRelationOptional(reverseInfo.getPropertyAccessType())) {
+            writtenObj = toRelationOptional(reverseInfo.getRelationPropertyName(), localEntity);
+        } else {
+            writtenObj = localEntity;
+        }
+        return writtenObj;
+    }
+
+    // -----------------------------------------------------
+    //                                   Ancient Entry Point
+    //                                   -------------------
+    /**
+     * Help load referrer internally. (ancient entry point) <br />
+     * About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
+     * @param <LOCAL_ENTITY> The type of base entity.
+     * @param <KEY> The type of primary key.
      * @param <REFERRER_CB> The type of referrer condition-bean.
      * @param <REFERRER_ENTITY> The type of referrer entity.
      * @param localEntityList The list of local entity. (NotNull)
@@ -469,28 +718,17 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param callback The internal callback of loadReferrer. (NotNull) 
      * @return The callback to load nested referrer. (NotNull)
      */
-    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> NestedReferrerListGateway<REFERRER_ENTITY> helpLoadReferrerInternally(
-            List<LOCAL_ENTITY> localEntityList, LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption,
-            InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
+    protected <LOCAL_ENTITY extends Entity, KEY, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> // generic
+    NestedReferrerListGateway<REFERRER_ENTITY> helpLoadReferrerInternally(List<LOCAL_ENTITY> localEntityList,
+            LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption,
+            InternalLoadReferrerCallback<LOCAL_ENTITY, KEY, REFERRER_CB, REFERRER_ENTITY> callback) {
         return doHelpLoadReferrerInternally(localEntityList, loadReferrerOption, callback);
     }
 
-    /**
-     * Do help load referrer internally.
-     * About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
-     * @param <LOCAL_ENTITY> The type of base entity.
-     * @param <PK> The type of primary key.
-     * @param <REFERRER_CB> The type of referrer condition-bean.
-     * @param <REFERRER_ENTITY> The type of referrer entity.
-     * @param localEntityList The list of local entity. (NotNull)
-     * @param loadReferrerOption The option of loadReferrer. (NotNull)
-     * @param callback The internal call-back of loadReferrer. (NotNull) 
-     * @return The callback to load nested referrer. (NotNull)
-     */
-    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> NestedReferrerListGateway<REFERRER_ENTITY> doHelpLoadReferrerInternally(
-            List<LOCAL_ENTITY> localEntityList, LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption,
-            final InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
-
+    protected <LOCAL_ENTITY extends Entity, KEY, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> // generic
+    NestedReferrerListGateway<REFERRER_ENTITY> doHelpLoadReferrerInternally(List<LOCAL_ENTITY> localEntityList,
+            LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption,
+            final InternalLoadReferrerCallback<LOCAL_ENTITY, KEY, REFERRER_CB, REFERRER_ENTITY> callback) {
         // - - - - - - - - - -
         // Assert precondition
         // - - - - - - - - - -
@@ -506,10 +744,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         // - - - - - - - - - - - - - -
         // Prepare temporary container
         // - - - - - - - - - - - - - -
-        final Map<PK, LOCAL_ENTITY> pkLocalEntityMap = new LinkedHashMap<PK, LOCAL_ENTITY>();
-        final List<PK> pkList = new ArrayList<PK>();
+        final Map<KEY, LOCAL_ENTITY> pkLocalEntityMap = new LinkedHashMap<KEY, LOCAL_ENTITY>();
+        final List<KEY> pkList = new ArrayList<KEY>();
         for (LOCAL_ENTITY localEntity : localEntityList) {
-            final PK primaryKeyValue = callback.getPKVal(localEntity);
+            final KEY primaryKeyValue = callback.getPKVal(localEntity);
             if (primaryKeyValue == null) {
                 String msg = "PK value of local entity should not be null: " + localEntity;
                 throw new IllegalArgumentException(msg);
@@ -564,11 +802,11 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         // - - - - - - - - - - - - - - - - - - - - - - - -
         // Create the map of {primary key / referrer list}
         // - - - - - - - - - - - - - - - - - - - - - - - -
-        final Map<PK, List<REFERRER_ENTITY>> pkReferrerListMap = new LinkedHashMap<PK, List<REFERRER_ENTITY>>();
+        final Map<KEY, List<REFERRER_ENTITY>> pkReferrerListMap = new LinkedHashMap<KEY, List<REFERRER_ENTITY>>();
         for (REFERRER_ENTITY referrerEntity : referrerList) {
-            final PK referrerListKey;
+            final KEY referrerListKey;
             {
-                final PK foreignKeyValue = callback.getFKVal(referrerEntity);
+                final KEY foreignKeyValue = callback.getFKVal(referrerEntity);
                 referrerListKey = toLoadReferrerMappingKey(foreignKeyValue);
             }
             if (!pkReferrerListMap.containsKey(referrerListKey)) {
@@ -585,9 +823,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         // Relate referrer list to base entity
         // - - - - - - - - - - - - - - - - - -
         for (LOCAL_ENTITY localEntity : localEntityList) {
-            final PK referrerListKey;
+            final KEY referrerListKey;
             {
-                final PK primaryKey = callback.getPKVal(localEntity);
+                final KEY primaryKey = callback.getPKVal(localEntity);
                 referrerListKey = toLoadReferrerMappingKey(primaryKey);
             }
             if (pkReferrerListMap.containsKey(referrerListKey)) {
@@ -647,7 +885,28 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     @SuppressWarnings("unchecked")
     protected <PK> PK toLoadReferrerMappingKey(PK value) {
-        return (PK) toLowerCaseIfString(value);
+        if (value instanceof String) { // simple key
+            return (PK) toLowerCaseIfString(value);
+        }
+        if (value instanceof Map<?, ?>) { // compound key
+            final Map<String, Object> pkMap = (Map<String, Object>) value;
+            final Map<String, Object> filteredMap = xnewLoadReferrerCompoundKeyMap();
+            for (Map.Entry<String, Object> entry : pkMap.entrySet()) {
+                final String key = entry.getKey();
+                final Object element = entry.getValue();
+                if (element instanceof String) {
+                    filteredMap.put(key, toLowerCaseIfString(element));
+                } else {
+                    filteredMap.put(key, element);
+                }
+            }
+            return (PK) filteredMap;
+        }
+        return value;
+    }
+
+    protected Map<String, Object> xnewLoadReferrerCompoundKeyMap() {
+        return new LinkedHashMap<String, Object>();
     }
 
     /**
@@ -760,7 +1019,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         final ForeignInfo foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
         final RelationInfo reverseInfo = foreignInfo.getReverseRelation();
         final boolean existsReferrer = reverseInfo != null;
-        final RelationOptionalFactory optionalFactory = _behaviorCommandInvoker.getRelationOptionalFactory();
+        final RelationOptionalFactory optionalFactory = xgetROpFactory();
         final Set<FOREIGN_ENTITY> foreignSet = new LinkedHashSet<FOREIGN_ENTITY>();
         final Map<FOREIGN_ENTITY, List<LOCAL_ENTITY>> foreignReferrerMap = new LinkedHashMap<FOREIGN_ENTITY, List<LOCAL_ENTITY>>();
         for (LOCAL_ENTITY localEntity : localEntityList) {
@@ -897,6 +1156,13 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected <RESULT> RESULT delegateSelectNextValSub(Class<RESULT> resultType, String columnDbName,
             String sequenceName, Integer incrementSize, Integer cacheSize) {
         return invoke(createSelectNextValSubCommand(resultType, columnDbName, sequenceName, incrementSize, cacheSize));
+    }
+
+    protected int delegateInsertNoPK(Entity entity, InsertOption<? extends ConditionBean> option) {
+        // only filtering for extension is supported (filtering for common columns is unsupported)
+        assertEntityNotNull(entity);
+        filterEntityOfInsert(entity, option);
+        return invoke(createInsertEntityCommand(entity, option));
     }
 
     // ===================================================================================
@@ -1102,12 +1368,41 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                   =================
     /**
      * Create present or null entity as relation optional.
+     * @param relationTitle The title of relation for exception message. (NotNull)
      * @param relationRow The entity instance of relation row. (NullAllowed)
      * @return The optional object for the entity, which has present or null entity. (NotNull)
      */
-    protected Object toRelationOptional(Object relationRow) {
-        final RelationOptionalFactory factory = _behaviorCommandInvoker.getRelationOptionalFactory();
-        return factory.createOptionalPresentEntity(relationRow);
+    protected Object toRelationOptional(final String relationTitle, Object relationRow) {
+        assertObjectNotNull("relationTitle", relationTitle);
+        final RelationOptionalFactory factory = xgetROpFactory();
+        final Object result;
+        if (relationRow != null) {
+            result = factory.createOptionalPresentEntity(relationRow);
+        } else {
+            result = factory.createOptionalNullEntity(new OptionalObjectExceptionThrower() {
+                public void throwNotFoundException() {
+                    String msg = "Not found the relation row for: " + relationTitle;
+                    throw new EntityAlreadyDeletedException(msg);
+                }
+            });
+        }
+        return result;
+    }
+
+    /**
+     * Is the property type optional for relation?
+     * @param relationPropertyType The type of relation property. (NotNull)
+     * @return The determination, true or false.
+     */
+    protected boolean isRelationOptional(Class<?> relationPropertyType) {
+        assertObjectNotNull("relationPropertyType", relationPropertyType);
+        final RelationOptionalFactory factory = xgetROpFactory();
+        return factory.isOptionalType(relationPropertyType);
+    }
+
+    protected RelationOptionalFactory xgetROpFactory() {
+        assertBehaviorCommandInvoker("xgetROpFactory");
+        return _behaviorCommandInvoker.getRelationOptionalFactory();
     }
 
     // ===================================================================================

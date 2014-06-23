@@ -712,12 +712,6 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         return load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), loadReferrerOption);
     }
 
-#end
-#if ($referrer.isSimpleKeyFK())
-#set ($referrerColumn = ${referrer.localColumnAsOne})
-#set ($localColumn = ${referrer.foreignColumnAsOne})
-#set ($keyJavaNative = "${referrerColumn.javaNative}")
-#if ($table.isAvailableLoadReferrerByOldOption())
     /**
      * {Refer to overload method that has an argument of condition-bean setupper.} #beforejava8
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
@@ -733,122 +727,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 
 #end
     protected NestedReferrerListGateway<${referrerEntityClassName}> doLoad${referrer.referrerPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> option) {
-        final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
-        return helpLoadReferrerInternally(${myEntityListVariableName}, option, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
-            public ${keyJavaNative} getPKVal(${myExtendedObjectClassName} et)
-#if ($referrer.canImplicitConversion())
-            { if (et.get${localColumn.javaName}() == null) { return null; }
-#if ($referrer.isConvertToReferrerByToString())
-              return et.get${localColumn.javaName}().toString(); }
-#elseif ($referrer.isConvertToReferrerByConstructor())
-              return new ${keyJavaNative}(et.get${localColumn.javaName}().toString()); }
-#elseif ($referrer.isConvertToReferrerByValueOf())
-              return ${keyJavaNative}.valueOf(et.get${localColumn.javaName}().toString()); }
-#else
-              return et.get${localColumn.javaName}(); }
-#end
-#else
-            { return et.get${localColumn.javaName}(); }
-#end
-            public void setRfLs(${myExtendedObjectClassName} et, List<${referrerEntityClassName}> ls)
-            { et.set${referrer.referrerPropertyNameInitCap}(ls); }
-            public ${referrerCBClassName} newMyCB() { return referrerBhv.newConditionBean(); }
-            public void qyFKIn(${referrerCBClassName} cb, List<${keyJavaNative}> ls)
-            { cb.query().set${referrerColumn.javaName}_InScope(ls); }
-            public void qyOdFKAsc(${referrerCBClassName} cb) { cb.query().addOrderBy_${referrerColumn.javaName}_Asc(); }
-            public void spFKCol(${referrerCBClassName} cb) { cb.specify().column${referrerColumn.javaName}(); }
-            public List<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb) { return referrerBhv.selectList(cb); }
-            public ${keyJavaNative} getFKVal(${referrerEntityClassName} re) { return re.get${referrerColumn.javaName}(); }
-            public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} le)
-#if ($referrer.isForeignPropertyOptionalEntity())
-            { re.set${referrer.foreignPropertyNameInitCap}(${database.relationOptionalEntitySimpleName}.of(le)); }
-#else
-            { re.set${referrer.foreignPropertyNameInitCap}(le); }
-#end
-            public String getRfPrNm() { return "${referrer.referrerPropertyName}"; }
-        });
+        return helpLoadReferrerInternally(${myEntityListVariableName}, option, "${referrer.referrerPropertyName}");
     }
 
-#else
-#set ($keyJavaNative = "java.util.Map<String, Object>")
-#if ($table.isAvailableLoadReferrerByOldOption())
-    /**
-     * {Refer to overload method that has an argument of condition-bean setupper.} #beforejava8
-     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param loadReferrerOption The option of load-referrer. (NotNull)
-     * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
-     */
-    @SuppressWarnings("unchecked")
-    public NestedReferrerListGateway<${referrerEntityClassName}> load${referrer.referrerPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
-        xassLRArg(${myEntityListVariableName}, loadReferrerOption);
-        if (${myEntityListVariableName}.isEmpty()) { return (NestedReferrerListGateway<${referrerEntityClassName}>)EMPTY_NREF_LGWAY; }
-        return doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}, loadReferrerOption);
-    }
-
-#end
-    protected NestedReferrerListGateway<${referrerEntityClassName}> doLoad${referrer.referrerPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> option) {
-        final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
-        return helpLoadReferrerInternally(${myEntityListVariableName}, option, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
-            public ${keyJavaNative} getPKVal(${myExtendedObjectClassName} et) {
-                ${keyJavaNative} primaryKeyMap = new java.util.LinkedHashMap<String, Object>();
-#foreach ($col in $referrer.foreignColumnList)
-                primaryKeyMap.put("${col.javaName}", et.get${col.javaName}());
-#end
-                return primaryKeyMap;
-            }
-            public void setRfLs(${myExtendedObjectClassName} et, List<${referrerEntityClassName}> ls) { et.set${referrer.referrerPropertyNameInitCap}(ls); }
-            public ${referrerCBClassName} newMyCB() { return referrerBhv.newConditionBean(); }
-            public void qyFKIn(${referrerCBClassName} cb, List<${keyJavaNative}> ls) {
-                final String aliasName = cb.getSqlClause().getBasePointAliasName();
-                String identity = null;
-                StringBuilder sb = new StringBuilder();
-                for (${keyJavaNative} primaryKeyMap : ls) {
-                    if (sb.length() > 0) { sb.append(")").append(ln()).append("     or ("); }
-#set ($referrerColumnIndex = 0)
-#foreach ($localColumn in $referrer.foreignColumnList)
-#set ($referrerColumn = $referrer.getLocalColumnByForeignColumn($localColumn))
-#if ($referrerColumnIndex > 0)
-                    sb.append(" and ");
-#end
-                    sb.append(aliasName).append(".${referrerColumn.name} = ");
-                    identity = "${referrer.referrerJavaBeansRulePropertyName}${localColumn.javaName}";
-                    sb.append(cb.query().xregisterFreeParameterToThemeList(identity, primaryKeyMap.get("${localColumn.javaName}")));
-#set ($referrerColumnIndex = $referrerColumnIndex + 1)
-#end
-                }
-                sb.insert(0, "((").append("))");
-                cb.getSqlClause().registerWhereClause(sb.toString(), aliasName);
-            }
-            public void qyOdFKAsc(${referrerCBClassName} cb) {
-#foreach ($col in $referrer.localColumnList)
-                cb.query().addOrderBy_${col.javaName}_Asc();
-#end
-            }
-            public void spFKCol(${referrerCBClassName} cb) {
-#foreach ($col in $referrer.localColumnList)
-                cb.specify().column${col.javaName}();
-#end
-            }
-            public List<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb) { return referrerBhv.selectList(cb); }
-            public ${keyJavaNative} getFKVal(${referrerEntityClassName} re) {
-                ${keyJavaNative} foreignKeyMap = new java.util.LinkedHashMap<String, Object>();
-#foreach ($col in $referrer.localColumnList)
-#set ($foreignColumn = $referrer.getForeignColumnByLocalColumn($col))
-                foreignKeyMap.put("${foreignColumn.javaName}", re.get${col.javaName}());
-#end
-                return foreignKeyMap;
-            }
-            public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} le)
-#if ($referrer.isForeignPropertyOptionalEntity())
-            { re.set${referrer.foreignPropertyNameInitCap}(${database.relationOptionalEntitySimpleName}.of(le)); }
-#else
-            { re.set${referrer.foreignPropertyNameInitCap}(le); }
-#end
-            public String getRfPrNm() { return "${referrer.referrerPropertyName}"; }
-        });
-    }
-
-#end
 #end
 #end
     // ===================================================================================
@@ -1904,7 +1785,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      */
     public void insert(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
-        delegateInsert(${myEntityVariableName}, null);
+        delegateInsertNoPK(${myEntityVariableName}, null);
     }
 #end
 #end

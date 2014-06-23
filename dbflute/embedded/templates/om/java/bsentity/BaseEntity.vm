@@ -837,10 +837,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
      */
 #if ($col.needsStringClobHandling())
-    @MappingValueType(keyName = "stringClobType");
+    @MappingValueType(keyName = "stringClobType")
 #end
 #if ($col.needsBytesOidHandling())
-    @MappingValueType(keyName = "bytesOidType");
+    @MappingValueType(keyName = "bytesOidType")
 #end
     public ${col.javaNative} get${col.javaName}() {
 #if ($col.isEntityConvertEmptyStringToNull())

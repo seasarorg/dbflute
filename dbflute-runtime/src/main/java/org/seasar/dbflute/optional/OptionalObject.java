@@ -32,13 +32,13 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
         EMPTY_INSTANCE = new OptionalObject<Object>(null, new OptionalObjectExceptionThrower() {
             public void throwNotFoundException() {
                 String msg = "The empty optional so the value is null.";
-                throw new EntityAlreadyDeletedException(msg);
+                throw new IllegalStateException(msg);
             }
         });
     }
     protected static final OptionalObjectExceptionThrower NOWAY_THROWER = new OptionalObjectExceptionThrower() {
         public void throwNotFoundException() {
-            throw new EntityAlreadyDeletedException("no way");
+            throw new IllegalStateException("no way");
         }
     };
 

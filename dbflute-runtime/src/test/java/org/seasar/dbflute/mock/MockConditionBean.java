@@ -17,8 +17,10 @@ package org.seasar.dbflute.mock;
 
 import java.util.Map;
 
+import org.seasar.dbflute.cbean.AndQuery;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
+import org.seasar.dbflute.cbean.OrQuery;
 import org.seasar.dbflute.cbean.OrderByBean;
 import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.PagingInvoker;
@@ -251,6 +253,12 @@ public class MockConditionBean implements ConditionBean {
 
     public HpSpecifiedColumn invokeSpecifyColumn(String columnNamePath) {
         return null;
+    }
+
+    public void invokeOrScopeQuery(OrQuery<ConditionBean> orQuery) {
+    }
+
+    public void invokeOrScopeQueryAndPart(AndQuery<ConditionBean> andQuery) {
     }
 
     public Map<String, Object> getFreeParameterMap() {

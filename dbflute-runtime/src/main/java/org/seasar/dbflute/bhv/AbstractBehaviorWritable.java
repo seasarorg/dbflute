@@ -968,16 +968,6 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         return invoke(createQueryDeleteCBCommand(cb, option));
     }
 
-    // -----------------------------------------------------
-    //                                           Compound PK
-    //                                           -----------
-    protected int delegateInsertNoPK(Entity entity, InsertOption<? extends ConditionBean> option) {
-        // only filtering for extension is supported (filtering for common columns is unsupported)
-        assertEntityNotNull(entity);
-        filterEntityOfInsert(entity, option);
-        return invoke(createInsertEntityCommand(entity, option));
-    }
-
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================

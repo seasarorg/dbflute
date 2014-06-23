@@ -167,8 +167,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected boolean _onClause;
 
     // -----------------------------------------------------
-    //                                      Parameter Option
-    //                                      ----------------
+    //                                         Parameter Map
+    //                                         -------------
+    /** The map of sub-query condition-query to keep parameters for parameter comment. */
+    protected Map<String, Map<String, ConditionQuery>> _subQueryKeepingMap;
+
+    /** The map of sub-query parameter to keep parameters for parameter comment. */
+    protected Map<String, Map<String, Object>> _subQueryParameterKeepingMap;
+
     /** The map of parameter option for parameter comment. */
     protected Map<String, ParameterOption> _parameterOptionMap;
 
@@ -195,8 +201,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         _baseCB = baseCB;
     }
 
-    protected <CQ extends AbstractConditionQuery> CQ xinitRelCQ(CQ cq, ConditionBean baseCB, String foreignPropertyName,
-            String nestRelationPath) {
+    protected <CQ extends AbstractConditionQuery> CQ xinitRelCQ(CQ cq, ConditionBean baseCB,
+            String foreignPropertyName, String nestRelationPath) {
         cq.xsetBaseCB(_baseCB);
         cq.xsetForeignPropertyName(foreignPropertyName);
         cq.xsetRelationPath(nestRelationPath);
@@ -1810,7 +1816,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         }
         final String methodName = "set" + columnCapPropName + "_" + initCap(ckey);
-        final List<Class<?>> typeList = newArrayList();
+        final List<Class<?>> typeList = newArrayListSized(4);
         if (fromTo) {
             typeList.add(Date.class);
             typeList.add(Date.class);
@@ -1826,7 +1832,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (option != null) {
             typeList.add(option.getClass());
         }
-        final Class<?>[] parameterTypes = typeList.toArray(new Class<?>[typeList.size()]);
+        final List<Class<?>> filteredTypeList = newArrayListSized(typeList.size());
+        for (Class<?> parameterType : typeList) {
+            filteredTypeList.add(xfilterInvokeQueryParameterType(colName, ckey, parameterType));
+        }
+        final Class<?>[] parameterTypes = filteredTypeList.toArray(new Class<?>[filteredTypeList.size()]);
         final Method method = xhelpGettingCQMethod(cq, methodName, parameterTypes);
         if (method == null) {
             throwConditionInvokingSetMethodNotFoundException(colName, ckey, value, option, methodName, parameterTypes);
@@ -1847,11 +1857,23 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             if (option != null) {
                 argList.add(option);
             }
-            xhelpInvokingCQMethod(cq, method, argList.toArray());
+            final List<Object> filteredArgList = newArrayListSized(argList.size());
+            for (Object arg : argList) {
+                filteredArgList.add(xfilterInvokeQueryParameterValue(colName, ckey, arg));
+            }
+            xhelpInvokingCQMethod(cq, method, filteredArgList.toArray());
         } catch (ReflectionFailureException e) {
             throwConditionInvokingSetReflectionFailureException(colName, ckey, value, option, methodName,
                     parameterTypes, e);
         }
+    }
+
+    protected Class<?> xfilterInvokeQueryParameterType(String colName, String ckey, Class<?> parameterType) {
+        return parameterType; // no filter as default (e.g. overridden by Scala to convert to immutable list)
+    }
+
+    protected Object xfilterInvokeQueryParameterValue(String colName, String ckey, Object parameterValue) {
+        return parameterValue; // no filter as default (e.g. overridden by Scala to convert to immutable list)
     }
 
     protected void throwConditionInvokingColumnFindFailureException(String columnFlexibleName, String conditionKeyName,
@@ -1904,6 +1926,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         br.addElement(conditionKeyName);
         br.addItem("conditionValue");
         br.addElement(conditionValue);
+        br.addElement(conditionValue != null ? conditionValue.getClass() : null);
         br.addItem("conditionOption");
         br.addElement(conditionOption);
         if (methodName != null) {
@@ -2461,6 +2484,47 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // ===================================================================================
+    //                                                                    SubQuery Keeping
+    //                                                                    ================
+    @SuppressWarnings("unchecked")
+    protected <CQ extends ConditionQuery> Map<String, CQ> xgetSQueMap(String identity) {
+        return _subQueryKeepingMap != null ? (Map<String, CQ>) _subQueryKeepingMap.get(identity) : null;
+    }
+
+    protected String xkeepSQue(String identity, ConditionQuery subQuery) {
+        if (_subQueryKeepingMap == null) {
+            _subQueryKeepingMap = newLinkedHashMapSized(4);
+        }
+        Map<String, ConditionQuery> sqMap = _subQueryKeepingMap.get(identity);
+        if (sqMap == null) {
+            sqMap = newLinkedHashMapSized(4);
+            _subQueryKeepingMap.put(identity, sqMap);
+        }
+        final String key = "subQueryKey" + (sqMap.size() + 1);
+        sqMap.put(key, subQuery);
+        return identity + "." + key; // [property-name] + [.] + [key]
+    }
+
+    protected Map<String, Object> xgetSQuePmMap(String identity) {
+        return _subQueryParameterKeepingMap != null ? _subQueryParameterKeepingMap.get(identity) : null;
+    }
+
+    protected String xkeepSQuePm(String identity, Object paramValue) {
+        // identity same as condition-query keeping
+        if (_subQueryParameterKeepingMap == null) {
+            _subQueryParameterKeepingMap = newLinkedHashMapSized(4);
+        }
+        Map<String, Object> paramMap = _subQueryParameterKeepingMap.get(identity);
+        if (paramMap == null) {
+            paramMap = newLinkedHashMapSized(4);
+            _subQueryParameterKeepingMap.put(identity, paramMap);
+        }
+        final String key = "subQueryParameterKey" + (paramMap.size() + 1);
+        paramMap.put(key, paramValue);
+        return identity + "Parameter." + key; // [property-name (needs suffix 'Parameter')] + [.] + [key]
+    }
+
+    // ===================================================================================
     //                                                                    Option Parameter
     //                                                                    ================
     public void xregisterParameterOption(ParameterOption option) {
@@ -2537,6 +2601,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected <ELEMENT> ArrayList<ELEMENT> newArrayList() {
         return DfCollectionUtil.newArrayList();
+    }
+
+    protected <ELEMENT> ArrayList<ELEMENT> newArrayListSized(int size) {
+        return DfCollectionUtil.newArrayListSized(size);
     }
 
     protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT... elements) {
