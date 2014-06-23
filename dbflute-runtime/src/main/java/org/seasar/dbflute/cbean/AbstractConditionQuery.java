@@ -167,8 +167,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected boolean _onClause;
 
     // -----------------------------------------------------
-    //                                         Parameter Map
-    //                                         -------------
+    //                                      Relation Keeping
+    //                                      ----------------
+    /** The map of query-relation condition-query to keep parameters for parameter comment. */
+    protected Map<String, ConditionQuery> _queryRelationKeepingMap;
+
     /** The map of sub-query condition-query to keep parameters for parameter comment. */
     protected Map<String, Map<String, ConditionQuery>> _subQueryKeepingMap;
 
@@ -293,6 +296,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      */
     public int xgetNextNestLevel() {
         return _nestLevel + 1;
+    }
+
+    protected int xgetNNLvl() { // for generated source
+        return xgetNextNestLevel();
     }
 
     /**
@@ -492,7 +499,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected abstract Map<String, Object> xfindFixedConditionDynamicParameterMap(String property);
 
-    protected void assertFixedConditionDynamicParameter(String property, Map<String, Object> parameterMap) {
+    protected void xassertFCDP(String property, Map<String, Object> parameterMap) { // assertFixedConditionDynamicParameter()
         final ForeignInfo foreignInfo = xgetLocalDBMeta().findForeignInfo(property);
         xdoAssertFixedConditionDynamicParameter(property, foreignInfo, parameterMap);
     }
@@ -1699,16 +1706,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                       Name Resolver
     //                                                                       =============
     /**
-     * Resolve alias name for join table.
-     * @param relationPath Relation path. (NotNull)
-     * @param nestLevel The nest No of condition query.
-     * @return The resolved name. (NotNull)
-     */
-    protected String resolveJoinAliasName(String relationPath, int nestLevel) {
-        return xgetSqlClause().resolveJoinAliasName(relationPath, nestLevel);
-    }
-
-    /**
      * Resolve relation no.
      * @param localTableName The name of local table. (NotNull)
      * @param foreignPropertyName The property name of foreign relation. (NotNull)
@@ -1722,6 +1719,24 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             nextRelationPath = relationPath + nextRelationPath;
         }
         return nextRelationPath;
+    }
+
+    protected String xresolveNRP(String localTableName, String foreignPropertyName) { // for generated source
+        return resolveNextRelationPath(localTableName, foreignPropertyName);
+    }
+
+    /**
+     * Resolve alias name for join table.
+     * @param relationPath Relation path. (NotNull)
+     * @param nestLevel The nest No of condition query.
+     * @return The resolved name. (NotNull)
+     */
+    protected String resolveJoinAliasName(String relationPath, int nestLevel) {
+        return xgetSqlClause().resolveJoinAliasName(relationPath, nestLevel);
+    }
+
+    protected String xresolveJAN(String relationPath, int nestLevel) { // for generated source
+        return resolveJoinAliasName(relationPath, nestLevel);
     }
 
     // ===================================================================================
@@ -2484,8 +2499,44 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // ===================================================================================
-    //                                                                    SubQuery Keeping
+    //                                                                    Relation Keeping
     //                                                                    ================
+    protected boolean xhasQueRlMap(String prop) {
+        return _queryRelationKeepingMap != null && _queryRelationKeepingMap.containsKey(prop);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <CQ extends ConditionQuery> CQ xgetQueRlMap(String prop) {
+        return _queryRelationKeepingMap != null ? (CQ) _queryRelationKeepingMap.get(prop) : null;
+    }
+
+    protected void xregQueRl(String prop, ConditionQuery cq) {
+        if (_queryRelationKeepingMap == null) {
+            _queryRelationKeepingMap = newLinkedHashMapSized(4);
+        }
+        _queryRelationKeepingMap.put(prop, cq);
+    }
+
+    protected void xregOutJo(String prop) { // should be called after registration
+        if (_queryRelationKeepingMap == null) { // no way, just in case
+            _queryRelationKeepingMap = newLinkedHashMapSized(4);
+        }
+        ConditionQuery cq = _queryRelationKeepingMap.get(prop);
+        if (cq == null) { // no way, just in case
+            String msg = "Not found the condition-query for (Query)Relation: " + prop;
+            throw new IllegalStateException(msg);
+        }
+        final ForeignInfo foreignInfo = xgetLocalDBMeta().findForeignInfo(prop);
+        final Map<ColumnInfo, ColumnInfo> localForeignColMap = foreignInfo.getLocalForeignColumnInfoMap();
+        final Map<String, String> joinOnMap = newLinkedHashMapSized(localForeignColMap.size());
+        for (Entry<ColumnInfo, ColumnInfo> entry : localForeignColMap.entrySet()) {
+            final ColumnInfo localCol = entry.getKey();
+            final ColumnInfo foreignCol = entry.getValue();
+            joinOnMap.put(localCol.getColumnDbName(), foreignCol.getColumnDbName());
+        }
+        registerOuterJoin(cq, joinOnMap, prop);
+    }
+
     @SuppressWarnings("unchecked")
     protected <CQ extends ConditionQuery> Map<String, CQ> xgetSQueMap(String identity) {
         return _subQueryKeepingMap != null ? (Map<String, CQ>) _subQueryKeepingMap.get(identity) : null;
