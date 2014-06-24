@@ -329,17 +329,19 @@ public abstract class AbstractDBMeta implements DBMeta {
         final String methodName = buildPropertyGetterMethodName(propertyName);
         final Method method = doFindPropertyMethod(beanType, methodName, new Class<?>[] {});
         if (method == null) {
-            String msg = "Not found the method by the name: " + methodName;
+            String msg = "Not found the read method by the name:";
+            msg = msg + " " + beanType.getName() + "#" + methodName + "()";
             throw new IllegalStateException(msg);
         }
         return method;
     }
 
-    protected Method findPropertyWriteMethod(Class<?> beanType, String propertyName, Class<?> propertyType) {
+    protected Method findPropertyWriteMethod(Class<?> beanType, String propertyName, Class<?> propertyAccessType) {
         final String methodName = buildPropertySetterMethodName(propertyName);
-        final Method method = doFindPropertyMethod(beanType, methodName, new Class<?>[] { propertyType });
+        final Method method = doFindPropertyMethod(beanType, methodName, new Class<?>[] { propertyAccessType });
         if (method == null) {
-            String msg = "Not found the method by the name and type: " + methodName + ", " + propertyType;
+            String msg = "Not found the write method by the name and type:";
+            msg = msg + " " + beanType.getName() + "#" + methodName + "(" + propertyAccessType.getName() + ")";
             throw new IllegalStateException(msg);
         }
         return method;

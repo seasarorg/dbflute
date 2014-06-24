@@ -397,6 +397,9 @@ public class DfReflectionUtil {
                 throw new IllegalStateException(msg, e);
             } catch (NoSuchMethodException continued) {
                 continue;
+            } catch (NoClassDefFoundError e) {
+                String msg = "No class definition: specified=" + clazz.getName() + "#" + methodName + "()";
+                throw new IllegalStateException(msg, e);
             }
             final int modifier = declaredMethod.getModifiers();
             if (isOutOfTargetForPublic(visibilityType, modifier)) {
