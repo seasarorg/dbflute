@@ -16,9 +16,9 @@
 package org.seasar.dbflute.bhv.core;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.DBDef;
@@ -83,8 +83,11 @@ public class BehaviorCommandInvoker {
     // -----------------------------------------------------
     //                                       Execution Cache
     //                                       ---------------
-    /** The map of SQL execution. (dispose target, synchronized manually) */
-    protected final Map<String, SqlExecution> _executionMap = newHashMap();
+    /** The map of SQL execution. (dispose target, synchronized manually as transaction) */
+    protected final Map<String, SqlExecution> _executionMap = newConcurrentHashMap();
+
+    /** The lock object to synchronize the execution map for transaction. (NotNull) */
+    protected final Object _executionCacheLock = new Object();
 
     // -----------------------------------------------------
     //                                    Disposable Process
@@ -106,7 +109,7 @@ public class BehaviorCommandInvoker {
     //                                                                     ===============
     public void clearExecutionCache() {
         // basically should be called only for special case (e.g. HotDeploy)
-        synchronized (_executionMap) {
+        synchronized (_executionCacheLock) {
             _executionMap.clear();
         }
     }
@@ -389,7 +392,7 @@ public class BehaviorCommandInvoker {
      */
     protected SqlExecution getOrCreateSqlExecution(String key, SqlExecutionCreator executionCreator) {
         SqlExecution execution = null;
-        synchronized (_executionMap) {
+        synchronized (_executionCacheLock) {
             execution = getSqlExecution(key);
             if (execution != null) {
                 // previous thread might have initialized
@@ -760,8 +763,8 @@ public class BehaviorCommandInvoker {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
-        return new HashMap<KEY, VALUE>();
+    protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
+        return new ConcurrentHashMap<KEY, VALUE>();
     }
 
     protected String ln() {

@@ -15,9 +15,9 @@
  */
 package org.seasar.dbflute.s2dao.valuetype;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.jdbc.ValueType;
@@ -106,8 +106,11 @@ public class TnValueTypes {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The map of plain value type keyed by DB definition object. (synchronized manually) */
-    protected static final Map<DBDef, TnPlainValueTypes> _valueTypesMap = new HashMap<DBDef, TnPlainValueTypes>();
+    /** The map of plain value type keyed by DB definition object. (synchronized manually as transaction) */
+    protected static final Map<DBDef, TnPlainValueTypes> _valueTypesMap = new ConcurrentHashMap<DBDef, TnPlainValueTypes>();
+
+    /** The lock object to synchronize this static world. (NotNull) */
+    protected static final Object _staticWorldLock = new Object();
 
     static {
         initialize();
@@ -150,7 +153,7 @@ public class TnValueTypes {
         if (valueTypes != null) {
             return valueTypes;
         }
-        synchronized (_valueTypesMap) {
+        synchronized (_staticWorldLock) {
             valueTypes = _valueTypesMap.get(dbdef);
             if (valueTypes != null) {
                 // previous thread might have initialized

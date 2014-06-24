@@ -49,7 +49,6 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -72,8 +71,8 @@ public class TnPlainValueTypes {
     protected final Map<Class<?>, ValueType> _basicInterfaceValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
     protected final Map<String, ValueType> _pluginValueTypeMap = new ConcurrentHashMap<String, ValueType>();
 
-    /** The map of value type keyed by JDBC definition type. (synchronized manually) */
-    protected final Map<Integer, ValueType> _dynamicObjectValueTypeMap = new HashMap<Integer, ValueType>();
+    /** The map of value type keyed by JDBC definition type. (synchronized manually as transaction) */
+    protected final Map<Integer, ValueType> _dynamicObjectValueTypeMap = new ConcurrentHashMap<Integer, ValueType>();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -258,7 +257,7 @@ public class TnPlainValueTypes {
             if (valueType != null) {
                 return valueType;
             }
-            synchronized (_dynamicObjectValueTypeMap) {
+            synchronized (this) { // lock this instance because also used in remove(), ...
                 valueType = _dynamicObjectValueTypeMap.get(jdbcDefType);
                 if (valueType != null) {
                     // previous thread might have initialized

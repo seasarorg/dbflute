@@ -16,8 +16,8 @@
 package org.seasar.dbflute.bhv.core.supplement;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
@@ -39,8 +39,11 @@ public class SequenceCacheHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The map of sequence cache keyed by unique strings of the sequence. (synchronized manually) */
-    protected final Map<String, SequenceCache> _sequenceCacheMap = newHashMap();
+    /** The map of sequence cache keyed by unique strings of the sequence. (synchronized manually as transaction) */
+    protected final Map<String, SequenceCache> _sequenceCacheMap = newConcurrentHashMap();
+
+    /** The lock object to synchronize this sequence cache for transaction. (NotNull) */
+    protected final Object _sequenceCacheLock = new Object();
 
     protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
     protected boolean _internalDebug;
@@ -67,7 +70,7 @@ public class SequenceCacheHandler {
         if (sequenceCache != null) {
             return sequenceCache;
         }
-        synchronized (_sequenceCacheMap) {
+        synchronized (_sequenceCacheLock) {
             sequenceCache = getSequenceCache(key);
             if (sequenceCache != null) {
                 // previous thread might have initialized
@@ -264,8 +267,8 @@ public class SequenceCacheHandler {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
-        return new HashMap<KEY, VALUE>();
+    protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
+        return new ConcurrentHashMap<KEY, VALUE>();
     }
 
     protected String ln() {
