@@ -94,6 +94,8 @@ public class DfLanguageImplStyleScala implements DfLanguageImplStyle {
             exp = variable + ".map(int2Integer(_)).orNull";
         } else if (immutableJavaNative.equals(DfLanguageTypeMappingScala.SCALA_NATIVE_LONG)) {
             exp = variable + ".map(long2Long(_)).orNull";
+        } else if (immutableJavaNative.equals(DfLanguageTypeMappingScala.SCALA_NATIVE_BOOLEAN)) {
+            exp = variable + ".map(boolean2Boolean(_)).orNull";
         } else {
             exp = variable + ".orNull";
         }

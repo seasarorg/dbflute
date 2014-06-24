@@ -1579,13 +1579,18 @@ public class Column {
 
     public String getJavaNativeTypeLiteral() {
         final String javaNative = getJavaNative();
-        final DfLanguageGrammar grammarInfo = getLanguageDependency().getLanguageGrammar();
+        final DfLanguageGrammar grammar = getLanguageDependency().getLanguageGrammar();
         final String pureNative = Srl.substringFirstFront(javaNative, "<"); // for example, List<String>
-        return grammarInfo.buildClassTypeLiteral(pureNative);
+        return grammar.buildClassTypeLiteral(pureNative);
     }
 
     public String getPropertyAccessTypeLiteral() {
         return "null"; // means same as java native type for now
+    }
+
+    public String getJavaNativeVariableDefaultValue() { // not immutable type
+        final DfLanguageGrammar grammar = getLanguageDependency().getLanguageGrammar();
+        return grammar.buildJavaNativeDefaultValue(getJavaNative());
     }
 
     public String getJavaNativeRemovedPackage() { // for SchemaHTML

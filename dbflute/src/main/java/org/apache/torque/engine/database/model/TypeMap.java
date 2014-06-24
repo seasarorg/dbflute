@@ -157,8 +157,6 @@ import org.seasar.dbflute.util.Srl;
  * LONGVARCHAR   | java.lang.String     | String        |
  * NUMERIC       | java.math.BigDecimal | decimal?      |
  * DECIMAL       | java.math.BigDecimal | decimal?      |
- * BIT           | java.lang.Boolean    | bool?         |
- * BOOLEAN       | java.lang.Boolean    | bool?         |
  * TINYINT       | java.lang.Integer    | int?          |
  * SMALLINT      | java.lang.Integer    | int?          |
  * INTEGER       | java.lang.Integer    | int?          |
@@ -166,12 +164,15 @@ import org.seasar.dbflute.util.Srl;
  * REAL          | java.math.BigDecimal | decimal?      |
  * FLOAT         | java.math.BigDecimal | decimal?      |
  * DOUBLE        | java.math.BigDecimal | decimal?      |
- * BINARY        | byte[]               | byte[]        |
- * VARBINARY     | byte[]               | byte[]        |
- * LONGVARBINARY | byte[]               | byte[]        |
  * DATE          | java.util.Date       | DateTime?     |
  * TIME          | java.sql.Time        | DateTime?     |
  * TIMESTAMP     | java.sql.Timestamp   | DateTime?     |
+ * BIT           | java.lang.Boolean    | bool?         |
+ * BOOLEAN       | java.lang.Boolean    | bool?         |
+ * BINARY        | byte[]               | byte[]        |
+ * VARBINARY     | byte[]               | byte[]        |
+ * LONGVARBINARY | byte[]               | byte[]        |
+ * BLOB          | byte[]               | byte[]        |
  * ARRAY         | *Unsupported         | *Unsupported  |
  * UUID          | java.util.UUID       | *Unsupported  |
  * ------------------------------------------------------
@@ -200,8 +201,6 @@ public class TypeMap {
     public static final String CLOB = "CLOB";
     public static final String NUMERIC = "NUMERIC";
     public static final String DECIMAL = "DECIMAL";
-    public static final String BIT = "BIT";
-    public static final String BOOLEAN = "BOOLEAN";
     public static final String TINYINT = "TINYINT";
     public static final String SMALLINT = "SMALLINT";
     public static final String INTEGER = "INTEGER";
@@ -209,13 +208,15 @@ public class TypeMap {
     public static final String REAL = "REAL";
     public static final String FLOAT = "FLOAT";
     public static final String DOUBLE = "DOUBLE";
+    public static final String DATE = "DATE";
+    public static final String TIME = "TIME";
+    public static final String TIMESTAMP = "TIMESTAMP";
+    public static final String BIT = "BIT";
+    public static final String BOOLEAN = "BOOLEAN";
     public static final String BINARY = "BINARY";
     public static final String VARBINARY = "VARBINARY";
     public static final String LONGVARBINARY = "LONGVARBINARY";
     public static final String BLOB = "BLOB";
-    public static final String DATE = "DATE";
-    public static final String TIME = "TIME";
-    public static final String TIMESTAMP = "TIMESTAMP";
     public static final String ARRAY = "ARRAY";
     public static final String OTHER = "OTHER";
 
@@ -234,8 +235,6 @@ public class TypeMap {
     public static final String CLOB_NATIVE_TYPE = "String";
     public static final String NUMERIC_NATIVE_TYPE = "java.math.BigDecimal";
     public static final String DECIMAL_NATIVE_TYPE = "java.math.BigDecimal";
-    public static final String BIT_NATIVE_TYPE = "Boolean";
-    public static final String BOOLEAN_NATIVE_TYPE = "Boolean";
     public static final String TINYINT_NATIVE_TYPE = "Integer";
     public static final String SMALLINT_NATIVE_TYPE = "Integer";
     public static final String INTEGER_NATIVE_TYPE = "Integer";
@@ -243,13 +242,15 @@ public class TypeMap {
     public static final String REAL_NATIVE_TYPE = "java.math.BigDecimal";
     public static final String FLOAT_NATIVE_TYPE = "java.math.BigDecimal";
     public static final String DOUBLE_NATIVE_TYPE = "java.math.BigDecimal";
+    public static final String DATE_NATIVE_TYPE = "java.util.Date";
+    public static final String TIME_NATIVE_TYPE = "java.sql.Time";
+    public static final String TIMESTAMP_NATIVE_TYPE = "java.sql.Timestamp";
+    public static final String BIT_NATIVE_TYPE = "Boolean";
+    public static final String BOOLEAN_NATIVE_TYPE = "Boolean";
     public static final String BINARY_NATIVE_TYPE = "byte[]";
     public static final String VARBINARY_NATIVE_TYPE = "byte[]";
     public static final String LONGVARBINARY_NATIVE_TYPE = "byte[]";
     public static final String BLOB_NATIVE_TYPE = "byte[]";
-    public static final String DATE_NATIVE_TYPE = "java.util.Date";
-    public static final String TIME_NATIVE_TYPE = "java.sql.Time";
-    public static final String TIMESTAMP_NATIVE_TYPE = "java.sql.Timestamp";
     public static final String ARRAY_NATIVE_TYPE = "String";
     public static final String UUID_NATIVE_TYPE = "java.util.UUID";
     public static final String OTHER_NATIVE_TYPE = "Object";
@@ -314,8 +315,6 @@ public class TypeMap {
         _jdbcTypeToJavaNativeMap.put(CLOB, initializeJavaNative(CLOB, CLOB_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(NUMERIC, initializeJavaNative(NUMERIC, getDefaultNumericJavaNativeType()));
         _jdbcTypeToJavaNativeMap.put(DECIMAL, initializeJavaNative(DECIMAL, getDefaultDecimalJavaNativeType()));
-        _jdbcTypeToJavaNativeMap.put(BIT, initializeJavaNative(BIT, BIT_NATIVE_TYPE));
-        _jdbcTypeToJavaNativeMap.put(BOOLEAN, initializeJavaNative(BOOLEAN, BOOLEAN_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(TINYINT, initializeJavaNative(TINYINT, TINYINT_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(SMALLINT, initializeJavaNative(SMALLINT, SMALLINT_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(INTEGER, initializeJavaNative(INTEGER, INTEGER_NATIVE_TYPE));
@@ -323,13 +322,15 @@ public class TypeMap {
         _jdbcTypeToJavaNativeMap.put(REAL, initializeJavaNative(REAL, REAL_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(FLOAT, initializeJavaNative(FLOAT, FLOAT_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(DOUBLE, initializeJavaNative(DOUBLE, DOUBLE_NATIVE_TYPE));
+        _jdbcTypeToJavaNativeMap.put(DATE, initializeJavaNative(DATE, DATE_NATIVE_TYPE));
+        _jdbcTypeToJavaNativeMap.put(TIME, initializeJavaNative(TIME, TIME_NATIVE_TYPE));
+        _jdbcTypeToJavaNativeMap.put(TIMESTAMP, initializeJavaNative(TIMESTAMP, TIMESTAMP_NATIVE_TYPE));
+        _jdbcTypeToJavaNativeMap.put(BIT, initializeJavaNative(BIT, BIT_NATIVE_TYPE));
+        _jdbcTypeToJavaNativeMap.put(BOOLEAN, initializeJavaNative(BOOLEAN, BOOLEAN_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(BINARY, initializeJavaNative(BINARY, BINARY_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(VARBINARY, initializeJavaNative(VARBINARY, VARBINARY_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(LONGVARBINARY, initializeJavaNative(LONGVARBINARY, LONGVARBINARY_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(BLOB, initializeJavaNative(BLOB, BLOB_NATIVE_TYPE));
-        _jdbcTypeToJavaNativeMap.put(DATE, initializeJavaNative(DATE, DATE_NATIVE_TYPE));
-        _jdbcTypeToJavaNativeMap.put(TIME, initializeJavaNative(TIME, TIME_NATIVE_TYPE));
-        _jdbcTypeToJavaNativeMap.put(TIMESTAMP, initializeJavaNative(TIMESTAMP, TIMESTAMP_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(ARRAY, initializeJavaNative(ARRAY, ARRAY_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(UUID, initializeJavaNative(UUID, UUID_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(OTHER, initializeJavaNative(OTHER, OTHER_NATIVE_TYPE));
@@ -352,8 +353,6 @@ public class TypeMap {
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.CLOB), CLOB);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.NUMERIC), NUMERIC);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.DECIMAL), DECIMAL);
-        _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.BIT), BIT);
-        _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.BOOLEAN), BOOLEAN);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.TINYINT), TINYINT);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.SMALLINT), SMALLINT);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.INTEGER), INTEGER);
@@ -361,13 +360,15 @@ public class TypeMap {
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.REAL), REAL);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.FLOAT), FLOAT);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.DOUBLE), DOUBLE);
+        _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.BIT), BIT);
+        _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.BOOLEAN), BOOLEAN);
+        _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.DATE), DATE);
+        _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.TIME), TIME);
+        _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.TIMESTAMP), TIMESTAMP);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.BINARY), BINARY);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.VARBINARY), VARBINARY);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.LONGVARBINARY), LONGVARBINARY);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.BLOB), BLOB);
-        _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.DATE), DATE);
-        _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.TIME), TIME);
-        _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.TIMESTAMP), TIMESTAMP);
         // [UUID Headache]: UUID has not been supported yet on JDBC.
         //_jdbcDefValueToJdbcTypeMap.put(new Integer(Types.UUID), UUID);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.ARRAY), ARRAY);

@@ -177,6 +177,10 @@ public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
         return "newArrayList(" + sb.toString() + ")";
     }
 
+    public String buildJavaNativeDefaultValue(String javaNative) {
+        return "null";
+    }
+
     // ===================================================================================
     //                                                                    Small Adjustment 
     //                                                                    ================

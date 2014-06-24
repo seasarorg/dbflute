@@ -15,8 +15,11 @@
  */
 package org.seasar.dbflute.logic.generate.language.typemapping;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -26,17 +29,41 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    protected static final Map<String, String> _jdbcToJavaNativeMap;
+    static {
+        final Map<String, String> map = DfCollectionUtil.newLinkedHashMap();
+        map.put("BINARY", "Array[Byte]");
+        map.put("VARBINARY", "Array[Byte]");
+        map.put("LONGVARBINARY", "Array[Byte]");
+        map.put("BLOB", "Array[Byte]");
+        _jdbcToJavaNativeMap = map;
+    }
     public static final String SCALA_NATIVE_INTEGER = "Int";
     public static final String SCALA_NATIVE_LONG = "Long";
     public static final String SCALA_NATIVE_BIGINTEGER = "scala.math.BigInt";
     public static final String SCALA_NATIVE_BIGDECIMAL = "scala.math.BigDecimal";
+    public static final String SCALA_NATIVE_BOOLEAN = "Boolean";
+    // DB-able entity same as Java 
+    //protected static final List<String> _numberList;
+    //static {
+    //    _numberList = newArrayList("Byte", "Short", "Integer", "Long", "Float", "Double", "BigDecimal", "BigInteger");
+    //}
+    protected static final List<String> _binaryList = newArrayList("Array[Byte]");
+
+    protected static <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) {
+        return DfCollectionUtil.newArrayList(elements);
+    }
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final DfLanguageTypeMapping _mappingJava = new DfLanguageTypeMappingJava();
 
     // ===================================================================================
     //                                                                        Type Mapping
     //                                                                        ============
     public Map<String, String> getJdbcToJavaNativeMap() {
-        return _mappingJava.getJdbcToJavaNativeMap();
+        return _jdbcToJavaNativeMap;
     }
 
     // ===================================================================================
@@ -59,7 +86,7 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
     }
 
     public List<String> getBinaryList() {
-        return _mappingJava.getBinaryList();
+        return _binaryList;
     }
 
     // ===================================================================================
@@ -103,6 +130,8 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
             defaultValue = "0";
         } else if (SCALA_NATIVE_BIGDECIMAL.equals(immutableJavaNative)) {
             defaultValue = "0";
+        } else if (SCALA_NATIVE_BOOLEAN.equals(immutableJavaNative)) {
+            defaultValue = "false";
         } else {
             defaultValue = "null";
         }

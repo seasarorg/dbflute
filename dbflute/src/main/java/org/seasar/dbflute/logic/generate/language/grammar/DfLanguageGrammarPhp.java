@@ -140,6 +140,10 @@ public class DfLanguageGrammarPhp implements DfLanguageGrammar {
         throw new UnsupportedOperationException("Unsupported at Php");
     }
 
+    public String buildJavaNativeDefaultValue(String javaNative) {
+        return "null";
+    }
+
     // ===================================================================================
     //                                                                    Small Adjustment 
     //                                                                    ================

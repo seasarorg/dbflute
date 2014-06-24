@@ -194,6 +194,12 @@ public interface DfLanguageGrammar {
      */
     String buildOneLinerListNewBackStage(List<String> elementList);
 
+    /**
+     * @param javaNative The type of java native. (NotNull)
+     * @return The expression of default value. (NotNull)
+     */
+    String buildJavaNativeDefaultValue(String javaNative);
+
     // ===================================================================================
     //                                                                    Small Adjustment 
     //                                                                    ================

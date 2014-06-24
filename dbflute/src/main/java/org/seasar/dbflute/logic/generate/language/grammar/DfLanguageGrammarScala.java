@@ -155,6 +155,10 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
         return _grammarJava.buildOneLinerListNewBackStage(elementList);
     }
 
+    public String buildJavaNativeDefaultValue(String javaNative) { // not immutable type
+        return "Boolean".equals(javaNative) ? "false" : "null";
+    }
+
     // ===================================================================================
     //                                                                    Small Adjustment 
     //                                                                    ================
