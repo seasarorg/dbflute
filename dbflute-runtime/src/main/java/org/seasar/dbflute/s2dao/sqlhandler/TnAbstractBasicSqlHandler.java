@@ -34,7 +34,10 @@ import org.seasar.dbflute.bhv.core.SqlFireReadyInfo;
 import org.seasar.dbflute.bhv.core.SqlFireResultInfo;
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
 import org.seasar.dbflute.exception.handler.SQLExceptionResource;
+import org.seasar.dbflute.jdbc.DataSourceHandler;
 import org.seasar.dbflute.jdbc.ExecutionTimeInfo;
+import org.seasar.dbflute.jdbc.HandlingDataSourceWrapper;
+import org.seasar.dbflute.jdbc.NotClosingConnectionWrapper;
 import org.seasar.dbflute.jdbc.SqlLogHandler;
 import org.seasar.dbflute.jdbc.SqlLogInfo;
 import org.seasar.dbflute.jdbc.SqlLogInfo.SqlLogDisplaySqlBuilder;
@@ -402,7 +405,7 @@ public abstract class TnAbstractBasicSqlHandler {
      * Get the database connection from data source. <br />
      * getting connection for SQL executions is only here. <br />
      * (for meta data is at TnBeanMetaDataFactoryImpl)
-     * @return The instance of connection. (NotNull)
+     * @return The new-created or inherited instance of connection. (NotNull)
      */
     protected Connection getConnection() {
         try {
@@ -410,7 +413,8 @@ public abstract class TnAbstractBasicSqlHandler {
             if (handler != null) {
                 return handler.getConnection(_dataSource);
             }
-            return _dataSource.getConnection();
+            final Connection conn = _dataSource.getConnection();
+            return conn;
         } catch (SQLException e) {
             final SQLExceptionResource resource = createSQLExceptionResource();
             resource.setNotice("Failed to get database connection.");
@@ -427,6 +431,10 @@ public abstract class TnAbstractBasicSqlHandler {
         return ManualThreadDataSourceHandler.getDataSourceHandler();
     }
 
+    /**
+     * @param conn The instance of connection for the statement. (NotNull)
+     * @return The new-created prepared statement. (NotNull)
+     */
     protected PreparedStatement prepareStatement(Connection conn) {
         if (_sql == null) {
             throw new IllegalStateException("The SQL should not be null.");
@@ -434,6 +442,10 @@ public abstract class TnAbstractBasicSqlHandler {
         return _statementFactory.createPreparedStatement(conn, _sql);
     }
 
+    /**
+     * @param conn The instance of connection for the statement. (NotNull)
+     * @return The new-created call-able statement. (NotNull)
+     */
     protected CallableStatement prepareCall(final Connection conn) {
         if (_sql == null) {
             throw new IllegalStateException("The SQL should not be null.");
@@ -441,15 +453,29 @@ public abstract class TnAbstractBasicSqlHandler {
         return _statementFactory.createCallableStatement(conn, _sql);
     }
 
+    /**
+     * Create the data source (wrapper) to inherit connection.
+     * @param conn The instance of connection to be wrapped. (NotNull)
+     * @return The new-created wrapper for data source handling. (NotNull)
+     */
+    protected HandlingDataSourceWrapper createInheritedConnectionDataSource(final Connection conn) {
+        return new HandlingDataSourceWrapper(_dataSource, new DataSourceHandler() {
+            public Connection getConnection(DataSource dataSource) throws SQLException {
+                return new NotClosingConnectionWrapper(conn); // not keep actual if closed (is default)
+            }
+        });
+    }
+
     // -----------------------------------------------------
     //                                             Execution
     //                                             ---------
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
     // four super stars:
     // o executeQuery()
     // o executeUpdate()
     // o executeBatch()
     // o executeProcedure()
-
+    // _/_/_/_/_/_/_/_/_/_/
     protected ResultSet executeQuery(PreparedStatement ps) throws SQLException {
         final boolean saveMillis = isSaveMillis();
         if (saveMillis) {

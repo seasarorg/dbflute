@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.s2dao.sqlhandler;
 
+import java.sql.Connection;
+
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.jdbc.StatementFactory;
@@ -49,19 +51,19 @@ public class TnBatchInsertHandler extends TnAbstractBatchHandler {
     }
 
     @Override
-    protected void processBefore(Object beanList) {
-        super.processBefore(beanList);
+    protected void processBefore(Connection conn, Object beanList) {
+        super.processBefore(conn, beanList);
         if (isPrimaryKeyIdentityDisabled()) {
-            disableIdentityGeneration();
+            disableIdentityGeneration(createInheritedConnectionDataSource(conn));
         }
     }
 
     @Override
-    protected void processFinally(Object beanList, RuntimeException sqlEx) {
-        super.processFinally(beanList, sqlEx);
+    protected void processFinally(Connection conn, Object beanList, RuntimeException sqlEx) {
+        super.processFinally(conn, beanList, sqlEx);
         if (isPrimaryKeyIdentityDisabled()) {
             try {
-                enableIdentityGeneration();
+                enableIdentityGeneration(createInheritedConnectionDataSource(conn));
             } catch (RuntimeException e) {
                 if (sqlEx == null) {
                     throw e;

@@ -97,7 +97,7 @@ public class ManualThreadDataSourceHandler implements DataSourceHandler {
         }
         final Connection actualConnection = actualDs.getConnection();
         _connectionWrapper = new NotClosingConnectionWrapper(actualConnection);
-        _connectionWrapper.keepActualIfClosed();
+        _connectionWrapper.keepActualIfClosed(); // to use the connection until handler's close()
         return _connectionWrapper;
     }
 

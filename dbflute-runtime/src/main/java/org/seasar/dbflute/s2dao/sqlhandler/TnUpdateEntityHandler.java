@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.s2dao.sqlhandler;
 
+import java.sql.Connection;
+
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.jdbc.StatementFactory;
@@ -44,7 +46,7 @@ public class TnUpdateEntityHandler extends TnAbstractEntityHandler {
     }
 
     @Override
-    protected void processSuccess(Object bean, int ret) {
+    protected void processSuccess(Connection conn, Object bean, int ret) {
         updateVersionNoIfNeed(bean);
         updateTimestampIfNeed(bean);
     }

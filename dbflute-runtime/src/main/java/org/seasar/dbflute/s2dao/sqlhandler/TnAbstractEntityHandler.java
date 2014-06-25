@@ -17,8 +17,6 @@ package org.seasar.dbflute.s2dao.sqlhandler;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,21 +24,17 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.DeleteOption;
 import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.dbway.WayOfSQLServer;
-import org.seasar.dbflute.dbway.WayOfSybase;
 import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
-import org.seasar.dbflute.exception.handler.SQLExceptionResource;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
+import org.seasar.dbflute.s2dao.identity.TnIdentityGenerationHandler;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -92,7 +86,7 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
     }
 
     protected int execute(Connection conn, Object bean) {
-        processBefore(bean);
+        processBefore(conn, bean);
         setupBindVariables(bean);
         logSql(_bindVariables, getArgTypes(_bindVariables));
         final PreparedStatement ps = prepareStatement(conn);
@@ -108,24 +102,24 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
             throw e;
         } finally {
             close(ps);
-            processFinally(bean, sqlEx);
+            processFinally(conn, bean, sqlEx);
         }
         // a value of exclusive control column should be synchronized
         // after handling optimistic lock
-        processSuccess(bean, ret);
+        processSuccess(conn, bean, ret);
         return ret;
     }
 
     // ===================================================================================
     //                                                                   Extension Process
     //                                                                   =================
-    protected void processBefore(Object bean) {
+    protected void processBefore(Connection conn, Object bean) {
     }
 
-    protected void processFinally(Object bean, RuntimeException sqlEx) {
+    protected void processFinally(Connection conn, Object bean, RuntimeException sqlEx) {
     }
 
-    protected void processSuccess(Object bean, int ret) {
+    protected void processSuccess(Connection conn, Object bean, int ret) {
     }
 
     // ===================================================================================
@@ -305,118 +299,35 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
     // ===================================================================================
     //                                                                            Identity
     //                                                                            ========
-    protected void disableIdentityGeneration() {
+    protected void disableIdentityGeneration(DataSource dataSource) {
         final String tableDbName = _beanMetaData.getTableName();
-        delegateDisableIdentityGeneration(tableDbName, _dataSource, _statementFactory);
+        delegateDisableIdentityGeneration(tableDbName, dataSource, _statementFactory);
     }
 
-    protected void enableIdentityGeneration() {
+    protected void enableIdentityGeneration(DataSource dataSource) {
         final String tableDbName = _beanMetaData.getTableName();
-        delegateEnableIdentityGeneration(tableDbName, _dataSource, _statementFactory);
+        delegateEnableIdentityGeneration(tableDbName, dataSource, _statementFactory);
     }
 
     protected boolean isPrimaryKeyIdentityDisabled() {
         return _insertOption != null && _insertOption.isPrimaryKeyIdentityDisabled();
     }
 
-    // "public static" for recycle
+    // "public static" for recycle, in an act of desperation
     public static void delegateDisableIdentityGeneration(String tableDbName, DataSource dataSource,
             StatementFactory statementFactory) {
-        final TnIdentityGenerationHandler handler = new TnIdentityGenerationHandler();
+        final TnIdentityGenerationHandler handler = newIdentityGenerationHandler();
         handler.disableIdentityGeneration(tableDbName, dataSource, statementFactory);
     }
 
     public static void delegateEnableIdentityGeneration(String tableDbName, DataSource dataSource,
             StatementFactory statementFactory) {
-        final TnIdentityGenerationHandler handler = new TnIdentityGenerationHandler();
+        final TnIdentityGenerationHandler handler = newIdentityGenerationHandler();
         handler.enableIdentityGeneration(tableDbName, dataSource, statementFactory);
     }
 
-    protected static class TnIdentityGenerationHandler {
-
-        public void disableIdentityGeneration(String tableDbName, DataSource dataSource,
-                StatementFactory statementFactory) {
-            if (isDatabaseSQLServer()) {
-                final String tableSqlName = findDBMeta(tableDbName).getTableSqlName().toString();
-                final String disableSql = getWayOfSQLServer().buildIdentityDisableSql(tableSqlName);
-                doExecuteIdentityAdjustment(disableSql, dataSource, statementFactory);
-            } else if (isDatabaseSybase()) {
-                final String tableSqlName = findDBMeta(tableDbName).getTableSqlName().toString();
-                final String disableSql = getWayOfSybase().buildIdentityDisableSql(tableSqlName);
-                doExecuteIdentityAdjustment(disableSql, dataSource, statementFactory);
-            }
-        }
-
-        public void enableIdentityGeneration(String tableDbName, DataSource dataSource,
-                StatementFactory statementFactory) {
-            if (isDatabaseSQLServer()) {
-                final String tableSqlName = findDBMeta(tableDbName).getTableSqlName().toString();
-                final String enableSql = getWayOfSQLServer().buildIdentityEnableSql(tableSqlName);
-                doExecuteIdentityAdjustment(enableSql, dataSource, statementFactory);
-            } else if (isDatabaseSybase()) {
-                final String tableSqlName = findDBMeta(tableDbName).getTableSqlName().toString();
-                final String enableSql = getWayOfSybase().buildIdentityEnableSql(tableSqlName);
-                doExecuteIdentityAdjustment(enableSql, dataSource, statementFactory);
-            }
-        }
-
-        protected DBMeta findDBMeta(String tableDbName) {
-            return ResourceContext.dbmetaProvider().provideDBMeta(tableDbName);
-        }
-
-        protected boolean isDatabaseSQLServer() {
-            return ResourceContext.isCurrentDBDef(DBDef.SQLServer);
-        }
-
-        protected boolean isDatabaseSybase() {
-            return ResourceContext.isCurrentDBDef(DBDef.Sybase);
-        }
-
-        protected WayOfSQLServer getWayOfSQLServer() {
-            return (WayOfSQLServer) ResourceContext.currentDBDef().dbway();
-        }
-
-        protected WayOfSybase getWayOfSybase() {
-            return (WayOfSybase) ResourceContext.currentDBDef().dbway();
-        }
-
-        protected void doExecuteIdentityAdjustment(String sql, DataSource dataSource, StatementFactory statementFactory) {
-            final TnIdentityAdjustmentSqlHandler handler = createIdentityAdjustmentSqlHandler(sql, dataSource,
-                    statementFactory);
-            handler.execute(new Object[] {}); // SQL for identity adjustment does not have a bind-variable
-        }
-
-        protected TnIdentityAdjustmentSqlHandler createIdentityAdjustmentSqlHandler(String sql, DataSource dataSource,
-                StatementFactory statementFactory) {
-            return new TnIdentityAdjustmentSqlHandler(dataSource, statementFactory, sql);
-        }
-    }
-
-    protected static class TnIdentityAdjustmentSqlHandler extends TnBasicUpdateHandler {
-
-        public TnIdentityAdjustmentSqlHandler(DataSource dataSource, StatementFactory statementFactory, String sql) {
-            super(dataSource, statementFactory, sql);
-        }
-
-        @Override
-        protected Object doExecute(Connection conn, Object[] args, Class<?>[] argTypes) {
-            logSql(args, argTypes);
-            Statement st = null;
-            try {
-                // PreparedStatement is not used here
-                // because SQLServer do not work by PreparedStatement
-                // but it do work well by Statement
-                st = conn.createStatement();
-                return st.executeUpdate(_sql);
-            } catch (SQLException e) {
-                final SQLExceptionResource resource = createSQLExceptionResource();
-                resource.setNotice("Failed to execute the SQL to adjust identity.");
-                handleSQLException(e, resource);
-                return 0; // unreachable
-            } finally {
-                close(st);
-            }
-        };
+    protected static TnIdentityGenerationHandler newIdentityGenerationHandler() {
+        return new TnIdentityGenerationHandler();
     }
 
     // ===================================================================================
@@ -427,22 +338,22 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
     }
 
     public void setOptimisticLockHandling(boolean optimisticLockHandling) {
-        this._optimisticLockHandling = optimisticLockHandling;
+        _optimisticLockHandling = optimisticLockHandling;
     }
 
     public void setVersionNoAutoIncrementOnMemory(boolean versionNoAutoIncrementOnMemory) {
-        this._versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
+        _versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
     }
 
     public void setInsertOption(InsertOption<? extends ConditionBean> insertOption) {
-        this._insertOption = insertOption;
+        _insertOption = insertOption;
     }
 
     public void setUpdateOption(UpdateOption<? extends ConditionBean> updateOption) {
-        this._updateOption = updateOption;
+        _updateOption = updateOption;
     }
 
     public void setDeleteOption(DeleteOption<? extends ConditionBean> deleteOption) {
-        this._deleteOption = deleteOption;
+        _deleteOption = deleteOption;
     }
 }

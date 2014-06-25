@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.s2dao.sqlhandler;
 
+import java.sql.Connection;
+
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.jdbc.StatementFactory;
@@ -46,25 +48,25 @@ public class TnInsertEntityHandler extends TnAbstractEntityHandler {
     }
 
     @Override
-    protected void processBefore(Object bean) {
-        super.processBefore(bean);
+    protected void processBefore(final Connection conn, Object bean) {
+        super.processBefore(conn, bean);
         doProcessIdentity(new IdentityProcessCallback() {
             public void callback(TnIdentifierGenerator generator) {
                 if (generator.isPrimaryKey() && isPrimaryKeyIdentityDisabled()) {
-                    disableIdentityGeneration();
+                    disableIdentityGeneration(createInheritedConnectionDataSource(conn));
                 }
             }
         });
     }
 
     @Override
-    protected void processFinally(Object bean, RuntimeException sqlEx) {
-        super.processFinally(bean, sqlEx);
+    protected void processFinally(final Connection conn, Object bean, RuntimeException sqlEx) {
+        super.processFinally(conn, bean, sqlEx);
         try {
             doProcessIdentity(new IdentityProcessCallback() {
                 public void callback(TnIdentifierGenerator generator) {
                     if (generator.isPrimaryKey() && isPrimaryKeyIdentityDisabled()) {
-                        enableIdentityGeneration();
+                        enableIdentityGeneration(createInheritedConnectionDataSource(conn));
                     }
                 }
             });
@@ -79,14 +81,14 @@ public class TnInsertEntityHandler extends TnAbstractEntityHandler {
     }
 
     @Override
-    protected void processSuccess(final Object bean, int ret) {
-        super.processSuccess(bean, ret);
+    protected void processSuccess(final Connection conn, final Object bean, int ret) {
+        super.processSuccess(conn, bean, ret);
         doProcessIdentity(new IdentityProcessCallback() {
             public void callback(TnIdentifierGenerator generator) {
                 if (generator.isPrimaryKey() && isPrimaryKeyIdentityDisabled()) {
                     return;
                 }
-                generator.setIdentifier(bean, _dataSource);
+                generator.setIdentifier(bean, createInheritedConnectionDataSource(conn));
             }
         });
         updateVersionNoIfNeed(bean);

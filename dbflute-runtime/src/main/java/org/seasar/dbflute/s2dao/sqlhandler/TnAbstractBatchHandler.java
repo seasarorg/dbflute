@@ -86,9 +86,9 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
             }
             return new int[0];
         }
-        processBefore(beanList);
         final Connection conn = getConnection();
         try {
+            processBefore(conn, beanList);
             RuntimeException sqlEx = null;
             final PreparedStatement ps = prepareStatement(conn);
             int[] result = null;
@@ -107,7 +107,7 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
                 throw e;
             } finally {
                 close(ps);
-                processFinally(beanList, sqlEx);
+                processFinally(conn, beanList, sqlEx);
             }
             // a value of exclusive control column should be synchronized
             // after handling optimistic lock
@@ -116,7 +116,7 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
                 processBatchSuccess(bean, index);
                 ++index;
             }
-            processSuccess(beanList, result.length);
+            processSuccess(conn, beanList, result.length);
             return result;
         } finally {
             close(conn);
@@ -229,13 +229,13 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
     //                                                                   Extension Process
     //                                                                   =================
     @Override
-    protected void processBefore(Object beanList) {
-        super.processBefore(beanList);
+    protected void processBefore(Connection conn, Object beanList) {
+        super.processBefore(conn, beanList);
     }
 
     @Override
-    protected void processFinally(Object beanList, RuntimeException sqlEx) {
-        super.processFinally(beanList, sqlEx);
+    protected void processFinally(Connection conn, Object beanList, RuntimeException sqlEx) {
+        super.processFinally(conn, beanList, sqlEx);
         noticeBatchLoggingOver();
 
         // clear just in case
@@ -253,8 +253,8 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
     }
 
     @Override
-    protected void processSuccess(Object beanList, int ret) {
-        super.processSuccess(beanList, ret);
+    protected void processSuccess(Connection conn, Object beanList, int ret) {
+        super.processSuccess(conn, beanList, ret);
     }
 
     protected void processBatchBefore(Object bean) {

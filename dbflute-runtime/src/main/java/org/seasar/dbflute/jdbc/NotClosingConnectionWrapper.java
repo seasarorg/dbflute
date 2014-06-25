@@ -57,14 +57,26 @@ public class NotClosingConnectionWrapper implements Connection {
     // ===================================================================================
     //                                                                   Actual Connection
     //                                                                   =================
+    /**
+     * Get the wrapped actual connection.
+     * @return The instance of connection to be wrapped. (NullAllowed: after closing and not be kept)
+     */
     public Connection getActualConnection() {
         return _actualConnection;
     }
 
+    /**
+     * Keep the actual connection in this wrapper even if closed. <br />
+     * You can use the connection after closing.
+     */
     public void keepActualIfClosed() {
         _keepActualIfClosed = true;
     }
 
+    /**
+     * Close the actual connection really if exists.
+     * @throws SQLException
+     */
     public void closeActualReally() throws SQLException {
         if (_actualConnection != null) {
             _actualConnection.close();
@@ -80,7 +92,7 @@ public class NotClosingConnectionWrapper implements Connection {
     }
 
     public void close() throws SQLException {
-        if (!_keepActualIfClosed) {
+        if (!_keepActualIfClosed) { // normally here
             _actualConnection = null;
         }
 
