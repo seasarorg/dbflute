@@ -227,7 +227,7 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
         }
         // e.g. public static String memberName_VALUE_TYPE = "fooType";
         final String valueTypeKey = pd.getPropertyName() + VALUE_TYPE_SUFFIX;
-        if (_beanDesc.hasField(valueTypeKey)) {
+        if (_beanDesc != null && _beanDesc.hasField(valueTypeKey)) { // not-null means DBFlute entity
             final Field field = _beanDesc.getField(valueTypeKey);
             if (Modifier.isStatic(field.getModifiers())) {
                 return (String) DfReflectionUtil.getValue(field, null);
