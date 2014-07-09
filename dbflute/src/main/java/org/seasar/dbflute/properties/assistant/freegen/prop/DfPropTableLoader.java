@@ -221,11 +221,11 @@ public class DfPropTableLoader {
             columnMap.put("hasComment", Srl.is_NotNull_and_NotTrimmedEmpty(comment));
             columnMap.put("isExtends", property.isExtends());
             columnMap.put("isOverride", property.isOverride());
-            columnMap.put("mayBeIntegerProperty", property.mayBeIntegerProperty());
-            columnMap.put("mayBeLongProperty", property.mayBeLongProperty());
-            columnMap.put("mayBeDecimalProperty", property.mayBeDecimalProperty());
-            columnMap.put("mayBeDateProperty", property.mayBeDateProperty());
-            columnMap.put("mayBeBooleanProperty", property.mayBeBooleanProperty());
+            columnMap.put("mayBeIntegerProperty", mayBeIntegerProperty(property, comment));
+            columnMap.put("mayBeLongProperty", mayBeLongProperty(property, comment));
+            columnMap.put("mayBeDecimalProperty", mayBeDecimalProperty(property, comment));
+            columnMap.put("mayBeDateProperty", mayBeDateProperty(property, comment));
+            columnMap.put("mayBeBooleanProperty", mayBeBooleanProperty(property, comment));
 
             for (Entry<String, String> entry : groupingKeyMap.entrySet()) {
                 final String groupingName = entry.getKey();
@@ -284,6 +284,39 @@ public class DfPropTableLoader {
 
     protected boolean isGroupingTarget(String propertyKey, String keyHint) {
         return DfNameHintUtil.isHitByTheHint(propertyKey, keyHint);
+    }
+
+    // -----------------------------------------------------
+    //                                         Property Type
+    //                                         -------------
+    protected boolean mayBeIntegerProperty(JavaPropertiesProperty property, String comment) {
+        if (mayBeLongProperty(property, comment) || mayBeDecimalProperty(property, comment)) {
+            return false;
+        }
+        return property.mayBeIntegerProperty() || containsPropertyTypeAnnotation(comment, "@IntegerType");
+    }
+
+    protected boolean mayBeLongProperty(JavaPropertiesProperty property, String comment) {
+        if (mayBeDecimalProperty(property, comment)) {
+            return false;
+        }
+        return property.mayBeLongProperty() || containsPropertyTypeAnnotation(comment, "@LongType");
+    }
+
+    protected boolean mayBeDecimalProperty(JavaPropertiesProperty property, String comment) {
+        return property.mayBeDecimalProperty() || containsPropertyTypeAnnotation(comment, "@DecimalType");
+    }
+
+    protected boolean mayBeDateProperty(JavaPropertiesProperty property, String comment) {
+        return property.mayBeDateProperty() || containsPropertyTypeAnnotation(comment, "@DateType");
+    }
+
+    protected boolean mayBeBooleanProperty(JavaPropertiesProperty property, String comment) {
+        return property.mayBeBooleanProperty() || containsPropertyTypeAnnotation(comment, "@BooleanType");
+    }
+
+    protected boolean containsPropertyTypeAnnotation(String comment, String annotation) {
+        return comment != null && comment.contains(annotation);
     }
 
     // ===================================================================================
