@@ -34,6 +34,27 @@ import org.seasar.dbflute.util.Srl;
 public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
 
     // ===================================================================================
+    //                                                                    Drop Foreign Key
+    //                                                                    ================
+    @Override
+    protected String filterDropForeignKeyName(String foreignKeyName) {
+        if (needsQuotedForeignKeyName(foreignKeyName)) {
+            return Srl.quoteDouble(foreignKeyName);
+        }
+        return foreignKeyName;
+    }
+
+    protected boolean needsQuotedForeignKeyName(String foreignKeyName) {
+        final char[] charArray = foreignKeyName.toCharArray();
+        for (int i = 0; i < charArray.length; i++) {
+            if (Character.isUpperCase(charArray[i])) { // e.g. Fk_Vendor_ForeignKey_NAME_CaseCrisis
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
     //                                                                       Drop Sequence
     //                                                                       =============
     @Override

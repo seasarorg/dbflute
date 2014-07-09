@@ -253,7 +253,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 final String foreignKeyName = metaInfo.getForeignKeyName();
                 final String localTableName = metaInfo.getLocalTableSqlName();
                 final StringBuilder sb = new StringBuilder();
-                sb.append("alter table ").append(localTableName).append(" drop constraint ").append(foreignKeyName);
+                sb.append("alter table ").append(localTableName).append(" drop constraint ");
+                sb.append(filterDropForeignKeyName(foreignKeyName));
                 return sb.toString();
             }
         };
@@ -297,6 +298,10 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     protected boolean isSkipDropForeignKey(DfTableMeta tableMetaInfo) { // for sub class.
         return false;
+    }
+
+    protected String filterDropForeignKeyName(String foreignKeyName) {
+        return foreignKeyName; // might need to be quoted e.g. PostgreSQL
     }
 
     // ===================================================================================

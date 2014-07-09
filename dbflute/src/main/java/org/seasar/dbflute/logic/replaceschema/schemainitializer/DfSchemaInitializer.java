@@ -20,5 +20,5 @@ package org.seasar.dbflute.logic.replaceschema.schemainitializer;
  */
 public interface DfSchemaInitializer {
 
-    public void initializeSchema();
+    void initializeSchema();
 }
