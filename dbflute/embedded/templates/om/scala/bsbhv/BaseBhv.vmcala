@@ -16,6 +16,7 @@
 ${database.allClassCopyright}package ${myBaseBhvPackageName};
 #set ($myClassName = "${myBaseBhvClassName}")
 
+import scala.collection.immutable;
 import scala.collection.JavaConverters._;
 
 import java.util.Collection;
@@ -309,7 +310,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @return The result bean of selected list. (NotNull: if no data, returns empty list)
      * @exception DangerousResultSizeException When the result size is over the specified safety size.
      */
-    def selectList(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): scala.collection.immutable.List[${myImmutableExtendedObjectClassName}] = {
+    def selectList(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): immutable.List[${myImmutableExtendedObjectClassName}] = {
         return toImmutableEntityList(facadeSelectList(callbackCB(cbCall))(loaderCall));
     }
 
@@ -586,7 +587,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
      * @return The list of foreign table. (NotNull, EmptyAllowed, NotNullElement)
      */
-    def pullout${fk.foreignPropertyNameInitCap}(${myEntityListVariableName}: scala.collection.immutable.List[${myImmutableExtendedObjectClassName}]): scala.collection.immutable.List[${foreignImmutableEntityClassName}] = {
+    def pullout${fk.foreignPropertyNameInitCap}(${myEntityListVariableName}: immutable.List[${myImmutableExtendedObjectClassName}]): immutable.List[${foreignImmutableEntityClassName}] = {
         val dbleList = helpPulloutInternally(toDBableEntityList(${myEntityListVariableName}), "${fk.foreignPropertyName}");
         return toScalaList(dbleList).map(new ${foreignImmutableEntityClassName}(_));
     }
@@ -600,7 +601,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
      * @return The list of referrer-as-one table. (NotNull, EmptyAllowed, NotNullElement)
      */
-    def pullout${referrer.referrerPropertyNameInitCapAsOne}(${myEntityListVariableName}: scala.collection.immutable.List[${myImmutableExtendedObjectClassName}]): scala.collection.immutable.List[${referrerImmutableEntityClassName}] = {
+    def pullout${referrer.referrerPropertyNameInitCapAsOne}(${myEntityListVariableName}: immutable.List[${myImmutableExtendedObjectClassName}]): immutable.List[${referrerImmutableEntityClassName}] = {
         val dbleList = helpPulloutInternally(toDBableEntityList(${myEntityListVariableName}), "${referrer.referrerPropertyNameAsOne}");
         return toScalaList(dbleList).map(new ${referrerImmutableEntityClassName}(_));
     }
@@ -616,7 +617,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
      * @return The list of the column value. (NotNull, EmptyAllowed, NotNullElement)
      */
-    def extract${pkCol.javaName}List(${myEntityListVariableName}: scala.collection.immutable.List[${myImmutableExtendedObjectClassName}]): scala.collection.immutable.List[${pkCol.immutableJavaNative}] = {
+    def extract${pkCol.javaName}List(${myEntityListVariableName}: immutable.List[${myImmutableExtendedObjectClassName}]): immutable.List[${pkCol.immutableJavaNative}] = {
         val plainList = helpExtractListInternally(toDBableEntityList(${myEntityListVariableName}), "${pkCol.javaBeansRulePropertyName}");
         return toScalaList(plainList).map(_.asInstanceOf[${pkCol.immutableJavaNative}]);
     }
@@ -628,7 +629,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
      * @return The list of the column value. (NotNull, EmptyAllowed, NotNullElement)
      */
-    def extract${uqCol.javaName}List(${myEntityListVariableName}: scala.collection.immutable.List[${myImmutableExtendedObjectClassName}]): scala.collection.immutable.List[${uqCol.immutableJavaNative}] = {
+    def extract${uqCol.javaName}List(${myEntityListVariableName}: immutable.List[${myImmutableExtendedObjectClassName}]): immutable.List[${uqCol.immutableJavaNative}] = {
         val plainList = helpExtractListInternally(toDBableEntityList(${myEntityListVariableName}), "${uqCol.javaBeansRulePropertyName}");
         return toScalaList(plainList).map(_.asInstanceOf[${uqCol.immutableJavaNative}]);
     }
@@ -1389,14 +1390,14 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     // ===================================================================================
     //                                                                        Scala Helper
     //                                                                        ============
-    protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): scala.collection.immutable.List[ENTITY] = {
-        if (javaList == null) { scala.collection.immutable.List() }
-        return scala.collection.immutable.List.fromArray(javaList.toArray()).asInstanceOf[scala.collection.immutable.List[ENTITY]];
+    protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): immutable.List[ENTITY] = {
+        if (javaList == null) { immutable.List() }
+        return immutable.List.fromArray(javaList.toArray()).asInstanceOf[immutable.List[ENTITY]];
     }
 
-    def toImmutableEntityList(dbleList: Collection[${myExtendedObjectClassName}]): scala.collection.immutable.List[${myImmutableExtendedObjectClassName}] =
+    def toImmutableEntityList(dbleList: Collection[${myExtendedObjectClassName}]): immutable.List[${myImmutableExtendedObjectClassName}] =
     { toScalaList(dbleList).map(new ${myImmutableExtendedObjectClassName}(_)) }
 
-    def toDBableEntityList(immuList: scala.collection.immutable.List[${myImmutableExtendedObjectClassName}]): List[${myExtendedObjectClassName}] =
+    def toDBableEntityList(immuList: immutable.List[${myImmutableExtendedObjectClassName}]): List[${myExtendedObjectClassName}] =
     { immuList.map(new ${myExtendedObjectClassName}().acceptImmutable(_)).asJava }
 }

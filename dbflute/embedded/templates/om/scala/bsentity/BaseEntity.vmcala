@@ -16,6 +16,7 @@
 ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
+import scala.collection.immutable;
 import scala.collection.JavaConverters._;
 
 // #avoided same name type in Java and Scala
@@ -519,7 +520,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
      * [convert] ${referrer.referrerDispForJavaDoc}
      * @return The new-created immutable list of immutable entity of the referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull)
      */
-    def toImmutable${referrer.referrerJavaBeansRulePropertyNameInitCap}(): scala.collection.immutable.List[${referrer.referrerTableImmutableExtendedEntityClassName}] = {
+    def toImmutable${referrer.referrerJavaBeansRulePropertyNameInitCap}(): immutable.List[${referrer.referrerTableImmutableExtendedEntityClassName}] = {
         return toScalaList(${referrerVariableName}).map(_.toImmutable());
     }
 
@@ -677,9 +678,9 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
     // ===================================================================================
     //                                                                        Scala Helper
     //                                                                        ============
-    protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): scala.collection.immutable.List[ENTITY] = {
-        if (javaList == null) { return scala.collection.immutable.List(); }
-        return scala.collection.immutable.List.fromArray(javaList.toArray).asInstanceOf[scala.collection.immutable.List[ENTITY]];
+    protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): immutable.List[ENTITY] = {
+        if (javaList == null) { return immutable.List(); }
+        return immutable.List.fromArray(javaList.toArray).asInstanceOf[immutable.List[ENTITY]];
     }
 
     // ===================================================================================
