@@ -105,10 +105,12 @@ public class DfProcedureExecutionMetaExtractor {
         final String sql = createSql(procedure, existsReturn, true);
         Connection conn = null;
         CallableStatement cs = null;
+        boolean beginTransaction = false;
         try {
             _log.info("...Calling: " + sql);
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
+            beginTransaction = true;
             cs = conn.prepareCall(sql);
             final List<DfProcedureColumnMeta> boundColumnList = DfCollectionUtil.newArrayList();
             setupBindParameter(conn, cs, columnList, testValueList, boundColumnList);
@@ -225,6 +227,14 @@ public class DfProcedureExecutionMetaExtractor {
                 } catch (SQLException continued) { // one day Oracle suddenly threw it (by socket trouble?)
                     final String exp = DfJDBCException.extractMessage(continued);
                     _log.info("*Failed to roll-back the procedure call but continued: " + exp);
+                }
+                if (beginTransaction) {
+                    try {
+                        conn.setAutoCommit(true);
+                    } catch (SQLException continued) {
+                        final String exp = DfJDBCException.extractMessage(continued);
+                        _log.info("*Failed to set auto-commit true: " + exp);
+                    }
                 }
             }
         }

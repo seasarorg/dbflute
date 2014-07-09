@@ -210,9 +210,11 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 _log.info("...Skipping the terminal garbage row");
             }
             if (!suppressBatchUpdate) {
+                boolean beginTransaction = false;
                 boolean transactionClosed = false;
                 try {
                     conn.setAutoCommit(false); // transaction to retry after
+                    beginTransaction = true;
                     ps.executeBatch();
                     conn.commit();
                     transactionClosed = true;
@@ -245,6 +247,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 } finally {
                     if (!transactionClosed) {
                         conn.rollback(); // for other exceptions
+                    }
+                    if (beginTransaction) {
+                        conn.setAutoCommit(true);
                     }
                 }
             }

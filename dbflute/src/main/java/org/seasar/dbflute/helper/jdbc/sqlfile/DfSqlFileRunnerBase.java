@@ -67,6 +67,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     // for sub-class process use
     protected Connection _currentConnection;
     protected Statement _currentStatement;
+    protected boolean _beginTransaction;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -194,10 +195,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         try {
             _currentConnection = _dataSource.getConnection();
 
-            final boolean autoCommit = _currentConnection.getAutoCommit();
-            if (autoCommit != _runInfo.isAutoCommit()) { // if different
-                _currentConnection.setAutoCommit(_runInfo.isAutoCommit());
-            }
+            final boolean autoCommit = _runInfo.isAutoCommit();
+            _beginTransaction = !autoCommit; // means begin transaction
+            _currentConnection.setAutoCommit(autoCommit);
         } catch (SQLException e) {
             String msg = "DataSource#getConnection() threw the exception:";
             msg = msg + " dataSource=" + _dataSource;
@@ -216,6 +216,12 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         try {
             if (_currentConnection != null) {
                 _currentConnection.rollback();
+            }
+        } catch (SQLException ignored) {
+        }
+        try {
+            if (_beginTransaction) {
+                _currentConnection.setAutoCommit(true);
             }
         } catch (SQLException ignored) {
         }
