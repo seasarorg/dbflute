@@ -184,7 +184,7 @@ public class DfClassificationTop {
         final Map<String, List<Object>> subItemListMap = new LinkedHashMap<String, List<Object>>();
         for (DfClassificationElement element : elementList) {
             final Map<String, Object> subItemMap = element.getSubItemMap();
-            if (subItemMap == null) {
+            if (subItemMap == null || subItemMap.isEmpty()) {
                 continue;
             }
             for (Entry<String, Object> entry : subItemMap.entrySet()) {

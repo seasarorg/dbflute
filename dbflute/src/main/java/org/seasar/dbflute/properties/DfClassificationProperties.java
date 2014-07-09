@@ -706,7 +706,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     public boolean hasClassificationSubItemMap(String classificationName) {
         final List<DfClassificationElement> elementList = getClassificationElementList(classificationName);
         for (DfClassificationElement element : elementList) {
-            if (element.getSubItemMap() != null) {
+            final Map<String, Object> subItemMap = element.getSubItemMap();
+            if (subItemMap != null && !subItemMap.isEmpty()) {
                 return true;
             }
         }

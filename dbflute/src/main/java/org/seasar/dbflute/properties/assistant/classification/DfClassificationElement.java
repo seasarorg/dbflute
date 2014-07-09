@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.properties.assistant.classification;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,7 +57,7 @@ public class DfClassificationElement {
     protected String _alias;
     protected String _comment;
     protected String[] _sisters = new String[] {}; // as default
-    protected Map<String, Object> _subItemMap;
+    protected Map<String, Object> _subItemMap; // not-null after accept
 
     // ===================================================================================
     //                                                                              Accept
@@ -94,9 +95,11 @@ public class DfClassificationElement {
             this._sisters = new String[] {};
         }
 
+        // initialize by dummy when no definition for velocity trap
+        // (if null, variable in foreach is not overridden so previous loop's value is used)
         @SuppressWarnings("unchecked")
         final Map<String, Object> subItemMap = (Map<String, Object>) elementMap.get(subItemMapKey);
-        this._subItemMap = subItemMap;
+        this._subItemMap = subItemMap != null ? subItemMap : new HashMap<String, Object>(2);
     }
 
     protected void throwClassificationRequiredAttributeNotFoundException(Map<?, ?> elementMap) {
