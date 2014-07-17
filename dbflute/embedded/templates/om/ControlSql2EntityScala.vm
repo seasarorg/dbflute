@@ -221,6 +221,8 @@ $database.info("public void parseParameterBean() {")
   #set ($pmbClassName = "$pmbMetaData.className")
   #set ($myBaseParameterBeanClassName = "$pmbMetaData.baseClassName")
   #set ($myExtendedParameterBeanClassName = "$pmbMetaData.extendedClassName")
+  #set ($myCompanionBaseClassName = "$pmbMetaData.companionBaseClassName")
+  #set ($myCompanionExtendedClassName = "${myExtendedParameterBeanClassName}")
 
   $pmbMetaData.switchSql2EntityOutputDirectory()
   #set ($path = $database.getPackageAsPath(${glPackageBaseParameterBean}))

@@ -15,6 +15,8 @@
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+import scala.collection.immutable;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
@@ -65,7 +67,7 @@ class ScrBatchEntityList[ENTITY] {
  * @param <ENTITY> The type of immutable entity to be selected.
  * @author ${database.classAuthor}
  */
-class ScrPagingView[ENTITY](val selectedList: scala.collection.immutable.List[ENTITY], bean: PagingResultBean[_]) {
+class ScrPagingView[ENTITY](val selectedList: immutable.List[ENTITY], bean: PagingResultBean[_]) {
 
     def allRecordCount: Int = { bean.getAllRecordCount() }
     def allPageCount: Int = { bean.getAllPageCount() }
@@ -153,7 +155,7 @@ class ScrOutsideSqlBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecutor[BEH
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
      * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
-    def selectList[IMMU, DBLE <: DBableEntity[IMMU]](pmb: ImmutableListHandlingPmb[BEHAVIOR, IMMU, DBLE]): scala.collection.immutable.List[IMMU] = {
+    def selectList[IMMU, DBLE <: DBableEntity[IMMU]](pmb: ImmutableListHandlingPmb[BEHAVIOR, IMMU, DBLE]): immutable.List[IMMU] = {
         return toScalaList(executor.selectList(pmb)).map(_.toImmutable);
     }
 
@@ -375,9 +377,9 @@ class ScrOutsideSqlBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecutor[BEH
     // ===================================================================================
     //                                                                        Scala Helper
     //                                                                        ============
-    protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): scala.collection.immutable.List[ENTITY] = {
+    protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): immutable.List[ENTITY] = {
         if (javaList == null) { scala.collection.immutable.List() }
-        return scala.collection.immutable.List.fromArray(javaList.toArray()).asInstanceOf[scala.collection.immutable.List[ENTITY]];
+        return immutable.List.fromArray(javaList.toArray()).asInstanceOf[immutable.List[ENTITY]];
     }
 }
 

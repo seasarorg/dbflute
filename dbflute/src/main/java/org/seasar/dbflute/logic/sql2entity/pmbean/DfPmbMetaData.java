@@ -118,6 +118,12 @@ public class DfPmbMetaData {
         return projectPrefix + _className;
     }
 
+    public String getCompanionBaseClassName() { // basically for Scala
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        return projectPrefix + "Cpon" + _className;
+        // *extended class name is same as parameter-bean if Scala
+    }
+
     public String getEntityClassName() {
         return getBqpElement(DfBehaviorQueryPathSetupper.KEY_ENTITY_NAME);
     }

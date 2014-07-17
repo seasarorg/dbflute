@@ -46,6 +46,7 @@ import org.seasar.dbflute.exception._;
 #end
 import org.seasar.dbflute.util.DfTypeUtil;
 import ${glPackageBaseCommon}._;
+import ${glPackageExtendedParameterBean}.${myExtendedParameterBeanClassName};
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
 #if ($database.isApplicationBehaviorProject())
 import ${database.libraryBehaviorPackage}._;
@@ -63,6 +64,16 @@ import ${glPackageExtendedEntity}._;
 #if ($database.isPmbMetaDataTypedReturnCustomizeEntityPmb($pmbClassName) || $database.isPmbMetaDataProcedureRefCustomizeEntity($pmbClassName))
 import ${glPackageExtendedCustomizeEntity}._;
 #end
+
+/**
+ * The base class of companion object defined at extended class to create parameter-bean.
+ * @author ${database.classAuthor}
+ */
+abstract class ${myCompanionBaseClassName} {
+    def apply(pmbCall: (${myExtendedParameterBeanClassName}) => Unit): ${myExtendedParameterBeanClassName} =
+    { val pmb = newPmb(); pmbCall(pmb); return pmb; }
+    protected def newPmb(): ${myExtendedParameterBeanClassName} = { new ${myExtendedParameterBeanClassName}() }
+}
 
 /**
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))

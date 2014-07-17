@@ -16,7 +16,15 @@
 ${database.allClassCopyright}package ${glPackageExtendedParameterBean};
 #set ($myClassName = "${myExtendedParameterBeanClassName}")
 
+import ${glPackageBaseParameterBean}.${myCompanionBaseClassName};
 import ${glPackageBaseParameterBean}.${myBaseParameterBeanClassName};
+
+/**
+ * The companion object to create ${myClassName} by apply().
+ * @author ${database.classAuthor}
+ */
+object ${myCompanionExtendedClassName} extends ${myCompanionBaseClassName} {
+}
 
 /**
  * ${database.extendedClassDescriptionBeginMark}
