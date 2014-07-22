@@ -43,6 +43,12 @@ import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.exception.*;
 #end
 import org.seasar.dbflute.util.DfTypeUtil;
+#if ($database.isAvailableJodaTimeEntity())
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+import org.joda.time.ReadableInstant;
+import org.joda.time.ReadablePartial;
+#end
 import ${glPackageBaseCommon}.*;
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
 #if ($database.isApplicationBehaviorProject())
@@ -310,9 +316,30 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
         return DfTypeUtil.toBoolean(obj);
     }
 
+#if ($database.isAvailableJodaTimeEntity())
+    protected Date toUtilDate(Object date) {
+        if (date != null && date instanceof ReadablePartial) {
+            return new Date(((ReadablePartial) date).toDateTime(null).getMillis());
+        } else if (date != null && date instanceof ReadableInstant) {
+            return new Date(((ReadableInstant) date).getMillis());
+        }
+#else
     protected Date toUtilDate(Date date) {
+#end
         return DfTypeUtil.toDate(date); // if sub class, re-create as pure date
     }
+#if ($database.isAvailableJodaTimeEntity())
+
+    @SuppressWarnings("unchecked")
+    protected <DATE> DATE toLocalDate(Date date, Class<DATE> localType) {
+        if (LocalDate.class.isAssignableFrom(localType)) {
+            return (DATE)LocalDate.fromDateFields(date);
+        } else if (LocalDateTime.class.isAssignableFrom(localType)) {
+            return (DATE)LocalDateTime.fromDateFields(date);
+        }
+        return null; // unreachable
+    }
+#end
 
     protected String formatUtilDate(Date date) {
 #if ($database.isDatabaseOracle())
@@ -509,7 +536,11 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${argumentName}) {
+#if ($database.isAvailableJodaTimeEntity())
+        ${variableName} = toLocalDate(new FromToOption().compareAsDate().filterFromDate(toUtilDate(${argumentName})), ${propertyType}.class);
+#else
         ${variableName} = new FromToOption().compareAsDate().filterFromDate(${argumentName});
+#end
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionFromDateOption($pmbClassName, $propertyName))
@@ -524,7 +555,11 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${argumentName}, FromToOption ${argumentName}Option) {
         assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
+#if ($database.isAvailableJodaTimeEntity())
+        ${variableName} = toLocalDate(${argumentName}Option.filterFromDate(toUtilDate(${argumentName})), ${propertyType}.class);
+#else
         ${variableName} = ${argumentName}Option.filterFromDate(${argumentName});
+#end
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
@@ -537,7 +572,11 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}) {
+#if ($database.isAvailableJodaTimeEntity())
+        ${variableName} = toLocalDate(new FromToOption().compareAsDate().filterToDate(toUtilDate(${argumentName})), ${propertyType}.class);
+#else
         ${variableName} = new FromToOption().compareAsDate().filterToDate(${argumentName});
+#end
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionToDateOption($pmbClassName, $propertyName))
@@ -552,7 +591,11 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}, FromToOption ${argumentName}Option) {
         assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
+#if ($database.isAvailableJodaTimeEntity())
+        ${variableName} = toLocalDate(${argumentName}Option.filterToDate(toUtilDate(${argumentName})), ${propertyType}.class);
+#else
         ${variableName} = ${argumentName}Option.filterToDate(${argumentName});
+#end
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionClassificationSetter($pmbClassName, $propertyName))

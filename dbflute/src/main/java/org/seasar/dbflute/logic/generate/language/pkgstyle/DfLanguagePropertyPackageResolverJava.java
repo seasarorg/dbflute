@@ -15,6 +15,9 @@
  */
 package org.seasar.dbflute.logic.generate.language.pkgstyle;
 
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+
 /**
  * @author jflute
  * @since 1.0.5F (2014/05/04 Sunday)
@@ -23,29 +26,86 @@ public class DfLanguagePropertyPackageResolverJava extends DfLanguagePropertyPac
 
     protected String processLanguageType(String typeName, boolean exceptUtil) {
         if (!exceptUtil) {
-            final String listType = processListType(typeName, exceptUtil, "java.util", "List");
+            final String listType = processListType(typeName, exceptUtil, getListPackage(), "List");
             if (listType != null) {
                 return listType;
             }
-            final String mapType = processMapType(typeName, exceptUtil, "java.util", "Map");
+            final String mapType = processMapType(typeName, exceptUtil, getMapPackage(), "Map");
             if (mapType != null) {
                 return mapType;
             }
         }
         if (typeName.equals("BigDecimal")) {
-            return "java.math." + typeName;
+            return getBigDecimalPackage() + "." + typeName;
+        }
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        if (typeName.equals("LocalDate")) {
+            return getJava8LocalDate();
+        }
+        if (typeName.equals("LocalDateTime")) {
+            return getJava8LocalDateTime();
+        }
+        if (typeName.equals("JodaLocalDate")) {
+            return getJodaLocalDate();
+        }
+        if (typeName.equals("JodaLocalDateTime")) {
+            return getJodaLocalDateTime();
+        }
+        if (typeName.equals("Date")) {
+            if (prop.isAvailableJava8TimeEntity()) {
+                return getJava8LocalDate();
+            }
+            if (prop.isAvailableJodaTimeEntity()) {
+                return getJodaLocalDate();
+            }
+            if (!exceptUtil) {
+                return "java.util." + typeName;
+            }
+        }
+        if (typeName.equals("Timestamp")) {
+            if (prop.isAvailableJava8TimeEntity()) {
+                return getJava8LocalDateTime();
+            }
+            if (prop.isAvailableJodaTimeEntity()) {
+                return getJodaLocalDateTime();
+            }
+            return "java.sql." + typeName;
         }
         if (typeName.equals("Time")) {
             return "java.sql." + typeName;
         }
-        if (typeName.equals("Timestamp")) {
-            return "java.sql." + typeName;
-        }
-        if (!exceptUtil) {
-            if (typeName.equals("Date")) {
-                return "java.util." + typeName;
-            }
-        }
         return null;
+    }
+
+    protected String getListPackage() {
+        return "java.util";
+    }
+
+    protected String getMapPackage() {
+        return "java.util";
+    }
+
+    protected String getBigDecimalPackage() {
+        return "java.math";
+    }
+
+    protected String getJava8LocalDate() {
+        return "java.time.LocalDate";
+    }
+
+    protected String getJava8LocalDateTime() {
+        return "java.time.LocalDateTime";
+    }
+
+    protected String getJodaLocalDate() {
+        return "org.joda.time.LocalDate";
+    }
+
+    protected String getJodaLocalDateTime() {
+        return "org.joda.time.LocalDateTime";
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return DfBuildProperties.getInstance().getLittleAdjustmentProperties();
     }
 }

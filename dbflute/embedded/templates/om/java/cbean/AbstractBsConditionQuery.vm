@@ -25,6 +25,11 @@ import org.seasar.dbflute.cbean.coption.*;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
+#if ($database.isAvailableJodaTimeEntity())
+import org.seasar.dbflute.util.DfTypeUtil;
+import org.joda.time.ReadableInstant;
+import org.joda.time.ReadablePartial;
+#end
 import ${glPackageBaseCommon}.*;
 import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
@@ -1122,9 +1127,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      * @param fromToOption The option of from-to. (NotNull)
      */
-    public void set${tmpJavaName}_FromTo(Date fromDatetime, Date toDatetime, FromToOption fromToOption) {
+    public void set${tmpJavaName}_FromTo(${col.fromToJavaNativeDate} fromDatetime, ${col.fromToJavaNativeDate} toDatetime, FromToOption fromToOption) {
 #if ($col.isJavaNativeUtilDate())
         regFTQ(fCTPD(fromDatetime), fCTPD(toDatetime), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
+#elseif ($col.isJavaNativeJodaTimeLocal())
+        regFTQ(toUtilDate(fromDatetime), toUtilDate(toDatetime), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
 #else
         regFTQ((fromDatetime != null ? new ${col.javaNative}(fromDatetime.getTime()) : null), (toDatetime != null ? new ${col.javaNative}(toDatetime.getTime()) : null), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
 #end
@@ -1143,7 +1150,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param fromDate The from-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
      * @param toDate The to-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      */
-    public void set${tmpJavaName}_DateFromTo(Date fromDate, Date toDate) {
+    public void set${tmpJavaName}_DateFromTo(${col.fromToJavaNativeDate} fromDate, ${col.fromToJavaNativeDate} toDate) {
         set${tmpJavaName}_FromTo(fromDate, toDate, new FromToOption().compareAsDate());
     }
 #end
@@ -1629,6 +1636,17 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         final ManualOrderBean manualOrderBean = new ManualOrderBean();
         manualOrderBean.acceptOrderValueList(orderValueList);
         withManualOrder(manualOrderBean);
+    }
+#end
+#if ($database.isAvailableJodaTimeEntity())
+
+    protected Date toUtilDate(Object date) {
+        if (date != null && date instanceof ReadablePartial) {
+            return new Date(((ReadablePartial) date).toDateTime(null).getMillis());
+        } else if (date != null && date instanceof ReadableInstant) {
+            return new Date(((ReadableInstant) date).getMillis());
+        }
+        return DfTypeUtil.toDate(date);
     }
 #end
 

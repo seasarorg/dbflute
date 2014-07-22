@@ -1584,6 +1584,16 @@ public class Column {
         return grammar.buildClassTypeLiteral(pureNative);
     }
 
+    public String getFromToJavaNativeDate() { // in condition-bean
+        final String definedDate;
+        if (getLittleAdjustmentProperties().isAvailableJodaTimeEntity()) {
+            definedDate = getJavaNative();
+        } else { // normally here
+            definedDate = "Date"; // java.util.Date
+        }
+        return definedDate;
+    }
+
     public String getPropertyAccessTypeLiteral() {
         return "null"; // means same as java native type for now
     }
@@ -1646,6 +1656,26 @@ public class Column {
 
     public boolean isJavaNativeUtilDate() { // as pinpoint
         return getJavaNative().equals("java.util.Date");
+    }
+
+    public boolean isJavaNativeJava8LocalDate() { // as pinpoint
+        return getJavaNative().equals("java.time.LocalDate");
+    }
+
+    public boolean isJavaNativeJava8LocalDateTime() { // as pinpoint
+        return getJavaNative().equals("java.time.LocalDateTime");
+    }
+
+    public boolean isJavaNativeJodaLocalDate() { // as pinpoint
+        return getJavaNative().equals("org.joda.time.LocalDate");
+    }
+
+    public boolean isJavaNativeJodaLocalDateTime() { // as pinpoint
+        return getJavaNative().equals("org.joda.time.LocalDateTime");
+    }
+
+    public boolean isJavaNativeJodaTimeLocal() { // as pinpoint
+        return isJavaNativeJodaLocalDate() || isJavaNativeJodaLocalDateTime();
     }
 
     public boolean isJavaNativeTimestamp() { // as pinpoint

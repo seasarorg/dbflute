@@ -323,16 +323,28 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     //                                                filter
     //                                                ------
     protected void filterCommonColumnSetupValue(Map<String, Object> map) {
+        final String allcommonExp = "$$allcommon$$";
+        final String accessContextExp = "$$AccessContext$$";
+        final String accessDateExp = accessContextExp + ".getAccessDateOnThread()";
+        final String accessTimestampExp = accessContextExp + ".getAccessTimestampOnThread()";
         final String baseCommonPackage = getBasicProperties().getBaseCommonPackage();
         final Set<String> keySet = map.keySet();
         for (String key : keySet) {
             String value = (String) map.get(key);
-            if (value != null && value.contains("$$allcommon$$")) {
-                value = DfStringUtil.replace(value, "$$allcommon$$", baseCommonPackage);
+            if (value != null && value.contains(allcommonExp)) {
+                value = DfStringUtil.replace(value, allcommonExp, baseCommonPackage);
             }
-            if (value != null && value.contains("$$AccessContext$$")) {
+            if (getLittleAdjustmentProperties().isAvailableJodaTimeEntity()) {
+                if (value != null && value.equals(accessDateExp)) {
+                    value = "org.joda.time.LocalDate.fromDateFields(" + value + ")";
+                }
+                if (value != null && value.equals(accessTimestampExp)) {
+                    value = "org.joda.time.LocalDateTime.fromDateFields(" + value + ")";
+                }
+            }
+            if (value != null && value.contains(accessContextExp)) {
                 final String accessContext = getAccessContextFqcn();
-                value = DfStringUtil.replace(value, "$$AccessContext$$", accessContext);
+                value = DfStringUtil.replace(value, accessContextExp, accessContext);
             }
             final String prefixMark = COMMON_COLUMN_SETUP_RESOURCE_PREFIX_MARK;
             final String secondMark = COMMON_COLUMN_SETUP_RESOURCE_SECOND_MARK;

@@ -1945,6 +1945,10 @@ public class Database {
         return isDatabaseOracle() && isAvailableDatabaseNativeJDBC();
     }
 
+    public boolean isAvailableJodaTimeEntity() {
+        return getLittleAdjustmentProperties().isAvailableJodaTimeEntity();
+    }
+
     public boolean isMakeDeprecated() {
         return getLittleAdjustmentProperties().isMakeDeprecated();
     }

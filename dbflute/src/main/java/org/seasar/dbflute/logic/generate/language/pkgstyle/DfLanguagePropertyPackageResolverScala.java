@@ -21,7 +21,42 @@ package org.seasar.dbflute.logic.generate.language.pkgstyle;
  */
 public class DfLanguagePropertyPackageResolverScala extends DfLanguagePropertyPackageResolver {
 
-    protected final DfLanguagePropertyPackageResolver _resolverJava = new DfLanguagePropertyPackageResolverJava();
+    protected final DfLanguagePropertyPackageResolver _resolverJava = new DfLanguagePropertyPackageResolverJava() {
+
+        @Override
+        protected String getListPackage() {
+            return "scala.collection.immutable";
+        };
+
+        @Override
+        protected String getMapPackage() {
+            return "scala.collection.immutable";
+        };
+
+        @Override
+        protected String getBigDecimalPackage() {
+            return "scala.math";
+        }
+
+        protected String getJava8LocalDate() {
+            return "java.time.LocalDate";
+        }
+
+        @Override
+        protected String getJava8LocalDateTime() {
+            return "java.time.LocalDateTime";
+        }
+
+        @Override
+        protected String getJodaLocalDate() {
+            return "org.joda.time.LocalDate";
+        }
+
+        @Override
+        protected String getJodaLocalDateTime() {
+            return "org.joda.time.LocalDateTime";
+        }
+    };
 
     protected String processLanguageType(String typeName, boolean exceptUtil) {
         // #pending jflute same as Java for now

@@ -163,6 +163,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isEntityDerivedMappable", defaultValue);
     }
 
+    public boolean isAvailableJava8TimeEntity() { // closet
+        return isProperty("isAvailableJava8TimeEntity", false);
+    }
+
+    public boolean isAvailableJodaTimeEntity() { // closet
+        return isProperty("isAvailableJodaTimeEntity", false);
+    }
+
     // -----------------------------------------------------
     //                                        Basic Optional
     //                                        --------------
