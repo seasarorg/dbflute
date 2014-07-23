@@ -44,8 +44,10 @@ import org.seasar.dbflute.exception.*;
 #end
 import org.seasar.dbflute.util.DfTypeUtil;
 #if ($database.isAvailableJodaTimeEntity())
+#if ($database.isAvailableJodaTimeLocalDateEntity())
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+#end
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
 #end
@@ -328,7 +330,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #end
         return DfTypeUtil.toDate(date); // if sub class, re-create as pure date
     }
-#if ($database.isAvailableJodaTimeEntity())
+#if ($database.isAvailableJodaTimeLocalDateEntity())
 
     @SuppressWarnings("unchecked")
     protected <DATE> DATE toLocalDate(Date date, Class<DATE> localType) {
@@ -536,7 +538,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${argumentName}) {
-#if ($database.isAvailableJodaTimeEntity())
+#if ($database.isAvailableJodaTimeLocalDateEntity())
         ${variableName} = toLocalDate(new FromToOption().compareAsDate().filterFromDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
         ${variableName} = new FromToOption().compareAsDate().filterFromDate(${argumentName});
@@ -555,7 +557,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${argumentName}, FromToOption ${argumentName}Option) {
         assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
-#if ($database.isAvailableJodaTimeEntity())
+#if ($database.isAvailableJodaTimeLocalDateEntity())
         ${variableName} = toLocalDate(${argumentName}Option.filterFromDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
         ${variableName} = ${argumentName}Option.filterFromDate(${argumentName});
@@ -572,7 +574,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}) {
-#if ($database.isAvailableJodaTimeEntity())
+#if ($database.isAvailableJodaTimeLocalDateEntity())
         ${variableName} = toLocalDate(new FromToOption().compareAsDate().filterToDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
         ${variableName} = new FromToOption().compareAsDate().filterToDate(${argumentName});
@@ -591,7 +593,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}, FromToOption ${argumentName}Option) {
         assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
-#if ($database.isAvailableJodaTimeEntity())
+#if ($database.isAvailableJodaTimeLocalDateEntity())
         ${variableName} = toLocalDate(${argumentName}Option.filterToDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
         ${variableName} = ${argumentName}Option.filterToDate(${argumentName});

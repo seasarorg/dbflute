@@ -52,10 +52,10 @@ public class DfLanguagePropertyPackageResolverJava extends DfLanguagePropertyPac
             return getJodaLocalDateTime();
         }
         if (typeName.equals("Date")) {
-            if (prop.isAvailableJava8TimeEntity()) {
+            if (prop.isAvailableJava8TimeLocalDateEntity()) {
                 return getJava8LocalDate();
             }
-            if (prop.isAvailableJodaTimeEntity()) {
+            if (prop.isAvailableJodaTimeLocalDateEntity()) {
                 return getJodaLocalDate();
             }
             if (!exceptUtil) {
@@ -63,10 +63,10 @@ public class DfLanguagePropertyPackageResolverJava extends DfLanguagePropertyPac
             }
         }
         if (typeName.equals("Timestamp")) {
-            if (prop.isAvailableJava8TimeEntity()) {
+            if (prop.isAvailableJava8TimeLocalDateEntity()) {
                 return getJava8LocalDateTime();
             }
-            if (prop.isAvailableJodaTimeEntity()) {
+            if (prop.isAvailableJodaTimeLocalDateEntity()) {
                 return getJodaLocalDateTime();
             }
             return "java.sql." + typeName;

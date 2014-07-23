@@ -1945,9 +1945,26 @@ public class Database {
         return isDatabaseOracle() && isAvailableDatabaseNativeJDBC();
     }
 
+    public boolean isAvailableJava8TimeEntity() {
+        return getLittleAdjustmentProperties().isAvailableJava8TimeEntity();
+    }
+
+    public boolean isAvailableJava8TimeLocalDateEntity() {
+        return getLittleAdjustmentProperties().isAvailableJava8TimeLocalDateEntity();
+    }
+
     public boolean isAvailableJodaTimeEntity() {
         return getLittleAdjustmentProperties().isAvailableJodaTimeEntity();
     }
+
+    public boolean isAvailableJodaTimeLocalDateEntity() {
+        return getLittleAdjustmentProperties().isAvailableJodaTimeLocalDateEntity();
+    }
+
+    // unsupported for now
+    //public boolean isAvailableJodaTimeDateTimeEntity() {
+    //    return getLittleAdjustmentProperties().isAvailableJodaTimeDateTimeEntity();
+    //}
 
     public boolean isMakeDeprecated() {
         return getLittleAdjustmentProperties().isMakeDeprecated();

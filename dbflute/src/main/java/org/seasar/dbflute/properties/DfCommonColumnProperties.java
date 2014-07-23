@@ -334,7 +334,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
             if (value != null && value.contains(allcommonExp)) {
                 value = DfStringUtil.replace(value, allcommonExp, baseCommonPackage);
             }
-            if (getLittleAdjustmentProperties().isAvailableJodaTimeEntity()) {
+            if (getLittleAdjustmentProperties().isAvailableJodaTimeLocalDateEntity()) {
                 if (value != null && value.equals(accessDateExp)) {
                     value = "org.joda.time.LocalDate.fromDateFields(" + value + ")";
                 }

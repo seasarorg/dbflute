@@ -151,20 +151,27 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
         final Map<String, String> jdbcToJavaNativeMap = newLinkedHashMap();
         jdbcToJavaNativeMap.putAll(getLanguageTypeMapping().getJdbcToJavaNativeMap()); // language definition at first
 
-        if (getLittleAdjustmentProperties().isAvailableJava8TimeEntity()) {
-            jdbcToJavaNativeMap.put("DATE", "java.time.LocalDate");
-            jdbcToJavaNativeMap.put("TIMESTAMP", "java.time.LocalDateTime");
-        }
-        if (getLittleAdjustmentProperties().isAvailableJodaTimeEntity()) {
-            jdbcToJavaNativeMap.put("DATE", "org.joda.time.LocalDate");
-            jdbcToJavaNativeMap.put("TIMESTAMP", "org.joda.time.LocalDateTime");
-        }
+        // Java8-Time and Joda-Time support
+        prepareJava8OrJodaTimeMappingIfNeeds(jdbcToJavaNativeMap);
 
         for (Entry<String, String> entry : getJdbcTypeMappingMap().entrySet()) {
             jdbcToJavaNativeMap.put(entry.getKey(), entry.getValue()); // override by specified types in property
         }
         _jdbcToJavaNativeMap = jdbcToJavaNativeMap;
         return _jdbcToJavaNativeMap;
+    }
+
+    protected void prepareJava8OrJodaTimeMappingIfNeeds(final Map<String, String> jdbcToJavaNativeMap) {
+        if (getLittleAdjustmentProperties().isAvailableJava8TimeLocalDateEntity()) {
+            jdbcToJavaNativeMap.put("DATE", "java.time.LocalDate");
+            jdbcToJavaNativeMap.put("TIMESTAMP", "java.time.LocalDateTime");
+            jdbcToJavaNativeMap.put("TIME", "java.time.LocalTime");
+        }
+        if (getLittleAdjustmentProperties().isAvailableJodaTimeLocalDateEntity()) {
+            jdbcToJavaNativeMap.put("DATE", "org.joda.time.LocalDate");
+            jdbcToJavaNativeMap.put("TIMESTAMP", "org.joda.time.LocalDateTime");
+            jdbcToJavaNativeMap.put("TIME", "org.joda.time.LocalTime");
+        }
     }
 
     // ===================================================================================

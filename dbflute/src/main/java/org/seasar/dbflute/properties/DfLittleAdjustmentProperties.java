@@ -163,12 +163,38 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isEntityDerivedMappable", defaultValue);
     }
 
-    public boolean isAvailableJava8TimeEntity() { // closet
-        return isProperty("isAvailableJava8TimeEntity", false);
+    // -----------------------------------------------------
+    //                              Java8-Time and Joda-Time
+    //                              ------------------------
+    // Java8-Time and Joda-Time support
+    // DfTypeMappingProperties.java, Column.java
+    // DBFluteConfig.vm, AbstractBsConditionQuery.vm, BsParameterBean.vm
+    public boolean isAvailableJava8OrJodaTimeEntity() {
+        return isAvailableJava8TimeEntity() || isAvailableJodaTimeEntity();
     }
 
-    public boolean isAvailableJodaTimeEntity() { // closet
-        return isProperty("isAvailableJodaTimeEntity", false);
+    public boolean isAvailableJava8TimeEntity() { // closet
+        return isAvailableJava8TimeLocalDateEntity() || isAvailableJava8TimeZonedDateEntity();
+    }
+
+    public boolean isAvailableJava8TimeLocalDateEntity() { // closet
+        return isProperty("isAvailableJava8TimeLocalDateEntity", false);
+    }
+
+    public boolean isAvailableJava8TimeZonedDateEntity() { // closet
+        return isProperty("isAvailableJava8TimeZonedDateEntity", false); // unsupported for now
+    }
+
+    public boolean isAvailableJodaTimeEntity() {
+        return isAvailableJodaTimeLocalDateEntity() || isAvailableJodaTimeZonedDateEntity();
+    }
+
+    public boolean isAvailableJodaTimeLocalDateEntity() { // closet
+        return isProperty("isAvailableJodaTimeLocalDateEntity", false);
+    }
+
+    public boolean isAvailableJodaTimeZonedDateEntity() { // closet
+        return isProperty("isAvailableJodaTimeZonedDateEntity", false); // unsupported for now
     }
 
     // -----------------------------------------------------
