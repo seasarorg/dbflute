@@ -129,7 +129,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
     }
 
     public Field getField(String fieldName) {
-        Field field = (Field) _fieldMap.get(fieldName);
+        final Field field = (Field) _fieldMap.get(fieldName);
         if (field == null) {
             throw new DfBeanFieldNotFoundException(_beanClass, fieldName);
         }
@@ -382,7 +382,9 @@ public class DfBeanDescImpl implements DfBeanDesc {
             if (_fieldMap.containsKey(fieldName)) { // target class's fields have priority  
                 continue;
             }
-            field.setAccessible(true);
+            if (isFieldPrivateAccessible()) {
+                field.setAccessible(true);
+            }
             _fieldMap.put(fieldName, field);
             if (DfReflectionUtil.isInstanceVariableField(field)) {
                 if (hasPropertyDesc(fieldName)) {
@@ -394,6 +396,12 @@ public class DfBeanDescImpl implements DfBeanDesc {
                 }
             }
         }
+    }
+
+    protected boolean isFieldPrivateAccessible() {
+        // GAE does not support private access, and DBFlute does not use private access
+        // so it does not use private access as default
+        return false;
     }
 
     protected void setupFieldsByClass(Class<?> targetClass) {
