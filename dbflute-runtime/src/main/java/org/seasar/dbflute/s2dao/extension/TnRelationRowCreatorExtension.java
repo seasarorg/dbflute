@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.s2dao.extension;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -129,14 +130,15 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             value = res.extractRelationKeyValue(columnName);
         } else {
             final ValueType valueType = mapping.getValueType();
-            final Map<String, Integer> selectIndexMap = res.getSelectIndexMap();
+            final Map<String, Map<String, Integer>> selectIndexMap = res.getSelectIndexMap();
+            final ResultSet rs = res.getResultSet();
             if (selectIndexMap != null) {
-                value = ResourceContext.getValue(res.getResultSet(), columnName, valueType, selectIndexMap);
+                final String relationNoSuffix = res.getRelationNoSuffix();
+                value = ResourceContext.getRelationValue(rs, relationNoSuffix, columnName, valueType, selectIndexMap);
             } else {
-                value = valueType.getValue(res.getResultSet(), columnName);
+                value = valueType.getValue(rs, columnName);
             }
         }
-
         if (value != null) {
             res.incrementValidValueCount();
             doRegisterRelationValue(res, mapping, value);

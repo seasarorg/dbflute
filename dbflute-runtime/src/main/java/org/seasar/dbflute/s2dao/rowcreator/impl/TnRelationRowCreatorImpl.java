@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
@@ -52,7 +53,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
      * {@inheritDoc}
      */
     public Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
-            Map<String, Integer> selectIndexMap, TnRelationKey relKey,
+            Map<String, Map<String, Integer>> selectIndexMap, TnRelationKey relKey,
             Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache,
             TnRelationSelector relSelector) throws SQLException {
         // - - - - - - - 
@@ -65,9 +66,9 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     }
 
     protected TnRelationRowCreationResource createResourceForRow(ResultSet rs, TnRelationPropertyType rpt,
-            Map<String, String> selectColumnMap, Map<String, Integer> selectIndexMap, TnRelationKey relKey,
-            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache,
-            TnRelationSelector relSelector) throws SQLException {
+            Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap,
+            TnRelationKey relKey, Map<String, Map<String, TnPropertyMapping>> relPropCache,
+            TnRelationRowCache relRowCache, TnRelationSelector relSelector) throws SQLException {
         // the resource class is already customized for DBFlute
         final TnRelationRowCreationResource res = new TnRelationRowCreationResource();
         res.setResultSet(rs);
@@ -125,7 +126,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
      * {@inheritDoc}
      */
     public Map<String, Map<String, TnPropertyMapping>> createPropertyCache(Map<String, String> selectColumnMap,
-            Map<String, Integer> selectIndexMap, TnRelationSelector relSelector, TnBeanMetaData baseBmd)
+            Map<String, Map<String, Integer>> selectIndexMap, TnRelationSelector relSelector, TnBeanMetaData baseBmd)
             throws SQLException {
         // - - - - - - - 
         // Entry Point!
@@ -148,7 +149,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     }
 
     protected TnRelationRowCreationResource createResourceForPropertyCache(TnRelationPropertyType rpt,
-            Map<String, String> selectColumnMap, Map<String, Integer> selectIndexMap,
+            Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap,
             Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationSelector relSelector,
             String baseSuffix, String relationNoSuffix, int limitRelationNestLevel) throws SQLException {
         // the resource class is already customized for DBFlute
@@ -169,10 +170,18 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
 
     protected void setupPropertyCacheElement(TnRelationRowCreationResource res) throws SQLException {
         final String columnName = res.buildRelationColumnName();
+        if (isOutOfRelationSelectIndex(res.getRelationNoSuffix(), columnName, res.getSelectIndexMap())) {
+            return;
+        }
         if (!res.containsSelectColumn(columnName)) {
             return;
         }
         res.savePropertyCacheElement();
+    }
+
+    protected boolean isOutOfRelationSelectIndex(String relationNoSuffix, String columnDbName,
+            Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
+        return ResourceContext.isOutOfRelationSelectIndex(relationNoSuffix, columnDbName, selectIndexMap);
     }
 
     // ===================================================================================

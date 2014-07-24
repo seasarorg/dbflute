@@ -108,13 +108,13 @@ public class TnRelationRowCache {
      * @param rs The result set. (NotNull)
      * @param rpt The property type of relation. (NotNull)
      * @param selectColumnMap The name map of select column. {flexible-name = column-DB-name} (NotNull)
-     * @param selectIndexMap The map of select index. (NullAllowed: If it's null, it doesn't use select index.)
+     * @param selectIndexMap The map of select index. map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}} (NullAllowed: If it's null, it doesn't use select index.)
      * @param relationNoSuffix The suffix of relation No. (NotNull)
      * @return The key of relation. (NullAllowed: null means no data of the relation)
      * @throws SQLException
      */
     public TnRelationKey createRelationKey(ResultSet rs, TnRelationPropertyType rpt // basic resource
-            , Map<String, String> selectColumnMap, Map<String, Integer> selectIndexMap // select resource
+            , Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap // select resource
             , String relationNoSuffix) throws SQLException { // relation resource
         if (!_canCache) {
             return EMPTY_KEY;
@@ -131,22 +131,24 @@ public class TnRelationRowCache {
     }
 
     protected TnRelationKey doCreateRelationKeySimple(ResultSet rs, TnRelationPropertyType rpt,
-            Map<String, String> selectColumnMap, Map<String, Integer> selectIndexMap, String relationNoSuffix)
-            throws SQLException {
+            Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap,
+            String relationNoSuffix) throws SQLException {
         final TnPropertyType pt = rpt.getSimpleUniquePropertyType();
-        final String columnLabel = buildColumnLabel(pt, relationNoSuffix);
-        final Object keyValue = setupKeyElement(rs, rpt, selectColumnMap, selectIndexMap, columnLabel, pt);
-        return keyValue != null ? new TnRelationKeySimple(columnLabel, keyValue) : null;
+        final String columnKeyName = buildColumnKeyName(pt, relationNoSuffix);
+        final Object keyValue = setupKeyElement(rs, rpt, selectColumnMap, selectIndexMap, columnKeyName, pt,
+                relationNoSuffix);
+        return keyValue != null ? new TnRelationKeySimple(columnKeyName, keyValue) : null;
     }
 
     protected TnRelationKey doCreateRelationKeyCompound(ResultSet rs, TnRelationPropertyType rpt,
-            Map<String, String> selectColumnMap, Map<String, Integer> selectIndexMap, String relationNoSuffix)
-            throws SQLException {
+            Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap,
+            String relationNoSuffix) throws SQLException {
         final List<TnPropertyType> uniquePropertyTypeList = rpt.getUniquePropertyTypeList();
         Map<String, Object> relKeyValues = null;
         for (TnPropertyType pt : uniquePropertyTypeList) {
-            final String columnLabel = buildColumnLabel(pt, relationNoSuffix);
-            final Object keyValue = setupKeyElement(rs, rpt, selectColumnMap, selectIndexMap, columnLabel, pt);
+            final String columnKeyName = buildColumnKeyName(pt, relationNoSuffix);
+            final Object keyValue = setupKeyElement(rs, rpt, selectColumnMap, selectIndexMap, columnKeyName, pt,
+                    relationNoSuffix);
             if (keyValue == null) {
                 if (relKeyValues != null) {
                     relKeyValues.clear();
@@ -156,35 +158,43 @@ public class TnRelationRowCache {
             if (relKeyValues == null) { // lazy-load for performance
                 relKeyValues = new HashMap<String, Object>(uniquePropertyTypeList.size());
             }
-            relKeyValues.put(columnLabel, keyValue);
+            relKeyValues.put(columnKeyName, keyValue);
         }
         return (relKeyValues != null && !relKeyValues.isEmpty()) ? new TnRelationKeyCompound(relKeyValues) : null;
     }
 
-    protected String buildColumnLabel(TnPropertyType pt, String relationNoSuffix) {
+    protected String buildColumnKeyName(TnPropertyType pt, String relationNoSuffix) {
         return pt.getColumnDbName() + relationNoSuffix;
     }
 
     protected Object setupKeyElement(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
-            Map<String, Integer> selectIndexMap, String columnLabel, TnPropertyType pt) throws SQLException {
-        final ValueType valueType;
-        if (selectColumnMap.containsKey(columnLabel)) {
-            valueType = pt.getValueType();
-        } else {
+            Map<String, Map<String, Integer>> selectIndexMap, String columnKeyName, TnPropertyType pt,
+            String relationNoSuffix) throws SQLException {
+        if (isOutOfRelationSelectIndex(relationNoSuffix, columnKeyName, selectIndexMap)) {
+            // basically unreachable, same reason with next if statement, check just in case
+            return null;
+        }
+        if (!selectColumnMap.containsKey(columnKeyName)) {
             // basically unreachable
             // because the referred column (basically PK or FK) must exist
             // if the relation's select clause is specified
             return null;
         }
+        final ValueType valueType = pt.getValueType();
         final Object value;
         if (selectIndexMap != null) {
-            value = ResourceContext.getValue(rs, columnLabel, valueType, selectIndexMap);
+            value = ResourceContext.getRelationValue(rs, relationNoSuffix, columnKeyName, valueType, selectIndexMap);
         } else {
-            value = valueType.getValue(rs, columnLabel);
+            value = valueType.getValue(rs, columnKeyName);
         }
         // null-able when the referred column data is null
         // (treated as no relation data)
         return value;
+    }
+
+    protected boolean isOutOfRelationSelectIndex(String relationNoSuffix, String columnDbName,
+            Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
+        return ResourceContext.isOutOfRelationSelectIndex(relationNoSuffix, columnDbName, selectIndexMap);
     }
 
     // ===================================================================================

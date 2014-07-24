@@ -117,14 +117,14 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     /**
      * {@inheritDoc}
      */
-    public Object createRow(ResultSet rs, Map<String, Integer> selectIndexMap,
+    public Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap,
             Map<String, TnPropertyMapping> propertyCache, Class<?> beanClass) throws SQLException {
         if (propertyCache.isEmpty()) {
             String msg = "The propertyCache should not be empty: bean=" + beanClass.getName();
             throw new IllegalStateException(msg);
         }
 
-        // temporary variable, for performance(!?) just in case
+        // temporary variable, for exception message, debug message
         String columnName = null;
         TnPropertyMapping mapping = null;
         String propertyName = null;
@@ -190,7 +190,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         return row instanceof DerivedMappable && ConditionBeanContext.isExistConditionBeanOnThread();
     }
 
-    protected void processDerivedMap(ResultSet rs, Map<String, Integer> selectIndexMap,
+    protected void processDerivedMap(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap,
             Map<String, TnPropertyMapping> propertyCache, Object row) throws SQLException {
         final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
         final SqlClause sqlClause = cb.getSqlClause();
@@ -220,11 +220,11 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         }
     }
 
-    protected Object getValue(ResultSet rs, String columnName, ValueType valueType, Map<String, Integer> selectIndexMap)
-            throws SQLException {
+    protected Object getValue(ResultSet rs, String columnName, ValueType valueType,
+            Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
         final Object value;
         if (selectIndexMap != null) {
-            value = ResourceContext.getValue(rs, columnName, valueType, selectIndexMap);
+            value = ResourceContext.getLocalValue(rs, columnName, valueType, selectIndexMap);
         } else {
             value = valueType.getValue(rs, columnName);
         }

@@ -23,8 +23,8 @@ import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinNoWaySpeaker;
  */
 public class QueryUsedAliasInfo {
 
-    protected final String _usedAliasName; // NotNull
-    protected final InnerJoinNoWaySpeaker _innerJoinNoWaySpeaker; // NullAllowed
+    protected final String _usedAliasName; // not null
+    protected final InnerJoinNoWaySpeaker _innerJoinNoWaySpeaker; // null allowed
 
     /**
      * @param usedAliasName The alias name of joined table (or local) where it is used in query. (NotNull)

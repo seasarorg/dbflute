@@ -1713,7 +1713,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      */
     protected String resolveNextRelationPath(String localTableName, String foreignPropertyName) {
         final int relationNo = xgetSqlClause().resolveRelationNo(localTableName, foreignPropertyName);
-        String nextRelationPath = "_" + relationNo;
+        String nextRelationPath = SqlClause.RELATION_PATH_DELIMITER + relationNo;
         final String relationPath = xgetRelationPath();
         if (relationPath != null) {
             nextRelationPath = relationPath + nextRelationPath;

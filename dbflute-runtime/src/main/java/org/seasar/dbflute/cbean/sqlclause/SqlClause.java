@@ -60,7 +60,14 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    public static final String RELATION_PATH_DELIMITER = "_";
+    /** The delimiter of relation path. The relation path is e.g. _0_3  */
+    String RELATION_PATH_DELIMITER = "_";
+
+    /** The alias name of base point table for on-query. */
+    String BASE_POINT_ALIAS_NAME = "dfloc";
+
+    /** The entity number of base point table for internal handling. */
+    String BASE_POINT_HANDLING_ENTITY_NO = "loc00";
 
     // ===================================================================================
     //                                                                      SubQuery Level
@@ -132,16 +139,24 @@ public interface SqlClause {
     String getSelectClause();
 
     /**
-     * Get the map of select index. map:{selectColumnKeyName = selectIndex}
-     * @return The map of select index. (NullAllowed: null means select index is disabled)
+     * Get the map of select index by key name of select column. <br />
+     * map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}}
+     * @return The map of select index. (NullAllowed: null means lazy-loaded not yet or select index is disabled)
      */
-    Map<String, Integer> getSelectIndexMap();
+    Map<String, Map<String, Integer>> getSelectIndexMap();
 
     /**
-     * Get the reverse map of select index. map:{indexedOnQueryName = selectColumnKeyName}
-     * @return The reverse map of select index. (NullAllowed: null means select index is disabled)
+     * Get the map of key name of select column by on-query name. <br />
+     * map:{onQueryAlias = selectColumnKeyName}}
+     * @return The map of key name. (NullAllowed: null means lazy-loaded not yet or select index is disabled)
      */
-    Map<String, String> getSelectIndexReverseMap();
+    Map<String, String> getSelectColumnKeyNameMap();
+
+    /**
+     * Change limit size of alias name.
+     * @param aliasNameLimitSize The limit size of alias name. (NotMinus, NotZero)
+     */
+    void changeAliasNameLimitSize(int aliasNameLimitSize);
 
     /**
      * Disable select index.

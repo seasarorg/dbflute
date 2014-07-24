@@ -35,7 +35,7 @@ public class QueryDerivedReferrer extends DerivedReferrer {
     //                                                                           Attribute
     //                                                                           =========
     protected final String _operand;
-    protected final Object _value; // NullAllowed: when IsNull or IsNotNull
+    protected final Object _value; // null allowed: when IsNull or IsNotNull
     protected final String _parameterPath;
 
     // ===================================================================================

@@ -63,29 +63,30 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
     //                                                                      ==============
     /**
      * Create property cache for base point row.
-     * @param selectColumnSet The name set of select column. (NotNull)
-     * @return The map of row property cache. Map{String(columnName), PropertyMapping} (NotNull)
+     * @param selectColumnMap The map of select column name. map:{flexibleName = columnAliasName} (NotNull)
+     * @param selectIndexMap The map of select index. map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}} (NullAllowed)
+     * @return The map of row property cache. map:{columnName, PropertyMapping} (NotNull)
      * @throws SQLException
      */
-    protected Map<String, TnPropertyMapping> createPropertyCache(Map<String, String> selectColumnSet)
-            throws SQLException {
+    protected Map<String, TnPropertyMapping> createPropertyCache(Map<String, String> selectColumnMap,
+            Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
         // - - - - - - - - -
         // Override for Bean
         // - - - - - - - - -
-        return _rowCreator.createPropertyCache(selectColumnSet, _beanMetaData);
+        return _rowCreator.createPropertyCache(selectColumnMap, selectIndexMap, _beanMetaData);
     }
 
     /**
      * Create relation property cache.
-     * @param selectColumnMap The name map of select column. map:{flexibleName = columnDbName} (NotNull)
-     * @param selectIndexMap The map of select index. map:{selectColumnKeyName = selectIndex} (NullAllowed: null means select index is disabled)
+     * @param selectColumnMap The map of select column name. map:{flexibleName = columnAliasName} (NotNull)
+     * @param selectIndexMap The map of select index. map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}} (NullAllowed)
      * @param relSelector The selector of relation, which can determines e.g. is it not-selected relation?. (NotNull)
      * @return The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
      * @throws SQLException
      */
     protected Map<String, Map<String, TnPropertyMapping>> createRelationPropertyCache(
-            Map<String, String> selectColumnMap, Map<String, Integer> selectIndexMap, TnRelationSelector relSelector)
-            throws SQLException {
+            Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap,
+            TnRelationSelector relSelector) throws SQLException {
         return _relationRowCreator.createPropertyCache(selectColumnMap, selectIndexMap, relSelector, _beanMetaData);
     }
 
@@ -95,12 +96,12 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
     /**
      * Create base point row.
      * @param rs Result set. (NotNull)
-     * @param selectIndexMap The map of select index. map:{selectColumnKeyName = selectIndex} (NullAllowed: null means select index is disabled)
-     * @param propertyCache The map of property cache. Map{String(columnName), PropertyMapping} (NotNull)
+     * @param selectIndexMap The map of select index. map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}} (NullAllowed)
+     * @param propertyCache The map of property cache. map:{columnName, PropertyMapping} (NotNull)
      * @return The created row. (NotNull)
      * @throws SQLException
      */
-    protected Object createRow(ResultSet rs, Map<String, Integer> selectIndexMap,
+    protected Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap,
             Map<String, TnPropertyMapping> propertyCache) throws SQLException {
         // - - - - - - - - -
         // Override for Bean
@@ -114,7 +115,7 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @param rs Result set. (NotNull)
      * @param rpt The type of relation property. (NotNull)
      * @param selectColumnMap The name map of select column. map:{flexibleName = columnDbName} (NotNull)
-     * @param selectIndexMap The map of select index. map:{selectColumnKeyName = selectIndex} (NullAllowed: null means select index is disabled)
+     * @param selectIndexMap The map of select index. map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}} (NullAllowed)
      * @param relKey The relation key, which has key values, of the relation. (NotNull)
      * @param relPropCache The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
      * @param relRowCache The cache of relation row. (NotNull)
@@ -123,7 +124,7 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @throws SQLException
      */
     protected Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
-            Map<String, Integer> selectIndexMap, TnRelationKey relKey,
+            Map<String, Map<String, Integer>> selectIndexMap, TnRelationKey relKey,
             Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache,
             TnRelationSelector relSelector) throws SQLException {
         return _relationRowCreator.createRelationRow(rs, rpt // basic resource

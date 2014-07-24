@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -48,26 +49,31 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
      * {@inheritDoc}
      */
     public Map<String, TnPropertyMapping> createPropertyCache(Map<String, String> selectColumnMap,
-            TnBeanMetaData beanMetaData) throws SQLException {
+            Map<String, Map<String, Integer>> selectIndexMap, TnBeanMetaData beanMetaData) throws SQLException {
         // - - - - - - - 
         // Entry Point!
         // - - - - - - -
         final Map<String, TnPropertyMapping> proprertyCache = newPropertyCache();
-        setupPropertyCache(proprertyCache, selectColumnMap, beanMetaData);
+        setupPropertyCache(proprertyCache, selectColumnMap, selectIndexMap, beanMetaData);
         return proprertyCache;
     }
 
     protected void setupPropertyCache(Map<String, TnPropertyMapping> proprertyCache,
-            Map<String, String> selectColumnMap, TnBeanMetaData beanMetaData) throws SQLException {
+            Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap,
+            TnBeanMetaData beanMetaData) throws SQLException {
         final List<TnPropertyType> ptList = beanMetaData.getPropertyTypeList();
         for (TnPropertyType pt : ptList) { // already been filtered as data properties only
-            setupPropertyCacheElement(proprertyCache, selectColumnMap, pt);
+            setupPropertyCacheElement(proprertyCache, selectColumnMap, selectIndexMap, pt);
         }
     }
 
     protected void setupPropertyCacheElement(Map<String, TnPropertyMapping> proprertyCache,
-            Map<String, String> selectColumnMap, TnPropertyType pt) throws SQLException {
+            Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap, TnPropertyType pt)
+            throws SQLException {
         final String columnDbName = pt.getColumnDbName();
+        if (isOutOfLocalSelectIndex(columnDbName, selectIndexMap)) {
+            return;
+        }
         if (pt.isPersistent()) {
             if (selectColumnMap.containsKey(columnDbName)) { // basically true if persistent
                 // the column DB name is same as selected name
@@ -81,6 +87,11 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
             }
         }
         // only a column that is not persistent and non-selected property
+    }
+
+    protected boolean isOutOfLocalSelectIndex(String columnDbName, Map<String, Map<String, Integer>> selectIndexMap)
+            throws SQLException {
+        return ResourceContext.isOutOfLocalSelectIndex(columnDbName, selectIndexMap);
     }
 
     // -----------------------------------------------------

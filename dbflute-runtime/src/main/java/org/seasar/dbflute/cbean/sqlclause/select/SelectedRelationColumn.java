@@ -28,7 +28,7 @@ public class SelectedRelationColumn {
     //                                                                           =========
     protected String _tableAliasName;
     protected ColumnInfo _columnInfo;
-    protected String _columnAliasName;
+    protected String _relationNoSuffix; // e.g. _0_3
 
     // ===================================================================================
     //                                                                              Naming
@@ -42,6 +42,10 @@ public class SelectedRelationColumn {
         }
     }
 
+    public String buildColumnAliasName() {
+        return _columnInfo.getColumnDbName() + _relationNoSuffix; // e.g. FOO_0_3
+    }
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
@@ -50,7 +54,7 @@ public class SelectedRelationColumn {
     }
 
     public void setTableAliasName(String tableAliasName) {
-        this._tableAliasName = tableAliasName;
+        _tableAliasName = tableAliasName;
     }
 
     public ColumnInfo getColumnInfo() {
@@ -58,14 +62,14 @@ public class SelectedRelationColumn {
     }
 
     public void setColumnInfo(ColumnInfo columnInfo) {
-        this._columnInfo = columnInfo;
+        _columnInfo = columnInfo;
     }
 
-    public String getColumnAliasName() {
-        return _columnAliasName;
+    public String getRelationNoSuffix() {
+        return _relationNoSuffix;
     }
 
-    public void setColumnAliasName(String columnAliasName) {
-        this._columnAliasName = columnAliasName;
+    public void setRelationNoSuffix(String relationNoSuffix) {
+        _relationNoSuffix = relationNoSuffix;
     }
 }

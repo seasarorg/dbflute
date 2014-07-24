@@ -33,7 +33,7 @@ public interface TnRelationRowCreator {
      * @param rs Result set. (NotNull)
      * @param rpt The type of relation property. (NotNull)
      * @param selectColumnMap The name map of select column. map:{flexibleName = columnDbName} (NotNull)
-     * @param selectIndexMap The map of select index. map:{selectColumnKeyName = selectIndex} (NullAllowed: null means select index is disabled)
+     * @param selectIndexMap The map of select index. map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}} (NullAllowed: null means select index is disabled)
      * @param relKey The relation key, which has key values, of the relation. (NotNull)
      * @param relPropCache The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
      * @param relRowCache The cache of relation row. (NotNull)
@@ -42,21 +42,21 @@ public interface TnRelationRowCreator {
      * @throws SQLException
      */
     Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
-            Map<String, Integer> selectIndexMap, TnRelationKey relKey,
+            Map<String, Map<String, Integer>> selectIndexMap, TnRelationKey relKey,
             Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache,
             TnRelationSelector relSelector) throws SQLException;
 
     /**
      * Create relation property cache.
      * @param selectColumnMap The name map of select column. map:{flexibleName = columnDbName} (NotNull)
-     * @param selectIndexMap The map of select index. map:{selectColumnKeyName = selectIndex} (NullAllowed: null means select index is disabled)
+     * @param selectIndexMap The map of select index. map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}} (NullAllowed: null means select index is disabled)
      * @param relSelector The selector of relation, which can determines e.g. is it not-selected relation?. (NotNull)
      * @param baseBmd Bean meta data of base object. (NotNull)
      * @return The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
      * @throws SQLException
      */
     Map<String, Map<String, TnPropertyMapping>> createPropertyCache(Map<String, String> selectColumnMap,
-            Map<String, Integer> selectIndexMap, TnRelationSelector relSelector, TnBeanMetaData baseBmd)
+            Map<String, Map<String, Integer>> selectIndexMap, TnRelationSelector relSelector, TnBeanMetaData baseBmd)
             throws SQLException;
 
     /**

@@ -29,6 +29,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
@@ -296,7 +297,7 @@ public class ResourceContext {
     public static Map<String, String> createSelectColumnMap(ResultSet rs) throws SQLException {
         final ResultSetMetaData rsmd = rs.getMetaData();
         final int count = rsmd.getColumnCount();
-        final Map<String, String> selectIndexReverseMap = getSelectIndexReverseMap();
+        final Map<String, String> selectColumnKeyNameMap = getSelectColumnKeyNameMap();
 
         // flexible for resolving non-compilable connectors and reservation words
         final Map<String, String> columnMap = StringKeyMap.createAsFlexible();
@@ -308,10 +309,10 @@ public class ResourceContext {
                 columnLabel = columnLabel.substring(dotIndex + 1);
             }
             final String realColumnName;
-            if (selectIndexReverseMap != null) {
-                final String mappedName = selectIndexReverseMap.get(columnLabel);
+            if (selectColumnKeyNameMap != null) { // use select index
+                final String mappedName = selectColumnKeyNameMap.get(columnLabel);
                 if (mappedName != null) { // mainly true
-                    realColumnName = mappedName; // switch select indexes to column DB names
+                    realColumnName = mappedName; // switch on-query-name to column DB names
                 } else { // for derived columns and so on
                     realColumnName = columnLabel;
                 }
@@ -323,33 +324,84 @@ public class ResourceContext {
         return columnMap;
     }
 
-    // -----------------------------------------------------
-    //                                          Select Index
-    //                                          ------------
-    public static Map<String, Integer> getSelectIndexMap() {
+    protected static Map<String, String> getSelectColumnKeyNameMap() {
         if (!ConditionBeanContext.isExistConditionBeanOnThread()) {
             return null;
         }
+        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+        return cb.getSqlClause().getSelectColumnKeyNameMap();
+    }
+
+    // -----------------------------------------------------
+    //                                          Select Index
+    //                                          ------------
+    /**
+     * Get the map of select index. map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}}
+     * @return The map of select index. (NullAllowed: null means select index is disabled)
+     */
+    public static Map<String, Map<String, Integer>> getSelectIndexMap() {
+        if (!ConditionBeanContext.isExistConditionBeanOnThread()) {
+            return null;
+        }
+        // basically only used by getLocalValue() or getRelationValue()
+        // but argument style for performance
         final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
         return cb.getSqlClause().getSelectIndexMap();
     }
 
-    protected static Map<String, String> getSelectIndexReverseMap() {
-        if (!ConditionBeanContext.isExistConditionBeanOnThread()) {
-            return null;
-        }
-        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
-        return cb.getSqlClause().getSelectIndexReverseMap();
+    public static Object getLocalValue(ResultSet rs, String columnName, ValueType valueType,
+            Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
+        return doGetValue(rs, SqlClause.BASE_POINT_HANDLING_ENTITY_NO, columnName, valueType, selectIndexMap);
     }
 
-    public static Object getValue(ResultSet rs, String columnName, ValueType valueType,
-            Map<String, Integer> selectIndexMap) throws SQLException { // no check
-        final Integer selectIndex = selectIndexMap.get(columnName);
+    public static Object getRelationValue(ResultSet rs, String relationNoSuffix, String columnName,
+            ValueType valueType, Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
+        return doGetValue(rs, relationNoSuffix, columnName, valueType, selectIndexMap);
+    }
+
+    protected static Object doGetValue(ResultSet rs, String entityNo, String columnName, ValueType valueType,
+            Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
+        final Map<String, Integer> innerMap = selectIndexMap != null ? selectIndexMap.get(entityNo) : null;
+        final Integer selectIndex = innerMap != null ? innerMap.get(columnName) : null;
         if (selectIndex != null) {
             return valueType.getValue(rs, selectIndex);
         } else {
             return valueType.getValue(rs, columnName);
         }
+    }
+
+    public static boolean isOutOfLocalSelectIndex(String columnDbName, Map<String, Map<String, Integer>> selectIndexMap)
+            throws SQLException {
+        // if use select index (basically ConditionBean) but no select index for the column,
+        // the column is not set up in select clause (and selectColumnMap also does not contain it)
+        // this determination is to avoid...
+        //  o exists duplicate key name, FOO_0 and FOO(_0)
+        //  o either is excepted column by SpecifyColumn
+        // in this case, selectColumnMap returns true in both column
+        // so it determines existence in select clause by this method
+        return selectIndexMap != null && !hasLocalSelectIndex(columnDbName, selectIndexMap);
+    }
+
+    public static boolean isOutOfRelationSelectIndex(String relationNoSuffix, String columnDbName,
+            Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
+        // see comment on the method for local
+        return selectIndexMap != null && !hasRelationSelectIndex(relationNoSuffix, columnDbName, selectIndexMap);
+    }
+
+    protected static boolean hasLocalSelectIndex(String columnName, Map<String, Map<String, Integer>> selectIndexMap)
+            throws SQLException {
+        return doHasSelectIndex(SqlClause.BASE_POINT_HANDLING_ENTITY_NO, columnName, selectIndexMap);
+    }
+
+    protected static boolean hasRelationSelectIndex(String relationNoSuffix, String columnName,
+            Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
+        return doHasSelectIndex(relationNoSuffix, columnName, selectIndexMap);
+    }
+
+    protected static boolean doHasSelectIndex(String entityNo, String columnName,
+            Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
+        final Map<String, Integer> innerMap = selectIndexMap != null ? selectIndexMap.get(entityNo) : null;
+        return innerMap != null && innerMap.containsKey(columnName);
     }
 
     // ===================================================================================

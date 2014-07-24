@@ -120,25 +120,37 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // The resources that are not frequently used to are lazy-loaded for performance.
     // - - - - - - - - - -/
-    /** The basic map of selected relation. map:{foreignRelationPath : foreignPropertyName} (NullAllowed: lazy-loaded) */
+    /**
+     * The basic map of selected relation. (NullAllowed: lazy-loaded) <br />
+     * map:{foreignRelationPath : foreignPropertyName}
+     */
     protected Map<String, String> _selectedRelationBasicMap;
 
-    /** The column map of selected relation. map:{foreignTableAliasName : map:{columnName : selectedRelationColumn}} (NullAllowed: lazy-loaded) */
+    /**
+     * The column map of selected relation. (NullAllowed: lazy-loaded) <br />
+     * map:{foreignTableAliasName : map:{columnName : selectedRelationColumn}}
+     */
     protected Map<String, Map<String, SelectedRelationColumn>> _selectedRelationColumnMap;
 
     /** The set of relation connecting to selected next relation. (NulAllowed: lazy-loaded) */
     protected Set<String> _selectedNextConnectingRelationSet;
 
-    /** Specified select column map. map:{ tableAliasName = map:{ columnName : specifiedInfo } } (NullAllowed: lazy-loaded) */
+    /**
+     * Specified select column map. (NullAllowed: lazy-loaded) <br />
+     * map:{tableAliasName = map:{ columnName : specifiedInfo}}
+     */
     protected Map<String, Map<String, HpSpecifiedColumn>> _specifiedSelectColumnMap; // [DBFlute-0.7.4]
 
-    /** Specified select column map for backup. map:{ tableAliasName = map:{ columnName : specifiedInfo } } (NullAllowed: lazy-loaded) */
+    /**
+     * Specified select column map for backup. (NullAllowed: lazy-loaded) <br />
+     * map:{tableAliasName = map:{ columnName : specifiedInfo}}
+     */
     protected Map<String, Map<String, HpSpecifiedColumn>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
 
     /** Specified derive sub-query map. A null key is acceptable. (NullAllowed: lazy-load) */
     protected Map<String, HpDerivingSubQueryInfo> _specifiedDerivingSubQueryMap; // [DBFlute-0.7.4]
 
-    /** The map of real column and alias of select clause. map:{realColumnName : aliasName} */
+    /** The map of real column and alias of select clause. map:{realColumnName : aliasName} (NullAllowed: lazy-load) */
     protected Map<String, String> _selectClauseRealColumnAliasMap;
 
     /** The type of select clause. (NotNull) */
@@ -147,16 +159,28 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The previous type of select clause. (NullAllowed: The default is null) */
     protected SelectClauseType _previousSelectClauseType;
 
-    /** The map of select index. {key:selectColumnKeyName, value:selectIndex} (NullAllowed: lazy-load) */
-    protected Map<String, Integer> _selectIndexMap;
+    /**
+     * The map of select index by key name of select column. (NullAllowed: lazy-load or no use select index) <br />
+     * map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}}
+     */
+    protected Map<String, Map<String, Integer>> _selectIndexMap;
 
-    /** The reverse map of select index. {key:indexedOnQueryName, value:selectColumnKeyName} (NullAllowed: lazy-load) */
-    protected Map<String, String> _selectIndexReverseMap;
+    /**
+     * The map of key name of select column by on-query name. (NullAllowed: lazy-load or no use select index) <br />
+     * map:{onQueryAlias = selectColumnKeyName}}
+     */
+    protected Map<String, String> _selectColumnKeyNameMap;
 
     /** Is use select index? Default value is true. */
     protected boolean _useSelectIndex = true;
 
-    /** The map of left-outer-join info. map:{ foreignAliasName : leftOuterJoinInfo } (NullAllowed: lazy-load) */
+    /** The limit size of alias name to adjust alias length on query. */
+    protected int _aliasNameLimitSize = getDefaultAliasNameLimitSize();
+
+    /**
+     * The map of left-outer-join info. (NullAllowed: lazy-load) <br />
+     * map:{foreignAliasName : leftOuterJoinInfo}
+     */
     protected Map<String, LeftOuterJoinInfo> _outerJoinMap;
 
     /** The list of lazy checker for fixed-condition e.g. dynamic parameters. (NullAllowed: lazy-load) */
@@ -539,18 +563,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         // if it's a scalar-select, it always has union-query since here
         final StringBuilder sb = new StringBuilder();
 
-        if (_useSelectIndex) {
-            _selectIndexMap = createSelectIndexMap(); // should be initialized before process
-        }
-
-        final Integer selectIndex = processSelectClauseLocal(sb);
-        processSelectClauseRelation(sb, selectIndex);
-        processSelectClauseDerivedReferrer(sb);
+        clearSelectIndex(); // suppress duplicate registration
+        int selectIndex = processSelectClauseLocal(sb); // inherit select index incremented
+        selectIndex = processSelectClauseRelation(sb, selectIndex);
+        processSelectClauseDerivedReferrer(sb, selectIndex);
 
         return sb.toString();
     }
 
-    protected Integer processSelectClauseLocal(StringBuilder sb) {
+    protected int processSelectClauseLocal(StringBuilder sb) {
         final String basePointAliasName = getBasePointAliasName();
         final DBMeta dbmeta = getDBMeta();
         final Map<String, HpSpecifiedColumn> localSpecifiedMap;
@@ -583,7 +604,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             validSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
         }
 
-        Integer selectIndex = 0; // because 1 origin in JDBC
+        int selectIndex = 0; // because 1 origin in JDBC
         boolean needsDelimiter = false;
         for (ColumnInfo columnInfo : columnInfoList) {
             final String columnDbName = columnInfo.getColumnDbName();
@@ -610,8 +631,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final String onQueryName;
             ++selectIndex;
             if (_useSelectIndex) {
-                onQueryName = buildSelectIndexAlias(columnSqlName, null, selectIndex);
-                registerSelectIndex(columnDbName, onQueryName, selectIndex);
+                final String entityNo = BASE_POINT_HANDLING_ENTITY_NO;
+                onQueryName = buildSelectIndexAlias(columnSqlName, null, selectIndex, entityNo);
+                registerSelectIndex(entityNo, columnDbName, onQueryName, selectIndex);
             } else {
                 onQueryName = columnSqlName.toString();
             }
@@ -626,7 +648,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return selectIndex;
     }
 
-    protected Integer processSelectClauseRelation(StringBuilder sb, Integer selectIndex) {
+    protected int processSelectClauseRelation(StringBuilder sb, int selectIndex) {
         if (_pkOnlySelectForcedly) {
             return selectIndex;
         }
@@ -648,12 +670,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 }
 
                 final String realColumnName = selectColumnInfo.buildRealColumnSqlName();
-                final String columnAliasName = selectColumnInfo.getColumnAliasName();
+                final String columnAliasName = selectColumnInfo.buildColumnAliasName();
+                final String relationNoSuffix = selectColumnInfo.getRelationNoSuffix();
                 final String onQueryName;
                 ++selectIndex;
                 if (_useSelectIndex) {
-                    onQueryName = buildSelectIndexAlias(columnInfo.getColumnSqlName(), columnAliasName, selectIndex);
-                    registerSelectIndex(columnAliasName, onQueryName, selectIndex);
+                    final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
+                    onQueryName = buildSelectIndexAlias(columnSqlName, columnAliasName, selectIndex, relationNoSuffix);
+                    registerSelectIndex(relationNoSuffix, columnAliasName, onQueryName, selectIndex);
                 } else {
                     onQueryName = columnAliasName;
                 }
@@ -674,9 +698,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return selectIndex;
     }
 
-    protected void processSelectClauseDerivedReferrer(StringBuilder sb) {
+    protected int processSelectClauseDerivedReferrer(StringBuilder sb, int selectIndex) {
         if (_specifiedDerivingSubQueryMap == null || _specifiedDerivingSubQueryMap.isEmpty()) {
-            return;
+            return selectIndex;
         }
         for (Entry<String, HpDerivingSubQueryInfo> entry : _specifiedDerivingSubQueryMap.entrySet()) {
             final String subQueryAlias = entry.getKey();
@@ -693,7 +717,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             if (subQueryAlias != null) {
                 getSelectClauseRealColumnAliasMap().put(subQueryAlias, subQueryAlias);
             }
+            ++selectIndex;
+            registerSelectIndex(BASE_POINT_HANDLING_ENTITY_NO, subQueryAlias, subQueryAlias, selectIndex);
         }
+        return selectIndex;
     }
 
     protected Map<String, String> getSelectClauseRealColumnAliasMap() {
@@ -818,37 +845,63 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /**
      * {@inheritDoc}
      */
-    public Map<String, Integer> getSelectIndexMap() {
-        return _selectIndexMap; // NullAllowed
+    public Map<String, Map<String, Integer>> getSelectIndexMap() {
+        return _selectIndexMap; // null allowed
     }
 
     /**
      * {@inheritDoc}
      */
-    public Map<String, String> getSelectIndexReverseMap() {
-        return _selectIndexReverseMap; // NullAllowed
+    public Map<String, String> getSelectColumnKeyNameMap() {
+        return _selectColumnKeyNameMap; // null allowed
     }
 
-    protected void registerSelectIndex(String keyName, String onQueryName, Integer selectIndex) {
+    protected void clearSelectIndex() {
+        _selectIndexMap = null;
+        _selectColumnKeyNameMap = null;
+    }
+
+    protected void registerSelectIndex(String entityNo, String keyName, String onQueryName, Integer selectIndex) {
+        doRegisterSelectIndex(entityNo, keyName, selectIndex);
+        doRegisterSelectOnQueryColumnKey(entityNo, keyName, onQueryName);
+    }
+
+    protected void doRegisterSelectIndex(String entityNo, String keyName, Integer selectIndex) {
         if (_selectIndexMap == null) { // lazy load
-            _selectIndexMap = createSelectIndexMap();
+            _selectIndexMap = createSelectIndexEntryMap();
         }
-        _selectIndexMap.put(keyName, selectIndex);
-        if (_selectIndexReverseMap == null) { // lazy load
-            _selectIndexReverseMap = createSelectIndexMap();
+        Map<String, Integer> indexElementMap = _selectIndexMap.get(entityNo);
+        if (indexElementMap == null) {
+            indexElementMap = createSelectIndexInnerMap();
+            _selectIndexMap.put(entityNo, indexElementMap);
         }
-        _selectIndexReverseMap.put(onQueryName, keyName);
+        indexElementMap.put(keyName, selectIndex);
     }
 
-    protected <VALUE> Map<String, VALUE> createSelectIndexMap() {
+    protected <VALUE> Map<String, VALUE> createSelectIndexEntryMap() {
+        return new HashMap<String, VALUE>(); // it does not need to be ordered
+    }
+
+    protected <VALUE> Map<String, VALUE> createSelectIndexInnerMap() {
         // flexible for resolving non-compilable connectors and reservation words
         // (and it does not need to be ordered)
         return StringKeyMap.createAsFlexible();
     }
 
-    protected String buildSelectIndexAlias(ColumnSqlName sqlName, String aliasName, Integer selectIndex) {
+    protected void doRegisterSelectOnQueryColumnKey(String entityNo, String keyName, String onQueryName) {
+        if (_selectColumnKeyNameMap == null) { // lazy load
+            _selectColumnKeyNameMap = createSelectOnQueryColumnKeyMap();
+        }
+        _selectColumnKeyNameMap.put(onQueryName, keyName); // found by column label provided by JDBC
+    }
+
+    protected <VALUE> Map<String, VALUE> createSelectOnQueryColumnKeyMap() {
+        return StringKeyMap.createAsFlexible(); // same reason with SelectIndexInnerMap
+    }
+
+    protected String buildSelectIndexAlias(ColumnSqlName sqlName, String aliasName, int selectIndex, String entityNo) {
         if (sqlName.hasIrregularChar()) {
-            return "c" + selectIndex; // use index only for safety
+            return buildSelectIndexSimpleName(selectIndex); // use index only for safety
         }
         // regular case only here
         final String baseName;
@@ -857,21 +910,50 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         } else { // local column
             baseName = sqlName.toString();
         }
-        final int aliasNameLimitSize = getAliasNameLimitSize();
-        if (baseName.length() > aliasNameLimitSize) {
-            final int aliasNameBaseSize = aliasNameLimitSize - 10;
-            return Srl.substring(baseName, 0, aliasNameBaseSize) + "_c" + selectIndex;
+        final String resolvedName;
+        final int limitSize = _aliasNameLimitSize;
+        if (baseName.length() > limitSize) {
+            resolvedName = buildSelectIndexCuttingName(selectIndex, baseName, limitSize);
         } else {
-            return baseName;
+            resolvedName = baseName;
         }
+        if (isDuplicateAliasName(resolvedName)) { // e.g. local:FOO_0, relation:FOO(_0)
+            return buildSelectIndexSimpleName(selectIndex); // rare case so use index only
+        }
+        return resolvedName;
     }
 
-    protected int getAliasNameLimitSize() { // used only when regular case
-        return 30; // default is the least limit size in DBMSs (Oracle)
+    protected String buildSelectIndexCuttingName(int selectIndex, String baseName, int limitSize) {
+        final int aliasNameBaseSize = limitSize - 10;
+        return Srl.substring(baseName, 0, aliasNameBaseSize) + "_c" + selectIndex;
+    }
+
+    protected String buildSelectIndexSimpleName(int selectIndex) {
+        final String baseName = "c" + selectIndex;
+        if (isDuplicateAliasName(baseName)) {
+            return "df" + selectIndex; // last retry
+        }
+        return baseName;
+    }
+
+    protected boolean isDuplicateAliasName(final String resolvedName) {
+        return _selectColumnKeyNameMap != null && _selectColumnKeyNameMap.containsKey(resolvedName);
+    }
+
+    public void changeAliasNameLimitSize(int aliasNameLimitSize) { // basically for test
+        if (aliasNameLimitSize < 1) {
+            String msg = "The argument 'aliasNameLimitSize' should not be minus or zero: " + aliasNameLimitSize;
+            throw new IllegalArgumentException(msg);
+        }
+        _aliasNameLimitSize = aliasNameLimitSize;
+    }
+
+    protected int getDefaultAliasNameLimitSize() {
+        return 30; // the default is the least limit size in DBMSs (Oracle)
     }
 
     public void disableSelectIndex() {
-        _useSelectIndex = false;
+        _useSelectIndex = false; // for e.g. scalar select (internal handling)
     }
 
     // -----------------------------------------------------
@@ -1255,7 +1337,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final SelectedRelationColumn selectColumnInfo = new SelectedRelationColumn();
             selectColumnInfo.setTableAliasName(foreignTableAliasName);
             selectColumnInfo.setColumnInfo(columnInfo);
-            selectColumnInfo.setColumnAliasName(columnDbName + nextRelationPath);
+            selectColumnInfo.setRelationNoSuffix(nextRelationPath);
             resultMap.put(columnDbName, selectColumnInfo);
         }
         return resultMap;
@@ -1271,8 +1353,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             return;
         }
         final String previousPath = Srl.substringLastFront(foreignRelationPath, delimiter);
-        final Set<String> selectecNextConnectingRelationSet = getSelectedNextConnectingRelationSet();
-        selectecNextConnectingRelationSet.add(previousPath);
+        getSelectedNextConnectingRelationSet().add(previousPath);
     }
 
     /**
@@ -2388,7 +2469,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      */
     public String getBasePointAliasName() {
         // the variable should be resolved when making a sub-query clause
-        return isForSubQuery() ? "sub" + getSubQueryLevel() + "loc" : "dfloc";
+        return isForSubQuery() ? "sub" + getSubQueryLevel() + "loc" : BASE_POINT_ALIAS_NAME;
     }
 
     /**

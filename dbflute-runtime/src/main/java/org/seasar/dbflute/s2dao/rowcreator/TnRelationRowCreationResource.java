@@ -50,8 +50,8 @@ public class TnRelationRowCreationResource {
     /** The name map of select column. (NotNull) */
     protected Map<String, String> _selectColumnMap;
 
-    /** The map of select index. (NullAllowed) */
-    protected Map<String, Integer> _selectIndexMap;
+    /** The map of select index. map:{ localAlias or relationNoSuffix = map:{ selectColumnKeyName = selectIndex } } (NullAllowed) */
+    protected Map<String, Map<String, Integer>> _selectIndexMap;
 
     /** The relation key, which has key values, of the relation. (NotNull) */
     protected TnRelationKey _relationKey;
@@ -142,8 +142,13 @@ public class TnRelationRowCreationResource {
     // ===================================================================================
     //                                                                       Select Column
     //                                                                       =============
-    public boolean containsSelectColumn(String columnName) {
-        return _selectColumnMap.containsKey(columnName);
+    /**
+     * Does the column name contain in selected columns?
+     * @param columnKeyName The key name of column. e.g. FOO, FOO_0_2 (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean containsSelectColumn(String columnKeyName) {
+        return _selectColumnMap.containsKey(columnKeyName);
     }
 
     // ===================================================================================
@@ -386,7 +391,7 @@ public class TnRelationRowCreationResource {
     }
 
     public void setResultSet(ResultSet resultSet) {
-        this._resultSet = resultSet;
+        _resultSet = resultSet;
     }
 
     public Object getRow() {
@@ -394,7 +399,7 @@ public class TnRelationRowCreationResource {
     }
 
     public void setRow(Object row) {
-        this._row = row;
+        _row = row;
     }
 
     public TnRelationPropertyType getRelationPropertyType() {
@@ -402,7 +407,7 @@ public class TnRelationRowCreationResource {
     }
 
     public void setRelationPropertyType(TnRelationPropertyType rpt) {
-        this._relationPropertyType = rpt;
+        _relationPropertyType = rpt;
     }
 
     public Map<String, String> getSelectColumnMap() {
@@ -410,14 +415,14 @@ public class TnRelationRowCreationResource {
     }
 
     public void setSelectColumnMap(Map<String, String> selectColumnMap) {
-        this._selectColumnMap = selectColumnMap;
+        _selectColumnMap = selectColumnMap;
     }
 
-    public Map<String, Integer> getSelectIndexMap() {
+    public Map<String, Map<String, Integer>> getSelectIndexMap() {
         return _selectIndexMap;
     }
 
-    public void setSelectIndexMap(Map<String, Integer> selectIndexMap) {
+    public void setSelectIndexMap(Map<String, Map<String, Integer>> selectIndexMap) {
         _selectIndexMap = selectIndexMap;
     }
 
@@ -426,7 +431,7 @@ public class TnRelationRowCreationResource {
     }
 
     public void setRelationKey(TnRelationKey relationKey) {
-        this._relationKey = relationKey;
+        _relationKey = relationKey;
     }
 
     public Map<String, Map<String, TnPropertyMapping>> getRelPropCache() {
