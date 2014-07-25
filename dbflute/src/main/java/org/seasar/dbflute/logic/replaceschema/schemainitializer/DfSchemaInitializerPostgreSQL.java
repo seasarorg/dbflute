@@ -20,18 +20,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
 public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
+
+    private static final Log _log = LogFactory.getLog(DfSchemaInitializerPostgreSQL.class);
 
     // ===================================================================================
     //                                                                    Drop Foreign Key
@@ -52,6 +59,63 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
             }
         }
         return false;
+    }
+
+    // ===================================================================================
+    //                                                                          Drop Table
+    //                                                                          ==========
+    @Override
+    protected List<DfTableMeta> prepareSortedTableList(Connection conn, List<DfTableMeta> viewList,
+            List<DfTableMeta> otherList) {
+        // order for inherit tables
+        final List<Map<String, String>> resultList = selectInheritList(conn);
+        final Set<String> childSet = StringSet.createAsCaseInsensitive();
+        for (Map<String, String> elementMap : resultList) {
+            childSet.add(elementMap.get("child_name"));
+        }
+        final Set<String> parentSet = StringSet.createAsCaseInsensitive();
+        for (Map<String, String> elementMap : resultList) {
+            parentSet.add(elementMap.get("parent_name"));
+        }
+        final List<DfTableMeta> firstPriorityList = new ArrayList<DfTableMeta>();
+        final List<DfTableMeta> secondPriorityList = new ArrayList<DfTableMeta>();
+        final List<DfTableMeta> thirdPriorityList = new ArrayList<DfTableMeta>();
+        for (DfTableMeta meta : otherList) {
+            final String tableDbName = meta.getTableDbName();
+            if (childSet.contains(tableDbName)) {
+                if (!parentSet.contains(tableDbName)) { // both inherited and inherits
+                    secondPriorityList.add(meta);
+                } else { // inherits any table
+                    firstPriorityList.add(meta);
+                }
+            } else { // no inheritance
+                thirdPriorityList.add(meta);
+            }
+        }
+        final List<DfTableMeta> sortedList = new ArrayList<DfTableMeta>();
+        sortedList.addAll(viewList); // should be before dropping reference table
+        sortedList.addAll(firstPriorityList);
+        sortedList.addAll(secondPriorityList);
+        sortedList.addAll(thirdPriorityList);
+        return sortedList;
+    }
+
+    protected List<Map<String, String>> selectInheritList(Connection conn) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("select rits.inhrelid, child_cls.relname as child_name");
+        sb.append(", rits.inhparent, parent_cls.relname as parent_name, inhseqno");
+        sb.append(" from pg_inherits rits");
+        sb.append(" left outer join pg_class child_cls on inhrelid = oid");
+        sb.append(" left outer join pg_class parent_cls on inhparent = oid");
+        final String sql = sb.toString();
+        final List<String> colList = Arrays.asList("inhrelid", "child_name", "inhparent", "parent_name", "inhseqno");
+        final DfJdbcFacade jdbcFacade = new DfJdbcFacade(conn);
+        try {
+            return jdbcFacade.selectStringList(sql, colList);
+        } catch (RuntimeException continued) {
+            _log.info("*Failed to select pg_inherits for priority of dropping table: " + continued.getMessage());
+            return DfCollectionUtil.emptyList();
+        }
     }
 
     // ===================================================================================

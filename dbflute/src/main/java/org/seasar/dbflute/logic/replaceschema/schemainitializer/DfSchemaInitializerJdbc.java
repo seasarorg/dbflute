@@ -319,9 +319,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         }
 
         // Drop view and drop others
-        final List<DfTableMeta> sortedList = new ArrayList<DfTableMeta>();
-        sortedList.addAll(viewList);
-        sortedList.addAll(otherList);
+        final List<DfTableMeta> sortedList = prepareSortedTableList(conn, viewList, otherList);
 
         callbackDropTableByJdbc(conn, sortedList, new DfDropTableByJdbcCallback() {
             public String buildDropTableSql(DfTableMeta metaInfo) {
@@ -336,6 +334,14 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 return sb.toString();
             }
         });
+    }
+
+    protected List<DfTableMeta> prepareSortedTableList(Connection conn, List<DfTableMeta> viewList,
+            List<DfTableMeta> otherList) {
+        final List<DfTableMeta> sortedList = new ArrayList<DfTableMeta>();
+        sortedList.addAll(viewList); // should be before dropping reference table
+        sortedList.addAll(otherList);
+        return sortedList;
     }
 
     protected void setupDropTable(StringBuilder sb, DfTableMeta tableMeta) {
