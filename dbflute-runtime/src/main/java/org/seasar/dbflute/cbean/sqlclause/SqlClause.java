@@ -822,6 +822,12 @@ public interface SqlClause {
     //                                      Specified as One
     //                                      ----------------
     /**
+     * Get the only one specified column.
+     * @return The instance as specified column. (NullAllowed: if not found or duplicated, returns null)
+     */
+    HpSpecifiedColumn getSpecifiedColumnAsOne();
+
+    /**
      * Get the DB name of only one specified column.
      * @return The instance as string. (NullAllowed: if not found or duplicated, returns null)
      */

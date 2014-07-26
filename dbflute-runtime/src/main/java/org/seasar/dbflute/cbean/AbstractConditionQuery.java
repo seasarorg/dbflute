@@ -1659,7 +1659,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         xgetSqlClause().addNullsLastToPreviousOrderBy();
     }
 
-    protected void xdoWithManualOrder(ManualOrderBean mob) { // is user public!
+    protected void xdoWithManualOrder(ManualOrderBean mob) {
         assertObjectNotNull("withManualOrder(mob)", mob);
         mob.bind(new HpManualOrderThemeListHandler() {
             public String register(String themeKey, Object orderValue) {

@@ -2636,6 +2636,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                      Specified as One
     //                                      ----------------
+    public HpSpecifiedColumn getSpecifiedColumnAsOne() {
+        final Map<String, HpSpecifiedColumn> elementMap = getSpecifiedColumnElementMapAsOne();
+        if (elementMap != null && elementMap.size() == 1) {
+            return elementMap.values().iterator().next();
+        }
+        return null;
+    }
+
     public String getSpecifiedColumnDbNameAsOne() {
         final ColumnInfo columnInfo = getSpecifiedColumnInfoAsOne();
         return columnInfo != null ? columnInfo.getColumnDbName() : null;

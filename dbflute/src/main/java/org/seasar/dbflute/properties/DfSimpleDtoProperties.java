@@ -294,6 +294,31 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                             Jackson
+    //                                                                             =======
+    // TODO jflute
+    protected Map<String, String> _jacksonDecorationMap;
+
+    protected Map<String, String> getJacksonDecorationMap() {
+        if (_jacksonDecorationMap != null) {
+            return _jacksonDecorationMap;
+        }
+        final String key = "jacksonDecorationMap";
+        @SuppressWarnings("unchecked")
+        final Map<String, String> map = (Map<String, String>) getSimpleDtoDefinitionMap().get(key);
+        if (map != null) {
+            _jacksonDecorationMap = map;
+        } else {
+            _jacksonDecorationMap = DfCollectionUtil.emptyMap();
+        }
+        return _jacksonDecorationMap;
+    }
+
+    public boolean isJacksonBasicDecorate() {
+        return isProperty("isBasicDecorate", false, getJsonPullParserDecorationMap());
+    }
+
+    // ===================================================================================
     //                                                                                 GWT
     //                                                                                 ===
     protected Map<String, String> _gwtDecorationMap;

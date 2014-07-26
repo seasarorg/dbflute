@@ -19,6 +19,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
@@ -163,8 +166,18 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     }
 
     protected ColumnRealName getDerivedColumnRealName() {
+        // TODO jflute
+        HpSpecifiedColumn specifiedColumnHp = _subQuerySqlClause.getSpecifiedColumnAsOne();
         final ColumnRealName specifiedColumn = _subQuerySqlClause.getSpecifiedColumnRealNameAsOne();
         if (specifiedColumn != null) {
+            if (specifiedColumnHp != null) {
+                specifiedColumnHp.xspecifyCalculation();
+                HpCalcSpecification<ConditionBean> calcSpecification = specifiedColumnHp.getCalculation();
+                if (calcSpecification != null) {
+                    final String statement = calcSpecification.buildStatementToSpecifidName(specifiedColumn.toString());
+                    return ColumnRealName.create(null, new ColumnSqlName(statement));
+                }
+            }
             return specifiedColumn;
         } else {
             final String nestedSubQuery = _subQuerySqlClause.getSpecifiedDerivingSubQueryAsOne();
