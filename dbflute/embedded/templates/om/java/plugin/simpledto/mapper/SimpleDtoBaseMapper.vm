@@ -35,9 +35,7 @@ import ${glPackageBaseCommon}.${glCDef};
 #end
 import ${myDomainEntityPackageName}.*;
 import ${myExtendedEntityPackageName}.*;
-#if ($table.hasRelation())
 import ${myExtendedDtoMapperPackageName}.*;
-#end
 
 /**
  * The DTO mapper of ${table.basicInfoDispString}. <br />
@@ -87,6 +85,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
     //                                                                           =========
     protected final Map<Entity, Object> _relationDtoMap;
     protected final Map<Object, Entity> _relationEntityMap;
+    protected boolean _exceptCommonColumn;
 #if ($database.isSimpleDtoMappingReverseReference())
     protected boolean _reverseReference = true; // default: reverse reference
 #else
@@ -138,15 +137,24 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
             return (${myExtendedObjectClassName})cachedLocalDto;
         }
 #end
+#if ($table.hasAllCommonColumn() || $table.hasRelation())
+        boolean exceptCommonColumn = isExceptCommonColumn();
+#end
         ${myExtendedObjectClassName} dto = new ${myExtendedObjectClassName}();
 #foreach ($col in $table.columns)
+#if ($col.isCommonColumn())
+        if (!exceptCommonColumn) {
+            dto.set${col.javaName}(entity.get${col.javaName}());
+        }
+#else
         dto.set${col.javaName}(entity.get${col.javaName}());
+#end
 #end
 #if ($table.hasRelation())
         if (instanceCache && entity.hasPrimaryKeyValue()) { // caches only a DTO that has a primary key value
             _relationDtoMap.put(localKey, dto);
         }
-        boolean reverseReference = _reverseReference;
+        boolean reverseReference = isReverseReference();
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignDtoClassName = "${fk.foreignTableExtendedSimpleDtoClassName}")
 #if ($fk.isForeignPropertyOptionalEntity())
@@ -173,6 +181,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
                 }
             } else {
                 ${foreignDtoClassName}Mapper mapper = new ${foreignDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+                mapper.setExceptCommonColumn(exceptCommonColumn);
                 mapper.setReverseReference(reverseReference);
                 if (!instanceCache) { mapper.disableInstanceCache(); }
 #if ($fk.canBeReferrer())
@@ -219,6 +228,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
                 }
             } else {
                 ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+                mapper.setExceptCommonColumn(exceptCommonColumn);
                 mapper.setReverseReference(reverseReference);
                 if (!instanceCache) { mapper.disableInstanceCache(); }
                 mapper.suppress${referrer.foreignJavaBeansRulePropertyNameInitCap}();
@@ -235,6 +245,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #else
         if (!_suppress${referrer.referrerJavaBeansRulePropertyNameInitCap} && !entity.get${referrer.referrerJavaBeansRulePropertyNameInitCap}().isEmpty()) {
             ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+            mapper.setExceptCommonColumn(exceptCommonColumn);
             mapper.setReverseReference(reverseReference);
             if (!instanceCache) { mapper.disableInstanceCache(); }
             mapper.suppress${referrer.foreignJavaBeansRulePropertyNameInitCap}();
@@ -291,9 +302,16 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
             return (${table.extendedEntityClassName})cachedLocalEntity;
         }
 #end
+#if ($table.hasAllCommonColumn() || $table.hasRelation())
+        boolean exceptCommonColumn = isExceptCommonColumn();
+#end
         ${table.extendedEntityClassName} entity = new ${table.extendedEntityClassName}();
 #foreach ($col in $table.columns)
+#if ($col.isCommonColumn())
+        if (needsMapping(dto, dto.get${col.javaName}(), "${col.javaBeansRulePropertyName}") && !exceptCommonColumn) {
+#else
         if (needsMapping(dto, dto.get${col.javaName}(), "${col.javaBeansRulePropertyName}")) {
+#end
 #if ($col.hasClassification())
             entity.set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(dto.get${col.javaName}()));
 #else
@@ -305,7 +323,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
         if (instanceCache && entity.hasPrimaryKeyValue()) { // caches only an entity that has a primary key value
             _relationEntityMap.put(localKey, entity);
         }
-        boolean reverseReference = _reverseReference;
+        boolean reverseReference = isReverseReference();
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignDtoClassName = "${fk.foreignTableExtendedSimpleDtoClassName}")
         if (!_suppress${fk.foreignJavaBeansRulePropertyNameInitCap} && dto.get${fk.foreignJavaBeansRulePropertyNameInitCap}() != null) {
@@ -335,6 +353,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
                 }
             } else {
                 ${foreignDtoClassName}Mapper mapper = new ${foreignDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+                mapper.setExceptCommonColumn(exceptCommonColumn);
                 mapper.setReverseReference(reverseReference);
                 if (!instanceCache) { mapper.disableInstanceCache(); }
 #if ($fk.canBeReferrer())
@@ -399,6 +418,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
                 }
             } else {
                 ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+                mapper.setExceptCommonColumn(exceptCommonColumn);
                 mapper.setReverseReference(reverseReference);
                 if (!instanceCache) { mapper.disableInstanceCache(); }
                 mapper.suppress${referrer.foreignJavaBeansRulePropertyNameInitCap}();
@@ -429,6 +449,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #else
         if (!_suppress${referrer.referrerJavaBeansRulePropertyNameInitCap} && !dto.get${referrer.referrerJavaBeansRulePropertyNameInitCap}().isEmpty()) {
             ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+            mapper.setExceptCommonColumn(exceptCommonColumn);
             mapper.setReverseReference(reverseReference);
             if (!instanceCache) { mapper.disableInstanceCache(); }
             mapper.suppress${referrer.foreignJavaBeansRulePropertyNameInitCap}();
@@ -576,10 +597,55 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
         }
     }
 
+    protected boolean isExceptCommonColumn() {
+        return _exceptCommonColumn;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setExceptCommonColumn(boolean exceptCommonColumn) {
+        _exceptCommonColumn = exceptCommonColumn;
+    }
+
+    protected boolean isReverseReference() {
+        return _reverseReference;
+    }
+
     /**
      * {@inheritDoc}
      */
     public void setReverseReference(boolean reverseReference) {
         _reverseReference = reverseReference;
+    }
+
+    // -----------------------------------------------------
+    //                                           Easy-to-Use
+    //                                           -----------
+    /**
+     * Enable base-only mapping that means the mapping ignores all references.
+     * @return this. (NotNull)
+     */
+    public ${myExtendedDtoMapperClassName} baseOnlyMapping() {
+        setBaseOnlyMapping(true);
+        return (${myExtendedDtoMapperClassName})this;
+    }
+
+    /**
+     * Enable except common column that means the mapping excepts common column.
+     * @return this. (NotNull)
+     */
+    public ${myExtendedDtoMapperClassName} exceptCommonColumn() {
+        setExceptCommonColumn(true);
+        return (${myExtendedDtoMapperClassName})this;
+    }
+
+    /**
+     * Enable reverse reference that means the mapping contains reverse references.
+     * @return this. (NotNull)
+     */
+    public ${myExtendedDtoMapperClassName} reverseReference() {
+        setReverseReference(true);
+        return (${myExtendedDtoMapperClassName})this;
     }
 }

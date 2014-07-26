@@ -65,6 +65,12 @@ public interface DtoMapper<ENTITY extends Entity, DTO> {
     void setBaseOnlyMapping(boolean baseOnlyMapping);
 
     /**
+     * Set the option whether common column is except or not.
+     * @param exceptCommonColumn Does the mapping except common column? (true: no mapping of common column)
+     */
+    void setExceptCommonColumn(boolean exceptCommonColumn);
+
+    /**
      * Set the option whether reverse reference or not.
      * @param reverseReference Does the mapping contain reverse references? (true: reverse reference, false: one-way reference)
      */
