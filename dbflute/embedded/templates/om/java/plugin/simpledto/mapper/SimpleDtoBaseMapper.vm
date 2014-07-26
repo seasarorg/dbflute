@@ -30,6 +30,11 @@ import ${database.relationOptionalEntityClassName};
 import org.seasar.dbflute.bhv.DtoMapper;
 import org.seasar.dbflute.bhv.InstanceKeyDto;
 import org.seasar.dbflute.bhv.InstanceKeyEntity;
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
+import org.seasar.dbflute.jdbc.Classification;
 #if ($table.hasClassification())
 import ${glPackageBaseCommon}.${glCDef};
 #end
@@ -150,6 +155,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
         dto.set${col.javaName}(entity.get${col.javaName}());
 #end
 #end
+        reflectDerivedProperty(entity, dto, true);
 #if ($table.hasRelation())
         if (instanceCache && entity.hasPrimaryKeyValue()) { // caches only a DTO that has a primary key value
             _relationDtoMap.put(localKey, dto);
@@ -319,6 +325,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #end
         }
 #end
+        reflectDerivedProperty(entity, dto, false);
 #if ($table.hasRelation())
         if (instanceCache && entity.hasPrimaryKeyValue()) { // caches only an entity that has a primary key value
             _relationEntityMap.put(localKey, entity);
@@ -536,6 +543,47 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 
     public void disableInstanceCache() { // internal option
         _instanceCache = false;
+    }
+
+    // -----------------------------------------------------
+    //                                      Derived Property
+    //                                      ----------------
+    protected void reflectDerivedProperty(Entity entity, Object dto, boolean toDto) {
+        DfBeanDesc entityDesc = DfBeanDescFactory.getBeanDesc(entity.getClass());
+        DfBeanDesc dtoDesc = DfBeanDescFactory.getBeanDesc(dto.getClass());
+        DBMeta dbmeta = entity.getDBMeta();
+        for (String propertyName : entityDesc.getProppertyNameList()) {
+            if (isOutOfDerivedPropertyName(entity, dto, toDto, dbmeta, propertyName)) {
+                continue;
+            }
+            DfPropertyDesc entityProp = entityDesc.getPropertyDesc(propertyName);
+            Class<?> propertyType = entityProp.getPropertyType();
+            if (isOutOfDerivedPropertyType(entity, dto, toDto, propertyName, propertyType)) {
+                continue;
+            }
+            if (entityProp.isReadable() && entityProp.isWritable()) {
+                DfPropertyDesc dtoProp = dtoDesc.getPropertyDesc(propertyName);
+                if (dtoProp.isReadable() && dtoProp.isWritable()) {
+                    if (toDto) {
+                        dtoProp.setValue(dto, entityProp.getValue(entity));
+                    } else {
+                        entityProp.setValue(entity, dtoProp.getValue(dto));
+                    }
+                }
+            }
+        }
+    }
+
+    protected boolean isOutOfDerivedPropertyName(Entity entity, Object dto, boolean toDto, DBMeta dbmeta, String propertyName) {
+        return dbmeta.hasColumn(propertyName)
+                    || dbmeta.hasForeign(propertyName) || dbmeta.hasReferrer(propertyName)
+                    || !dtoDesc.hasPropertyDesc(propertyName);
+    }
+
+    protected boolean isOutOfDerivedPropertyType(Entity entity, Object dto, boolean toDto, String propertyName, Class<?> propertyType) {
+        return List.class.isAssignableFrom(propertyType)
+                || Entity.class.isAssignableFrom(propertyType)
+                || Classification.class.isAssignableFrom(propertyType);
     }
 
     // ===================================================================================
