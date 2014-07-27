@@ -513,13 +513,15 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
             } else {
                 columnExp = calculationColumn.toColumnRealName().toString();
             }
+            final Object baseExp;
             if (columnAliasMap != null) { // e.g. ManualOrder on union
                 final String mappedAlias = columnAliasMap.get(columnExp);
-                calcValueExp = mappedAlias != null ? mappedAlias : columnExp;
+                baseExp = mappedAlias != null ? mappedAlias : columnExp;
             } else { // e.g. ColumnQuery, UpdateOption, non-union ManualOrder, DerivedReferrer
                 final ColumnInfo columnInfo = calculationColumn.getColumnInfo();
-                calcValueExp = !calculationColumn.isDerived() ? decryptIfNeeds(columnInfo, columnExp) : columnExp;
+                baseExp = !calculationColumn.isDerived() ? decryptIfNeeds(columnInfo, columnExp) : columnExp;
             }
+            calcValueExp = filterNestedCalculation(baseExp, calculationColumn);
         } else {
             throwCalculationElementIllegalStateException(targetExp);
             return null; // unreachable
@@ -537,6 +539,15 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         }
         final ColumnFunctionCipher cipher = _baseCB.getSqlClause().findColumnFunctionCipher(columnInfo);
         return cipher != null ? cipher.decrypt(valueExp) : valueExp;
+    }
+
+    protected Object filterNestedCalculation(Object specifiedRealName, HpSpecifiedColumn hpCol) {
+        if (hpCol != null && hpCol.hasSpecifyCalculation()) {
+            hpCol.xinitSpecifyCalculation();
+            final HpCalcSpecification<ConditionBean> calcSpecification = hpCol.getSpecifyCalculation();
+            return calcSpecification.buildStatementToSpecifidName(specifiedRealName.toString());
+        }
+        return specifiedRealName;
     }
 
     protected void throwCalculationColumnRelationUnresolvedException(String targetExp,

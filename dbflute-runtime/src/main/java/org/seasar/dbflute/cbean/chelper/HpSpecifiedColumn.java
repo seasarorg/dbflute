@@ -133,6 +133,7 @@ public class HpSpecifiedColumn implements HpCalculator {
     // ===================================================================================
     //                                                                         Calculation
     //                                                                         ===========
+    // SpecifyCalculation: basically for nested Calculation, DerivedReferrer
     /**
      * {@inheritDoc}
      */
@@ -248,11 +249,6 @@ public class HpSpecifiedColumn implements HpCalculator {
             _calcSpecification.setBaseCB(_baseCB);
         }
     }
-    
-    // TODO jflute
-    public void xspecifyCalculation() {
-        _calcSpecification.specify(_baseCB);
-    }
 
     protected void setupSelectDreamCruiseJourneyLogBookIfUnionExists(HpSpecifiedColumn column) {
         column.setupSelectDreamCruiseJourneyLogBookIfUnionExists();
@@ -269,23 +265,18 @@ public class HpSpecifiedColumn implements HpCalculator {
         };
     }
 
-    public boolean hasCalculation() {
+    public boolean hasSpecifyCalculation() {
         return _calcSpecification != null;
     }
 
-    public HpCalcSpecification<ConditionBean> getCalculation() {
+    public HpCalcSpecification<ConditionBean> getSpecifyCalculation() {
         return _calcSpecification;
     }
 
-    // TODO jflute
-    //public void xinitCalculationOrder(ConditionBean baseCB, ConditionBean dreamCruiseCB) {
-    //    if (!dreamCruiseCB.xisDreamCruiseShip()) {
-    //        String msg = "The CB was not dream cruise: " + dreamCruiseCB.getClass();
-    //        throw new IllegalConditionBeanOperationException(msg);
-    //    }
-    //    _calcSpecification.setBaseCB(baseCB);
-    //    _calcSpecification.specify(dreamCruiseCB);
-    //}
+    public void xinitSpecifyCalculation() { // called by e.g. HpHpCalcSpecification, DerivedReferrer
+        // specify the condition-bean that has this specified column
+        _calcSpecification.specify(_baseCB);
+    }
 
     // ===================================================================================
     //                                                                       Assert Helper

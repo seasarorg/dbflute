@@ -166,27 +166,30 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     }
 
     protected ColumnRealName getDerivedColumnRealName() {
-        // TODO jflute
-        HpSpecifiedColumn specifiedColumnHp = _subQuerySqlClause.getSpecifiedColumnAsOne();
-        final ColumnRealName specifiedColumn = _subQuerySqlClause.getSpecifiedColumnRealNameAsOne();
-        if (specifiedColumn != null) {
-            if (specifiedColumnHp != null) {
-                specifiedColumnHp.xspecifyCalculation();
-                HpCalcSpecification<ConditionBean> calcSpecification = specifiedColumnHp.getCalculation();
-                if (calcSpecification != null) {
-                    final String statement = calcSpecification.buildStatementToSpecifidName(specifiedColumn.toString());
-                    return ColumnRealName.create(null, new ColumnSqlName(statement));
-                }
-            }
-            return specifiedColumn;
+        final ColumnRealName specifiedRealName = _subQuerySqlClause.getSpecifiedColumnRealNameAsOne();
+        if (specifiedRealName != null) { // e.g. subCB.specify().column...()
+            final HpSpecifiedColumn hpCol = _subQuerySqlClause.getSpecifiedColumnAsOne();
+            return filterSpecifyColumnCalculation(specifiedRealName, hpCol);
         } else {
             final String nestedSubQuery = _subQuerySqlClause.getSpecifiedDerivingSubQueryAsOne();
-            if (nestedSubQuery != null) {
-                return ColumnRealName.create(null, new ColumnSqlName(nestedSubQuery));
+            if (nestedSubQuery != null) { // e.g. subCB.specify().derived...()
+                final HpSpecifiedColumn hpCol = _subQuerySqlClause.getSpecifiedDerivingColumnAsOne();
+                final ColumnRealName derivingRealName = ColumnRealName.create(null, new ColumnSqlName(nestedSubQuery));
+                return filterSpecifyColumnCalculation(derivingRealName, hpCol);
             } else {
                 return null;
             }
         }
+    }
+
+    protected ColumnRealName filterSpecifyColumnCalculation(ColumnRealName specifiedRealName, HpSpecifiedColumn hpCol) {
+        if (hpCol != null && hpCol.hasSpecifyCalculation()) {
+            hpCol.xinitSpecifyCalculation();
+            final HpCalcSpecification<ConditionBean> calcSpecification = hpCol.getSpecifyCalculation();
+            final String statement = calcSpecification.buildStatementToSpecifidName(specifiedRealName.toString());
+            return ColumnRealName.create(null, new ColumnSqlName(statement));
+        }
+        return specifiedRealName;
     }
 
     protected String buildUnionSubQueryClause(String function, ColumnRealName correlatedColumnRealName,

@@ -183,8 +183,8 @@ public class OrderByElement implements Serializable {
     protected void setupManualOrderClause(StringBuilder sb, String columnAlias,
             Map<String, String> selectClauseRealColumnAliasMap) {
         final String realAlias;
-        if (_manualOrderBean.hasCalculationOrder()) {
-            final HpCalcSpecification<ConditionBean> calculationOrder = _manualOrderBean.getCalculationOrder();
+        if (_manualOrderBean.hasOrderByCalculation()) {
+            final HpCalcSpecification<ConditionBean> calculationOrder = _manualOrderBean.getOrderByCalculation();
             realAlias = calculationOrder.buildStatementToSpecifidName(columnAlias, selectClauseRealColumnAliasMap);
         } else {
             if (selectClauseRealColumnAliasMap != null) { // means union

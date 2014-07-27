@@ -835,19 +835,19 @@ public interface SqlClause {
 
     /**
      * Get the information of only one specified column.
-     * @return An instance as a type for information of column. (NullAllowed: if not found or duplicated, returns null)
+     * @return The instance as type for information of column. (NullAllowed: if not found or duplicated, returns null)
      */
     ColumnInfo getSpecifiedColumnInfoAsOne();
 
     /**
      * Get the real name of only one specified column.
-     * @return An instance as a type for real name of column. (NullAllowed: if not found or duplicated, returns null)
+     * @return The instance as type for real name of column. (NullAllowed: if not found or duplicated, returns null)
      */
     ColumnRealName getSpecifiedColumnRealNameAsOne();
 
     /**
      * Get the SQL name of only one specified column.
-     * @return An instance as a type for SQL name of column. (NullAllowed: if not found or duplicated, returns null)
+     * @return The instance as type for SQL name of column. (NullAllowed: if not found or duplicated, returns null)
      */
     ColumnSqlName getSpecifiedColumnSqlNameAsOne();
 
@@ -904,8 +904,14 @@ public interface SqlClause {
     //                                       Deriving as One
     //                                       ---------------
     /**
+     * Get the specified column for specified deriving sub-query as specified one.
+     * @return The instance as specified column. (NullAlowed: if not found or not one)
+     */
+    HpSpecifiedColumn getSpecifiedDerivingColumnAsOne();
+
+    /**
      * Get the info of column for specified deriving sub-query as specified one.
-     * @return The info of column. (NullAlowed: if not found or not one)
+     * @return The instance as column info. (NullAlowed: if not found or not one)
      */
     ColumnInfo getSpecifiedDerivingColumnInfoAsOne();
 

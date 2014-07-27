@@ -1494,11 +1494,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected Class<?> xfindDerivedMappingTypeOfMax(HpDerivingSubQueryInfo derivingInfo) {
-        return derivingInfo.extractDerivingColumn().getObjectNativeType(); // plainly
+        return derivingInfo.extractDerivingColumnInfo().getObjectNativeType(); // plainly
     }
 
     protected Class<?> xfindDerivedMappingTypeOfMin(HpDerivingSubQueryInfo derivingInfo) {
-        return derivingInfo.extractDerivingColumn().getObjectNativeType(); // plainly
+        return derivingInfo.extractDerivingColumnInfo().getObjectNativeType(); // plainly
     }
 
     protected Class<?> xfindDerivedMappingTypeOfSum(HpDerivingSubQueryInfo derivingInfo) {

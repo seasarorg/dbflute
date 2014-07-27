@@ -1666,10 +1666,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 return xregisterManualOrderParameterToThemeList(themeKey, orderValue);
             }
         });
-        if (mob.hasCalculationOrder()) {
+        if (mob.hasOrderByCalculation()) {
             final ConditionBean dreamCruiseCB = xgetBaseCB().xcreateDreamCruiseCB();
             dreamCruiseCB.overTheWaves(xcreateManualOrderSpecifiedColumn(dreamCruiseCB));
-            mob.xinitCalculationOrder(xgetBaseCB(), dreamCruiseCB);
+            mob.xinitOrderByCalculation(xgetBaseCB(), dreamCruiseCB);
         }
         mob.validate();
         xgetSqlClause().addManualOrderToPreviousOrderByElement(mob);

@@ -518,15 +518,15 @@ public class ManualOrderBean implements HpCalculator {
         };
     }
 
-    public boolean hasCalculationOrder() {
+    public boolean hasOrderByCalculation() {
         return _calcSpecification != null;
     }
 
-    public HpCalcSpecification<ConditionBean> getCalculationOrder() {
+    public HpCalcSpecification<ConditionBean> getOrderByCalculation() {
         return _calcSpecification;
     }
 
-    public void xinitCalculationOrder(ConditionBean baseCB, ConditionBean dreamCruiseCB) {
+    public void xinitOrderByCalculation(ConditionBean baseCB, ConditionBean dreamCruiseCB) {
         if (!dreamCruiseCB.xisDreamCruiseShip()) {
             String msg = "The CB was not dream cruise: " + dreamCruiseCB.getClass();
             throw new IllegalConditionBeanOperationException(msg);

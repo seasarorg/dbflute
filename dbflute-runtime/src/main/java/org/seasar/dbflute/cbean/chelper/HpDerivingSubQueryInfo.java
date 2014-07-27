@@ -46,7 +46,16 @@ public class HpDerivingSubQueryInfo {
     // ===================================================================================
     //                                                                       Meta Provider
     //                                                                       =============
-    public ColumnInfo extractDerivingColumn() {
+    public HpSpecifiedColumn extractDerivingColumn() {
+        final SqlClause subQuerySqlClause = _derivedReferrer.getSubQuerySqlClause();
+        final HpSpecifiedColumn specifiedColumn = subQuerySqlClause.getSpecifiedColumnAsOne();
+        if (specifiedColumn != null) {
+            return specifiedColumn;
+        }
+        return subQuerySqlClause.getSpecifiedDerivingColumnAsOne(); // nested
+    }
+
+    public ColumnInfo extractDerivingColumnInfo() {
         final SqlClause subQuerySqlClause = _derivedReferrer.getSubQuerySqlClause();
         final ColumnInfo columnInfo = subQuerySqlClause.getSpecifiedColumnInfoAsOne();
         if (columnInfo != null) {

@@ -2068,7 +2068,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             String msg = "The deriving column was not found by the property: " + orderByProperty;
             throw new IllegalStateException(msg);
         }
-        final ColumnInfo columnInfo = specifiedDerivingInfo.extractDerivingColumn();
+        final ColumnInfo columnInfo = specifiedDerivingInfo.extractDerivingColumnInfo();
         doRegisterOrderBy(orderByProperty, ascOrDesc, columnInfo, true);
     }
 
@@ -2721,7 +2721,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public ColumnInfo getSpecifiedDerivingColumnInfo(String aliasName) {
         final HpDerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfo(aliasName);
-        return derivingInfo != null ? derivingInfo.extractDerivingColumn() : null;
+        return derivingInfo != null ? derivingInfo.extractDerivingColumnInfo() : null;
     }
 
     public void clearSpecifiedDerivingSubQuery() {
@@ -2734,9 +2734,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                       Deriving as One
     //                                       ---------------
-    public ColumnInfo getSpecifiedDerivingColumnInfoAsOne() {
+    public HpSpecifiedColumn getSpecifiedDerivingColumnAsOne() {
         final HpDerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
         return derivingInfo != null ? derivingInfo.extractDerivingColumn() : null;
+    }
+
+    public ColumnInfo getSpecifiedDerivingColumnInfoAsOne() {
+        final HpDerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
+        return derivingInfo != null ? derivingInfo.extractDerivingColumnInfo() : null;
     }
 
     public String getSpecifiedDerivingAliasNameAsOne() {
