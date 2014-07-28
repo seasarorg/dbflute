@@ -25,6 +25,9 @@ import net.arnx.jsonic.JSONHint;
 #if ($table.hasSimpleDtoJsonPullParserDecoration())
 import net.vvakame.util.jsonpullparser.annotation.*;
 #end
+#if ($table.hasSimpleDtoJacksonDecoration())
+import com.fasterxml.jackson.annotation.JsonFormat;
+#end
 #if ($database.isSimpleDtoClassificationDeployment() && $table.hasClassification())
 import ${database.simpleCDefPackage}.${database.simpleCDefClass};
 #end
@@ -355,6 +358,15 @@ public abstract class $myClassName implements Serializable {
 #end
 #if ($col.hasSimpleDtoJsonicDecorationTimePattern())
     @JSONHint(format="${col.simpleDtoJsonicDecorationTimePattern}")
+#end
+#if ($col.hasSimpleDtoJacksonDecorationDatePattern())
+    @JsonFormat(pattern="${col.simpleDtoJsonicDecorationDatePattern}")
+#end
+#if ($col.hasSimpleDtoJacksonDecorationTimestampPattern())
+    @JsonFormat(pattern="${col.simpleDtoJsonicDecorationTimestampPattern}")
+#end
+#if ($col.hasSimpleDtoJacksonDecorationTimePattern())
+    @JsonFormat(pattern="${col.simpleDtoJsonicDecorationTimePattern}")
 #end
     public ${col.javaNative} get${col.javaName}() {
         return ${col.simpleDtoVariableName};

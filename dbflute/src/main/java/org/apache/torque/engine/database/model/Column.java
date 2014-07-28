@@ -2634,6 +2634,50 @@ public class Column {
         return getProperties().getSimpleDtoProperties().isJsonPullParserBasicDecorate();
     }
 
+    // -----------------------------------------------------
+    //                                    Jackson Decoration
+    //                                    ------------------
+    public boolean hasSimpleDtoJacksonDecoration() {
+        // add a determination element when a new decoration is added
+        return hasSimpleDtoJacksonDecorationDatePattern() // Date
+                || hasSimpleDtoJacksonDecorationTimestampPattern() // Timestamp
+                || hasSimpleDtoJacksonDecorationTimePattern() // Time
+        ;
+    }
+
+    public boolean hasSimpleDtoJacksonDecorationDatePattern() {
+        if (!isJavaNativeUtilDate()) {
+            return false;
+        }
+        return getProperties().getSimpleDtoProperties().hasJacksonDecorationDatePattern();
+    }
+
+    public String getSimpleDtoJacksonDecorationDatePattern() {
+        return getProperties().getSimpleDtoProperties().getJacksonDecorationDatePattern();
+    }
+
+    public boolean hasSimpleDtoJacksonDecorationTimestampPattern() {
+        if (!isJavaNativeTimestamp()) {
+            return false;
+        }
+        return getProperties().getSimpleDtoProperties().hasJacksonDecorationTimestampPattern();
+    }
+
+    public String getSimpleDtoJacksonDecorationTimestampPattern() {
+        return getProperties().getSimpleDtoProperties().getJacksonDecorationTimestampPattern();
+    }
+
+    public boolean hasSimpleDtoJacksonDecorationTimePattern() {
+        if (!isJavaNativeTime()) {
+            return false;
+        }
+        return getProperties().getSimpleDtoProperties().hasJacksonDecorationTimePattern();
+    }
+
+    public String getSimpleDtoJacksonDecorationTimePattern() {
+        return getProperties().getSimpleDtoProperties().getJacksonDecorationTimePattern();
+    }
+
     // ===================================================================================
     //                                                                     Behavior Filter
     //                                                                     ===============

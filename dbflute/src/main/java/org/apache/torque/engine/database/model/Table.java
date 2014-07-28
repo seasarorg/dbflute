@@ -3696,6 +3696,19 @@ public class Table {
         return false;
     }
 
+    // -----------------------------------------------------
+    //                                    Jackson Decoration
+    //                                    ------------------
+    public boolean hasSimpleDtoJacksonDecoration() {
+        final List<Column> columnList = getColumnList();
+        for (Column column : columnList) {
+            if (column.hasSimpleDtoJacksonDecoration()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // ===================================================================================
     //                                                                            FLEX DTO
     //                                                                            ========

@@ -296,7 +296,6 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                             Jackson
     //                                                                             =======
-    // TODO jflute
     protected Map<String, String> _jacksonDecorationMap;
 
     protected Map<String, String> getJacksonDecorationMap() {
@@ -314,8 +313,28 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
         return _jacksonDecorationMap;
     }
 
-    public boolean isJacksonBasicDecorate() {
-        return isProperty("isBasicDecorate", false, getJsonPullParserDecorationMap());
+    public boolean hasJacksonDecorationDatePattern() {
+        return getJacksonDecorationDatePattern() != null;
+    }
+
+    public String getJacksonDecorationDatePattern() {
+        return getJacksonDecorationMap().get("datePattern");
+    }
+
+    public boolean hasJacksonDecorationTimestampPattern() {
+        return getJacksonDecorationTimestampPattern() != null;
+    }
+
+    public String getJacksonDecorationTimestampPattern() {
+        return getJacksonDecorationMap().get("timestampPattern");
+    }
+
+    public boolean hasJacksonDecorationTimePattern() {
+        return getJacksonDecorationTimePattern() != null;
+    }
+
+    public String getJacksonDecorationTimePattern() {
+        return getJacksonDecorationMap().get("timePattern");
     }
 
     // ===================================================================================
