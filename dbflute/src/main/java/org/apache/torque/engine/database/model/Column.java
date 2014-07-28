@@ -1658,6 +1658,18 @@ public class Column {
         return getJavaNative().equals("java.util.Date");
     }
 
+    public boolean isJavaNativeHandlingAsDate() { // as pinpoint
+        return isJavaNativeUtilDate() || isJavaNativeJava8LocalDate() || isJavaNativeJodaLocalDate();
+    }
+
+    public boolean isJavaNativeHandlingAsTimestamp() { // as pinpoint
+        return isJavaNativeTimestamp() || isJavaNativeJava8LocalDateTime() || isJavaNativeJodaLocalDateTime();
+    }
+
+    public boolean isJavaNativeHandlingAsTime() { // as pinpoint
+        return isJavaNativeTime() || isJavaNativeJava8LocalTime() || isJavaNativeJodaLocalTime();
+    }
+
     public boolean isJavaNativeJava8LocalDate() { // as pinpoint
         return getJavaNative().equals("java.time.LocalDate");
     }
@@ -2595,7 +2607,7 @@ public class Column {
     }
 
     public boolean hasSimpleDtoJsonicDecorationDatePattern() {
-        if (!isJavaNativeUtilDate()) {
+        if (!isJavaNativeHandlingAsDate()) {
             return false;
         }
         return getProperties().getSimpleDtoProperties().hasJsonicDecorationDatePattern();
@@ -2606,7 +2618,7 @@ public class Column {
     }
 
     public boolean hasSimpleDtoJsonicDecorationTimestampPattern() {
-        if (!isJavaNativeTimestamp()) {
+        if (!isJavaNativeHandlingAsTimestamp()) {
             return false;
         }
         return getProperties().getSimpleDtoProperties().hasJsonicDecorationTimestampPattern();
@@ -2617,7 +2629,7 @@ public class Column {
     }
 
     public boolean hasSimpleDtoJsonicDecorationTimePattern() {
-        if (!isJavaNativeTime()) {
+        if (!isJavaNativeHandlingAsTime()) {
             return false;
         }
         return getProperties().getSimpleDtoProperties().hasJsonicDecorationTimePattern();
@@ -2646,7 +2658,7 @@ public class Column {
     }
 
     public boolean hasSimpleDtoJacksonDecorationDatePattern() {
-        if (!isJavaNativeUtilDate()) {
+        if (!isJavaNativeHandlingAsDate()) {
             return false;
         }
         return getProperties().getSimpleDtoProperties().hasJacksonDecorationDatePattern();
@@ -2657,7 +2669,7 @@ public class Column {
     }
 
     public boolean hasSimpleDtoJacksonDecorationTimestampPattern() {
-        if (!isJavaNativeTimestamp()) {
+        if (!isJavaNativeHandlingAsTimestamp()) {
             return false;
         }
         return getProperties().getSimpleDtoProperties().hasJacksonDecorationTimestampPattern();
@@ -2668,7 +2680,7 @@ public class Column {
     }
 
     public boolean hasSimpleDtoJacksonDecorationTimePattern() {
-        if (!isJavaNativeTime()) {
+        if (!isJavaNativeHandlingAsTime()) {
             return false;
         }
         return getProperties().getSimpleDtoProperties().hasJacksonDecorationTimePattern();
