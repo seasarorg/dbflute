@@ -25,11 +25,13 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SpecifyQuery;
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.exception.BatchUpdateColumnModifiedPropertiesFragmentedException;
+import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.SpecifyUpdateColumnInvalidException;
 import org.seasar.dbflute.exception.VaryingUpdateCalculationUnsupportedColumnTypeException;
 import org.seasar.dbflute.exception.VaryingUpdateCommonColumnSpecificationException;
@@ -265,6 +267,10 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         if (calcSp == null) {
             return null;
         }
+        final HpSpecifiedColumn specifiedColumn = calcSp.getResolvedSpecifiedColumn();
+        if (specifiedColumn != null && specifiedColumn.hasSpecifyCalculation()) {
+            throwVaryingUpdateSpecifyCalculatonUnsupportedException(columnDbName);
+        }
         final String statement = calcSp.buildStatementAsSqlName(aliasName);
         if (statement == null) { // means non-calculation
             throwVaryingUpdateNotFoundCalculationException(columnDbName);
@@ -277,19 +283,41 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         return _selfSpecificationMap != null ? _selfSpecificationMap.get(columnDbName) : null;
     }
 
+    protected void throwVaryingUpdateSpecifyCalculatonUnsupportedException(String columnDbName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("VaryingUpdate with SpecifyCalculation is unsupported.");
+        br.addItem("Advice");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
+        br.addElement("        public void specify(PurchaseCB cb) {");
+        br.addElement("            cb.specify().columnPurchaseCount().plus(1); // *NG");
+        br.addElement("        }");
+        br.addElement("    }).multiply(3);");
+        br.addElement("  (o):");
+        br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
+        br.addElement("        public void specify(PurchaseCB cb) {");
+        br.addElement("            cb.specify().columnPurchaseCount();");
+        br.addElement("        }");
+        br.addElement("    }).plus(1).multiply(3); // OK");
+        br.addItem("Specified Column");
+        br.addElement(columnDbName);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg); // because of specified by ConditionBean
+    }
+
     protected void throwVaryingUpdateNotFoundCalculationException(String columnDbName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("A calculation of specified column for varying-update was not found.");
+        br.addNotice("The calculation of specified column for VaryingUpdate was not found.");
         br.addItem("Advice");
         br.addElement("You should call plus()/minus()/... methods after specification.");
         br.addElement("For example:");
-        br.addElement("");
         br.addElement("  (x):");
         br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
         br.addElement("        public void specify(PurchaseCB cb) {");
         br.addElement("            cb.specify().columnPurchaseCount();");
         br.addElement("        }");
-        br.addElement("    }); // *no!");
+        br.addElement("    }); // *NG");
         br.addElement("  (o):");
         br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
         br.addElement("        public void specify(PurchaseCB cb) {");

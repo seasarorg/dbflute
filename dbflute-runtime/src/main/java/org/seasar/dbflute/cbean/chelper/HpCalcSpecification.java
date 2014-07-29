@@ -29,6 +29,7 @@ import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @param <CB> The type of condition-bean for column specification. 
@@ -105,6 +106,18 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     }
 
     /**
+     * @return The specified column of resolved column. (NullAllowed)
+     */
+    public HpSpecifiedColumn getResolvedSpecifiedColumn() { // resolved plain or deriving sub-query
+        checkSpecifiedCB();
+        if (_specifedCB.xhasDreamCruiseTicket()) {
+            final HpSpecifiedColumn dreamCruiseTicket = _specifedCB.xshowDreamCruiseTicket();
+            return !dreamCruiseTicket.isDerived() ? dreamCruiseTicket : null;
+        }
+        return _specifedCB.getSqlClause().getSpecifiedColumnAsOne();
+    }
+
+    /**
      * @return The column info of specified resolved column. (NullAllowed)
      */
     public ColumnInfo getResolvedSpecifiedColumnInfo() { // resolved plain or deriving sub-query
@@ -130,43 +143,28 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     }
 
     /**
-     * @return The column real name of specified resolved column. (NullAllowed)
-     */
-    public ColumnRealName getResolvedSpecifiedColumnRealName() { // resolved plain or deriving sub-query
-        checkSpecifiedCB();
-        if (_specifedCB.xhasDreamCruiseTicket()) {
-            final HpSpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
-            return ticket.toColumnRealName();
-        }
-        final ColumnRealName columnRealName = _specifedCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
-        if (columnRealName != null) {
-            return columnRealName;
-        }
-        final String subQuery = _specifedCB.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
-        if (subQuery != null) { // basically for (Specify)DerivedReferrer in ColumnQuery
-            return ColumnRealName.create(null, new ColumnSqlName(subQuery));
-        }
-        return null;
-    }
-
-    /**
      * @return The column SQL name of specified resolved column. (NullAllowed)
      */
-    public ColumnSqlName getResolvedSpecifiedColumnSqlName() { // resolved plain or deriving sub-query
+    protected ColumnSqlName getResolvedSpecifiedColumnSqlName() { // resolved plain or deriving sub-query
+        // Basically for UpdateOption, No SpecifyCalculation.
         checkSpecifiedCB();
         if (_specifedCB.xhasDreamCruiseTicket()) {
             final HpSpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
             return ticket.toColumnSqlName();
         }
-        final ColumnSqlName columnSqlName = _specifedCB.getSqlClause().getSpecifiedColumnSqlNameAsOne();
-        if (columnSqlName != null) {
-            return columnSqlName;
+        return _specifedCB.getSqlClause().getSpecifiedResolvedColumnSqlNameAsOne();
+    }
+
+    /**
+     * @return The column real name of specified resolved column. (NullAllowed)
+     */
+    public ColumnRealName getResolvedSpecifiedColumnRealName() { // resolved plain or deriving sub-query and calculation
+        checkSpecifiedCB();
+        if (_specifedCB.xhasDreamCruiseTicket()) {
+            final HpSpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
+            return ticket.toColumnRealName();
         }
-        final String subQuery = _specifedCB.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
-        if (subQuery != null) { // basically for (Specify)DerivedReferrer in ColumnQuery
-            return new ColumnSqlName(subQuery);
-        }
-        return null;
+        return _specifedCB.getSqlClause().getSpecifiedResolvedColumnRealNameAsOne();
     }
 
     // -----------------------------------------------------
@@ -463,11 +461,12 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         if (_calculationList.isEmpty()) {
             return null;
         }
-        // columnAliasMap means, e.g. union, already handled cipher 
+        // columnAliasMap means, e.g. union, already handled cipher
         String targetExp = columnAliasMap != null ? columnExp : decryptIfNeeds(columnExp);
         int index = 0;
+        final boolean encloseCalc = needsEncloseCalculation(targetExp);
         for (HpCalcElement calculation : _calculationList) {
-            if (index > 0) {
+            if (index > 0 || (index == 0 && encloseCalc)) {
                 targetExp = "(" + targetExp + ")";
             }
             if (!calculation.isPreparedConvOption()) {
@@ -481,6 +480,23 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
             ++index;
         }
         return targetExp;
+    }
+
+    protected boolean needsEncloseCalculation(String targetExp) {
+        if (targetExp == null) { // just in case
+            return false;
+        }
+        final String checkedStr;
+        if (targetExp.contains(")")) {
+            // e.g. (select ...) here, coalesce(...) here 
+            // not accurate but small problem
+            // cannot use Srl.isQuotedAnything() because targetExp might be '(select ...)--#df:...'
+            // (checking identity is no point but identity does not contain operand)
+            checkedStr = Srl.substringLastRear(targetExp, ")"); // after scope end e.g. (select ...) here
+        } else {
+            checkedStr = targetExp; // e.g. normal column
+        }
+        return Srl.containsAny(checkedStr, " + ", " - ", " * ", " / ");
     }
 
     /**

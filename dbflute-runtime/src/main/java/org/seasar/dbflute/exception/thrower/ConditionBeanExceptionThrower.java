@@ -493,14 +493,14 @@ public class ConditionBeanExceptionThrower {
         br.addElement("This condition-bean is not allowed to specify a derived referrer.");
         br.addElement("Because this is for " + purpose + ".");
         br.addElement("For example:");
-        br.addElement("  (x): (DerivedReferrer)");
-        br.addElement("    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {");
+        br.addElement("  (x): (ScalaCondition)");
+        br.addElement("    cb.query().scalar_Equal().max(new SubQuery<PurchaseCB>() {");
         br.addElement("        public void query(PurchaseCB subCB) {");
         br.addElement("            subCB.specify().derivedPurchaseList()...; // *NG");
         br.addElement("        }");
         br.addElement("    });");
-        br.addElement("  (o): (DerivedReferrer)");
-        br.addElement("    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {");
+        br.addElement("  (o): (ScalaCondition)");
+        br.addElement("    cb.query().scalar_Equal().max(new SubQuery<PurchaseCB>() {");
         br.addElement("        public void query(PurchaseCB subCB) {");
         br.addElement("            subCB.specify().columnPurchaseCount(); // OK");
         br.addElement("        }");

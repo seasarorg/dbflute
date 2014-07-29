@@ -87,13 +87,13 @@ public class ScalarCondition extends AbstractSubQuery {
         //    msg = msg + " table=" + _subQueryDBMeta.getTableDbName();
         //    throw new IllegalConditionBeanOperationException(msg);
         //}
-        final String tableAliasName = getSubQueryLocalAliasName();
         final String derivedColumnDbName = _subQuerySqlClause.getSpecifiedColumnDbNameAsOne();
         if (derivedColumnDbName == null) {
             throwScalarConditionInvalidColumnSpecificationException(function);
         }
-        final ColumnSqlName derivedColumnSqlName = _subQuerySqlClause.getSpecifiedColumnSqlNameAsOne();
-        final ColumnRealName derivedColumnRealName = ColumnRealName.create(tableAliasName, derivedColumnSqlName);
+        final ColumnSqlName derivedColumnSqlName = getDerivedColumnSqlName();
+        final ColumnRealName derivedColumnRealName = getDerivedColumnRealName();
+        final String tableAliasName = derivedColumnRealName.getTableAliasName();
         assertScalarConditionColumnType(function, derivedColumnDbName);
         ColumnRealName partitionByCorrelatedColumnRealName = null;
         ColumnSqlName partitionByRelatedColumnSqlName = null;
@@ -119,6 +119,14 @@ public class ScalarCondition extends AbstractSubQuery {
             subQueryClause = selectClause + " " + fromWhereClause;
         }
         return resolveSubQueryLevelVariable(subQueryClause);
+    }
+
+    protected ColumnSqlName getDerivedColumnSqlName() {
+        return _subQuerySqlClause.getSpecifiedResolvedColumnSqlNameAsOne();
+    }
+
+    protected ColumnRealName getDerivedColumnRealName() {
+        return _subQuerySqlClause.getSpecifiedResolvedColumnRealNameAsOne(); // resolved calculation
     }
 
     protected String getUnionSubQuerySql(String function, String tableAliasName // basic

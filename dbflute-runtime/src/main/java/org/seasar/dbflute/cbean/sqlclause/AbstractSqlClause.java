@@ -29,8 +29,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ManualOrderBean;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
+import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
@@ -589,7 +591,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 columnInfoList.addAll(dbmeta.getPrimaryUniqueInfo().getUniqueColumnList());
                 if (isSelectClauseTypeSpecifiedScalar()) {
                     final ColumnInfo specifiedColumn = getSpecifiedColumnInfoAsOne();
-                    if (specifiedColumn != null) {
+                    if (specifiedColumn != null && !specifiedColumn.isPrimary()) {
                         columnInfoList.add(specifiedColumn);
                     }
                     // derivingSubQuery is handled after this process
@@ -807,16 +809,21 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected String buildSelectClauseSpecifiedScalar(String aliasName, String function) {
         final String columnAlias = getScalarSelectColumnAlias();
         final ColumnSqlName columnSqlName = getSpecifiedColumnSqlNameAsOne();
-        final ColumnInfo columnInfo = getSpecifiedColumnInfoAsOne();
-        if (columnSqlName != null) {
+        if (columnSqlName != null) { // normal column
             final String valueExp = aliasName + "." + columnSqlName;
-            final String functionExp = doBuildFunctionExp(function, decryptSelectColumnIfNeeds(columnInfo, valueExp));
+            if (hasUnionQuery() && hasSpecifyCalculation(getSpecifiedColumnAsOne())) {
+                throwScalarSelectUnionQuerySpecifyCalculationUnsupportedException();
+            }
+            final ColumnInfo columnInfo = getSpecifiedColumnInfoAsOne(); // not null here
+            final String functionExp = doBuildFunctionExp(function, columnInfo, valueExp); // calculation resolved
             return "select " + functionExp + " as " + columnAlias;
         }
         final String subQuery = getSpecifiedDerivingSubQueryAsOne();
-        if (subQuery != null) {
+        if (subQuery != null) { // derived column
+            // SpecifyCalculation is already resolved in DerivedReferrer process
             if (hasUnionQuery()) {
                 final String valueExp = aliasName + "." + columnAlias;
+                final ColumnInfo columnInfo = getSpecifiedDerivingColumnInfoAsOne(); // not null here
                 return "select " + doBuildFunctionExp(function, decryptSelectColumnIfNeeds(columnInfo, valueExp));
             } else {
                 // adjusts alias definition target (move to function's scope)
@@ -831,6 +838,22 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
         String msg = "Not found specifed column for scalar: function=" + function;
         throw new IllegalStateException(msg); // basically no way (checked before)
+    }
+
+    protected void throwScalarSelectUnionQuerySpecifyCalculationUnsupportedException() {
+        String msg = "ScalarSelect using UnionQuery with SpecifyCalculation is unsupported: " + _tableDbName;
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    protected String doBuildFunctionExp(String function, ColumnInfo columnInfo, String valueExp) {
+        final ColumnRealName filtered;
+        {
+            final String decrypted = decryptSelectColumnIfNeeds(columnInfo, valueExp);
+            final ColumnRealName beforeFilter = ColumnRealName.create(null, new ColumnSqlName(decrypted));
+            final HpSpecifiedColumn specifiedColumn = getSpecifiedColumnAsOne();
+            filtered = filterSpecifyColumnCalculation(beforeFilter, specifiedColumn);
+        }
+        return doBuildFunctionExp(function, filtered.toString());
     }
 
     protected String doBuildFunctionExp(String function, String columnExp) {
@@ -2759,6 +2782,53 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             return _specifiedDerivingSubQueryMap.values().iterator().next();
         }
         return null;
+    }
+
+    // -----------------------------------------------------
+    //                                       Resolved as One
+    //                                       ---------------
+    public ColumnSqlName getSpecifiedResolvedColumnSqlNameAsOne() {
+        final ColumnSqlName specifiedColumn = getSpecifiedColumnSqlNameAsOne();
+        if (specifiedColumn != null) {
+            return specifiedColumn;
+        } else {
+            final String nestedSubQuery = getSpecifiedDerivingSubQueryAsOne();
+            if (nestedSubQuery != null) {
+                return new ColumnSqlName(nestedSubQuery);
+            } else {
+                return null;
+            }
+        }
+    }
+
+    public ColumnRealName getSpecifiedResolvedColumnRealNameAsOne() {
+        final ColumnRealName specifiedRealName = getSpecifiedColumnRealNameAsOne();
+        if (specifiedRealName != null) { // e.g. subCB.specify().column...()
+            final HpSpecifiedColumn hpCol = getSpecifiedColumnAsOne();
+            return filterSpecifyColumnCalculation(specifiedRealName, hpCol);
+        } else {
+            final String nestedSubQuery = getSpecifiedDerivingSubQueryAsOne();
+            if (nestedSubQuery != null) { // e.g. subCB.specify().derived...()
+                // already resolved in nested process of e.g. derived-referrer
+                return ColumnRealName.create(null, new ColumnSqlName(nestedSubQuery));
+            } else {
+                return null;
+            }
+        }
+    }
+
+    protected ColumnRealName filterSpecifyColumnCalculation(ColumnRealName specifiedRealName, HpSpecifiedColumn hpCol) {
+        if (hasSpecifyCalculation(hpCol)) {
+            hpCol.xinitSpecifyCalculation();
+            final HpCalcSpecification<ConditionBean> calcSpecification = hpCol.getSpecifyCalculation();
+            final String statement = calcSpecification.buildStatementToSpecifidName(specifiedRealName.toString());
+            return ColumnRealName.create(null, new ColumnSqlName(statement));
+        }
+        return specifiedRealName;
+    }
+
+    protected boolean hasSpecifyCalculation(HpSpecifiedColumn hpCol) {
+        return hpCol != null && hpCol.hasSpecifyCalculation();
     }
 
     // ===================================================================================

@@ -19,9 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
-import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
@@ -111,11 +108,8 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             String endIndent);
 
     // ===================================================================================
-    //                                                                     SubQuery Clause
-    //                                                                     ===============
-    // -----------------------------------------------------
-    //                                     Single PrimaryKey
-    //                                     -----------------
+    //                                                 (Single PrimaryKey) SubQuery Clause
+    //                                                 ===================================
     /**
      * Build the clause of sub-query by single primary key.
      * @param function The expression for deriving function. (NotNull)
@@ -138,7 +132,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             subQueryClause = buildUnionSubQueryClause(function, correlatedColumnRealName, relatedColumnSqlName, option,
                     tableAliasName, derivedColumnRealName, derivedColumnSqlName, correlatedFixedCondition);
         } else {
-            final String selectClause = "select " + buildFunctionPart(function, derivedColumnRealName, option);
+            final String selectClause = "select " + buildFunctionPart(function, derivedColumnRealName, option, false);
             final String fromWhereClause;
             if (option.isSuppressCorrelation()) { // e.g. myselfDerived
                 fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName, correlatedFixedCondition);
@@ -151,52 +145,14 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         return resolveSubQueryLevelVariable(subQueryClause);
     }
 
-    protected ColumnSqlName getDerivedColumnSqlName() {
-        final ColumnSqlName specifiedColumn = _subQuerySqlClause.getSpecifiedColumnSqlNameAsOne();
-        if (specifiedColumn != null) {
-            return specifiedColumn;
-        } else {
-            final String nestedSubQuery = _subQuerySqlClause.getSpecifiedDerivingSubQueryAsOne();
-            if (nestedSubQuery != null) {
-                return new ColumnSqlName(nestedSubQuery);
-            } else {
-                return null;
-            }
-        }
-    }
-
-    protected ColumnRealName getDerivedColumnRealName() {
-        final ColumnRealName specifiedRealName = _subQuerySqlClause.getSpecifiedColumnRealNameAsOne();
-        if (specifiedRealName != null) { // e.g. subCB.specify().column...()
-            final HpSpecifiedColumn hpCol = _subQuerySqlClause.getSpecifiedColumnAsOne();
-            return filterSpecifyColumnCalculation(specifiedRealName, hpCol);
-        } else {
-            final String nestedSubQuery = _subQuerySqlClause.getSpecifiedDerivingSubQueryAsOne();
-            if (nestedSubQuery != null) { // e.g. subCB.specify().derived...()
-                final HpSpecifiedColumn hpCol = _subQuerySqlClause.getSpecifiedDerivingColumnAsOne();
-                final ColumnRealName derivingRealName = ColumnRealName.create(null, new ColumnSqlName(nestedSubQuery));
-                return filterSpecifyColumnCalculation(derivingRealName, hpCol);
-            } else {
-                return null;
-            }
-        }
-    }
-
-    protected ColumnRealName filterSpecifyColumnCalculation(ColumnRealName specifiedRealName, HpSpecifiedColumn hpCol) {
-        if (hpCol != null && hpCol.hasSpecifyCalculation()) {
-            hpCol.xinitSpecifyCalculation();
-            final HpCalcSpecification<ConditionBean> calcSpecification = hpCol.getSpecifyCalculation();
-            final String statement = calcSpecification.buildStatementToSpecifidName(specifiedRealName.toString());
-            return ColumnRealName.create(null, new ColumnSqlName(statement));
-        }
-        return specifiedRealName;
-    }
-
+    // -----------------------------------------------------
+    //                    (Single PrimaryKey) Union Handling
+    //                    ----------------------------------
     protected String buildUnionSubQueryClause(String function, ColumnRealName correlatedColumnRealName,
             ColumnSqlName relatedColumnSqlName, DerivedReferrerOption option, String tableAliasName,
             ColumnRealName derivedColumnRealName, ColumnSqlName derivedColumnSqlName, String correlatedFixedCondition) {
         final String mainSql = buildUnionMainPartClause(relatedColumnSqlName, tableAliasName, derivedColumnRealName,
-                correlatedFixedCondition);
+                derivedColumnSqlName, correlatedFixedCondition);
         final String mainAlias = buildSubQueryMainAliasName();
         final String whereJoinCondition;
         if (option.isSuppressCorrelation()) { // e.g. myselfDerived
@@ -206,7 +162,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             final StringBuilder sb = new StringBuilder();
             sb.append(ln()).append(" where ");
             sb.append(relatedColumnRealName).append(" = ").append(correlatedColumnRealName);
-            if (correlatedFixedCondition != null && correlatedFixedCondition.trim().length() > 0) {
+            if (isFixedCondition(correlatedFixedCondition)) {
                 sb.append(ln()).append("   and ");
                 sb.append(Srl.replace(correlatedFixedCondition, tableAliasName + ".", mainAlias + "."));
             }
@@ -218,76 +174,86 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     }
 
     protected String buildUnionMainPartClause(ColumnSqlName relatedColumnSqlName, String tableAliasName,
-            ColumnRealName derivedColumnRealName, String correlatedFixedCondition) {
+            ColumnRealName derivedColumnRealName, ColumnSqlName derivedColumnSqlName, String correlatedFixedCondition) {
+        // derivedColumnSqlName : e.g. PURCHASE_PRICE
+        // derivedRealSqlName   : might be sub-query
+        final ColumnSqlName derivedRealSqlName = derivedColumnRealName.getColumnSqlName();
         final StringBuilder keySb = new StringBuilder();
-        if (correlatedFixedCondition != null && correlatedFixedCondition.trim().length() > 0) {
-            // all columns because fixed condition might contain them
-            final List<ColumnInfo> columnInfoList = _subQueryDBMeta.getColumnInfoList();
-            for (ColumnInfo columnInfo : columnInfoList) {
-                if (keySb.length() > 0) {
-                    keySb.append(", ");
-                }
-                keySb.append(ColumnRealName.create(tableAliasName, columnInfo.getColumnSqlName()));
-            }
+        if (isFixedCondition(correlatedFixedCondition)) {
+            setupUnionMainForFixedCondition(keySb, tableAliasName, derivedColumnSqlName);
         } else { // no fixed condition, mainly here
-            final ColumnSqlName derivedSqlName = derivedColumnRealName.getColumnSqlName();
             final List<ColumnInfo> pkList = _subQueryDBMeta.getPrimaryUniqueInfo().getUniqueColumnList();
             for (ColumnInfo pk : pkList) {
                 final ColumnSqlName pkSqlName = pk.getColumnSqlName();
-                if (pkSqlName.equals(derivedSqlName) || pkSqlName.equals(relatedColumnSqlName)) {
+                if (pkSqlName.equals(derivedRealSqlName) || pkSqlName.equals(relatedColumnSqlName)) {
                     continue; // to suppress same columns selected
                 }
-                if (keySb.length() > 0) {
-                    keySb.append(", ");
-                }
+                keySb.append(keySb.length() > 0 ? ", " : "");
                 keySb.append(ColumnRealName.create(tableAliasName, pk.getColumnSqlName()));
             }
-            if (!relatedColumnSqlName.equals(derivedSqlName)) { // to suppress same columns selected
-                if (keySb.length() > 0) {
-                    keySb.append(", ");
-                }
+            if (!relatedColumnSqlName.equals(derivedRealSqlName)) { // to suppress same columns selected
+                keySb.append(keySb.length() > 0 ? ", " : "");
                 keySb.append(ColumnRealName.create(tableAliasName, relatedColumnSqlName));
             }
-            if (keySb.length() > 0) {
-                keySb.append(", ");
-            }
-            keySb.append(derivedColumnRealName);
         }
-        final String selectClause = "select " + keySb.toString();
-        final String fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName, null);
-        return selectClause + " " + fromWhereClause;
+        setupUnionMainForDerivedColumn(keySb, derivedColumnRealName, derivedColumnSqlName, derivedRealSqlName);
+        return completeUnionMainWholeClause(tableAliasName, keySb);
     }
 
     protected String doBuildUnionSubQueryClause(String function, DerivedReferrerOption option, String mainSql,
             String mainAlias, String whereJoinCondition, ColumnRealName mainDerivedColumnRealName) {
         final String beginMark = resolveSubQueryBeginMark(_mainSubQueryIdentity) + ln();
         final String endMark = resolveSubQueryEndMark(_mainSubQueryIdentity);
-        return "select " + buildFunctionPart(function, mainDerivedColumnRealName, option) // select
+        return "select " + buildFunctionPart(function, mainDerivedColumnRealName, option, true) // select
                 + ln() + "  from (" + beginMark + mainSql + ln() + "       ) " + mainAlias + endMark // from
                 + whereJoinCondition; // where
     }
 
-    protected String buildFunctionPart(String function, ColumnRealName columnRealName, DerivedReferrerOption option) {
-        final String connector = buildFunctionConnector(function);
-        final String columnWithEndExp;
-        {
-            final String specifiedExp = columnRealName.toString();
-            final String dummyAlias = " as " + _subQuerySqlClause.getDerivedReferrerNestedAlias();
-            if (specifiedExp.contains(dummyAlias)) { // means nested DerivedReferrer
-                final String resolved = _subQueryPath.resolveParameterLocationPath(specifiedExp);
-                columnWithEndExp = replace(resolved, dummyAlias, ")");
-            } else {
-                final ColumnInfo derivedColumnInfo = _subQuerySqlClause.getSpecifiedColumnInfoAsOne();
-                columnWithEndExp = decrypt(derivedColumnInfo, specifiedExp) + ")";
+    protected void setupUnionMainForFixedCondition(StringBuilder keySb, String tableAliasName,
+            ColumnSqlName derivedColumnSqlName) {
+        // all columns because fixed condition might contain them
+        final List<ColumnInfo> columnInfoList = _subQueryDBMeta.getColumnInfoList();
+        for (ColumnInfo columnInfo : columnInfoList) {
+            final ColumnSqlName sqlName = columnInfo.getColumnSqlName();
+            if (sqlName.equals(derivedColumnSqlName)) {
+                continue; // to suppress same columns selected
             }
+            final ColumnRealName realName = ColumnRealName.create(tableAliasName, columnInfo.getColumnSqlName());
+            keySb.append(keySb.length() > 0 ? ", " : "");
+            keySb.append(realName);
         }
-        final String functionExp = function + connector + columnWithEndExp;
-        return option.filterFunction(functionExp);
     }
 
-    // -----------------------------------------------------
-    //                                   Compound PrimaryKey
-    //                                   -------------------
+    protected void setupUnionMainForDerivedColumn(StringBuilder keySb, ColumnRealName derivedColumnRealName,
+            ColumnSqlName derivedColumnSqlName, ColumnSqlName derivedRealSqlName) {
+        // derivedColumnSqlName : e.g. PURCHASE_PRICE
+        // derivedRealSqlName   : might be sub-query
+        if (mightBeSubQueryOrCalculation(derivedRealSqlName)) { // nested sub-query or calculation
+            if (!isNestedDerivedReferrer(derivedRealSqlName)) { // might be calculation
+                keySb.append(keySb.length() > 0 ? ", " : "");
+                keySb.append(derivedColumnRealName).append(" as ").append(derivedColumnSqlName);
+            }
+            // *skip here if nested sub-query, handled at function part in select clause
+        } else {
+            keySb.append(keySb.length() > 0 ? ", " : "");
+            keySb.append(derivedColumnRealName);
+        }
+    }
+
+    protected boolean mightBeSubQueryOrCalculation(ColumnSqlName derivedRealSqlName) {
+        final String exp = derivedRealSqlName.toString();
+        return exp.contains(" ") || exp.contains("("); // not accurate but small problem
+    }
+
+    protected String completeUnionMainWholeClause(String tableAliasName, StringBuilder keySb) {
+        final String selectClause = "select " + keySb.toString();
+        final String fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName, null);
+        return selectClause + " " + fromWhereClause;
+    }
+
+    // ===================================================================================
+    //                                               SubQuery Clause (Compound PrimaryKey)
+    //                                               =====================================
     /**
      * Build the clause of sub-query by compound primary key.
      * @param function The expression for deriving function. (NotNull)
@@ -310,7 +276,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             subQueryClause = buildUnionSubQueryClause(function, correlatedColumnRealNames, relatedColumnSqlNames,
                     option, tableAliasName, derivedColumnRealName, derivedColumnSqlName, correlatedFixedCondition);
         } else {
-            final String selectClause = "select " + buildFunctionPart(function, derivedColumnRealName, option);
+            final String selectClause = "select " + buildFunctionPart(function, derivedColumnRealName, option, false);
             final String fromWhereClause;
             if (option.isSuppressCorrelation()) { // e.g. myselfDerived
                 fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName, correlatedFixedCondition);
@@ -323,11 +289,14 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         return resolveSubQueryLevelVariable(subQueryClause);
     }
 
+    // -----------------------------------------------------
+    //                  (Compound PrimaryKey) Union Handling
+    //                  ------------------------------------
     protected String buildUnionSubQueryClause(String function, ColumnRealName[] correlatedColumnRealNames,
             ColumnSqlName[] relatedColumnSqlNames, DerivedReferrerOption option, String tableAliasName,
             ColumnRealName derivedColumnRealName, ColumnSqlName derivedColumnSqlName, String correlatedFixedCondition) {
         final String mainSql = buildUnionMainPartClause(correlatedColumnRealNames, relatedColumnSqlNames,
-                tableAliasName, derivedColumnRealName, correlatedFixedCondition);
+                tableAliasName, derivedColumnRealName, derivedColumnSqlName, correlatedFixedCondition);
         final String mainAlias = buildSubQueryMainAliasName();
         final String whereJoinCondition;
         if (option.isSuppressCorrelation()) { // e.g. myselfDerived
@@ -342,7 +311,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
                 sb.append(ColumnRealName.create(mainAlias, relatedColumnSqlNames[i]));
                 sb.append(" = ").append(correlatedColumnRealNames[i]);
             }
-            if (correlatedFixedCondition != null && correlatedFixedCondition.trim().length() > 0) {
+            if (isFixedCondition(correlatedFixedCondition)) {
                 if (correlatedColumnRealNames.length > 0) { // basically true (but just in case)
                     sb.append(ln()).append("   and ");
                 }
@@ -357,51 +326,106 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
 
     protected String buildUnionMainPartClause(ColumnRealName[] correlatedColumnRealNames,
             ColumnSqlName[] relatedColumnSqlNames, String tableAliasName, ColumnRealName derivedColumnRealName,
-            String correlatedFixedCondition) {
+            ColumnSqlName derivedColumnSqlName, String correlatedFixedCondition) {
+        // similar to simple primary key so refer it
         final StringBuilder keySb = new StringBuilder();
-        if (correlatedFixedCondition != null && correlatedFixedCondition.trim().length() > 0) {
-            // all columns because fixed condition might contain them
-            final List<ColumnInfo> columnInfoList = _subQueryDBMeta.getColumnInfoList();
-            for (ColumnInfo columnInfo : columnInfoList) {
-                if (keySb.length() > 0) {
-                    keySb.append(", ");
-                }
-                keySb.append(ColumnRealName.create(tableAliasName, columnInfo.getColumnSqlName()));
-            }
+        ColumnSqlName derivedRealSqlName = derivedColumnRealName.getColumnSqlName();
+        if (isFixedCondition(correlatedFixedCondition)) {
+            setupUnionMainForFixedCondition(keySb, tableAliasName, derivedColumnSqlName);
         } else { // no fixed condition, mainly here
             final Set<ColumnSqlName> relatedColumnSqlSet = new HashSet<ColumnSqlName>();
             for (ColumnSqlName columnSqlName : relatedColumnSqlNames) {
                 relatedColumnSqlSet.add(columnSqlName);
             }
-            final ColumnSqlName derivedSqlName = derivedColumnRealName.getColumnSqlName();
+            final ColumnSqlName derivedSqlName = derivedRealSqlName;
             final List<ColumnInfo> pkList = _subQueryDBMeta.getPrimaryUniqueInfo().getUniqueColumnList();
             for (ColumnInfo pk : pkList) {
                 final ColumnSqlName pkSqlName = pk.getColumnSqlName();
                 if (pkSqlName.equals(derivedSqlName) || relatedColumnSqlSet.contains(pkSqlName)) {
                     continue; // to suppress same columns selected
                 }
-                if (keySb.length() > 0) {
-                    keySb.append(", ");
-                }
+                keySb.append(keySb.length() > 0 ? ", " : "");
                 keySb.append(ColumnRealName.create(tableAliasName, pk.getColumnSqlName()));
             }
             for (ColumnSqlName relatedSqlName : relatedColumnSqlNames) {
                 if (relatedSqlName.equals(derivedSqlName)) {
                     continue; // to suppress same columns selected
                 }
-                if (keySb.length() > 0) {
-                    keySb.append(", ");
-                }
+                keySb.append(keySb.length() > 0 ? ", " : "");
                 keySb.append(ColumnRealName.create(tableAliasName, relatedSqlName));
             }
-            if (keySb.length() > 0) {
-                keySb.append(", ");
-            }
-            keySb.append(derivedColumnRealName);
         }
-        final String selectClause = "select " + keySb.toString();
-        final String fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName, null);
-        return selectClause + " " + fromWhereClause;
+        setupUnionMainForDerivedColumn(keySb, derivedColumnRealName, derivedColumnSqlName, derivedRealSqlName);
+        return completeUnionMainWholeClause(tableAliasName, keySb);
+    }
+
+    // ===================================================================================
+    //                                                                      Derived Column
+    //                                                                      ==============
+    protected ColumnSqlName getDerivedColumnSqlName() {
+        return _subQuerySqlClause.getSpecifiedResolvedColumnSqlNameAsOne();
+    }
+
+    protected ColumnRealName getDerivedColumnRealName() {
+        return _subQuerySqlClause.getSpecifiedResolvedColumnRealNameAsOne(); // resolved calculation
+    }
+
+    // ===================================================================================
+    //                                                                       Function Part
+    //                                                                       =============
+    protected String buildFunctionPart(String function, ColumnRealName columnRealName, DerivedReferrerOption option,
+            boolean union) {
+        final String connector = buildFunctionConnector(function);
+        final String columnWithEndExp;
+        {
+            final String aliasDef = getDerivedReferrerNestedAliasDef();
+            final ColumnSqlName columnSqlName = columnRealName.getColumnSqlName();
+            if (isNestedDerivedReferrer(columnSqlName)) { // e.g. select max((select ... from ...))
+                final String sqlNameExp = columnSqlName.toString(); // no use tableAlias here because of sub-query
+                final String localtionResolved = _subQueryPath.resolveParameterLocationPath(sqlNameExp);
+                final String aliasResolved = resolveNestedDerivedReferrerAliasDef(localtionResolved, aliasDef);
+                columnWithEndExp = union ? resolveUnionCorrelation(aliasResolved) : aliasResolved;
+            } else { // normal column derived
+                final ColumnInfo derivedColumnInfo = _subQuerySqlClause.getSpecifiedColumnInfoAsOne();
+                columnWithEndExp = decrypt(derivedColumnInfo, columnRealName.toString()) + ")";
+            }
+        }
+        final String functionExp = function + connector + columnWithEndExp;
+        return option.filterFunction(functionExp);
+    }
+
+    protected String resolveNestedDerivedReferrerAliasDef(String derivedExp, String aliasDef) {
+        return replace(derivedExp, aliasDef, ")"); // ' as dfrelview' to ')'
+    }
+
+    protected String resolveUnionCorrelation(String derivedExp) {
+        // replace e.g. ... = sub1loc.MEMBER_ID to ... = sub1main.MEMBER_ID
+        final String basePointAlias = _subQuerySqlClause.getBasePointAliasName();
+        final String mainAlias = buildSubQueryMainAliasName();
+        return replace(derivedExp, basePointAlias, mainAlias);
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected boolean isFixedCondition(String correlatedFixedCondition) {
+        return correlatedFixedCondition != null && correlatedFixedCondition.trim().length() > 0;
+    }
+
+    protected boolean isNestedDerivedReferrer(String name) {
+        return name.contains(getDerivedReferrerNestedAliasDef());
+    }
+
+    protected boolean isNestedDerivedReferrer(ColumnSqlName name) {
+        return name.toString().contains(getDerivedReferrerNestedAliasDef());
+    }
+
+    protected String getDerivedReferrerNestedAlias() {
+        return _subQuerySqlClause.getDerivedReferrerNestedAlias();
+    }
+
+    protected String getDerivedReferrerNestedAliasDef() {
+        return " as " + getDerivedReferrerNestedAlias();
     }
 
     // ===================================================================================

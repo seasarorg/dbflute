@@ -927,6 +927,22 @@ public interface SqlClause {
      */
     String getSpecifiedDerivingSubQueryAsOne();
 
+    // -----------------------------------------------------
+    //                                       Resolved as One
+    //                                       ---------------
+    /**
+     * Get the SQL name of definition resolved column (specified or deriving) as specified one.
+     * @return The object of SQL name. (NullAllowed: if not found or not one)
+     */
+    ColumnSqlName getSpecifiedResolvedColumnSqlNameAsOne();
+
+    /**
+     * Get the real name of sub-query resolved column (specified or deriving) as specified one. <br />
+     * And the SpecifyCalculation is resolved here.
+     * @return The object of real name. (NullAllowed: if not found or not one)
+     */
+    ColumnRealName getSpecifiedResolvedColumnRealNameAsOne();
+
     // ===================================================================================
     //                                                                  Invalid Query Info
     //                                                                  ==================
