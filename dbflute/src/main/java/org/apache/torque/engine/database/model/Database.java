@@ -2316,6 +2316,10 @@ public class Database {
         return getProperties().getSimpleDtoProperties().isUseDtoMapper();
     }
 
+    public boolean isSimpleDtoMappingExceptCommonColumn() {
+        return getProperties().getSimpleDtoProperties().isMappingExceptCommonColumn();
+    }
+
     public boolean isSimpleDtoMappingReverseReference() {
         return getProperties().getSimpleDtoProperties().isMappingReverseReference();
     }

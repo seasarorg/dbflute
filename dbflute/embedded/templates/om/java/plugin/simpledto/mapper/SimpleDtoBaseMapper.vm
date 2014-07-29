@@ -90,7 +90,11 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
     //                                                                           =========
     protected final Map<Entity, Object> _relationDtoMap;
     protected final Map<Object, Entity> _relationEntityMap;
+#if ($database.isSimpleDtoMappingExceptCommonColumn())
+    protected boolean _exceptCommonColumn = true; // default: no mapping of common column
+#else
     protected boolean _exceptCommonColumn;
+#end
 #if ($database.isSimpleDtoMappingReverseReference())
     protected boolean _reverseReference = true; // default: reverse reference
 #else

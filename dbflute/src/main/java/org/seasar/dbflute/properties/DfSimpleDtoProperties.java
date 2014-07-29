@@ -168,6 +168,10 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
         return Srl.substringFirstRear(baseMapperClassName, getBaseDtoPrefix());
     }
 
+    public boolean isMappingExceptCommonColumn() {
+        return isProperty("isMappingExceptCommonColumn", false, getSimpleDtoDefinitionMap());
+    }
+
     public boolean isMappingReverseReference() {
         // default is false because cyclic references may have problems
         return isProperty("isMappingReverseReference", false, getSimpleDtoDefinitionMap());
