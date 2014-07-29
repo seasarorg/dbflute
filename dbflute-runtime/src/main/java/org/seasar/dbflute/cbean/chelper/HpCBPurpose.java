@@ -42,7 +42,7 @@ public enum HpCBPurpose {
             .noSpecifyDerivedReferrer().noOrderBy().subQuery()) // ScalarCondition
 
     , SCALAR_CONDITION_PARTITION_BY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
-            .noSpecifyDerivedReferrer().noOrderBy().subQuery()) // ScalarConditionPartitionBy
+            .noSpecifyDerivedReferrer().noQuery().noOrderBy().subQuery()) // ScalarConditionPartitionBy
 
     , MYSELF_EXISTS(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyColumnTwoOrMore()
             .noSpecifyColumnWithDerivedReferrer().noOrderBy().subQuery()) // MyselfExists
