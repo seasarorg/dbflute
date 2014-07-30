@@ -1936,6 +1936,10 @@ public class Database {
     public boolean isThatsBadTimingDetect() {
         return getLittleAdjustmentProperties().isThatsBadTimingDetect();
     }
+    
+    public boolean isInvalidQueryChecked() {
+        return getLittleAdjustmentProperties().isInvalidQueryChecked();
+    }
 
     public boolean isAvailableDatabaseNativeJDBC() {
         return getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC();

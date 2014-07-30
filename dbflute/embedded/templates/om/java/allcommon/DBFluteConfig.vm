@@ -95,7 +95,7 @@ public class ${glDBFluteConfig} {
     protected boolean _thatsBadTimingDetect = ${database.isThatsBadTimingDetect()};
     protected boolean _emptyStringQueryAllowed;
     protected boolean _emptyStringParameterAllowed;
-    protected boolean _invalidQueryChecked;
+    protected boolean _invalidQueryChecked = ${database.isInvalidQueryChecked()};
     protected boolean _disableSelectIndex;
     protected boolean _checkCountBeforeQueryUpdate = ${database.isCheckCountBeforeQueryUpdate()};
 
