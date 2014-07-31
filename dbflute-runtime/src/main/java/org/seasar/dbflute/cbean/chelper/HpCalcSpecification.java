@@ -53,6 +53,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     protected boolean _leftMode;
     protected HpCalcSpecification<CB> _leftCalcSp;
     protected boolean _convert;
+    protected boolean _synchronizeSetupSelectByJourneyLogBook;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -357,6 +358,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         calculation.setCalculationType(type);
         calculation.setCalculationColumn(column);
         _calculationList.add(calculation);
+        setupSelectDreamCruiseJourneyLogBookIfUnionExists(column);
         return this;
     }
 
@@ -613,6 +615,34 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
             }
         }
         return false;
+    }
+
+    // ===================================================================================
+    //                                                                     Journey LogBook
+    //                                                                     ===============
+    public void synchronizeSetupSelectByJourneyLogBook() {
+        _synchronizeSetupSelectByJourneyLogBook = true;
+        if (_leftCalcSp != null) {
+            _leftCalcSp.synchronizeSetupSelectByJourneyLogBook();
+        }
+    }
+
+    protected void setupSelectDreamCruiseJourneyLogBookIfUnionExists(HpSpecifiedColumn column) {
+        if (!_synchronizeSetupSelectByJourneyLogBook) {
+            return;
+        }
+        // to synchronize setupSelect if union already exists
+        // basically for ManualOrderCalculation with Union
+        // union needs alias name defined in select-clause on order-by clause
+        // e.g.
+        // cb.union(new UnionQuery<MemberCB>() {
+        //     public void query(MemberCB unionCB) {
+        //     }
+        // });
+        // MemberCB dreamCruiseCB = cb.dreamCruiseCB();
+        // ManualOrderBean mob = new ManualOrderBean();
+        // mob.multiply(dreamCruiseCB.specify().specifyMemberServiceAsOne().columnServicePointCount());
+        column.setupSelectDreamCruiseJourneyLogBookIfUnionExists();
     }
 
     // ===================================================================================

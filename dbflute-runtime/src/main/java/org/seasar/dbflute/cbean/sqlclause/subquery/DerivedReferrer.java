@@ -229,9 +229,11 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         // derivedColumnSqlName : e.g. PURCHASE_PRICE
         // derivedRealSqlName   : might be sub-query
         if (mightBeSubQueryOrCalculation(derivedRealSqlName)) { // nested sub-query or calculation
-            if (!isNestedDerivedReferrer(derivedRealSqlName)) { // might be calculation
+            if (!isNestedDerivedReferrer(derivedRealSqlName)) { // might be calculation (needs to resolve location)
                 keySb.append(keySb.length() > 0 ? ", " : "");
-                keySb.append(derivedColumnRealName).append(" as ").append(derivedColumnSqlName);
+                final String realNameExp = derivedColumnRealName.toString();
+                final String locationResolved = _subQueryPath.resolveParameterLocationPath(realNameExp);
+                keySb.append(locationResolved).append(" as ").append(derivedColumnSqlName);
             }
             // *skip here if nested sub-query, handled at function part in select clause
         } else {
@@ -329,7 +331,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             ColumnSqlName derivedColumnSqlName, String correlatedFixedCondition) {
         // similar to simple primary key so refer it
         final StringBuilder keySb = new StringBuilder();
-        ColumnSqlName derivedRealSqlName = derivedColumnRealName.getColumnSqlName();
+        final ColumnSqlName derivedRealSqlName = derivedColumnRealName.getColumnSqlName();
         if (isFixedCondition(correlatedFixedCondition)) {
             setupUnionMainForFixedCondition(keySb, tableAliasName, derivedColumnSqlName);
         } else { // no fixed condition, mainly here
@@ -381,13 +383,17 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             final String aliasDef = getDerivedReferrerNestedAliasDef();
             final ColumnSqlName columnSqlName = columnRealName.getColumnSqlName();
             if (isNestedDerivedReferrer(columnSqlName)) { // e.g. select max((select ... from ...))
+                // needs to resolve location path on nested query, connect it to base location
                 final String sqlNameExp = columnSqlName.toString(); // no use tableAlias here because of sub-query
                 final String localtionResolved = _subQueryPath.resolveParameterLocationPath(sqlNameExp);
                 final String aliasResolved = resolveNestedDerivedReferrerAliasDef(localtionResolved, aliasDef);
                 columnWithEndExp = union ? resolveUnionCorrelation(aliasResolved) : aliasResolved;
             } else { // normal column derived
+                // might be calculation e.g. sub1loc.DOCKSIDE_PRICE + coalesce(HUNGER_PRICE, 0)
+                // so also needs to resolve location here
                 final ColumnInfo derivedColumnInfo = _subQuerySqlClause.getSpecifiedColumnInfoAsOne();
-                columnWithEndExp = decrypt(derivedColumnInfo, columnRealName.toString()) + ")";
+                final String localtionResolved = _subQueryPath.resolveParameterLocationPath(columnRealName.toString());
+                columnWithEndExp = decrypt(derivedColumnInfo, localtionResolved) + ")";
             }
         }
         final String functionExp = function + connector + columnWithEndExp;

@@ -137,94 +137,106 @@ public class HpSpecifiedColumn implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator plus(Number plusValue) {
+    public HpSpecifiedColumn plus(Number plusValue) {
         assertObjectNotNull("plusValue", plusValue);
         initializeCalcSpecificationIfNeeds();
-        return _calcSpecification.plus(plusValue);
+        _calcSpecification.plus(plusValue);
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // not return calcSpecification but this
+        // for smart specification of DreamCruise
+        // e.g.
+        // subCB.specify().columnPurchasePrice()
+        //    .multiply(dreamCruiseCB.specify().specifyMember().columnMemberId().plus(3));
+        // _/_/_/_/_/_/_/_/_/_/
+        return this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public HpCalculator plus(HpSpecifiedColumn plusColumn) {
+    public HpSpecifiedColumn plus(HpSpecifiedColumn plusColumn) {
         assertObjectNotNull("plusColumn", plusColumn);
         assertCalculationColumnNumber(plusColumn);
         assertSpecifiedDreamCruiseTicket(plusColumn);
         initializeCalcSpecificationIfNeeds();
-        setupSelectDreamCruiseJourneyLogBookIfUnionExists(plusColumn);
-        return _calcSpecification.plus(plusColumn);
+        _calcSpecification.plus(plusColumn);
+        return this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public HpCalculator minus(Number minusValue) {
+    public HpSpecifiedColumn minus(Number minusValue) {
         assertObjectNotNull("minusValue", minusValue);
         initializeCalcSpecificationIfNeeds();
-        return _calcSpecification.minus(minusValue);
+        _calcSpecification.minus(minusValue);
+        return this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public HpCalculator minus(HpSpecifiedColumn minusColumn) {
+    public HpSpecifiedColumn minus(HpSpecifiedColumn minusColumn) {
         assertObjectNotNull("minusColumn", minusColumn);
         assertCalculationColumnNumber(minusColumn);
         assertSpecifiedDreamCruiseTicket(minusColumn);
         initializeCalcSpecificationIfNeeds();
-        setupSelectDreamCruiseJourneyLogBookIfUnionExists(minusColumn);
-        return _calcSpecification.minus(minusColumn);
+        _calcSpecification.minus(minusColumn);
+        return this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public HpCalculator multiply(Number multiplyValue) {
+    public HpSpecifiedColumn multiply(Number multiplyValue) {
         assertObjectNotNull("multiplyValue", multiplyValue);
         initializeCalcSpecificationIfNeeds();
-        return _calcSpecification.multiply(multiplyValue);
+        _calcSpecification.multiply(multiplyValue);
+        return this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public HpCalculator multiply(HpSpecifiedColumn multiplyColumn) {
+    public HpSpecifiedColumn multiply(HpSpecifiedColumn multiplyColumn) {
         assertObjectNotNull("multiplyColumn", multiplyColumn);
         assertCalculationColumnNumber(multiplyColumn);
         assertSpecifiedDreamCruiseTicket(multiplyColumn);
         initializeCalcSpecificationIfNeeds();
-        setupSelectDreamCruiseJourneyLogBookIfUnionExists(multiplyColumn);
-        return _calcSpecification.multiply(multiplyColumn);
+        _calcSpecification.multiply(multiplyColumn);
+        return this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public HpCalculator divide(Number divideValue) {
+    public HpSpecifiedColumn divide(Number divideValue) {
         assertObjectNotNull("divideValue", divideValue);
         initializeCalcSpecificationIfNeeds();
-        return _calcSpecification.divide(divideValue);
+        _calcSpecification.divide(divideValue);
+        return this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public HpCalculator divide(HpSpecifiedColumn divideColumn) {
+    public HpSpecifiedColumn divide(HpSpecifiedColumn divideColumn) {
         assertObjectNotNull("divideColumn", divideColumn);
         assertCalculationColumnNumber(divideColumn);
         assertSpecifiedDreamCruiseTicket(divideColumn);
         initializeCalcSpecificationIfNeeds();
-        setupSelectDreamCruiseJourneyLogBookIfUnionExists(divideColumn);
-        return _calcSpecification.divide(divideColumn);
+        _calcSpecification.divide(divideColumn);
+        return this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public HpCalculator convert(ColumnConversionOption option) {
+    public HpSpecifiedColumn convert(ColumnConversionOption option) {
         assertObjectNotNull("option", option);
         initializeCalcSpecificationIfNeeds();
-        return _calcSpecification.convert(option);
+        _calcSpecification.convert(option);
+        return this;
     }
 
     /**
@@ -246,12 +258,15 @@ public class HpSpecifiedColumn implements HpCalculator {
     protected void initializeCalcSpecificationIfNeeds() {
         if (_calcSpecification == null) {
             _calcSpecification = createCalcSpecification();
-            _calcSpecification.setBaseCB(_baseCB);
+            final ConditionBean handlingCB;
+            if (_baseCB.xisDreamCruiseShip()) {
+                // to tell option parameters by DreamCruise to base condition-bean
+                handlingCB = _baseCB.xgetDreamCruiseDeparturePort();
+            } else {
+                handlingCB = _baseCB;
+            }
+            _calcSpecification.setBaseCB(handlingCB);
         }
-    }
-
-    protected void setupSelectDreamCruiseJourneyLogBookIfUnionExists(HpSpecifiedColumn column) {
-        column.setupSelectDreamCruiseJourneyLogBookIfUnionExists();
     }
 
     protected HpCalcSpecification<ConditionBean> createCalcSpecification() {
