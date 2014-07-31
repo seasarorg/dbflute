@@ -466,9 +466,9 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         // columnAliasMap means, e.g. union, already handled cipher
         String targetExp = columnAliasMap != null ? columnExp : decryptIfNeeds(columnExp);
         int index = 0;
-        final boolean encloseCalc = needsEncloseCalculation(targetExp);
+        final boolean firstEnclosing = needsFirstEnclosing(targetExp);
         for (HpCalcElement calculation : _calculationList) {
-            if (index > 0 || (index == 0 && encloseCalc)) {
+            if (index > 0 || (index == 0 && firstEnclosing)) {
                 targetExp = "(" + targetExp + ")";
             }
             if (!calculation.isPreparedConvOption()) {
@@ -484,7 +484,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         return targetExp;
     }
 
-    protected boolean needsEncloseCalculation(String targetExp) {
+    protected boolean needsFirstEnclosing(String targetExp) {
         if (targetExp == null) { // just in case
             return false;
         }
@@ -563,7 +563,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         if (hpCol != null && hpCol.hasSpecifyCalculation()) {
             hpCol.xinitSpecifyCalculation();
             final HpCalcSpecification<ConditionBean> calcSpecification = hpCol.getSpecifyCalculation();
-            return calcSpecification.buildStatementToSpecifidName(specifiedRealName.toString());
+            return "(" + calcSpecification.buildStatementToSpecifidName(specifiedRealName.toString()) + ")";
         }
         return specifiedRealName;
     }
@@ -695,6 +695,10 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
 
     public void setBaseCB(ConditionBean baseCB) {
         _baseCB = baseCB;
+    }
+
+    public boolean hasCalculation() {
+        return !_calculationList.isEmpty();
     }
 
     public List<HpCalcElement> getCalculationList() {

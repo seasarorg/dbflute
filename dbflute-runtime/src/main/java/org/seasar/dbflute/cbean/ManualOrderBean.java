@@ -596,7 +596,7 @@ public class ManualOrderBean implements HpCalculator {
             return null;
         }
         if (plainValue instanceof HpSpecifiedColumn) {
-            return ((HpSpecifiedColumn) plainValue).toColumnRealName().toString();
+            return resolveDreamCruiseExp(plainValue);
         }
         ClassificationCodeType codeType = null;
         if (plainValue instanceof Classification) {
@@ -627,6 +627,17 @@ public class ManualOrderBean implements HpCalculator {
             boundExp = handler.register(THEME_KEY, plainValue);
         }
         return boundExp;
+    }
+
+    protected Object resolveDreamCruiseExp(Object plainValue) {
+        final HpSpecifiedColumn specifiedColumn = (HpSpecifiedColumn) plainValue;
+        final String columnExp = specifiedColumn.toColumnRealName().toString();
+        if (specifiedColumn.hasSpecifyCalculation()) {
+            specifiedColumn.xinitSpecifyCalculation();
+            final HpCalcSpecification<ConditionBean> calcSpecification = specifiedColumn.getSpecifyCalculation();
+            return calcSpecification.buildStatementToSpecifidName(columnExp);
+        }
+        return columnExp;
     }
 
     protected Object handleClassificationOrderValue(Classification cls) {

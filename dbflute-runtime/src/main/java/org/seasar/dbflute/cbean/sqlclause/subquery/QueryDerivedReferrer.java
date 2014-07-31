@@ -17,6 +17,9 @@ package org.seasar.dbflute.cbean.sqlclause.subquery;
 
 import java.util.List;
 
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -73,22 +76,47 @@ public class QueryDerivedReferrer extends DerivedReferrer {
         final StringBuilder sb = new StringBuilder();
         sb.append("(").append(beginMark).append(subQueryClause);
         sb.append(ln()).append(endIndent).append(") ");
-        sb.append(_operand);
+        sb.append(_operand); // e.g. "(select max(...) from ...) >"
         if (_value != null) {
-            final String prefix = "/*pmb.";
-            final String suffix = "*/null";
-            final String parameter;
-            if (isOperandBetween() && isValueListType()) {
-                final String fromParameter = buildListParameter(prefix, 0, suffix);
-                final String toParameter = buildListParameter(prefix, 1, suffix);
-                parameter = fromParameter + " and " + toParameter;
-            } else {
-                parameter = prefix + _parameterPath + suffix;
+            sb.append(" "); // e.g. "(select max(...) from ...) > "
+            if (_value instanceof HpSpecifiedColumn) { // DreamCruise
+                // e.g. "(select max(...) from ...) > ZAMBINI_PRICE"
+                buildRightClauseDreamCruiseExp(sb);
+            } else { // normally here
+                // e.g. "(select max(...) from ...) > 3"
+                buildRightClauseNormalValue(sb);
             }
-            sb.append(" ").append(parameter);
         }
         sb.append(endMark);
         return sb.toString();
+    }
+
+    protected void buildRightClauseDreamCruiseExp(StringBuilder sb) {
+        final HpSpecifiedColumn specifiedColumn = (HpSpecifiedColumn) _value;
+        final String columnExp = specifiedColumn.toColumnRealName().toString();
+        final String appended;
+        if (specifiedColumn.hasSpecifyCalculation()) {
+            specifiedColumn.xinitSpecifyCalculation();
+            final HpCalcSpecification<ConditionBean> calcSpecification = specifiedColumn.getSpecifyCalculation();
+            appended = calcSpecification.buildStatementToSpecifidName(columnExp);
+        } else {
+            appended = columnExp;
+        }
+        sb.append(appended);
+    }
+
+    protected void buildRightClauseNormalValue(final StringBuilder sb) {
+        final String prefix = "/*pmb.";
+        final String suffix = "*/null";
+        final String parameter;
+        if (isOperandBetween() && isValueListType()) {
+            final String fromParameter = buildListParameter(prefix, 0, suffix);
+            final String toParameter = buildListParameter(prefix, 1, suffix);
+            parameter = fromParameter + " and " + toParameter;
+        } else {
+            parameter = prefix + _parameterPath + suffix;
+        }
+        sb.append(parameter);
     }
 
     protected boolean isOperandBetween() {
