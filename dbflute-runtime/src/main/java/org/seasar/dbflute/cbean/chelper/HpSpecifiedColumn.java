@@ -235,6 +235,7 @@ public class HpSpecifiedColumn implements HpCalculator {
     public HpSpecifiedColumn convert(ColumnConversionOption option) {
         assertObjectNotNull("option", option);
         initializeCalcSpecificationIfNeeds();
+        initializeConvOptionColumn(option);
         _calcSpecification.convert(option);
         return this;
     }
@@ -291,6 +292,13 @@ public class HpSpecifiedColumn implements HpCalculator {
     public void xinitSpecifyCalculation() { // called by e.g. HpHpCalcSpecification, DerivedReferrer
         // specify the condition-bean that has this specified column
         _calcSpecification.specify(_baseCB);
+    }
+
+    protected void initializeConvOptionColumn(ColumnConversionOption option) {
+        // e.g. DreamCruise specifies several columns
+        // then cannot set the target column later so needs to set here
+        // e.g. DerivedReferrer has only-one specified column so either way is OK
+        option.xsetTargetColumnInfo(_columnInfo); // to judge correctly e.g. Date type
     }
 
     // ===================================================================================

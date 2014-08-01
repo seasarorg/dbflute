@@ -29,6 +29,7 @@ import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -393,7 +394,12 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
 
     protected void prepareConvOption(ColumnConversionOption option) {
         option.xjudgeDatabase(_baseCB.getSqlClause());
-        option.xsetTargetColumnInfo(getResolvedSpecifiedColumnInfo());
+        if (option.xgetTargetColumnInfo() == null) {
+            // might be already set (e.g. HpSpecifiedColumn's convert(), see the comment)
+            // DreamCruise specifies several columns so cannot get here so checked
+            final ColumnInfo columnInfo = getResolvedSpecifiedColumnInfo();
+            option.xsetTargetColumnInfo(columnInfo); // can be set if specified once
+        }
         _baseCB.localCQ().xregisterParameterOption(option);
     }
 
@@ -684,6 +690,16 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
             final String msg = "The specified column was not dream cruise ticket: " + column;
             throw new IllegalConditionBeanOperationException(msg);
         }
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        final String title = DfTypeUtil.toClassTitle(this);
+        return title + ":{left=" + _leftMode + ", convert=" + _convert + ", logBook="
+                + _synchronizeSetupSelectByJourneyLogBook + "}";
     }
 
     // ===================================================================================

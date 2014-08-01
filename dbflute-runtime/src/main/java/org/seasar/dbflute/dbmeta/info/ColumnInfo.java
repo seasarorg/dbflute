@@ -22,8 +22,10 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.seasar.dbflute.Entity;
@@ -49,6 +51,32 @@ public class ColumnInfo {
     //                                                                          ==========
     /** The empty read-only list for empty property. */
     protected static final List<String> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<String>());
+
+    /** The type name of JodaTime's just date. */
+    protected static final String JODA_JUST_DATE_TYPE = "org.joda.time.LocalDate";
+
+    /** The set of type name for JodaTime judgment. */
+    protected static final Set<String> JODA_DATE_TYPE_SET;
+    static {
+        final Set<String> tmpSet = new HashSet<String>();
+        tmpSet.add(JODA_JUST_DATE_TYPE);
+        tmpSet.add("org.joda.time.LocalDateTime");
+        tmpSet.add("org.joda.time.LocalTime");
+        JODA_DATE_TYPE_SET = Collections.unmodifiableSet(tmpSet);
+    }
+
+    /** The type name of Java8Time's just date. */
+    protected static final String JAVA8_JUST_DATE_TYPE = "java.time.LocalDate";
+
+    /** The set of type name for Java8Time judgment. */
+    protected static final Set<String> JAVA8_DATE_TYPE_SET;
+    static {
+        final Set<String> tmpSet = new HashSet<String>();
+        tmpSet.add(JAVA8_JUST_DATE_TYPE);
+        tmpSet.add("java.time.LocalDateTime");
+        tmpSet.add("java.time.LocalTime");
+        JAVA8_DATE_TYPE_SET = Collections.unmodifiableSet(tmpSet);
+    }
 
     // ===================================================================================
     //                                                                           Attribute
@@ -464,7 +492,21 @@ public class ColumnInfo {
      * @return The determination, true or false.
      */
     public boolean isObjectNativeTypeDate() {
+        return assignableObjectNativeTypeUtilDate() // traditional date
+                || assignableObjectNativeTypeJodaDate() // JodaDate
+                || assignableObjectNativeTypeJodaDate(); // Java8Date
+    }
+
+    protected boolean assignableObjectNativeTypeUtilDate() {
         return Date.class.isAssignableFrom(_objectNativeType);
+    }
+
+    protected boolean assignableObjectNativeTypeJodaDate() {
+        return JODA_DATE_TYPE_SET.contains(_objectNativeType.getName());
+    }
+
+    protected boolean assignableObjectNativeTypeJava8Date() {
+        return JAVA8_DATE_TYPE_SET.contains(_objectNativeType.getName());
     }
 
     /**
@@ -472,7 +514,21 @@ public class ColumnInfo {
      * @return The determination, true or false.
      */
     public boolean isObjectNativeTypeJustDate() {
+        return justObjectNativeTypeUtilDate() // traditional date
+                || justObjectNativeJodaDate() // JodaDate
+                || justObjectNativeJava8Date(); // Java8Date
+    }
+
+    protected boolean justObjectNativeTypeUtilDate() {
         return Date.class.equals(_objectNativeType);
+    }
+
+    protected boolean justObjectNativeJodaDate() {
+        return _objectNativeType.getName().equals(JODA_JUST_DATE_TYPE);
+    }
+
+    protected boolean justObjectNativeJava8Date() {
+        return _objectNativeType.getName().equals(JAVA8_JUST_DATE_TYPE);
     }
 
     /**

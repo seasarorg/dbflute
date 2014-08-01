@@ -765,6 +765,10 @@ public class FunctionFilterOption implements ParameterOption {
     // -----------------------------------------------------
     //                                    called by internal
     //                                    ------------------
+    public ColumnInfo xgetTargetColumnInfo() {
+        return _targetColumnInfo;
+    }
+
     public void xsetTargetColumnInfo(ColumnInfo targetColumnInfo) {
         _targetColumnInfo = targetColumnInfo;
     }

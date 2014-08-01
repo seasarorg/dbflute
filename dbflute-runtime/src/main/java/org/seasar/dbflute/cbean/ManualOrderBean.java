@@ -874,9 +874,11 @@ public class ManualOrderBean implements HpCalculator {
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
+    // *instance match so does not override equals()
     @Override
     public String toString() {
-        return DfTypeUtil.toClassTitle(this) + ":{" + _caseWhenAcceptedList + "}";
+        final String title = DfTypeUtil.toClassTitle(this);
+        return title + ":{case-when=" + _caseWhenAcceptedList.size() + ", calc=" + _calcSpecification + "}";
     }
 
     // ===================================================================================

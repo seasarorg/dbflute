@@ -519,8 +519,15 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                             OrderBy
     //                                                                             =======
+    /**
+     * @return The object of order-by clause. (NotNull)
+     */
     OrderByClause getOrderByComponent();
 
+    /**
+     * Get the last element of order-by.
+     * @return The order-by element object. (NullAllowed: when no order-by)
+     */
     OrderByElement getOrderByLastElement();
 
     void clearOrderBy();

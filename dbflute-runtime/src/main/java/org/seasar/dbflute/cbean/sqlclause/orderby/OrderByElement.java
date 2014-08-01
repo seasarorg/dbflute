@@ -29,6 +29,7 @@ import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.resource.DBFluteSystem;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -70,7 +71,7 @@ public class OrderByElement implements Serializable {
     protected boolean _nullsFirst;
 
     /** The bean of manual order. (NullAllowed, SetupLater) */
-    protected transient ManualOrderBean _manualOrderBean;
+    protected transient ManualOrderBean _mob;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -134,7 +135,7 @@ public class OrderByElement implements Serializable {
         }
         final StringBuilder sb = new StringBuilder();
         final String columnFullName = getColumnFullName();
-        if (_manualOrderBean != null && _manualOrderBean.hasManualOrder()) {
+        if (_mob != null && _mob.hasManualOrder()) {
             setupManualOrderClause(sb, columnFullName, null);
             return sb.toString();
         } else {
@@ -159,7 +160,7 @@ public class OrderByElement implements Serializable {
         }
         final String columnAlias = mappingToRealColumnAlias(selectClauseRealColumnAliasMap, getColumnFullName());
         final StringBuilder sb = new StringBuilder();
-        if (_manualOrderBean != null && _manualOrderBean.hasManualOrder()) {
+        if (_mob != null && _mob.hasManualOrder()) {
             setupManualOrderClause(sb, columnAlias, selectClauseRealColumnAliasMap);
             return sb.toString();
         } else {
@@ -183,8 +184,8 @@ public class OrderByElement implements Serializable {
     protected void setupManualOrderClause(StringBuilder sb, String columnAlias,
             Map<String, String> selectClauseRealColumnAliasMap) {
         final String realAlias;
-        if (_manualOrderBean.hasOrderByCalculation()) {
-            final HpCalcSpecification<ConditionBean> calculationOrder = _manualOrderBean.getOrderByCalculation();
+        if (_mob.hasOrderByCalculation()) {
+            final HpCalcSpecification<ConditionBean> calculationOrder = _mob.getOrderByCalculation();
             realAlias = calculationOrder.buildStatementToSpecifidName(columnAlias, selectClauseRealColumnAliasMap);
         } else {
             if (selectClauseRealColumnAliasMap != null) { // means union
@@ -193,7 +194,7 @@ public class OrderByElement implements Serializable {
                 realAlias = decryptIfNeeds(_columnInfo, columnAlias);
             }
         }
-        final List<HpMobCaseWhenElement> caseWhenList = _manualOrderBean.getCaseWhenBoundList();
+        final List<HpMobCaseWhenElement> caseWhenList = _mob.getCaseWhenBoundList();
         if (!caseWhenList.isEmpty()) {
             sb.append(ln()).append("   case").append(ln());
             int index = 0;
@@ -214,7 +215,7 @@ public class OrderByElement implements Serializable {
                 sb.append(" then ").append(thenExp).append(ln());
                 ++index;
             }
-            final Object elseValue = _manualOrderBean.getElseValue();
+            final Object elseValue = _mob.getElseValue();
             final String elseExp;
             if (elseValue != null) {
                 elseExp = elseValue.toString();
@@ -344,10 +345,13 @@ public class OrderByElement implements Serializable {
      * @return The view-string of all-columns value. (NotNull)
      */
     public String toString() {
+        final String title = DfTypeUtil.toClassTitle(this);
         final StringBuilder sb = new StringBuilder();
+        sb.append(title).append(":");
         sb.append("{aliasName=").append(_aliasName);
         sb.append(" columnName=").append(_columnName);
-        sb.append(" ascDesc=").append(_ascDesc).append("}");
+        sb.append(" ascDesc=").append(_ascDesc);
+        sb.append("}");
         return sb.toString();
     }
 
@@ -383,7 +387,11 @@ public class OrderByElement implements Serializable {
         _nullsFirst = nullsFirst;
     }
 
-    public void setManualOrderBean(ManualOrderBean manualOrderBean) {
-        _manualOrderBean = manualOrderBean;
+    public void setManualOrderBean(ManualOrderBean mob) {
+        _mob = mob;
+    }
+
+    public ManualOrderBean getManualOrderBean() {
+        return _mob;
     }
 }

@@ -103,11 +103,11 @@ public class OrderByClause implements Serializable {
         public String setup(String columnName, String orderByElementClause, boolean nullsFirst);
     }
 
-    public void addManualOrderByElement(ManualOrderBean manumalOrderBean) {
+    public void addManualOrderByElement(ManualOrderBean mob) {
         if (_orderByList.isEmpty()) {
             return;
         }
-        getOrderByLastElement().setManualOrderBean(manumalOrderBean);
+        getOrderByLastElement().setManualOrderBean(mob);
     }
 
     // ===================================================================================

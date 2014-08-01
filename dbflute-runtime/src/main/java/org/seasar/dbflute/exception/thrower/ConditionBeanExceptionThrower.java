@@ -20,12 +20,15 @@ import java.util.Map;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
+import org.seasar.dbflute.cbean.ManualOrderBean;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
+import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.ColumnQueryInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.FixedConditionParameterNotFoundException;
+import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.InvalidQueryRegisteredException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartAlreadySetupException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartNotOrScopeException;
@@ -1278,6 +1281,67 @@ public class ConditionBeanExceptionThrower {
         br.addElement(parameterMap);
         final String msg = br.buildExceptionMessage();
         throw new FixedConditionParameterNotFoundException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                        Manual Order
+    //                                                                        ============
+    public void throwManualOrderNotFoundOrderByException(ConditionBean baseCB, ManualOrderBean mob) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found order-by element for the ManualOrder.");
+        br.addItem("Advice");
+        br.addElement("Make sure your implementation:");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    mob.when_LessEqual(...);");
+        br.addElement("    cb.query().withManualOrder(mob); // *NG");
+        br.addElement("  (o):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    mob.when_LessEqual(...);");
+        br.addElement("    cb.query().addOrderBy_Birthdate_Asc().withManualOrder(mob); // OK");
+        br.addItem("ConditionBean");
+        br.addElement(baseCB != null ? baseCB.getClass().getName() : baseCB); // check just in case
+        br.addItem("ManualOrderBean");
+        br.addElement(mob);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    public void throwManualOrderSameBeanAlreadyExistsException(ConditionBean baseCB, ManualOrderBean existingMob,
+            OrderByElement existingOrder, ManualOrderBean specifiedMob, OrderByElement specifiedOrder) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The same manual-order-bean with other columns was registered.");
+        br.addItem("Advice");
+        br.addElement("You can use manual-order-bean one time.");
+        br.addElement("Make sure your implementation:");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    mob.when_LessEqual(...);");
+        br.addElement("    cb.query().addOrderBy_Birthdate_Asc().withManualOrder(mob);");
+        br.addElement("    cb.query().addOrderBy_MemberId_Asc().withManualOrder(mob); // *NG");
+        br.addElement("  (o):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    ManualOrderBean birthMob = new ManualOrderBean();");
+        br.addElement("    birthMob.when_LessEqual(...);");
+        br.addElement("    cb.query().addOrderBy_Birthdate_Asc().withManualOrder(birthMob);");
+        br.addElement("    ManualOrderBean idMob = new ManualOrderBean();");
+        br.addElement("    idMob.when_LessEqual(...);");
+        br.addElement("    cb.query().addOrderBy_MemberId_Asc().withManualOrder(idMob); // OK");
+        br.addItem("ConditionBean");
+        br.addElement(baseCB != null ? baseCB.getClass().getName() : baseCB); // check just in case
+        br.addItem("Existing Bean");
+        br.addElement(existingMob);
+        br.addElement(existingOrder);
+        br.addItem("Specified Bean");
+        br.addElement(specifiedMob);
+        br.addElement(specifiedOrder);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
     }
 
     // ===================================================================================

@@ -1661,6 +1661,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void xdoWithManualOrder(ManualOrderBean mob) {
         assertObjectNotNull("withManualOrder(mob)", mob);
+        final OrderByElement lastElement = xgetSqlClause().getOrderByLastElement();
+        xcheckManualOrderState(mob, lastElement);
+        xcheckManualOrderUnique(mob, lastElement);
         mob.bind(new HpManualOrderThemeListHandler() {
             public String register(String themeKey, Object orderValue) {
                 return xregisterManualOrderParameterToThemeList(themeKey, orderValue);
@@ -1673,6 +1676,23 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         mob.validate();
         xgetSqlClause().addManualOrderToPreviousOrderByElement(mob);
+    }
+
+    protected void xcheckManualOrderState(ManualOrderBean mob, final OrderByElement lastElement) {
+        if (lastElement == null) {
+            createCBExThrower().throwManualOrderNotFoundOrderByException(_baseCB, mob);
+        }
+    }
+
+    protected void xcheckManualOrderUnique(ManualOrderBean mob, final OrderByElement lastElement) {
+        final List<OrderByElement> orderByList = xgetSqlClause().getOrderByComponent().getOrderByList();
+        for (OrderByElement existingOrder : orderByList) {
+            final ManualOrderBean existingMob = existingOrder.getManualOrderBean();
+            if (existingMob != null && existingMob.equals(mob)) { // the bean already exists
+                createCBExThrower().throwManualOrderSameBeanAlreadyExistsException(_baseCB, existingMob, existingOrder,
+                        mob, lastElement);
+            }
+        }
     }
 
     protected HpSpecifiedColumn xcreateManualOrderSpecifiedColumn(ConditionBean dreamCruiseCB) {
