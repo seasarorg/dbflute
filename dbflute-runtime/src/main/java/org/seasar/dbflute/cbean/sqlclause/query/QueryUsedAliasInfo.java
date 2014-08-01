@@ -28,7 +28,7 @@ public class QueryUsedAliasInfo {
 
     /**
      * @param usedAliasName The alias name of joined table (or local) where it is used in query. (NotNull)
-     * @param innerJoinNoWaySpeaker The no-way speaker for auto-detect of inner-join. (NullAllowed)
+     * @param innerJoinNoWaySpeaker The no-way speaker for auto-detect of inner-join. (NullAllowed: null means inner-allowed)
      */
     public QueryUsedAliasInfo(String usedAliasName, InnerJoinNoWaySpeaker innerJoinNoWaySpeaker) {
         _usedAliasName = usedAliasName;

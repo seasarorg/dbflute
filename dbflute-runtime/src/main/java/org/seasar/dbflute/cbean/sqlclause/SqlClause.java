@@ -387,6 +387,9 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                               Where
     //                                                                               =====
+    // -----------------------------------------------------
+    //                                          Registration
+    //                                          ------------
     /**
      * Register 'where' clause.
      * @param columnRealName The real name of column. {[alias-name].[column-name]}. (NotNull)
@@ -424,6 +427,19 @@ public interface SqlClause {
      */
     void registerWhereClause(QueryClause clause, QueryUsedAliasInfo... usedAliasInfos);
 
+    // -----------------------------------------------------
+    //                                        WhereUsed Join
+    //                                        --------------
+    /**
+     * Reflect the information of where-used-to join. <br />
+     * Basically interface for DreamCruise.
+     * @param usedAliasInfo The information of used alias, contains no-way-inner determination. (NotNull, NotEmpty)
+     */
+    void reflectWhereUsedToJoin(QueryUsedAliasInfo usedAliasInfo);
+
+    // -----------------------------------------------------
+    //                                       Where Attribute
+    //                                       ---------------
     /**
      * Exchange first The clause of 'where' for last one.
      */

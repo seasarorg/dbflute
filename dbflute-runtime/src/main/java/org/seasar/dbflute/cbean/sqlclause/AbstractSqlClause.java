@@ -1649,7 +1649,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         assertStringNotNullAndNotTrimmedEmpty("usedAliasName", usedAliasName);
         final List<QueryClause> clauseList = getWhereClauseList4Register();
         doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, false, false);
-        reflectWhereUsedToJoin(usedAliasName);
+        doReflectWhereUsedToJoin(usedAliasName);
         if (!ConditionKey.isNullaleConditionKey(key)) {
             registerInnerJoinLazyReflector(usedAliasName);
         }
@@ -1670,7 +1670,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         assertStringNotNullAndNotTrimmedEmpty("usedAliasName", usedAliasName);
         final List<QueryClause> clauseList = getWhereClauseList4Register();
         doRegisterWhereClause(clauseList, clause);
-        reflectWhereUsedToJoin(usedAliasName);
+        doReflectWhereUsedToJoin(usedAliasName);
         if (!noWayInner) {
             registerInnerJoinLazyReflector(usedAliasName);
         }
@@ -1689,16 +1689,24 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final List<QueryClause> clauseList = getWhereClauseList4Register();
         doRegisterWhereClause(clauseList, clause);
         for (QueryUsedAliasInfo usedAliasInfo : usedAliasInfos) {
-            final String usedAliasName = usedAliasInfo.getUsedAliasName();
-            reflectWhereUsedToJoin(usedAliasName);
-            registerInnerJoinLazyReflector(usedAliasInfo);
+            reflectWhereUsedToJoin(usedAliasInfo);
         }
     }
 
     // -----------------------------------------------------
     //                                        WhereUsed Join
     //                                        --------------
-    protected void reflectWhereUsedToJoin(final String usedAliasName) {
+    /**
+     * {@inheritDoc}
+     */
+    public void reflectWhereUsedToJoin(QueryUsedAliasInfo usedAliasInfo) {
+        assertObjectNotNull("usedAliasInfo", usedAliasInfo);
+        final String usedAliasName = usedAliasInfo.getUsedAliasName();
+        doReflectWhereUsedToJoin(usedAliasName);
+        registerInnerJoinLazyReflector(usedAliasInfo);
+    }
+
+    protected void doReflectWhereUsedToJoin(String usedAliasName) {
         LeftOuterJoinInfo currentJoinInfo = getOuterJoinMap().get(usedAliasName);
         while (true) {
             if (currentJoinInfo == null) { // means base point

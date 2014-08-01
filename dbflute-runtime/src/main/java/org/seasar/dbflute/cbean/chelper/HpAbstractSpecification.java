@@ -22,6 +22,8 @@ import java.util.Map;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinNoWaySpeaker;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
@@ -92,7 +94,8 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
             final String relationPath = _query.xgetRelationPath();
             final int nestLevel = _query.xgetNestLevel();
             tableAliasName = sqlClause.resolveJoinAliasName(relationPath, nestLevel);
-            keepDreamCruiseJourneyLogBookIfNeeds(relationPath);
+            keepDreamCruiseJourneyLogBookIfNeeds(relationPath, tableAliasName);
+            reflectDreamCruiseWhereUsedToJoin(relationPath, tableAliasName);
         }
         final HpSpecifiedColumn specifiedColumn = createSpecifiedColumn(columnName, tableAliasName);
         sqlClause.specifySelectColumn(specifiedColumn);
@@ -167,11 +170,26 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     // -----------------------------------------------------
     //                                          Dream Cruise
     //                                          ------------
-    protected void keepDreamCruiseJourneyLogBookIfNeeds(String relationPath) {
+    protected void keepDreamCruiseJourneyLogBookIfNeeds(String relationPath, String tableAliasName) {
         if (!_baseCB.xisDreamCruiseShip()) {
             return;
         }
         _baseCB.xkeepDreamCruiseJourneyLogBook(relationPath);
+    }
+
+    protected void reflectDreamCruiseWhereUsedToJoin(String relationPath, String tableAliasName) {
+        if (!_baseCB.xisDreamCruiseShip()) {
+            return;
+        }
+        // to suppress CountLeastJoin of the relation
+        // the DreamCruise might be used in where clause (not correctly but safety logic)
+        final ConditionBean portCB = _baseCB.xgetDreamCruiseDeparturePort();
+        final QueryUsedAliasInfo usedAliasInfo = new QueryUsedAliasInfo(tableAliasName, new InnerJoinNoWaySpeaker() {
+            public boolean isNoWayInner() {
+                return true; // non fact of inner-join, because judge is so difficult when DreamCruise
+            }
+        });
+        portCB.getSqlClause().reflectWhereUsedToJoin(usedAliasInfo);
     }
 
     // ===================================================================================
