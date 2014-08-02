@@ -909,19 +909,20 @@ public class ConditionBeanExceptionThrower {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The invalid query was registered. (check is working)");
         br.addItem("Advice");
-        br.addElement("You should not set an invalid query when the check is valid.");
-        br.addElement("For example:");
+        br.addElement("You should not set null or empty to query.");
+        br.addElement("For example: (when checked by default)");
         br.addElement("  (x):");
         br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.checkInvalidQuery();");
-        br.addElement("    cb.query().setMemberId_Equal(null); // exception");
+        br.addElement("    cb.query().setMemberName_Equal(null); // exception");
+        br.addElement("    cb.query().setMemberName_Equal(\"\"); // exception");
         br.addElement("  (o):");
         br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.checkInvalidQuery();");
-        br.addElement("    cb.query().setMemberId_Equal(3);");
+        br.addElement("    cb.query().setMemberName_Equal(\"Pixy\"); // normal query");
         br.addElement("  (o):");
         br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.query().setMemberId_Equal(null);");
+        br.addElement("    cb.ignoreNullOrEmptyQuery();");
+        br.addElement("    cb.query().setMemberName_Equal(null); // no condition");
+        br.addElement("    cb.query().setMemberName_Equal(\"\"); // no condition");
         br.addItem("Invalid Query");
         for (HpInvalidQueryInfo invalidQueryInfo : invalidQueryInfoAry) {
             br.addElement(invalidQueryInfo.buildDisplay());

@@ -953,7 +953,8 @@ public class FromToOption implements ConditionOption {
     }
 
     /**
-     * Allow you to set one-side only condition. (null allowed)
+     * Allow you to set one-side only condition. (null allowed) <br />
+     * If you ignore null-or-empty query, you don't need to call this.
      * @return this. (NotNull)
      */
     public FromToOption allowOneSide() {
@@ -961,6 +962,10 @@ public class FromToOption implements ConditionOption {
         return this;
     }
 
+    /**
+     * Does it allow you to set one-side only condition. <br />
+     * @return The determination, true or false.
+     */
     public boolean isOneSideAllowed() {
         return _oneSideAllowed;
     }
