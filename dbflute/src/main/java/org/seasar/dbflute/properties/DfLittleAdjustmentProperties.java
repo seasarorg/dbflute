@@ -333,9 +333,9 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //    return isProperty("isMakeConditionBeanCBDrivenLoadReferrer", false);
     //}
 
-    public boolean isInvalidQueryChecked() { // closet
-        final boolean defaultValue = !isCompatibleBeforeJava8();
-        return isProperty("isInvalidQueryChecked", defaultValue);
+    public boolean isNullOrEmptyQueryChecked() { // closet
+        final boolean defaultValue = isProperty("isInvalidQueryChecked", !isCompatibleBeforeJava8());
+        return isProperty("isNullOrEmptyQueryChecked", defaultValue);
     }
 
     // ===================================================================================
@@ -705,8 +705,9 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                        Query Update
     //                                                                        ============
-    public boolean isCheckCountBeforeQueryUpdate() { // closet
-        return isProperty("isCheckCountBeforeQueryUpdate", false);
+    public boolean isQueryUpdateCountPreCheck() { // closet
+        final boolean defaultValue = isProperty("isCheckCountBeforeQueryUpdate", false); // for compatible
+        return isProperty("isQueryUpdateCountPreCheck", defaultValue);
     }
 
     // *stop support because of incomplete, not look much like DBFlute policy
@@ -1084,6 +1085,18 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public boolean isCompatibleConditionBeanAcceptPKOldStyle() { // closet
         return isProperty("isCompatibleConditionBeanAcceptPKOldStyle", isCompatibleBeforeJava8());
+    }
+
+    public boolean isCompatibleConditionBeanOldNamingCheckInvalid() { // closet
+        return isProperty("isCompatibleConditionBeanOldNamingCheckInvalid", isCompatibleBeforeJava8());
+    }
+
+    public boolean isCompatibleConditionBeanOldNamingOption() { // closet
+        return isProperty("isCompatibleConditionBeanOldNamingOption", isCompatibleBeforeJava8());
+    }
+
+    public boolean isCompatibleConditionBeanFromToOneSideAllowed() { // closet
+        return isProperty("isCompatibleConditionBeanFromToOneSideAllowed", isCompatibleBeforeJava8());
     }
 
     public boolean isCompatibleBeforeJava8() { // closet

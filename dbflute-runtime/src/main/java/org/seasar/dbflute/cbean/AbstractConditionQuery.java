@@ -666,7 +666,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void handleInvalidQueryList(List<ConditionKey> keyList, List<? extends Object> valueList,
             String columnDbName) {
         if (keyList.size() != valueList.size()) {
-            String msg = "The argument 'keyList' should have the same size as 'valueList'";
+            String msg = "The argument 'keyList' should have the same size as 'valueList':";
+            msg = msg + " keyList=" + keyList + ", valueList=" + valueList;
             throw new IllegalArgumentException(msg);
         }
         final HpInvalidQueryInfo[] invalidQueryInfoAry = new HpInvalidQueryInfo[keyList.size()];
@@ -680,7 +681,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void xdoHandleInvalidQuery(String columnDbName, HpInvalidQueryInfo... invalidQueryInfoAry) {
-        if (xgetSqlClause().isInvalidQueryChecked()) {
+        if (xgetSqlClause().isNullOrEmptyQueryChecked()) {
             throwInvalidQueryRegisteredException(invalidQueryInfoAry);
         } else {
             for (HpInvalidQueryInfo invalidQueryInfo : invalidQueryInfoAry) {
@@ -855,7 +856,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
             final boolean needsNewOrScope = !isOrScopeQueryEffective();
             if (needsNewOrScope) {
-                xgetSqlClause().makeOrScopeQueryEffective();
+                xgetSqlClause().beginOrScopeQuery();
             }
             try {
                 for (int i = 0; i < strArray.length; i++) {
@@ -868,7 +869,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 }
             } finally {
                 if (needsNewOrScope) {
-                    xgetSqlClause().closeOrScopeQuery();
+                    xgetSqlClause().endOrScopeQuery();
                 }
             }
         }
@@ -906,6 +907,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          ------------
     protected void regFTQ(Date fromDate, Date toDate, ConditionValue cvalue, String columnDbName, FromToOption option) {
         assertObjectNotNull("option(FromToOption)", option);
+        filterFromToOption(option); // for fixed option
         final Date filteredFromDate = option.filterFromDate(fromDate);
         final ConditionKey fromKey = option.getFromDateConditionKey();
         final boolean fromValidQuery = isValidQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName);
@@ -924,8 +926,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
             if (toValidQuery) {
                 setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, columnDbName);
-            } else {
-                if (!fromValidQuery) { // means both queries are invalid
+            }
+            if (!fromValidQuery && !toValidQuery) { // both no condition
+                final List<ConditionKey> keyList = newArrayList(fromKey, toKey);
+                final List<Date> valueList = newArrayList(fromDate, toDate);
+                handleInvalidQueryList(keyList, valueList, columnDbName);
+            } else if (!fromValidQuery || !toValidQuery) { // either no condition
+                if (!option.isOneSideAllowed()) { // not allowed (if both required)
                     final List<ConditionKey> keyList = newArrayList(fromKey, toKey);
                     final List<Date> valueList = newArrayList(fromDate, toDate);
                     handleInvalidQueryList(keyList, valueList, columnDbName);
@@ -936,6 +943,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 xgetSqlClause().endOrScopeQueryAndPart();
             }
         }
+    }
+
+    protected void filterFromToOption(FromToOption option) {
+        // do nothing as default, basically for option default
     }
 
     // -----------------------------------------------------
@@ -996,7 +1007,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             final boolean needsAndPart = orScopeQuery && !orScopeQueryAndPart;
             if (isConditionKeyInScope(key)) {
                 // if or-scope query has already been effective, create new or-scope
-                xgetSqlClause().makeOrScopeQueryEffective();
+                xgetSqlClause().beginOrScopeQuery();
             } else {
                 if (needsAndPart) {
                     xgetSqlClause().beginOrScopeQueryAndPart();
@@ -1018,7 +1029,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 }
             } finally {
                 if (isConditionKeyInScope(key)) {
-                    xgetSqlClause().closeOrScopeQuery();
+                    xgetSqlClause().endOrScopeQuery();
                 } else {
                     if (needsAndPart) {
                         xgetSqlClause().endOrScopeQueryAndPart();
@@ -2240,7 +2251,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @return The determination, true or false.
      */
     protected boolean isEmptyStringQueryAllowed() {
-        return xgetSqlClause().isEmptyStringQueryAllowed();
+        return xgetSqlClause().isEmptyStringQueryEnabled();
     }
 
     /**
@@ -2404,7 +2415,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             throw new IllegalArgumentException(msg);
         }
         conditionValue = xescapeFullTextSearchValue(conditionValue);
-        xgetSqlClause().makeOrScopeQueryEffective();
+        xgetSqlClause().beginOrScopeQuery();
         try {
             for (ColumnInfo columnInfo : textColumnList) {
                 if (columnInfo == null) {
@@ -2424,7 +2435,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, xcreateMatchLikeSearch());
             }
         } finally {
-            xgetSqlClause().closeOrScopeQuery();
+            xgetSqlClause().endOrScopeQuery();
         }
     }
 

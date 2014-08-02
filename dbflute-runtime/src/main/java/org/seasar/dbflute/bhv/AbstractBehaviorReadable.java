@@ -327,19 +327,19 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
             public int count() {
                 try {
-                    cb.getSqlClause().makePagingAdjustmentEffective();
+                    cb.getSqlClause().enablePagingAdjustment();
                     return delegateSelectCountPlainly(cb);
                 } finally {
-                    cb.getSqlClause().ignorePagingAdjustment();
+                    cb.getSqlClause().disablePagingAdjustment();
                 }
             }
 
             public List<ENTITY> paging() {
                 try {
-                    cb.getSqlClause().makePagingAdjustmentEffective();
+                    cb.getSqlClause().enablePagingAdjustment();
                     return delegateSelectList(cb, entityType);
                 } finally {
-                    cb.getSqlClause().ignorePagingAdjustment();
+                    cb.getSqlClause().disablePagingAdjustment();
                 }
             }
         };

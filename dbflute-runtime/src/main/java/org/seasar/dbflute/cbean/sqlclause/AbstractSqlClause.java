@@ -189,10 +189,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected List<FixedConditionLazyChecker> _fixedConditionLazyChecker;
 
     /** Does it allow to auto-detect joins that can be structural-possible inner-join? */
-    protected boolean _structuralPossibleInnerJoinAllowed;
+    protected boolean _structuralPossibleInnerJoinEnabled;
 
     /** Does it allow to auto-detect joins that can be where-used inner-join? */
-    protected boolean _whereUsedInnerJoinAllowed;
+    protected boolean _whereUsedInnerJoinEnabled;
 
     /** The list of lazy reflector for auto-detected inner-join. (NullAllowed: lazy-load) */
     protected List<InnerJoinLazyReflector> _innerJoinLazyReflector;
@@ -255,10 +255,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                    Invalid Query Info
     //                                    ------------------
     /** Does it accept an empty string for query? */
-    protected boolean _emptyStringQueryAllowed;
+    protected boolean _emptyStringQueryEnabled;
 
     /** Does it check an invalid query? */
-    protected boolean _invalidQueryChecked;
+    protected boolean _nullOrEmptyChecked;
 
     /** The list of invalid query info. (NullAllowed: lazy-load) */
     protected List<HpInvalidQueryInfo> _invalidQueryList;
@@ -293,8 +293,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The manager of geared cipher. (also for saving) (NullAllowed: lazy-load) */
     protected GearedCipherManager _gearedCipherManager;
 
-    /** Does it suppress cipher for select columns? */
-    protected boolean _suppressSelectColumnCipher;
+    /** Does it use cipher for select columns? (true if cipher manager is set) */
+    protected boolean _selectColumnCipherEffective;
 
     // -----------------------------------------------------
     //                                         Scalar Select
@@ -306,22 +306,22 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                         Paging Select
     //                                         -------------
     /** Is the clause for paging select? */
-    protected boolean _pagingAdjustment;
+    protected boolean _pagingAdjustmentEnabled;
 
     /** Is the joins of count least? */
-    protected boolean _pagingCountLeastJoin;
+    protected boolean _pagingCountLeastJoinEnabled;
 
     /** Is the count executed later? */
-    protected boolean _pagingCountLater;
+    protected boolean _pagingCountLaterEnabled;
 
     /** Does it forcedly select only primary key? (basically for paging select and query split) */
-    protected boolean _pkOnlySelectForcedly;
+    protected boolean _pkOnlySelectForcedlyEnabled;
 
     // -----------------------------------------------------
     //                                          Query Update
     //                                          ------------
     /** Does it allowed to use in-scope clause in query update? */
-    protected boolean _queryUpdateForcedDirectAllowed;
+    protected boolean _queryUpdateForcedDirectEffective;
 
     // -----------------------------------------------------
     //                                          Purpose Type
@@ -333,7 +333,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected boolean _locked;
 
     /** Does it allow "that's bad timing" check? */
-    protected boolean _thatsBadTimingDetectAllowed;
+    protected boolean _thatsBadTimingDetectEffective;
 
     // -----------------------------------------------------
     //                                        Lazy Reflector
@@ -373,12 +373,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     /**
-     * Set the manager of geared cipher.
+     * Set the manager of geared cipher. <br />
+     * And enable cipher of select column.
      * @param manager The manager of geared cipher. (NullAllowed)
      * @return this. (NotNull)
      */
     public AbstractSqlClause cipherManager(GearedCipherManager manager) {
         _gearedCipherManager = manager;
+        _selectColumnCipherEffective = true;
         return this;
     }
 
@@ -612,7 +614,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final String columnDbName = columnInfo.getColumnDbName();
             final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
 
-            if (_pkOnlySelectForcedly && !columnInfo.isPrimary()) {
+            if (_pkOnlySelectForcedlyEnabled && !columnInfo.isPrimary()) {
                 continue;
             }
 
@@ -651,7 +653,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected int processSelectClauseRelation(StringBuilder sb, int selectIndex) {
-        if (_pkOnlySelectForcedly) {
+        if (_pkOnlySelectForcedlyEnabled) {
             return selectIndex;
         }
         for (Entry<String, Map<String, SelectedRelationColumn>> entry : getSelectedRelationColumnMap().entrySet()) {
@@ -706,7 +708,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
         for (Entry<String, HpDerivingSubQueryInfo> entry : _specifiedDerivingSubQueryMap.entrySet()) {
             final String subQueryAlias = entry.getKey();
-            if (_pkOnlySelectForcedly && !isSpecifiedDerivedOrderBy(subQueryAlias)) {
+            if (_pkOnlySelectForcedlyEnabled && !isSpecifiedDerivedOrderBy(subQueryAlias)) {
                 // even if PK only add one used as specified derived order-by
                 // (because it needs in order-by)
                 continue;
@@ -1079,7 +1081,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected boolean checkStructuralPossibleInnerJoinAllowed() {
-        if (!_structuralPossibleInnerJoinAllowed) {
+        if (!_structuralPossibleInnerJoinEnabled) {
             return false;
         }
         return !hasFixedConditionOverRelationJoin();
@@ -1557,46 +1559,46 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                  InnerJoin AutoDetect
     //                                  --------------------
     // has several items of inner-join auto-detected
-    public void allowInnerJoinAutoDetect() {
-        allowStructuralPossibleInnerJoin();
-        allowWhereUsedInnerJoin();
+    public void enableInnerJoinAutoDetect() {
+        enableStructuralPossibleInnerJoin();
+        enableWhereUsedInnerJoin();
     }
 
-    public void suppressInnerJoinAutoDetect() {
-        suppressStructuralPossibleInnerJoin();
-        suppressWhereUsedInnerJoin();
+    public void disableInnerJoinAutoDetect() {
+        disableStructuralPossibleInnerJoin();
+        disableWhereUsedInnerJoin();
     }
 
     // -----------------------------------------------------
     //                          StructuralPossible InnerJoin
     //                          ----------------------------
     // one of inner-join auto-detect
-    public void allowStructuralPossibleInnerJoin() {
-        _structuralPossibleInnerJoinAllowed = true;
+    public void enableStructuralPossibleInnerJoin() {
+        _structuralPossibleInnerJoinEnabled = true;
     }
 
-    public void suppressStructuralPossibleInnerJoin() {
-        _structuralPossibleInnerJoinAllowed = false;
+    public void disableStructuralPossibleInnerJoin() {
+        _structuralPossibleInnerJoinEnabled = false;
     }
 
-    public boolean isStructuralPossibleInnerJoinAllowed() {
-        return _structuralPossibleInnerJoinAllowed;
+    public boolean isStructuralPossibleInnerJoinEnabled() {
+        return _structuralPossibleInnerJoinEnabled;
     }
 
     // -----------------------------------------------------
     //                                   WhereUsed InnerJoin
     //                                   -------------------
     // one of inner-join auto-detect
-    public void allowWhereUsedInnerJoin() {
-        _whereUsedInnerJoinAllowed = true;
+    public void enableWhereUsedInnerJoin() {
+        _whereUsedInnerJoinEnabled = true;
     }
 
-    public void suppressWhereUsedInnerJoin() {
-        _whereUsedInnerJoinAllowed = false;
+    public void disableWhereUsedInnerJoin() {
+        _whereUsedInnerJoinEnabled = false;
     }
 
-    public boolean isWhereUsedInnerJoinAllowed() {
-        return _whereUsedInnerJoinAllowed;
+    public boolean isWhereUsedInnerJoinEnabled() {
+        return _whereUsedInnerJoinEnabled;
     }
 
     // -----------------------------------------------------
@@ -1740,7 +1742,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected boolean isOutOfWhereUsedInnerJoin() {
-        return !_whereUsedInnerJoinAllowed || _orScopeQueryEffective;
+        return !_whereUsedInnerJoinEnabled || _orScopeQueryEffective;
     }
 
     protected InnerJoinLazyReflectorBase createInnerJoinLazyReflector(QueryUsedAliasInfo usedAliasInfo) {
@@ -1964,7 +1966,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                        OrScopeQuery
     //                                                                        ============
-    public void makeOrScopeQueryEffective() {
+    public void beginOrScopeQuery() {
         final OrScopeQueryInfo tmpOrScopeQueryInfo = new OrScopeQueryInfo();
         if (_currentTmpOrScopeQueryInfo != null) {
             _currentTmpOrScopeQueryInfo.addChildInfo(tmpOrScopeQueryInfo);
@@ -1973,7 +1975,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _orScopeQueryEffective = true;
     }
 
-    public void closeOrScopeQuery() {
+    public void endOrScopeQuery() {
         assertCurrentTmpOrScopeQueryInfo();
         final OrScopeQueryInfo parentInfo = _currentTmpOrScopeQueryInfo.getParentInfo();
         if (parentInfo != null) {
@@ -2079,14 +2081,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         getOrderBy().clear();
     }
 
-    public void makeOrderByEffective() {
+    public void suppressOrderBy() {
+        _orderByEffective = false;
+    }
+
+    public void reviveOrderBy() {
         if (hasOrderByClause()) {
             _orderByEffective = true;
         }
-    }
-
-    public void ignoreOrderBy() {
-        _orderByEffective = false;
     }
 
     public void registerOrderBy(String orderByProperty, boolean ascOrDesc, ColumnInfo columnInfo) {
@@ -2124,7 +2126,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                     aliasName = orderBy.substring(0, orderBy.lastIndexOf("."));
                     columnName = orderBy.substring(orderBy.lastIndexOf(".") + 1);
                 }
-                final OrderByElement element = new OrderByElement(aliasName, columnName, columnInfo, derived);
+                final OrderByElement element = newOrderByElement(columnInfo, derived, aliasName, columnName);
                 if (ascOrDesc) {
                     element.setupAsc();
                 } else {
@@ -2140,6 +2142,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             msg = msg + " table=" + _tableDbName;
             throw new IllegalStateException(msg, e);
         }
+    }
+
+    protected OrderByElement newOrderByElement(ColumnInfo columnInfo, boolean derived, String aliasName,
+            String columnName) {
+        return new OrderByElement(aliasName, columnName, columnInfo, derived);
     }
 
     public void addNullsFirstToPreviousOrderBy() {
@@ -2437,19 +2444,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _fetchStartIndex + (_fetchSize * _fetchPageNumber);
     }
 
-    public boolean isFetchScopeEffective() {
-        return _fetchScopeEffective;
-    }
-
-    public void ignoreFetchScope() {
+    public void suppressFetchScope() {
         _fetchScopeEffective = false;
         doClearFetchPageClause();
     }
 
-    public void makeFetchScopeEffective() {
+    public void reviveFetchScope() {
         if (getFetchSize() > 0 && getFetchPageNumber() > 0) {
             fetchPage(getFetchPageNumber());
         }
+    }
+
+    public boolean isFetchScopeEffective() {
+        return _fetchScopeEffective;
     }
 
     public boolean isFetchStartIndexSupported() {
@@ -2842,24 +2849,28 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                  Invalid Query Info
     //                                                                  ==================
-    public boolean isEmptyStringQueryAllowed() {
-        return _emptyStringQueryAllowed;
+    public void checkNullOrEmptyQuery() {
+        _nullOrEmptyChecked = true;
     }
 
-    public void allowEmptyStringQuery() {
-        _emptyStringQueryAllowed = true;
+    public void ignoreNullOrEmptyQuery() {
+        _nullOrEmptyChecked = false;
     }
 
-    public boolean isInvalidQueryChecked() {
-        return _invalidQueryChecked;
+    public boolean isNullOrEmptyQueryChecked() {
+        return _nullOrEmptyChecked;
     }
 
-    public void checkInvalidQuery() {
-        _invalidQueryChecked = true;
+    public void enableEmptyStringQuery() {
+        _emptyStringQueryEnabled = true;
     }
 
-    public void acceptInvalidQuery() {
-        _invalidQueryChecked = false;
+    public void disableEmptyStringQuery() {
+        _emptyStringQueryEnabled = false;
+    }
+
+    public boolean isEmptyStringQueryEnabled() {
+        return _emptyStringQueryEnabled;
     }
 
     /**
@@ -3036,12 +3047,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return null;
     }
 
-    public void makeSelectColumnCipherEffective() {
-        _suppressSelectColumnCipher = false;
+    public void enableSelectColumnCipher() {
+        _selectColumnCipherEffective = true;
     }
 
-    public void suppressSelectColumnCipher() {
-        _suppressSelectColumnCipher = true;
+    public void disableSelectColumnCipher() {
+        _selectColumnCipherEffective = false;
     }
 
     protected String encryptIfNeeds(ColumnInfo columnInfo, String valueExp) {
@@ -3050,7 +3061,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String decryptSelectColumnIfNeeds(ColumnInfo columnInfo, String valueExp) {
-        if (_suppressSelectColumnCipher) {
+        if (!_selectColumnCipherEffective) {
             return valueExp;
         }
         return doDecryptIfNeeds(columnInfo, valueExp);
@@ -3079,54 +3090,54 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                     Paging Adjustment
     //                                     -----------------
-    public void makePagingAdjustmentEffective() {
-        _pagingAdjustment = true;
+    public void enablePagingAdjustment() {
+        _pagingAdjustmentEnabled = true;
     }
 
-    public void ignorePagingAdjustment() {
-        _pagingAdjustment = false;
+    public void disablePagingAdjustment() {
+        _pagingAdjustmentEnabled = false;
     }
 
     // -----------------------------------------------------
     //                                           Count Later
     //                                           -----------
     public void enablePagingCountLater() {
-        _pagingCountLater = true;
+        _pagingCountLaterEnabled = true;
     }
 
     public void disablePagingCountLater() {
-        _pagingCountLater = false;
+        _pagingCountLaterEnabled = false;
     }
 
     protected boolean canPagingCountLater() {
-        return _pagingAdjustment && _pagingCountLater;
+        return _pagingAdjustmentEnabled && _pagingCountLaterEnabled;
     }
 
     // -----------------------------------------------------
     //                                       Count LeastJoin
     //                                       ---------------
     public void enablePagingCountLeastJoin() {
-        _pagingCountLeastJoin = true;
+        _pagingCountLeastJoinEnabled = true;
     }
 
     public void disablePagingCountLeastJoin() {
-        _pagingCountLeastJoin = false;
+        _pagingCountLeastJoinEnabled = false;
     }
 
     public boolean canPagingCountLeastJoin() {
-        return _pagingAdjustment && _pagingCountLeastJoin;
+        return _pagingAdjustmentEnabled && _pagingCountLeastJoinEnabled;
     }
 
     // [DBFlute-1.0.5G]
     // -----------------------------------------------------
     //                                        PK Only Select
     //                                        --------------
-    public void makePKOnlySelectForcedlyEffective() {
-        _pkOnlySelectForcedly = true;
+    public void enablePKOnlySelectForcedly() {
+        _pkOnlySelectForcedlyEnabled = true;
     }
 
-    public void closePKOnlySelectForcedly() {
-        _pkOnlySelectForcedly = false;
+    public void disablePKOnlySelectForcedly() {
+        _pkOnlySelectForcedlyEnabled = false;
     }
 
     // [DBFlute-0.9.9.4C]
@@ -3248,7 +3259,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected boolean isUseQueryUpdateDirect(final DBMeta dbmeta) {
-        return _queryUpdateForcedDirectAllowed || !canUseQueryUpdateInScope(dbmeta);
+        return _queryUpdateForcedDirectEffective || !canUseQueryUpdateInScope(dbmeta);
     }
 
     protected boolean canUseQueryUpdateInScope(final DBMeta dbmeta) {
@@ -3435,8 +3446,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /**
      * {@inheritDoc}
      */
-    public void allowQueryUpdateForcedDirect() {
-        _queryUpdateForcedDirectAllowed = true;
+    public void enableQueryUpdateForcedDirect() {
+        _queryUpdateForcedDirectEffective = true;
     }
 
     protected boolean isUpdateSubQueryUseLocalTableSupported() {
@@ -3473,7 +3484,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     public boolean isLocked() {
-        return _thatsBadTimingDetectAllowed && _locked;
+        return _thatsBadTimingDetectEffective && _locked;
     }
 
     public void lock() {
@@ -3485,15 +3496,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     public boolean isThatsBadTimingDetectAllowed() {
-        return _thatsBadTimingDetectAllowed;
+        return _thatsBadTimingDetectEffective;
     }
 
-    public void allowThatsBadTimingDetect() {
-        _thatsBadTimingDetectAllowed = true;
+    public void enableThatsBadTimingDetect() {
+        _thatsBadTimingDetectEffective = true;
     }
 
-    public void suppressThatsBadTimingDetect() {
-        _thatsBadTimingDetectAllowed = false;
+    public void disableThatsBadTimingDetect() {
+        _thatsBadTimingDetectEffective = false;
     }
 
     // [DBFlute-0.9.4]

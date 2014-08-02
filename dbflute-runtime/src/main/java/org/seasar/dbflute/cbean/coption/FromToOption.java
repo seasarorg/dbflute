@@ -113,6 +113,7 @@ public class FromToOption implements ConditionOption {
     protected Integer _moveToScope;
     protected boolean _usePattern;
     protected boolean _orIsNull;
+    protected boolean _oneSideAllowed;
 
     // ===================================================================================
     //                                                                  Comparison Pattern
@@ -949,6 +950,19 @@ public class FromToOption implements ConditionOption {
     public FromToOption orIsNull() {
         _orIsNull = true;
         return this;
+    }
+
+    /**
+     * Allow you to set one-side only condition. (null allowed)
+     * @return this. (NotNull)
+     */
+    public FromToOption allowOneSide() {
+        _oneSideAllowed = true;
+        return this;
+    }
+
+    public boolean isOneSideAllowed() {
+        return _oneSideAllowed;
     }
 
     // ===================================================================================

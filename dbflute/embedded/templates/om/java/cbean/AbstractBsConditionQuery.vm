@@ -1571,6 +1571,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 #end
 
+    // ===================================================================================
+    //                                                                        Manual Order
+    //                                                                        ============
     /**
      * Order along manual ordering information.
      * <pre>
@@ -1605,11 +1608,12 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public void withManualOrder(ManualOrderBean mob) { // is user public!
         xdoWithManualOrder(mob);
     }
-#if ($table.isMakeConditionQueryPlainListManualOrder())
 
     // ===================================================================================
-    //                                                                          Compatible
-    //                                                                          ==========
+    //                                                                    Small Adjustment
+    //                                                                    ================
+#if ($table.isMakeConditionQueryPlainListManualOrder())
+
     /**
      * Order along the list of manual values. #beforejava8 <br />
      * This function with Union is unsupported! <br />
@@ -1647,6 +1651,13 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
             return new Date(((ReadableInstant) date).getMillis());
         }
         return DfTypeUtil.toDate(date);
+    }
+#end
+#if ($table.isCompatibleConditionBeanFromToOneSideAllowed())
+
+    @Override
+    protected void filterFromToOption(FromToOption option) {
+        option.allowOneSide();
     }
 #end
 

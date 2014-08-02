@@ -48,9 +48,6 @@ public class MockConditionBean implements ConditionBean {
     public void acceptPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
     }
 
-    public void acceptPrimaryKeyMapString(String primaryKeyMapString) {
-    }
-
     public ConditionBean addOrderBy_PK_Asc() {
         return null;
     }
@@ -203,7 +200,7 @@ public class MockConditionBean implements ConditionBean {
         return 0;
     }
 
-    public void ignoreFetchNarrowing() {
+    public void xdisableFetchNarrowing() {
     }
 
     public boolean isFetchNarrowingEffective() {
@@ -218,7 +215,7 @@ public class MockConditionBean implements ConditionBean {
         return false;
     }
 
-    public void restoreIgnoredFetchNarrowing() {
+    public void xenableIgnoredFetchNarrowing() {
     }
 
     public OrderByBean clearOrderBy() {
@@ -233,11 +230,11 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
-    public OrderByBean ignoreOrderBy() {
+    public OrderByBean disableOrderBy() {
         return null;
     }
 
-    public OrderByBean makeOrderByEffective() {
+    public OrderByBean enableOrderBy() {
         return null;
     }
 
@@ -261,46 +258,31 @@ public class MockConditionBean implements ConditionBean {
     public void invokeOrScopeQueryAndPart(AndQuery<ConditionBean> andQuery) {
     }
 
-    public Map<String, Object> getFreeParameterMap() {
-        return null;
-    }
-
-    public String xregisterFreeParameter(String key, Object value) {
-        return null;
-    }
-
-    public String xregisterFreeParameterToThemeList(String themeKey, Object addedValue) {
-        return null;
-    }
-
     public void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer) {
     }
 
-    public void allowEmptyStringQuery() {
+    public void checkNullOrEmptyQuery() {
     }
 
-    public void checkInvalidQuery() {
+    public void ignoreNullOrEmptyQuery() {
     }
 
-    public void acceptInvalidQuery() {
+    public void enableEmptyStringQuery() {
     }
 
-    public void allowInnerJoinAutoDetect() {
+    public void disableEmptyStringQuery() {
     }
 
-    public void allowStructurePossibleInnerJoin() {
+    public void enableInnerJoinAutoDetect() {
     }
 
-    public void suppressInnerJoinAutoDetect() {
+    public void disableInnerJoinAutoDetect() {
     }
 
     public void enablePagingCountLeastJoin() {
     }
 
     public void disablePagingCountLeastJoin() {
-    }
-
-    public void disableRelationMappingCache() {
     }
 
     public boolean canRelationMappingCache() {
@@ -311,14 +293,7 @@ public class MockConditionBean implements ConditionBean {
         return false;
     }
 
-    public boolean hasWhereClauseOnBaseTableInline() {
-        return false;
-    }
-
     public void clearWhereClauseOnBaseQuery() {
-    }
-
-    public void clearWhereClauseOnBaseTableInline() {
     }
 
     public boolean hasSelectAllPossible() {
@@ -372,13 +347,13 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
-    public void enableCheckCountBeforeQueryUpdate() {
+    public void enableQueryUpdateCountPreCheck() {
     }
 
-    public void disableCheckCountBeforeQueryUpdate() {
+    public void disableQueryUpdateCountPreCheck() {
     }
 
-    public boolean isCheckCountBeforeQueryUpdate() {
+    public boolean isQueryUpdateCountPreCheck() {
         return false;
     }
 
@@ -390,9 +365,9 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
-    public void allowThatsBadTiming() {
+    public void enableThatsBadTiming() {
     }
 
-    public void suppressThatsBadTiming() {
+    public void disableThatsBadTiming() {
     }
 }

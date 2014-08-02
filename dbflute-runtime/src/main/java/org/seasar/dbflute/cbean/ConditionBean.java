@@ -39,7 +39,7 @@ public interface ConditionBean extends PagingBean {
     //                                                                          ==========
     /**
      * Get table DB-name.
-     * @return Table DB-name. (NotNull)
+     * @return The DB-name of the table. (NotNull)
      */
     String getTableDbName();
 
@@ -57,7 +57,7 @@ public interface ConditionBean extends PagingBean {
     //                                                                           =========
     /**
      * Get SQL clause instance. {Internal}<br />
-     * @return SQL clause. (NotNull)
+     * @return The object for SQL clause. (NotNull)
      */
     SqlClause getSqlClause();
 
@@ -107,30 +107,20 @@ public interface ConditionBean extends PagingBean {
     ConditionQuery localCQ();
 
     /**
-     * Allow to auto-detect joins that can be inner-join. <br />
+     * Enable to auto-detect joins that can be inner-join. (back to default) <br />
      * <pre>
      * o You should call this before registrations of where clause.
      * o Union and SubQuery and other sub condition-bean inherit this.
      * o You should confirm your SQL on the log to be tuned by inner-join correctly.
      * </pre>
      */
-    void allowInnerJoinAutoDetect();
+    void enableInnerJoinAutoDetect();
 
     /**
-     * Suppress auto-detecting inner-join. <br />
+     * Disable auto-detecting inner-join. (default is enabled) <br />
      * You should call this before registrations of where clause.
      */
-    void suppressInnerJoinAutoDetect();
-
-    /**
-     * Allow "that's bad timing" check.
-     */
-    void allowThatsBadTiming();
-
-    /**
-     * Suppress "that's bad timing" check.
-     */
-    void suppressThatsBadTiming();
+    void disableInnerJoinAutoDetect();
 
     // ===================================================================================
     //                                                                        Dream Cruise
@@ -236,34 +226,46 @@ public interface ConditionBean extends PagingBean {
     //                                                                       Invalid Query
     //                                                                       =============
     /**
-     * Allow an empty string for query. <br />
+     * Check null or empty value for query when query is set. (back to default) <br />
+     * (it throws exception if set query is invalid, e.g. null, empty string, empty list) <br />
+     * You should call this before registrations of where clause and other queries. <br />
+     * Union and SubQuery and other sub condition-bean inherit this.
+     */
+    void checkNullOrEmptyQuery();
+
+    /**
+     * Ignore null-or-empty check for query when query is set. (default is checked) <br />
+     * (no condition if set query is invalid)
+     * <pre>
+     * MemberCB cb = new MemberCB();
+     * cb.ignoreNullOrEmptyQuery();
+     * cb.query().setMemberName_PrefixSearch(null); // no condition
+     * cb.query().setMemberName_PrefixSearch(""); // no condition
+     * </pre>
+     * You should call this before registrations of where clause and other queries. <br />
+     * And Union and SubQuery and other sub condition-bean inherit this.
+     */
+    void ignoreNullOrEmptyQuery();
+
+    /**
+     * Enable empty string for query. (default is disabled) <br />
      * (you can use an empty string as condition) <br />
      * You should call this before registrations of where clause and other queries. <br />
      * Union and SubQuery and other sub condition-bean inherit this.
      */
-    void allowEmptyStringQuery();
+    void enableEmptyStringQuery();
 
     /**
-     * Check an invalid query when a query is set. <br />
-     * (it throws an exception if a set query is invalid) <br />
-     * You should call this before registrations of where clause and other queries. <br />
-     * Union and SubQuery and other sub condition-bean inherit this.
+     * Disable empty string for query. (back to default) <br />
+     * The empty string for query is treated as invalid data, like null.
      */
-    void checkInvalidQuery();
-
-    /**
-     * Accept (no check) an invalid query when a query is set. <br />
-     * (no condition if a set query is invalid) <br />
-     * You should call this before registrations of where clause and other queries. <br />
-     * Union and SubQuery and other sub condition-bean inherit this.
-     */
-    void acceptInvalidQuery();
+    void disableEmptyStringQuery();
 
     // ===================================================================================
     //                                                                      Paging Setting
     //                                                                      ==============
     /**
-     * Enable paging count-least-join, which means least joined on count select. <br />
+     * Enable paging count-least-join, which means least joined on count select. (back to default) <br />
      * You can use it by default on DBFlute so you don't need to call this basically.
      * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br />
      * You should call this before execution of selectPage().
@@ -271,7 +273,7 @@ public interface ConditionBean extends PagingBean {
     void enablePagingCountLeastJoin();
 
     /**
-     * Disable paging count-least-join, which means least joined on count select. <br />
+     * Disable paging count-least-join, which means least joined on count select. (default is enabled) <br />
      * You should call this before execution of selectPage().
      */
     void disablePagingCountLeastJoin();
@@ -343,22 +345,22 @@ public interface ConditionBean extends PagingBean {
     //                                                                        Query Update
     //                                                                        ============
     /**
-     * Enable checking record count before QueryUpdate (contains QueryDelete). <br />
+     * Enable checking record count before QueryUpdate (contains QueryDelete). (default is disabled) <br />
      * No query update if zero count. (basically for MySQL's deadlock by next-key lock)
      */
-    void enableCheckCountBeforeQueryUpdate();
+    void enableQueryUpdateCountPreCheck();
 
     /**
-     * Disable checking record count before QueryUpdate (contains QueryDelete).
+     * Disable checking record count before QueryUpdate (contains QueryDelete). (back to default) <br />
      * Executes query update even if zero count. (normal specification)
      */
-    void disableCheckCountBeforeQueryUpdate();
+    void disableQueryUpdateCountPreCheck();
 
     /**
      * Does it check record count before QueryUpdate (contains QueryDelete)?
      * @return The determination, true or false.
      */
-    boolean isCheckCountBeforeQueryUpdate();
+    boolean isQueryUpdateCountPreCheck();
 
     // ===================================================================================
     //                                                                     StatementConfig
@@ -519,4 +521,14 @@ public interface ConditionBean extends PagingBean {
      * @return The instance of purpose object for condition-bean. (NotNull)
      */
     HpCBPurpose getPurpose();
+
+    /**
+     * Enable "that's bad timing" check. (back to default)
+     */
+    void enableThatsBadTiming();
+
+    /**
+     * Disable "that's bad timing" check. (default is enabled)
+     */
+    void disableThatsBadTiming();
 }

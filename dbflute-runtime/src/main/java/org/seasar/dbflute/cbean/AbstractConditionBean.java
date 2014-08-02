@@ -132,7 +132,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected int _safetyMaxResultSize;
 
     /** Does it check record count before QueryUpdate? (contains QueryDelete) {Internal} */
-    protected boolean _checkCountBeforeQueryUpdate;
+    protected boolean _queryUpdateCountPreCheck;
 
     /** The configuration of statement. {Internal} (NullAllowed) */
     protected StatementConfig _statementConfig;
@@ -258,18 +258,21 @@ public abstract class AbstractConditionBean implements ConditionBean {
         createCBExThrower().throwQueryIllegalPurposeException(_purpose, this);
     }
 
+    // -----------------------------------------------------
+    //                                  InnerJoin AutoDetect
+    //                                  --------------------
     /**
      * {@inheritDoc}
      */
-    public void allowInnerJoinAutoDetect() {
-        getSqlClause().allowInnerJoinAutoDetect();
+    public void enableInnerJoinAutoDetect() {
+        getSqlClause().enableInnerJoinAutoDetect();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void suppressInnerJoinAutoDetect() {
-        getSqlClause().suppressInnerJoinAutoDetect();
+    public void disableInnerJoinAutoDetect() {
+        getSqlClause().disableInnerJoinAutoDetect();
     }
 
     // [DBFlute-0.9.5.3]
@@ -609,7 +612,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected <CB extends ConditionBean> void xdoOrSQ(CB cb, OrQuery<CB> orQuery) {
-        getSqlClause().makeOrScopeQueryEffective();
+        getSqlClause().beginOrScopeQuery();
         final HpCBPurpose originalPurpose = xhandleOrSQPurposeChange();
         try {
             // cannot lock base condition-bean for now
@@ -617,7 +620,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
             orQuery.query(cb);
         } finally {
             xhandleOrSQPurposeClose(originalPurpose);
-            getSqlClause().closeOrScopeQuery();
+            getSqlClause().endOrScopeQuery();
         }
     }
 
@@ -655,22 +658,29 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public void allowEmptyStringQuery() {
-        getSqlClause().allowEmptyStringQuery();
+    public void checkNullOrEmptyQuery() {
+        getSqlClause().checkNullOrEmptyQuery();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void checkInvalidQuery() {
-        getSqlClause().checkInvalidQuery();
+    public void ignoreNullOrEmptyQuery() {
+        getSqlClause().ignoreNullOrEmptyQuery();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void acceptInvalidQuery() {
-        getSqlClause().acceptInvalidQuery();
+    public void enableEmptyStringQuery() {
+        getSqlClause().enableEmptyStringQuery();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void disableEmptyStringQuery() {
+        getSqlClause().disableEmptyStringQuery();
     }
 
     // ===================================================================================
@@ -1006,7 +1016,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public void ignoreFetchNarrowing() {
+    public void xdisableFetchNarrowing() {
+        // no need to disable in ConditionBean, basically for OutsideSql
         String msg = "This method is unsupported on ConditionBean!";
         throw new UnsupportedOperationException(msg);
     }
@@ -1014,8 +1025,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public void restoreIgnoredFetchNarrowing() {
-        // Do nothing!
+    public void xenableIgnoredFetchNarrowing() {
+        // do nothing
     }
 
     // ===================================================================================
@@ -1040,22 +1051,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public OrderByBean clearOrderBy() {
         getSqlClause().clearOrderBy();
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public OrderByBean ignoreOrderBy() {
-        getSqlClause().ignoreOrderBy();
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public OrderByBean makeOrderByEffective() {
-        getSqlClause().makeOrderByEffective();
         return this;
     }
 
@@ -1086,8 +1081,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
             clauseType = SelectClauseType.PLAIN_COUNT;
         }
         getSqlClause().classifySelectClauseType(clauseType);
-        getSqlClause().ignoreOrderBy();
-        getSqlClause().ignoreFetchScope();
+        getSqlClause().suppressOrderBy();
+        getSqlClause().suppressFetchScope();
         return this;
     }
 
@@ -1098,8 +1093,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
         _isSelectCountIgnoreFetchScope = false;
 
         getSqlClause().rollbackSelectClauseType();
-        getSqlClause().makeOrderByEffective();
-        getSqlClause().makeFetchScopeEffective();
+        getSqlClause().reviveOrderBy();
+        getSqlClause().reviveFetchScope();
         return this;
     }
 
@@ -1139,22 +1134,22 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public void enableCheckCountBeforeQueryUpdate() {
-        _checkCountBeforeQueryUpdate = true;
+    public void enableQueryUpdateCountPreCheck() {
+        _queryUpdateCountPreCheck = true;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void disableCheckCountBeforeQueryUpdate() {
-        _checkCountBeforeQueryUpdate = false;
+    public void disableQueryUpdateCountPreCheck() {
+        _queryUpdateCountPreCheck = false;
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean isCheckCountBeforeQueryUpdate() {
-        return _checkCountBeforeQueryUpdate;
+    public boolean isQueryUpdateCountPreCheck() {
+        return _queryUpdateCountPreCheck;
     }
 
     // ===================================================================================
@@ -1577,7 +1572,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     public void xsetupForQueryInsert() { // not sub-query (used independently)
         xchangePurposeSqlClause(HpCBPurpose.QUERY_INSERT, null);
-        getSqlClause().suppressSelectColumnCipher(); // suppress cipher for values from DB to DB
+        getSqlClause().disableSelectColumnCipher(); // suppress cipher for values from DB to DB
     }
 
     public void xsetupForColumnQuery(ConditionBean mainCB) {
@@ -1641,36 +1636,36 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected void xinheritInvalidQueryInfo(ConditionQuery mainCQ) {
-        if (mainCQ.xgetSqlClause().isEmptyStringQueryAllowed()) {
-            allowEmptyStringQuery();
+        if (mainCQ.xgetSqlClause().isEmptyStringQueryEnabled()) {
+            enableEmptyStringQuery();
         }
-        if (mainCQ.xgetSqlClause().isInvalidQueryChecked()) {
-            checkInvalidQuery();
+        if (mainCQ.xgetSqlClause().isNullOrEmptyQueryChecked()) {
+            checkNullOrEmptyQuery();
         }
     }
 
     protected void xinheritStructurePossibleInnerJoin(ConditionQuery mainCQ) {
         // inherited
-        if (mainCQ.xgetSqlClause().isStructuralPossibleInnerJoinAllowed()) { // DBFlute default
-            getSqlClause().allowStructuralPossibleInnerJoin();
+        if (mainCQ.xgetSqlClause().isStructuralPossibleInnerJoinEnabled()) { // DBFlute default
+            getSqlClause().enableStructuralPossibleInnerJoin();
         } else { // e.g. if it suppresses it by DBFlute property
-            getSqlClause().suppressStructuralPossibleInnerJoin();
+            getSqlClause().disableStructuralPossibleInnerJoin();
         }
     }
 
     protected void xinheritWhereUsedInnerJoin(ConditionQuery mainCQ) {
-        if (mainCQ.xgetSqlClause().isWhereUsedInnerJoinAllowed()) { // DBFlute default
-            getSqlClause().allowWhereUsedInnerJoin();
+        if (mainCQ.xgetSqlClause().isWhereUsedInnerJoinEnabled()) { // DBFlute default
+            getSqlClause().enableWhereUsedInnerJoin();
         } else { // e.g. if it suppresses it by DBFlute property
-            getSqlClause().suppressWhereUsedInnerJoin();
+            getSqlClause().disableWhereUsedInnerJoin();
         }
     }
 
     protected void xinheritThatsBadTiming(ConditionQuery mainCQ) {
         if (mainCQ.xgetSqlClause().isThatsBadTimingDetectAllowed()) { // DBFlute default
-            getSqlClause().allowThatsBadTimingDetect();
+            getSqlClause().enableThatsBadTimingDetect();
         } else { // e.g. if it suppresses it by DBFlute property
-            getSqlClause().suppressThatsBadTimingDetect();
+            getSqlClause().disableThatsBadTimingDetect();
         }
     }
 
@@ -1697,15 +1692,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public void allowThatsBadTiming() {
-        getSqlClause().allowThatsBadTimingDetect();
+    public void enableThatsBadTiming() {
+        getSqlClause().enableThatsBadTimingDetect();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void suppressThatsBadTiming() {
-        getSqlClause().suppressThatsBadTimingDetect();
+    public void disableThatsBadTiming() {
+        getSqlClause().disableThatsBadTimingDetect();
     }
 
     // ===================================================================================

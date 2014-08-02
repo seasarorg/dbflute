@@ -73,7 +73,7 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         if (pmb instanceof FetchBean) {
             FetchAssistContext.setFetchBeanOnThread((FetchBean) pmb);
             if (pmb instanceof FetchNarrowingBean && option.isManualPaging()) {
-                ((FetchNarrowingBean) pmb).ignoreFetchNarrowing();
+                ((FetchNarrowingBean) pmb).xdisableFetchNarrowing();
             }
         }
     }

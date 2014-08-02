@@ -22,6 +22,7 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseDefault;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.exception.PagingPageSizeNotPlusException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.twowaysql.pmbean.MapParameterBean;
 
@@ -101,24 +102,20 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object> {
     }
 
     protected void throwPagingPageSizeNotPlusException(int pageSize, int pageNumber) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "Page size for paging should not be minus or zero!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Confirm the value of your parameter 'pageSize'." + ln();
-        msg = msg + "The first parameter of paging() should be a plus value!" + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    (x) - pmb.paging(0, 1);" + ln();
-        msg = msg + "    (x) - pmb.paging(-3, 2);" + ln();
-        msg = msg + "    (o) - pmb.paging(4, 3);" + ln();
-        msg = msg + ln();
-        msg = msg + "[Page Size]" + ln();
-        msg = msg + pageSize + ln();
-        msg = msg + ln();
-        msg = msg + "[Page Number]" + ln();
-        msg = msg + pageNumber + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Page size for paging should not be minus or zero!");
+        br.addItem("Advice");
+        br.addElement("Confirm the value of your parameter 'pageSize'.");
+        br.addElement("The first parameter of paging() should be a plus value!");
+        br.addElement("For example:");
+        br.addElement("  (x): pmb.paging(0, 1);");
+        br.addElement("  (x): pmb.paging(-3, 2);");
+        br.addElement("  (o): pmb.paging(4, 3);");
+        br.addItem("Page Size");
+        br.addElement(pageSize);
+        br.addItem("Page Number");
+        br.addElement(pageNumber);
+        final String msg = br.buildExceptionMessage();
         throw new PagingPageSizeNotPlusException(msg);
     }
 
@@ -127,11 +124,11 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object> {
      */
     public void xsetPaging(boolean paging) {
         if (paging) {
-            getSqlClause().makeFetchScopeEffective();
+            getSqlClause().reviveFetchScope();
         } else {
-            getSqlClause().ignoreFetchScope();
+            getSqlClause().suppressFetchScope();
         }
-        this._paging = paging;
+        _paging = paging;
     }
 
     /**
@@ -295,14 +292,14 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object> {
     /**
      * {@inheritDoc}
      */
-    public void ignoreFetchNarrowing() {
+    public void xdisableFetchNarrowing() {
         _fetchNarrowing = false;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void restoreIgnoredFetchNarrowing() {
+    public void xenableIgnoredFetchNarrowing() {
         _fetchNarrowing = true;
     }
 
@@ -333,22 +330,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object> {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public OrderByBean ignoreOrderBy() {
-        getSqlClause().ignoreOrderBy();
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public OrderByBean makeOrderByEffective() {
-        getSqlClause().makeOrderByEffective();
-        return this;
-    }
-
     // ===================================================================================
     //                                                    Implementation of SelectResource
     //                                                    ================================
@@ -356,7 +337,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object> {
      * {@inheritDoc}
      */
     public void checkSafetyResult(int safetyMaxResultSize) {
-        this._safetyMaxResultSize = safetyMaxResultSize;
+        _safetyMaxResultSize = safetyMaxResultSize;
     }
 
     // ===================================================================================

@@ -40,16 +40,4 @@ public interface OrderByBean {
      * @return this. (NotNull)
      */
     OrderByBean clearOrderBy();
-
-    /**
-     * Ignore order-by.
-     * @return this. (NotNull)
-     */
-    OrderByBean ignoreOrderBy();
-
-    /**
-     * Make order-by effective.
-     * @return this. (NotNull)
-     */
-    OrderByBean makeOrderByEffective();
 }

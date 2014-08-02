@@ -68,7 +68,7 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     void xsetPaging(boolean paging);
 
     /**
-     * Enable paging count-later that means counting after selecting. <br />
+     * Enable paging count-later that means counting after selecting. (back to default) <br />
      * You can use it by default on DBFlute so you don't need to call this basically.
      * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br />
      * You should call this before execution of selectPage().
@@ -76,13 +76,13 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     void enablePagingCountLater();
 
     /**
-     * Disable paging count-later that means counting after selecting. <br />
+     * Disable paging count-later that means counting after selecting. (default is enabled) <br />
      * You should call this before execution of selectPage().
      */
     void disablePagingCountLater();
 
     /**
-     * Enable paging re-select that is executed when the page number is over page count. <br />
+     * Enable paging re-select that is executed when the page number is over page count. (back to default) <br />
      * You can use it by default on DBFlute so you don't need to call this basically.
      * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br />
      * You should call this before execution of selectPage().
@@ -90,7 +90,7 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     void enablePagingReSelect();
 
     /**
-     * Disable paging re-select that is executed when the page number is over page count. <br />
+     * Disable paging re-select that is executed when the page number is over page count. (default is enabled) <br />
      * You should call this before execution of selectPage().
      */
     void disablePagingReSelect();

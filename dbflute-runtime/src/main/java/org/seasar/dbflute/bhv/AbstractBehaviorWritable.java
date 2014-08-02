@@ -377,7 +377,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      */
     protected boolean checkCountBeforeQueryUpdateIfNeeds(ConditionBean cb) {
         final boolean countExists;
-        if (cb.isCheckCountBeforeQueryUpdate()) {
+        if (cb.isQueryUpdateCountPreCheck()) {
             countExists = readCount(cb) > 0;
         } else {
             countExists = true; // means no check

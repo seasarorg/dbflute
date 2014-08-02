@@ -3538,6 +3538,21 @@ public class Table {
         return prop.isCompatibleConditionBeanAcceptPKOldStyle();
     }
 
+    public boolean isCompatibleConditionBeanOldNamingCheckInvalid() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isCompatibleConditionBeanOldNamingCheckInvalid();
+    }
+
+    public boolean isCompatibleConditionBeanOldNamingOption() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isCompatibleConditionBeanOldNamingOption();
+    }
+
+    public boolean isCompatibleConditionBeanFromToOneSideAllowed() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isCompatibleConditionBeanFromToOneSideAllowed();
+    }
+
     public boolean isMakeConditionQueryPlainListManualOrder() {
         return getLittleAdjustmentProperties().isMakeConditionQueryPlainListManualOrder();
     }

@@ -77,9 +77,9 @@ object ${glDBFluteConfig} {
     protected var _thatsBadTimingDetect: Boolean = ${database.isThatsBadTimingDetect()};
     protected var _emptyStringQueryAllowed: Boolean = false;
     protected var _emptyStringParameterAllowed: Boolean = false;
-    protected var _invalidQueryChecked: Boolean = false;
+    protected var _nullOrEmptyChecked: Boolean = false;
     protected var _disableSelectIndex: Boolean = false;
-    protected var _checkCountBeforeQueryUpdate: Boolean = ${database.isCheckCountBeforeQueryUpdate()};
+    protected var _queryUpdateCountPreCheck: Boolean = ${database.isQueryUpdateCountPreCheck()};
 
     // logging
     protected var _queryLogLevelInfo: Boolean = false;
@@ -216,7 +216,7 @@ object ${glDBFluteConfig} {
     /**
      * Set whether an empty string for query is allowed or not. {default: false}<br />
      * This configuration is only for ConditionBean.
-     * @param emptyStringQueryAllowed Determination.
+     * @param emptyStringQueryAllowed The determination, true or false.
      */
     def setEmptyStringQueryAllowed(emptyStringQueryAllowed: Boolean): Unit = {
         assertNotLocked();
@@ -233,7 +233,7 @@ object ${glDBFluteConfig} {
     /**
      * Set whether an empty string for parameter is allowed or not. {default: false}<br />
      * This configuration is only for ParameterBean.
-     * @param emptyStringParameterAllowed Determination.
+     * @param emptyStringParameterAllowed The determination, true or false.
      */
     def setEmptyStringParameterAllowed(emptyStringParameterAllowed: Boolean): Unit = {
         assertNotLocked();
@@ -243,21 +243,21 @@ object ${glDBFluteConfig} {
         _emptyStringParameterAllowed = emptyStringParameterAllowed;
     }
 
-    def isInvalidQueryChecked(): Boolean = {
-        return _invalidQueryChecked;
+    def isNullOrEmptyQueryChecked(): Boolean = {
+        return _nullOrEmptyChecked;
     }
 
     /**
      * Set whether an invalid query is checked or not. {default: false}<br />
      * This configuration is only for ConditionBean.
-     * @param invalidQueryChecked Determination.
+     * @param nullOrEmptyChecked The determination, true or false.
      */
-    def setInvalidQueryChecked(invalidQueryChecked: Boolean): Unit = {
+    def setNullOrEmptyQueryChecked(nullOrEmptyChecked: Boolean): Unit = {
         assertNotLocked();
         if (_log.isInfoEnabled()) {
-            _log.info("...Setting invalidQueryChecked: " + invalidQueryChecked);
+            _log.info("...Setting nullOrEmptyChecked: " + nullOrEmptyChecked);
         }
-        _invalidQueryChecked = invalidQueryChecked;
+        _nullOrEmptyChecked = nullOrEmptyChecked;
     }
 
     // ===================================================================================
@@ -278,16 +278,16 @@ object ${glDBFluteConfig} {
     // ===================================================================================
     //                                                                        Query Update
     //                                                                        ============
-    def isCheckCountBeforeQueryUpdate(): Boolean = {
-        return _checkCountBeforeQueryUpdate;
+    def isQueryUpdateCountPreCheck(): Boolean = {
+        return _queryUpdateCountPreCheck;
     }
 
-    def setCheckCountBeforeQueryUpdate(checkCountBeforeQueryUpdate: Boolean): Unit = {
+    def setQueryUpdateCountPreCheck(queryUpdateCountPreCheck: Boolean): Unit = {
         assertNotLocked();
         if (_log.isInfoEnabled()) {
-            _log.info("...Setting checkCountBeforeQueryUpdate: " + checkCountBeforeQueryUpdate);
+            _log.info("...Setting queryUpdateCountPreCheck: " + queryUpdateCountPreCheck);
         }
-        _checkCountBeforeQueryUpdate = checkCountBeforeQueryUpdate;
+        _queryUpdateCountPreCheck = queryUpdateCountPreCheck;
     }
 
     // ===================================================================================

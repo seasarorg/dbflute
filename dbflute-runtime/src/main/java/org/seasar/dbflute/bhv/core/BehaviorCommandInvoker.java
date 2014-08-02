@@ -613,7 +613,7 @@ public class BehaviorCommandInvoker {
             // ignored for manualPaging of outsideSql.
             // - - - - - - - - - -/
             final FetchNarrowingBean fnbean = FetchAssistContext.getFetchNarrowingBeanOnThread();
-            fnbean.restoreIgnoredFetchNarrowing();
+            fnbean.xenableIgnoredFetchNarrowing();
         }
         clearAllCurrentContext();
         restoreAllContextOnThreadIfExists();

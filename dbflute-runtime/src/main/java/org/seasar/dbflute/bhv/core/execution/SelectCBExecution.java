@@ -154,7 +154,7 @@ public class SelectCBExecution extends AbstractFixedArgExecution {
     protected List<Object> doSplitSelectFirst(Object[] args, ConditionBean cb, DBMeta dbmeta, SqlClause sqlClause) {
         final List<Object> pkList = new ArrayList<Object>();
         try {
-            sqlClause.makePKOnlySelectForcedlyEffective();
+            sqlClause.enablePKOnlySelectForcedly();
             final Object firstResult = superExecute(args);
             if (firstResult == null || !(firstResult instanceof List)) { // no way just in case
                 return null;
@@ -167,7 +167,7 @@ public class SelectCBExecution extends AbstractFixedArgExecution {
             }
             return pkList;
         } finally {
-            sqlClause.closePKOnlySelectForcedly();
+            sqlClause.disablePKOnlySelectForcedly();
         }
     }
 
@@ -178,7 +178,7 @@ public class SelectCBExecution extends AbstractFixedArgExecution {
         try {
             sqlClause.backupWhereClauseOnBaseQuery();
             sqlClause.clearWhereClauseOnBaseQuery();
-            sqlClause.ignoreFetchScope();
+            sqlClause.suppressFetchScope();
 
             // order by is inherited
             // basically small list here so one more order-by is not problem

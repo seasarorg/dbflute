@@ -51,8 +51,14 @@ import org.seasar.dbflute.dbway.DBWay;
 
 /**
  * The interface of SQL clause. <br />
- * And this also has a role of a container for common info
- * between the top level condition-bean and related condition-queries.
+ *
+ * <p>And this also has a role of a container for common info
+ * between the top level condition-bean and related condition-queries.</p>
+ *
+ * <p>It has many histories... e.g. structures, method names,
+ * it might be hard to read but no big refactoring
+ * because the histories and memories are also documents.</p>
+ *
  * @author jflute
  */
 public interface SqlClause {
@@ -327,62 +333,62 @@ public interface SqlClause {
     //                                  --------------------
     // has several items of inner-join auto-detected
     /**
-     * Allow to auto-detect joins that can be (all type) inner-join. <br />
+     * Enable to auto-detect joins that can be (all type) inner-join. <br />
      * You should call this before registrations of where clause.
      * (actually you can call before selecting but it's a fixed specification for user)
      */
-    void allowInnerJoinAutoDetect();
+    void enableInnerJoinAutoDetect();
 
     /**
-     * Suppress auto-detecting inner-join. <br />
+     * Disable auto-detecting inner-join. <br />
      * You should call this before registrations of where clause.
      */
-    void suppressInnerJoinAutoDetect();
+    void disableInnerJoinAutoDetect();
 
     // -----------------------------------------------------
     //                          StructuralPossible InnerJoin
     //                          ----------------------------
     // one of inner-join auto-detect
     /**
-     * Allow to auto-detect joins that can be structure-possible inner-join. <br />
+     * Enable to auto-detect joins that can be structure-possible inner-join. <br />
      * You should call this before registrations of where clause.
      * (actually you can call before selecting but it's a fixed specification for user)
      */
-    void allowStructuralPossibleInnerJoin();
+    void enableStructuralPossibleInnerJoin();
 
     /**
-     * Suppress auto-detecting structural-possible inner-join. <br />
+     * Disable auto-detecting structural-possible inner-join. <br />
      * You should call this before registrations of where clause.
      */
-    void suppressStructuralPossibleInnerJoin();
+    void disableStructuralPossibleInnerJoin();
 
     /**
      * Does it allow to auto-detect structure-possible inner-join? 
      * @return Determination. (true or false)
      */
-    boolean isStructuralPossibleInnerJoinAllowed();
+    boolean isStructuralPossibleInnerJoinEnabled();
 
     // -----------------------------------------------------
     //                                   WhereUsed InnerJoin
     //                                   -------------------
     // one of inner-join auto-detect
     /**
-     * Allow to auto-detect joins that can be where-used inner-join. <br />
+     * Enable to auto-detect joins that can be where-used inner-join. <br />
      * You should call this before registrations of where clause.
      */
-    void allowWhereUsedInnerJoin();
+    void enableWhereUsedInnerJoin();
 
     /**
-     * Suppress auto-detecting where-used inner-join.
+     * Disable auto-detecting where-used inner-join.
      * You should call this before registrations of where clause.
      */
-    void suppressWhereUsedInnerJoin();
+    void disableWhereUsedInnerJoin();
 
     /**
      * Does it allow to auto-detect where-used inner-join? 
      * @return Determination. (true or false)
      */
-    boolean isWhereUsedInnerJoinAllowed();
+    boolean isWhereUsedInnerJoinEnabled();
 
     // ===================================================================================
     //                                                                               Where
@@ -501,14 +507,14 @@ public interface SqlClause {
     //                                                                        OrScopeQuery
     //                                                                        ============
     /**
-     * Make or-scope query effective.
+     * Begin or-scope query.
      */
-    void makeOrScopeQueryEffective();
+    void beginOrScopeQuery();
 
     /**
-     * Close or-scope query.
+     * End or-scope query.
      */
-    void closeOrScopeQuery();
+    void endOrScopeQuery();
 
     /**
      * Begin or-scope query to and-part.
@@ -516,7 +522,7 @@ public interface SqlClause {
     void beginOrScopeQueryAndPart();
 
     /**
-     * End or-scope query and-part.
+     * End or-scope query to and-part.
      */
     void endOrScopeQueryAndPart();
 
@@ -546,11 +552,21 @@ public interface SqlClause {
      */
     OrderByElement getOrderByLastElement();
 
+    /**
+     * Clear order-by information in this clause.
+     */
     void clearOrderBy();
 
-    void makeOrderByEffective();
+    /**
+     * Suppress order-by temporarily.
+     */
+    void suppressOrderBy();
 
-    void ignoreOrderBy();
+    /**
+     * Revive order-by from suppressed status. <br />
+     * You can call when not suppressed, only reloaded.
+     */
+    void reviveOrderBy();
 
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnSqlName/aliasName.columnSqlName/...' (NotNull)
@@ -598,15 +614,15 @@ public interface SqlClause {
     //                                                                          FetchScope
     //                                                                          ==========
     /**
-     * Fetch first.
-     * @param fetchSize Fetch-size. (NotMinus)
+     * Fetch first several rows only.
+     * @param fetchSize The size of fetching. (NotMinus)
      */
     void fetchFirst(int fetchSize);
 
     /**
-     * Fetch scope.
-     * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
-     * @param fetchSize Fetch-size. (NotMinus)
+     * Fetch scope (skip first several rows, and fetch first rows).
+     * @param fetchStartIndex The index of fetch-start. 0 origin. (NotMinus)
+     * @param fetchSize The size of fetching from start index. (NotMinus)
      */
     void fetchScope(int fetchStartIndex, int fetchSize);
 
@@ -617,7 +633,7 @@ public interface SqlClause {
      * But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'.
      * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
      * </p>
-     * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
+     * @param fetchPageNumber The number of fetch page. 1 origin. (NotMinus & NotZero: if minus or zero, set one)
      */
     void fetchPage(int fetchPageNumber);
 
@@ -652,20 +668,21 @@ public interface SqlClause {
     int getPageEndIndex();
 
     /**
+     * Suppress fetch-scope.
+     */
+    void suppressFetchScope();
+
+    /**
+     * Revive fetch-scope from suppressed status. <br />
+     * You can call when not suppressed, only reloaded.
+     */
+    void reviveFetchScope();
+
+    /**
      * Is fetch scope effective?
      * @return The determination, true or false.
      */
     boolean isFetchScopeEffective();
-
-    /**
-     * Ignore fetch-scope.
-     */
-    void ignoreFetchScope();
-
-    /**
-     * Make fetch-scope effective.
-     */
-    void makeFetchScopeEffective();
 
     /**
      * Is fetch start index supported?
@@ -969,15 +986,30 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                  Invalid Query Info
     //                                                                  ==================
-    boolean isEmptyStringQueryAllowed();
+    /**
+     * Check null-or-empty query. <br />
+     * The default is ignored, but public default is checked by DBFluteConfig
+     */
+    void checkNullOrEmptyQuery();
 
-    void allowEmptyStringQuery();
+    /**
+     * Ignore null-or-empty query.
+     */
+    void ignoreNullOrEmptyQuery();
 
-    boolean isInvalidQueryChecked();
+    boolean isNullOrEmptyQueryChecked();
 
-    void checkInvalidQuery();
+    /**
+     * Enable empty string query. (default is disabled)
+     */
+    void enableEmptyStringQuery();
 
-    void acceptInvalidQuery();
+    /**
+     * Disable empty string query. (back to default)
+     */
+    void disableEmptyStringQuery();
+
+    boolean isEmptyStringQueryEnabled();
 
     /**
      * Get the list of invalid query. (basically for logging)
@@ -1075,16 +1107,16 @@ public interface SqlClause {
     ColumnFunctionCipher findColumnFunctionCipher(ColumnInfo columnInfo);
 
     /**
-     * Make select column cipher effective. <br />
-     * The default is effective so this method is called after suppressing.
+     * Enable select column cipher effective. <br />
+     * The default is enabled (if cipher manager is set) so this method is called after disabling.
      */
-    void makeSelectColumnCipherEffective();
+    void enableSelectColumnCipher();
 
     /**
-     * Suppress select column cipher effective. <br />
+     * Disable select column cipher effective. <br />
      * basically for queryInsert().
      */
-    void suppressSelectColumnCipher();
+    void disableSelectColumnCipher();
 
     // [DBFlute-0.9.8.4]
     // ===================================================================================
@@ -1104,15 +1136,15 @@ public interface SqlClause {
     //                                     Paging Adjustment
     //                                     -----------------
     /**
-     * Make paging adjustment, e.g. PagingCountLater, PagingCountLeastJoin, effective. <br />
+     * Enable paging adjustment, e.g. PagingCountLater, PagingCountLeastJoin, effective. <br />
      * The options might be on by default so the adjustments are off normally.
      */
-    void makePagingAdjustmentEffective();
+    void enablePagingAdjustment();
 
     /**
-     * Ignore paging adjustment.
+     * Disable paging adjustment.
      */
-    void ignorePagingAdjustment();
+    void disablePagingAdjustment();
 
     // -----------------------------------------------------
     //                                           Count Later
@@ -1120,7 +1152,8 @@ public interface SqlClause {
     /**
      * Enable paging count-later that means counting after selecting. <br />
      * And you should also make paging adjustment effective to enable this. <br />
-     * This option is copy of condition-bean's one for clause adjustment, e.g. MySQL found_rows().
+     * This option is copy of condition-bean's one for clause adjustment, e.g. MySQL found_rows(). <br />
+     * The default is disabled, but public default is enabled by DBFluteConfig.
      */
     void enablePagingCountLater();
 
@@ -1135,7 +1168,8 @@ public interface SqlClause {
     //                                       ---------------
     /**
      * Enable paging count-least-join, which means least joined on count select. <br />
-     * And you should also make paging adjustment effective to enable this.
+     * And you should also make paging adjustment effective to enable this. <br />
+     * The default is disabled, but public default is enabled by DBFluteConfig.
      */
     void enablePagingCountLeastJoin();
 
@@ -1156,16 +1190,16 @@ public interface SqlClause {
     //                                        PK Only Select
     //                                        --------------
     /**
-     * Make PK only select forcedly effective, ignoring select clause setting and derived referrer. <br />
+     * Enable PK only select forcedly effective, ignoring select clause setting and derived referrer. <br />
      * Basically for PagingSelectAndQuerySplit.
      */
-    void makePKOnlySelectForcedlyEffective();
+    void enablePKOnlySelectForcedly();
 
     /**
-     * Close PK only select forcedly. <br />
+     * Disable PK only select forcedly. <br />
      * Basically for PagingSelectAndQuerySplit.
      */
-    void closePKOnlySelectForcedly();
+    void disablePKOnlySelectForcedly();
 
     // [DBFlute-0.9.9.4C]
     // ===================================================================================
@@ -1213,11 +1247,11 @@ public interface SqlClause {
     String getClauseQueryDelete();
 
     /**
-     * Allow you to use direct clause in query update forcedly (contains query delete).
+     * Enable to use direct clause in query update forcedly (contains query delete).
      * You cannot use join, sub-query, union and so on, by calling this. <br />
      * So you may have the painful SQLException by this, attention!
      */
-    void allowQueryUpdateForcedDirect();
+    void enableQueryUpdateForcedDirect();
 
     // [DBFlute-0.9.7.2]
     // ===================================================================================
@@ -1265,21 +1299,21 @@ public interface SqlClause {
     void unlock();
 
     /**
+     * Enable "that's-bad-timing" detect.
+     */
+    void enableThatsBadTimingDetect();
+
+    /**
+     * Disable "that's-bad-timing" detect for compatible. <br />
+     * If disabled, isLocked() always returns false.
+     */
+    void disableThatsBadTimingDetect();
+
+    /**
      * Does it allow "that's-bad-timing" detect?
      * @return The determination, true or false.
      */
     boolean isThatsBadTimingDetectAllowed();
-
-    /**
-     * Allow "that's-bad-timing" detect.
-     */
-    void allowThatsBadTimingDetect();
-
-    /**
-     * Suppress "that's-bad-timing" detect for compatible. <br />
-     * If suppressed, isLocked() always returns false.
-     */
-    void suppressThatsBadTimingDetect();
 
     // [DBFlute-0.9.4]
     // ===================================================================================

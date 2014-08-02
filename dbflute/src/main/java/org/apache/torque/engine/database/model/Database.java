@@ -1936,9 +1936,9 @@ public class Database {
     public boolean isThatsBadTimingDetect() {
         return getLittleAdjustmentProperties().isThatsBadTimingDetect();
     }
-    
-    public boolean isInvalidQueryChecked() {
-        return getLittleAdjustmentProperties().isInvalidQueryChecked();
+
+    public boolean isNullOrEmptyQueryChecked() {
+        return getLittleAdjustmentProperties().isNullOrEmptyQueryChecked();
     }
 
     public boolean isAvailableDatabaseNativeJDBC() {
@@ -2022,8 +2022,8 @@ public class Database {
         return getLittleAdjustmentProperties().isBatchUpdateColumnModifiedPropertiesFragmentedAllowed();
     }
 
-    public boolean isCheckCountBeforeQueryUpdate() {
-        return getLittleAdjustmentProperties().isCheckCountBeforeQueryUpdate();
+    public boolean isQueryUpdateCountPreCheck() {
+        return getLittleAdjustmentProperties().isQueryUpdateCountPreCheck();
     }
 
     public boolean isStopGenerateExtendedBhv() {
@@ -2064,6 +2064,14 @@ public class Database {
 
     public boolean isCompatibleBatchUpdateDefaultEveryColumn() {
         return getLittleAdjustmentProperties().isCompatibleBatchUpdateDefaultEveryColumn();
+    }
+
+    public boolean isCompatibleConditionBeanOldNamingCheckInvalid() {
+        return getLittleAdjustmentProperties().isCompatibleConditionBeanOldNamingCheckInvalid();
+    }
+
+    public boolean isCompatibleConditionBeanOldNamingOption() {
+        return getLittleAdjustmentProperties().isCompatibleConditionBeanOldNamingOption();
     }
 
     // -----------------------------------------------------

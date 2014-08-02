@@ -54,12 +54,12 @@ public interface FetchNarrowingBean extends FetchBean {
     boolean isFetchNarrowingEffective();
 
     /**
-     * Ignore fetch narrowing. Only checking safety result size is valid. {INTERNAL METHOD}
+     * Disable fetch narrowing. Only checking safety result size is valid. {INTERNAL METHOD}
      */
-    void ignoreFetchNarrowing();
+    void xdisableFetchNarrowing();
 
     /**
-     * Restore ignored fetch narrowing. {INTERNAL METHOD}
+     * Enable ignored fetch narrowing. {INTERNAL METHOD}
      */
-    void restoreIgnoredFetchNarrowing();
+    void xenableIgnoredFetchNarrowing();
 }

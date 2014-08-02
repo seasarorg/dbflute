@@ -118,7 +118,7 @@ public class TnQueryDeleteDynamicCommand extends TnAbstractQueryDynamicCommand {
     //                                                                           =========
     protected String buildQueryDeleteTwoWaySql(ConditionBean cb, DeleteOption<ConditionBean> option) {
         if (option != null && option.isQueryDeleteForcedDirectAllowed()) {
-            cb.getSqlClause().allowQueryUpdateForcedDirect();
+            cb.getSqlClause().enableQueryUpdateForcedDirect();
         }
         return cb.getSqlClause().getClauseQueryDelete();
     }
