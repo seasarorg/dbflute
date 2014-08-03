@@ -430,12 +430,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return doScalarSelect(resultType, newConditionBean());
     }
 
-    protected def doScalarSelect[RESULT, CB <: ${myConditionBeanClassName}](tp: Class[RESULT], cb: CB): HpSLSFunction[CB, RESULT] = {
-        assertObjectNotNull("resultType", tp); assertCBStateValid(cb);
-        cb.xsetupForScalarSelect(); cb.getSqlClause().disableSelectIndex(); // for when you use union
-        return createSLSFunction[CB, RESULT](cb, tp, createHpSLSExecutor());
-    }
-
     protected def doReadScalar[RESULT](tp: Class[RESULT]): HpSLSFunction[_ <: ConditionBean, RESULT] = { facadeScalarSelect(tp) }
 
     // ===================================================================================
@@ -942,17 +936,14 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         prepareBatchInsertOption(ls, op); // required
         return delegateBatchInsert(ls, op);
     }
+#if ($database.isBatchInsertColumnModifiedPropertiesFragmentedDisallowed())
 
-    protected def prepareBatchInsertOption(ls: List[${myExtendedObjectClassName}], op: InsertOption[${myConditionBeanClassName}]): Unit = {
-#if ($database.isBatchInsertColumnModifiedPropertiesFragmentedAllowed())
-        op.xallowInsertColumnModifiedPropertiesFragmented();
+    override protected def isBatchUpdateColumnModifiedPropertiesFragmentedDisallowed(): Boolean = { true }
 #end
 #if ($database.isCompatibleBatchInsertDefaultEveryColumn())
-        op.xtoBeCompatibleBatchInsertDefaultEveryColumn();
+
+    override protected def isCompatibleBatchInsertDefaultEveryColumn(): Boolean = { true }
 #end
-        op.xacceptInsertColumnModifiedPropertiesIfNeeds(ls);
-        prepareInsertOption(op);
-    }
 
     protected def doLumpCreate(ls: List[Entity], op: InsertOption[_ <: ConditionBean]): Array[Int] = { doBatchInsert(downcast(ls), downcast(op)) }
 
@@ -998,17 +989,14 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         prepareBatchUpdateOption(ls, rlop); // required
         return delegateBatchUpdate(ls, rlop);
     }
-
-    protected def prepareBatchUpdateOption(ls: List[${myExtendedObjectClassName}], op: UpdateOption[${myConditionBeanClassName}]): Unit = {
 #if ($database.isBatchUpdateColumnModifiedPropertiesFragmentedAllowed())
-        op.xallowUpdateColumnModifiedPropertiesFragmented();
+
+    override protected def isBatchUpdateColumnModifiedPropertiesFragmentedAllowed(): Boolean = { true }
 #end
 #if ($database.isCompatibleBatchUpdateDefaultEveryColumn())
-        op.xtoBeCompatibleBatchUpdateDefaultEveryColumn();
+
+    override protected def isCompatibleBatchUpdateDefaultEveryColumn(): Boolean = { true }
 #end
-        op.xacceptUpdateColumnModifiedPropertiesIfNeeds(ls);
-        prepareUpdateOption(op);
-    }
 
     protected def doLumpModify(ls: List[Entity], op: UpdateOption[_ <: ConditionBean]): Array[Int] = { doBatchUpdate(downcast(ls), downcast(op)) }
 #if ($table.hasOptimisticLock())

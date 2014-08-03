@@ -38,7 +38,7 @@ public class SelectCursorCBCommand<ENTITY extends Entity> extends AbstractSelect
     //                                                                           Attribute
     //                                                                           =========
     /** The type of entity. (NotNull) */
-    protected Class<ENTITY> _entityType;
+    protected Class<? extends ENTITY> _entityType; // generic 'extends' to specify extended type
 
     /** The handler of entity row. (NotNull) */
     protected EntityRowHandler<ENTITY> _entityRowHandler;
@@ -123,7 +123,7 @@ public class SelectCursorCBCommand<ENTITY extends Entity> extends AbstractSelect
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setEntityType(Class<ENTITY> entityType) {
+    public void setEntityType(Class<? extends ENTITY> entityType) {
         _entityType = entityType;
     }
 

@@ -522,6 +522,28 @@ public interface ConditionBean extends PagingBean {
      */
     HpCBPurpose getPurpose();
 
+    // -----------------------------------------------------
+    //                                        Internal Setup
+    //                                        --------------
+    // only methods called by interface are defined
+    /**
+     * Set up condition-bean for ScalarSelect.
+     */
+    void xsetupForScalarSelect();
+
+    /**
+     * Set up condition-bean for SpecifiedUpdate.
+     */
+    void xsetupForSpecifiedUpdate();
+
+    /**
+     * Set up condition-bean for VaryingUpdate.
+     */
+    void xsetupForVaryingUpdate();
+
+    // -----------------------------------------------------
+    //                                                  Lock
+    //                                                  ----
     /**
      * Enable "that's bad timing" check. (back to default)
      */

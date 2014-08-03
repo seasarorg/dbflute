@@ -63,9 +63,8 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     protected CB _updateColumnSpecifiedCB;
     protected Set<String> _forcedSpecifiedUpdateColumnSet;
     protected boolean _exceptCommonColumnForcedSpecified;
-    protected boolean _updateColumnModifiedPropertiesFragmentedAllowed;
+    protected boolean _updateColumnModifiedPropertiesFragmentedAllowed; // as default of batch update
     protected boolean _compatibleBatchUpdateDefaultEveryColumn;
-
     protected boolean _disableCommonColumnAutoSetup;
     protected boolean _nonQueryUpdateAllowed;
     protected boolean _queryUpdateForcedDirectAllowed;
@@ -438,8 +437,12 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         });
     }
 
-    public void xallowUpdateColumnModifiedPropertiesFragmented() { // depends on generator option (mainly NOT called)
+    public void xallowUpdateColumnModifiedPropertiesFragmented() { // might be called by generator for option
         _updateColumnModifiedPropertiesFragmentedAllowed = true;
+    }
+
+    public void xdisallowUpdateColumnModifiedPropertiesFragmented() { // for back to default
+        _updateColumnModifiedPropertiesFragmentedAllowed = false;
     }
 
     public boolean xisUpdateColumnModifiedPropertiesFragmentedAllowed() {

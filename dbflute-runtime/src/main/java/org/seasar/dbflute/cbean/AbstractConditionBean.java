@@ -1520,12 +1520,14 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return _purpose;
     }
 
+    // -----------------------------------------------------
+    //                                        Internal Setup
+    //                                        --------------
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // very internal (super very important)
     // these are called immediate after creation of condition-bean
     // because there are important initializations here
     // - - - - - - - - - -/
-
     public void xsetupForUnion(ConditionBean mainCB) {
         xinheritSubQueryInfo(mainCB.localCQ());
         xchangePurposeSqlClause(HpCBPurpose.UNION_QUERY, mainCB.localCQ());

@@ -53,7 +53,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     protected CB _insertColumnSpecifiedCB;
     protected Set<String> _forcedSpecifiedInsertColumnSet;
     protected boolean _exceptCommonColumnForcedSpecified;
-    protected boolean _insertColumnModifiedPropertiesFragmentedAllowed;
+    protected boolean _insertColumnModifiedPropertiesFragmentedAllowed = true; // as default of batch insert
     protected boolean _compatibleBatchInsertDefaultEveryColumn;
     protected boolean _compatibleInsertColumnNotNullOnly;
 
@@ -204,8 +204,12 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
         }
     }
 
-    public void xallowInsertColumnModifiedPropertiesFragmented() { // depends on generator option (mainly called)
+    public void xallowInsertColumnModifiedPropertiesFragmented() { // back to default
         _insertColumnModifiedPropertiesFragmentedAllowed = true;
+    }
+
+    public void xdisallowInsertColumnModifiedPropertiesFragmented() { // might be called by generator for option
+        _insertColumnModifiedPropertiesFragmentedAllowed = false;
     }
 
     public boolean xisInsertColumnModifiedPropertiesFragmentedAllowed() {

@@ -156,7 +156,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected abstract Entity doReadEntityWithDeletedCheck(ConditionBean cb);
 
     protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityInternally(CB cb,
-            Class<ENTITY> entityType) {
+            Class<? extends ENTITY> entityType) {
         assertConditionBeanSelectResource(cb, entityType);
         if (cb.hasSelectAllPossible() && cb.getFetchSize() != 1) { // if no condition for one
             throwSelectEntityConditionNotFoundException(cb);
@@ -274,7 +274,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     protected <ENTITY extends Entity, CB extends ConditionBean> ListResultBean<ENTITY> helpSelectListInternally(CB cb,
-            Class<ENTITY> entityType) {
+            Class<? extends ENTITY> entityType) {
         assertConditionBeanSelectResource(cb, entityType);
         try {
             final List<ENTITY> selectedList = delegateSelectList(cb, entityType);
@@ -306,7 +306,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected abstract PagingResultBean<? extends Entity> doReadPage(ConditionBean cb);
 
     protected <ENTITY extends Entity, CB extends ConditionBean> PagingResultBean<ENTITY> helpSelectPageInternally(
-            CB cb, Class<ENTITY> entityType) {
+            CB cb, Class<? extends ENTITY> entityType) {
         assertConditionBeanSelectResource(cb, entityType);
         try {
             final PagingHandler<ENTITY> handler = createPagingHandler(cb, entityType);
@@ -319,7 +319,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     protected <ENTITY extends Entity, CB extends ConditionBean> PagingHandler<ENTITY> createPagingHandler(final CB cb,
-            final Class<ENTITY> entityType) {
+            final Class<? extends ENTITY> entityType) {
         return new PagingHandler<ENTITY>() {
             public PagingBean getPagingBean() {
                 return cb;
@@ -353,7 +353,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                         Cursor Read
     //                                                                         ===========
     protected <ENTITY extends Entity, CB extends ConditionBean> void helpSelectCursorInternally(CB cb,
-            EntityRowHandler<ENTITY> handler, Class<ENTITY> entityType) {
+            EntityRowHandler<ENTITY> handler, Class<? extends ENTITY> entityType) {
         assertObjectNotNull("entityRowHandler", handler);
         assertConditionBeanSelectResource(cb, entityType);
         final CursorSelectOption option = cb.getCursorSelectOption();
@@ -365,7 +365,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     protected <ENTITY extends Entity, CB extends ConditionBean> void helpSelectCursorHandlingByPaging(CB cb,
-            EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType, CursorSelectOption option) {
+            EntityRowHandler<ENTITY> entityRowHandler, Class<? extends ENTITY> entityType, CursorSelectOption option) {
         helpSelectCursorCheckingByPagingAllowed(cb, option);
         helpSelectCursorCheckingOrderByPK(cb, option);
         final int pageSize = option.getPageSize();
@@ -411,6 +411,16 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         @SuppressWarnings("unchecked")
         final HpSLSFunction<ConditionBean, RESULT> func = (HpSLSFunction<ConditionBean, RESULT>) doReadScalar(resultType);
         return func;
+    }
+
+    protected <RESULT, CB extends ConditionBean> HpSLSFunction<CB, RESULT> doScalarSelect(final Class<RESULT> tp,
+            final CB cb) {
+        assertObjectNotNull("resultType", tp);
+        assertCBStateValid(cb);
+        cb.xsetupForScalarSelect();
+        cb.getSqlClause().disableSelectIndex(); // for when you use union
+        HpSLSExecutor<CB, RESULT> executor = createHpSLSExecutor(); // variable to resolve generic
+        return createSLSFunction(cb, tp, executor);
     }
 
     protected <CB extends ConditionBean, RESULT> HpSLSExecutor<CB, RESULT> createHpSLSExecutor() {
@@ -1141,11 +1151,12 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     protected <ENTITY extends Entity> void delegateSelectCursor(ConditionBean cb, EntityRowHandler<ENTITY> handler,
-            Class<ENTITY> entityType) {
+            Class<? extends ENTITY> entityType) {
         invoke(createSelectCursorCBCommand(cb, handler, entityType));
     }
 
-    protected <ENTITY extends Entity> List<ENTITY> delegateSelectList(ConditionBean cb, Class<ENTITY> entityType) {
+    protected <ENTITY extends Entity> List<ENTITY> delegateSelectList(ConditionBean cb,
+            Class<? extends ENTITY> entityType) {
         return invoke(createSelectListCBCommand(cb, entityType));
     }
 
@@ -1207,7 +1218,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     protected <ENTITY extends Entity> SelectCursorCBCommand<ENTITY> createSelectCursorCBCommand(ConditionBean cb,
-            EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType) {
+            EntityRowHandler<ENTITY> entityRowHandler, Class<? extends ENTITY> entityType) {
         assertBehaviorCommandInvoker("createSelectCursorCBCommand");
         final SelectCursorCBCommand<ENTITY> cmd = newSelectCursorCBCommand();
         xsetupSelectCommand(cmd);
@@ -1222,7 +1233,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     protected <ENTITY extends Entity> SelectListCBCommand<ENTITY> createSelectListCBCommand(ConditionBean cb,
-            Class<ENTITY> entityType) {
+            Class<? extends ENTITY> entityType) {
         assertBehaviorCommandInvoker("createSelectListCBCommand");
         final SelectListCBCommand<ENTITY> cmd = newSelectListCBCommand();
         xsetupSelectCommand(cmd);

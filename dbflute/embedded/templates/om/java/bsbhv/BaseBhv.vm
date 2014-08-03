@@ -21,7 +21,6 @@ import java.util.List;
 import org.seasar.dbflute.*;
 import org.seasar.dbflute.bhv.*;
 import org.seasar.dbflute.cbean.*;
-import org.seasar.dbflute.cbean.chelper.HpSLSExecutor;
 import org.seasar.dbflute.cbean.chelper.HpSLSFunction;
 import org.seasar.dbflute.dbmeta.DBMeta;
 #if ($database.isMakeFlatExpansion())
@@ -223,11 +222,11 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #end
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntity(${myConditionBeanClassName} cb, Class<ENTITY> tp) {
+    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntity(${myConditionBeanClassName} cb, Class<? extends ENTITY> tp) {
         return helpSelectEntityInternally(cb, tp);
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> ${table.filterSelectEntityOptionalReturn("ENTITY")} doSelectOptionalEntity(${myConditionBeanClassName} cb, Class<ENTITY> tp) {
+    protected <ENTITY extends ${myExtendedObjectClassName}> ${table.filterSelectEntityOptionalReturn("ENTITY")} doSelectOptionalEntity(${myConditionBeanClassName} cb, Class<? extends ENTITY> tp) {
         return createOptionalEntity(doSelectEntity(cb, tp), cb);
     }
 
@@ -260,7 +259,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         return doSelectEntityWithDeletedCheck(cb, typeOfSelectedEntity());
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntityWithDeletedCheck(${myConditionBeanClassName} cb, Class<ENTITY> tp) {
+    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntityWithDeletedCheck(${myConditionBeanClassName} cb, Class<? extends ENTITY> tp) {
         assertCBStateValid(cb); assertObjectNotNull("entityType", tp);
         return helpSelectEntityWithDeletedCheckInternally(cb, tp);
     }
@@ -292,7 +291,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #end
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectByPK(${table.primaryKeyArgsString}, Class<ENTITY> tp) {
+    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectByPK(${table.primaryKeyArgsString}, Class<? extends ENTITY> tp) {
         return doSelectEntity(xprepareCBAsPK(${table.primaryKeyArgsCallingString}), tp);
     }
 
@@ -341,7 +340,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         return doSelectByUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString}, typeOfSelectedEntity());
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> ${table.filterSelectEntityOptionalReturn("ENTITY")} doSelectByUniqueOf${uq.javaNameKeyword}(${uq.argsString}, Class<ENTITY> tp) {
+    protected <ENTITY extends ${myExtendedObjectClassName}> ${table.filterSelectEntityOptionalReturn("ENTITY")} doSelectByUniqueOf${uq.javaNameKeyword}(${uq.argsString}, Class<? extends ENTITY> tp) {
         return createOptionalEntity(doSelectEntity(xprepareCBAsUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString}), tp), ${uq.argsCallingString});
     }
 
@@ -377,7 +376,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         return doSelectList(cb, typeOfSelectedEntity());
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> ListResultBean<ENTITY> doSelectList(${myConditionBeanClassName} cb, Class<ENTITY> tp) {
+    protected <ENTITY extends ${myExtendedObjectClassName}> ListResultBean<ENTITY> doSelectList(${myConditionBeanClassName} cb, Class<? extends ENTITY> tp) {
         return helpSelectListInternally(cb, tp);
     }
 
@@ -423,7 +422,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         return doSelectPage(cb, typeOfSelectedEntity());
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> PagingResultBean<ENTITY> doSelectPage(${myConditionBeanClassName} cb, Class<ENTITY> tp) {
+    protected <ENTITY extends ${myExtendedObjectClassName}> PagingResultBean<ENTITY> doSelectPage(${myConditionBeanClassName} cb, Class<? extends ENTITY> tp) {
         return helpSelectPageInternally(cb, tp);
     }
 
@@ -454,7 +453,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         doSelectCursor(cb, entityRowHandler, typeOfSelectedEntity());
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> void doSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<ENTITY> handler, Class<ENTITY> tp) {
+    protected <ENTITY extends ${myExtendedObjectClassName}> void doSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<ENTITY> handler, Class<? extends ENTITY> tp) {
         assertCBStateValid(cb); assertObjectNotNull("entityRowHandler", handler); assertObjectNotNull("entityType", tp);
         assertSpecifyDerivedReferrerEntityProperty(cb, tp);
         helpSelectCursorInternally(cb, handler, tp);
@@ -484,13 +483,6 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 
     protected <RESULT> HpSLSFunction<${myConditionBeanClassName}, RESULT> facadeScalarSelect(Class<RESULT> resultType) {
         return doScalarSelect(resultType, newConditionBean());
-    }
-
-    protected <RESULT, CB extends ${myConditionBeanClassName}> HpSLSFunction<CB, RESULT> doScalarSelect(final Class<RESULT> tp, final CB cb) {
-        assertObjectNotNull("resultType", tp); assertCBStateValid(cb);
-        cb.xsetupForScalarSelect(); cb.getSqlClause().disableSelectIndex(); // for when you use union
-        HpSLSExecutor<CB, RESULT> executor = createHpSLSExecutor(); // variable to resolve generic
-        return createSLSFunction(cb, tp, executor);
     }
 
     protected <RESULT> HpSLSFunction<? extends ConditionBean, RESULT> doReadScalar(Class<RESULT> tp) { return facadeScalarSelect(tp); }
@@ -713,7 +705,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     }
 
     /**
-     * {Refer to overload method that has an argument of condition-bean setupper.} #beforejava8
+     * {Refer to overload method that has an argument of condition-bean set-upper} #beforejava8
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param loadReferrerOption The option of load-referrer. (NotNull)
      * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
@@ -816,11 +808,6 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         assertObjectNotNull("${myEntityVariableName}", et); prepareInsertOption(op); delegateInsert(et, op);
     }
 
-    protected void prepareInsertOption(InsertOption<${myConditionBeanClassName}> op) {
-        if (op == null) { return; } assertInsertOptionStatus(op);
-        if (op.hasSpecifiedInsertColumn()) { op.resolveInsertColumnSpecification(createCBForSpecifiedUpdate()); }
-    }
-
     protected void doCreate(Entity et, InsertOption<? extends ConditionBean> op) { doInsert(downcast(et), downcast(op)); }
 
     /**
@@ -861,18 +848,6 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     protected void doUpdate(${myExtendedObjectClassName} et, UpdateOption<${myConditionBeanClassName}> op) {
         assertObjectNotNull("${myEntityVariableName}", et); prepareUpdateOption(op); helpUpdateInternally(et, op);
     }
-
-    protected void prepareUpdateOption(UpdateOption<${myConditionBeanClassName}> op) {
-        if (op == null) { return; } assertUpdateOptionStatus(op);
-        if (op.hasSelfSpecification()) { op.resolveSelfSpecification(createCBForVaryingUpdate()); }
-        if (op.hasSpecifiedUpdateColumn()) { op.resolveUpdateColumnSpecification(createCBForSpecifiedUpdate()); }
-    }
-
-    protected ${myConditionBeanClassName} createCBForVaryingUpdate()
-    { ${myConditionBeanClassName} cb = newConditionBean(); cb.xsetupForVaryingUpdate(); return cb; }
-
-    protected ${myConditionBeanClassName} createCBForSpecifiedUpdate()
-    { ${myConditionBeanClassName} cb = newConditionBean(); cb.xsetupForSpecifiedUpdate(); return cb; }
 
     protected void doModify(Entity et, UpdateOption<? extends ConditionBean> op) { doUpdate(downcast(et), downcast(op)); }
 #if ($table.hasOptimisticLock())
@@ -1000,8 +975,6 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         assertObjectNotNull("${myEntityVariableName}", et); prepareDeleteOption(op); helpDeleteInternally(et, op);
     }
 
-    protected void prepareDeleteOption(DeleteOption<${myConditionBeanClassName}> op) { if (op != null) { assertDeleteOptionStatus(op); } }
-
     protected void doRemove(Entity et, DeleteOption<? extends ConditionBean> op) { doDelete(downcast(et), downcast(op)); }
 #if ($table.hasOptimisticLock())
 
@@ -1096,17 +1069,16 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         prepareBatchInsertOption(ls, rlop); // required
         return delegateBatchInsert(ls, rlop);
     }
+#if ($database.isBatchInsertColumnModifiedPropertiesFragmentedDisallowed())
 
-    protected void prepareBatchInsertOption(List<${myExtendedObjectClassName}> ls, InsertOption<${myConditionBeanClassName}> op) {
-#if ($database.isBatchInsertColumnModifiedPropertiesFragmentedAllowed())
-        op.xallowInsertColumnModifiedPropertiesFragmented();
+    @Override
+    protected boolean isBatchInsertColumnModifiedPropertiesFragmentedDisallowed() { return true; }
 #end
 #if ($database.isCompatibleBatchInsertDefaultEveryColumn())
-        op.xtoBeCompatibleBatchInsertDefaultEveryColumn();
+
+    @Override
+    protected boolean isCompatibleBatchInsertDefaultEveryColumn() { return true; }
 #end
-        op.xacceptInsertColumnModifiedPropertiesIfNeeds(ls);
-        prepareInsertOption(op);
-    }
 
     protected int[] doLumpCreate(List<Entity> ls, InsertOption<? extends ConditionBean> op) { return doBatchInsert(downcast(ls), downcast(op)); }
 
@@ -1156,17 +1128,16 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         prepareBatchUpdateOption(ls, rlop); // required
         return delegateBatchUpdate(ls, rlop);
     }
-
-    protected void prepareBatchUpdateOption(List<${myExtendedObjectClassName}> ls, UpdateOption<${myConditionBeanClassName}> op) {
 #if ($database.isBatchUpdateColumnModifiedPropertiesFragmentedAllowed())
-        op.xallowUpdateColumnModifiedPropertiesFragmented();
+
+    @Override
+    protected boolean isBatchUpdateColumnModifiedPropertiesFragmentedAllowed() { return true; }
 #end
 #if ($database.isCompatibleBatchUpdateDefaultEveryColumn())
-        op.xtoBeCompatibleBatchUpdateDefaultEveryColumn();
+
+    @Override
+    protected boolean isCompatibleBatchUpdateDefaultEveryColumn() { return true; }
 #end
-        op.xacceptUpdateColumnModifiedPropertiesIfNeeds(ls);
-        prepareUpdateOption(op);
-    }
 
     protected int[] doLumpModify(List<Entity> ls, UpdateOption<? extends ConditionBean> op) { return doBatchUpdate(downcast(ls), downcast(op)); }
 
@@ -1904,7 +1875,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected Class<${myExtendedObjectClassName}> typeOfSelectedEntity() { return ${myExtendedObjectClassName}.class; }
+    protected Class<? extends ${myExtendedObjectClassName}> typeOfSelectedEntity() { return ${myExtendedObjectClassName}.class; }
     protected ${myExtendedObjectClassName} downcast(Entity et) { return helpEntityDowncastInternally(et, ${myExtendedObjectClassName}.class); }
     protected ${myConditionBeanClassName} downcast(ConditionBean cb) { return helpConditionBeanDowncastInternally(cb, ${myConditionBeanClassName}.class); }
     @SuppressWarnings("unchecked")

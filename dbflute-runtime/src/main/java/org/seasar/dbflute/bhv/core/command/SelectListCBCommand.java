@@ -37,7 +37,7 @@ public class SelectListCBCommand<ENTITY extends Entity> extends AbstractSelectCB
     //                                                                           Attribute
     //                                                                           =========
     /** The type of entity. (Required) */
-    protected Class<ENTITY> _entityType;
+    protected Class<? extends ENTITY> _entityType; // generic 'extends' to specify extended type
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -113,7 +113,7 @@ public class SelectListCBCommand<ENTITY extends Entity> extends AbstractSelectCB
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setEntityType(Class<ENTITY> entityType) {
+    public void setEntityType(Class<? extends ENTITY> entityType) {
         _entityType = entityType;
     }
 }

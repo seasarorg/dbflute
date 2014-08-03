@@ -2014,8 +2014,8 @@ public class Database {
         return getLittleAdjustmentProperties().getCursorSelectFetchSize();
     }
 
-    public boolean isBatchInsertColumnModifiedPropertiesFragmentedAllowed() {
-        return getLittleAdjustmentProperties().isBatchInsertColumnModifiedPropertiesFragmentedAllowed();
+    public boolean isBatchInsertColumnModifiedPropertiesFragmentedDisallowed() {
+        return getLittleAdjustmentProperties().isBatchInsertColumnModifiedPropertiesFragmentedDisallowed();
     }
 
     public boolean isBatchUpdateColumnModifiedPropertiesFragmentedAllowed() {

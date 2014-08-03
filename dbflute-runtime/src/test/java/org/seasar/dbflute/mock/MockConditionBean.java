@@ -361,8 +361,20 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
+    // ===================================================================================
+    //                                                                        Purpose Type
+    //                                                                        ============
     public HpCBPurpose getPurpose() {
         return null;
+    }
+
+    public void xsetupForScalarSelect() {
+    }
+
+    public void xsetupForSpecifiedUpdate() {
+    }
+
+    public void xsetupForVaryingUpdate() {
     }
 
     public void enableThatsBadTiming() {
