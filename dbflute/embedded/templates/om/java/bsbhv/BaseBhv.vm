@@ -295,7 +295,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         return doSelectEntity(xprepareCBAsPK(${table.primaryKeyArgsCallingString}), tp);
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> ${table.filterSelectEntityOptionalReturn("ENTITY")} doSelectOptionalByPK(${table.primaryKeyArgsString}, Class<ENTITY> tp) {
+    protected <ENTITY extends ${myExtendedObjectClassName}> ${table.filterSelectEntityOptionalReturn("ENTITY")} doSelectOptionalByPK(${table.primaryKeyArgsString}, Class<? extends ENTITY> tp) {
         return createOptionalEntity(doSelectByPK(${table.primaryKeyArgsCallingString}, tp), ${table.primaryKeyArgsCallingString});
     }
 #if ($table.isCompatibleSelectByPKWithDeletedCheck())

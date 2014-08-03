@@ -189,7 +189,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return doSelectOptionalEntity(cb, typeOfSelectedEntity())(loaderCall);
     }
 
-    protected def doSelectEntity[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ENTITY = {
+    protected def doSelectEntity[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[_ <: ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ENTITY = {
         assertCBStateValid(cb); assertObjectNotNull("entityType", tp);
         val dble = helpSelectEntityInternally(cb, tp);
         if (dble != null) {
@@ -198,7 +198,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return dble;
     }
 
-    protected def doSelectOptionalEntity[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ${table.filterSelectEntityOptionalReturn("ENTITY")} = {
+    protected def doSelectOptionalEntity[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[_ <: ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ${table.filterSelectEntityOptionalReturn("ENTITY")} = {
         return ${database.basicOptionalEntitySimpleName}.apply(doSelectEntity(cb, tp)(loaderCall));
     }
 
@@ -254,7 +254,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return doSelectByPK(${table.primaryKeyArgsCallingString}, typeOfSelectedEntity());
     }
 
-    protected def doSelectByPK[ENTITY <: ${myExtendedObjectClassName}](${table.primaryKeyArgsString}, tp: Class[ENTITY]): ${table.filterSelectEntityOptionalReturn("ENTITY")} = {
+    protected def doSelectByPK[ENTITY <: ${myExtendedObjectClassName}](${table.primaryKeyArgsString}, tp: Class[_ <: ENTITY]): ${table.filterSelectEntityOptionalReturn("ENTITY")} = {
         return ${database.basicOptionalEntityClassName}.apply(doSelectEntity(xprepareCBAsPK(${table.primaryKeyArgsCallingString}), tp)());
     }
 
@@ -281,7 +281,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return doSelectByUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString}, typeOfSelectedEntity());
     }
 
-    protected def doSelectByUniqueOf${uq.javaNameKeyword}[ENTITY <: ${myExtendedObjectClassName}](${uq.argsString}, tp: Class[ENTITY]): ${table.filterSelectEntityOptionalReturn("ENTITY")} = {
+    protected def doSelectByUniqueOf${uq.javaNameKeyword}[ENTITY <: ${myExtendedObjectClassName}](${uq.argsString}, tp: Class[_ <: ENTITY]): ${table.filterSelectEntityOptionalReturn("ENTITY")} = {
         return ${database.basicOptionalEntityClassName}.apply(doSelectEntity(xprepareCBAsUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString}), tp)());
     }
 
@@ -318,7 +318,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return doSelectList(cb, typeOfSelectedEntity())(loaderCall);
     }
 
-    protected def doSelectList[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ListResultBean[ENTITY] = {
+    protected def doSelectList[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[_ <: ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ListResultBean[ENTITY] = {
         val dbleList = helpSelectListInternally(cb, tp);
         callbackLoader(dbleList.asInstanceOf[List[${myExtendedObjectClassName}]], loaderCall);
         return dbleList;
@@ -364,7 +364,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return doSelectPage(cb, typeOfSelectedEntity())(loaderCall);
     }
 
-    protected def doSelectPage[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): PagingResultBean[ENTITY] = {
+    protected def doSelectPage[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[_ <: ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): PagingResultBean[ENTITY] = {
         return helpSelectPageInternally(cb, tp);
     }
 
@@ -397,7 +397,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         doSelectCursor(cb, handler, typeOfSelectedEntity());
     }
 
-    protected def doSelectCursor[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, handler: EntityRowHandler[ENTITY], tp: Class[ENTITY]): Unit = {
+    protected def doSelectCursor[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, handler: EntityRowHandler[ENTITY], tp: Class[_ <: ENTITY]): Unit = {
         helpSelectCursorInternally(cb, handler, tp);
     }
 
