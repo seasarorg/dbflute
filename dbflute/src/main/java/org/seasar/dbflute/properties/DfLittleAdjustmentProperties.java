@@ -695,7 +695,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                                        ============
     public boolean isBatchInsertColumnModifiedPropertiesFragmentedDisallowed() { // closet
         // BatchInsert can allow fragmented properties (least common multiple)
-        final boolean defaultValue = isProperty("isBatchInsertColumnModifiedPropertiesFragmentedAllowed", true);
+        final boolean defaultValue = !isProperty("isBatchInsertColumnModifiedPropertiesFragmentedAllowed", true);
         return isProperty("isBatchInsertColumnModifiedPropertiesFragmentedDisallowed", defaultValue);
     }
 
