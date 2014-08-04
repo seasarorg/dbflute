@@ -371,6 +371,9 @@ public class MockConditionBean implements ConditionBean {
     public void xsetupForScalarSelect() {
     }
 
+    public void xsetupForQueryInsert() {
+    }
+
     public void xsetupForSpecifiedUpdate() {
     }
 
