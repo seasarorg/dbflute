@@ -532,6 +532,11 @@ public interface ConditionBean extends PagingBean {
     void xsetupForScalarSelect();
 
     /**
+     * Set up condition-bean for QueryInsert.
+     */
+    void xsetupForQueryInsert();
+
+    /**
      * Set up condition-bean for SpecifiedUpdate.
      */
     void xsetupForSpecifiedUpdate();

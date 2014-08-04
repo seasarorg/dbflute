@@ -1136,9 +1136,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return delegateQueryInsert(et, cb, sp.setup(et, cb), op);
     }
 
-    protected def createCBForQueryInsert(): ${myConditionBeanClassName} =
-    { val cb: ${myConditionBeanClassName} = newConditionBean(); cb.xsetupForQueryInsert(); return cb; }
-
     protected def doRangeCreate(setupper: QueryInsertSetupper[_ <: Entity, _ <: ConditionBean], option: InsertOption[_ <: ConditionBean]): Int =
     { doQueryInsert(downcast(setupper), downcast(option)) }
 

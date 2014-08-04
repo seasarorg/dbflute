@@ -470,6 +470,13 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     protected abstract int doRangeCreate(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> setupper,
             InsertOption<? extends ConditionBean> option);
 
+    protected <CB extends ConditionBean> CB createCBForQueryInsert() {
+        @SuppressWarnings("unchecked")
+        CB cb = (CB) newConditionBean();
+        cb.xsetupForQueryInsert();
+        return cb;
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -1301,8 +1301,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     }
 
     protected int[] doBatchDeleteNonstrict(List<${myExtendedObjectClassName}> ls, DeleteOption<${myConditionBeanClassName}> op) {
-        assertObjectNotNull("${myEntityListVariableName}", ls);
-        prepareDeleteOption(op);
+        assertObjectNotNull("${myEntityListVariableName}", ls); prepareDeleteOption(op);
         return delegateBatchDeleteNonstrict(ls, op);
     }
 #end
@@ -1352,9 +1351,6 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         ${myExtendedObjectClassName} et = newEntity(); ${myConditionBeanClassName} cb = createCBForQueryInsert();
         return delegateQueryInsert(et, cb, sp.setup(et, cb), op);
     }
-
-    protected ${myConditionBeanClassName} createCBForQueryInsert()
-    { ${myConditionBeanClassName} cb = newConditionBean(); cb.xsetupForQueryInsert(); return cb; }
 
     protected int doRangeCreate(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> setupper, InsertOption<? extends ConditionBean> op)
     { return doQueryInsert(downcast(setupper), downcast(op)); }
