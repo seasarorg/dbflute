@@ -327,17 +327,18 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return doSelectList(cb, typeOfSelectedEntity());
     }
 
-    protected <RESULT extends ENTITY> ListResultBean<ENTITY> doSelectList(CB cb, Class<? extends RESULT> entityType) {
+    protected <RESULT extends ENTITY> ListResultBean<RESULT> doSelectList(CB cb, Class<? extends RESULT> entityType) {
         return helpSelectListInternally(cb, entityType);
     }
 
     // -----------------------------------------------------
     //                                       Internal Helper
     //                                       ---------------
-    protected ListResultBean<ENTITY> helpSelectListInternally(CB cb, Class<? extends ENTITY> entityType) {
+    protected <RESULT extends ENTITY> ListResultBean<RESULT> helpSelectListInternally(CB cb,
+            Class<? extends RESULT> entityType) {
         assertConditionBeanSelectResource(cb, entityType);
         try {
-            final List<ENTITY> selectedList = delegateSelectList(cb, entityType);
+            final List<RESULT> selectedList = delegateSelectList(cb, entityType);
             return createListResultBean(cb, selectedList);
         } catch (FetchingOverSafetySizeException e) {
             createBhvExThrower().throwDangerousResultSizeException(cb, e);
