@@ -290,62 +290,6 @@ public class ${myClassName} extends AbstractDBMeta {
         return cri("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyName}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), mp, ${referrer.isOneToOne()}, ${referrer.referrerReverseRelationPropertyNameArg});
     }
 #end
-#if ($database.isMakeFlatExpansion())
-
-    // -----------------------------------------------------
-    //                                        Relation Trace
-    //                                        --------------
-    public ${table.relationTraceClassName}RelationTrace createRelationTrace(RelationTraceFixHandler relationTraceFixHandler) {
-        return new ${table.relationTraceClassName}RelationTrace(relationTraceFixHandler);
-    }
-
-    public ${table.relationTraceClassName}RelationTrace createRelationTrace(List<RelationInfo> relationList, List<AbstractRelationTrace> relationTraceList) {
-        return new ${table.relationTraceClassName}RelationTrace(relationList, relationTraceList);
-    }
-
-    public static class ${table.relationTraceClassName}RelationTrace extends AbstractRelationTrace {
-
-        /**
-         * Constructor for first step.
-         * @param relationTraceFixHandler The handler of fixed relation trace. (NullAllowed)
-         */
-        public ${table.relationTraceClassName}RelationTrace(RelationTraceFixHandler relationTraceFixHandler) {
-            super(relationTraceFixHandler);
-        }
-
-        /**
-         * Constructor for relation step.
-         * @param relationList The list of relation. (NotNull)
-         * @param relationTraceList The list of relation trace. (NotNull)
-         */
-        public ${table.relationTraceClassName}RelationTrace(List<RelationInfo> relationList, List<AbstractRelationTrace> relationTraceList) {
-            super(relationList, relationTraceList);
-        }
-
-#foreach ($foreignKeys in $table.foreignKeys)
-        public ${foreignKeys.foreignTableDBMetaClassName}.${foreignKeys.foreignTable.relationTraceClassName}RelationTrace foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
-            _relationList.add(${myDBMetaClassName}.getInstance().foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}());
-            return ${foreignKeys.foreignTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
-        }
-#end
-#foreach ($referrer in $table.referrerAsOneList)
-        public ${referrer.referrerTableDBMetaClassName}.${referrer.table.relationTraceClassName}RelationTrace foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
-            _relationList.add(${myDBMetaClassName}.getInstance().foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}());
-            return ${referrer.referrerTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
-        }
-#end
-#foreach ($referrer in $table.referrerAsManyList)
-        public ${referrer.referrerTableDBMetaClassName}.${referrer.table.relationTraceClassName}RelationTrace referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
-            _relationList.add(${myDBMetaClassName}.getInstance().referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}());
-            return ${referrer.referrerTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
-        }
-#end
-
-#foreach ($col in $table.columns)
-        public RelationTrace column${col.javaBeansRulePropertyNameInitCap}() { return fixTrace(_relationList, ${myDBMetaClassName}.getInstance().column${col.javaBeansRulePropertyNameInitCap}()); }
-#end
-    }
-#end
 
     // ===================================================================================
     //                                                                        Various Info

@@ -87,9 +87,12 @@ import org.seasar.dbflute.util.Srl;
 
 /**
  * The abstract class of readable behavior.
+ * @param <ENTITY> The type of entity handled by this behavior.
+ * @param <CB> The type of condition-bean handled by this behavior.
  * @author jflute
  */
-public abstract class AbstractBehaviorReadable implements BehaviorReadable {
+public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends ConditionBean> implements
+        BehaviorReadable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -112,8 +115,45 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected BehaviorSelector _behaviorSelector;
 
     // ===================================================================================
-    //                                                                          Count Read
+    //                                                                          Table name
     //                                                                          ==========
+    /** {@inheritDoc} */
+    public String getTableDbName() {
+        return getDBMeta().getTableDbName();
+    }
+
+    /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
+    public ENTITY newEntity() {
+        return (ENTITY) getDBMeta().newEntity();
+    }
+
+    /** {@inheritDoc} */
+    public abstract CB newConditionBean(); // defined here to resolve generic of return type
+
+    // ===================================================================================
+    //                                                                        Count Select
+    //                                                                        ============
+    // -----------------------------------------------------
+    //                                         Main Entrance
+    //                                         -------------
+    protected int facadeSelectCount(CB cb) {
+        return doSelectCountUniquely(cb);
+    }
+
+    protected int doSelectCountUniquely(CB cb) { // called by selectCount(cb)
+        assertCBStateValid(cb);
+        return delegateSelectCountUniquely(cb);
+    }
+
+    protected int doSelectCountPlainly(CB cb) { // called by selectPage(cb)
+        assertCBStateValid(cb);
+        return delegateSelectCountPlainly(cb);
+    }
+
+    // -----------------------------------------------------
+    //                                    Interface Dispatch
+    //                                    ------------------
     /**
      * {@inheritDoc}
      */
@@ -122,47 +162,41 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         return doReadCount(cb);
     }
 
-    protected abstract int doReadCount(ConditionBean cb);
+    protected int doReadCount(ConditionBean cb) {
+        return facadeSelectCount(downcast(cb));
+    }
 
     // ===================================================================================
-    //                                                                         Entity Read 
-    //                                                                         ===========
-    /**
-     * {@inheritDoc}
-     */
-    public Entity readEntity(ConditionBean cb) {
+    //                                                                       Entity Select
+    //                                                                       =============
+    // -----------------------------------------------------
+    //                                         Main Entrance
+    //                                         -------------
+    // *several methods cannot be resolved because they are changed by generator option
+    protected <RESULT extends ENTITY> RESULT doSelectEntity(CB cb, Class<? extends RESULT> entityType) {
+        return helpSelectEntityInternally(cb, entityType);
+    }
+
+    protected ENTITY facadeSelectEntityWithDeletedCheck(CB cb) {
+        return doSelectEntityWithDeletedCheck(cb, typeOfSelectedEntity());
+    }
+
+    protected <RESULT extends ENTITY> RESULT doSelectEntityWithDeletedCheck(CB cb, Class<? extends RESULT> entityType) {
         assertCBStateValid(cb);
-        return doReadEntity(cb);
+        assertObjectNotNull("entityType", entityType);
+        return helpSelectEntityWithDeletedCheckInternally(cb, entityType);
     }
 
-    protected abstract Entity doReadEntity(ConditionBean cb);
-
-    protected <ENTITY> OptionalEntity<ENTITY> createOptionalEntity(ENTITY entity, final Object... searchKey) {
-        return new OptionalEntity<ENTITY>(entity, new OptionalObjectExceptionThrower() {
-            public void throwNotFoundException() {
-                throwSelectEntityAlreadyDeletedException(searchKey);
-            }
-        });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Entity readEntityWithDeletedCheck(ConditionBean cb) {
-        assertCBStateValid(cb);
-        return doReadEntityWithDeletedCheck(cb);
-    }
-
-    protected abstract Entity doReadEntityWithDeletedCheck(ConditionBean cb);
-
-    protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityInternally(CB cb,
-            Class<? extends ENTITY> entityType) {
+    // -----------------------------------------------------
+    //                                       Internal Helper
+    //                                       ---------------
+    protected <RESULT extends ENTITY> RESULT helpSelectEntityInternally(CB cb, Class<? extends RESULT> entityType) {
         assertConditionBeanSelectResource(cb, entityType);
         if (cb.hasSelectAllPossible() && cb.getFetchSize() != 1) { // if no condition for one
             throwSelectEntityConditionNotFoundException(cb);
         }
         final int preSafetyMaxResultSize = xcheckSafetyResultAsOne(cb);
-        final List<ENTITY> ls;
+        final List<RESULT> ls;
         try {
             ls = delegateSelectList(cb, entityType);
         } catch (FetchingOverSafetySizeException e) {
@@ -175,12 +209,12 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             return null;
         }
         assertEntitySelectedAsOne(ls, cb);
-        return (ENTITY) ls.get(0);
+        return (RESULT) ls.get(0);
     }
 
-    protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityWithDeletedCheckInternally(
-            CB cb, Class<ENTITY> entityType) {
-        final ENTITY entity = helpSelectEntityInternally(cb, entityType);
+    protected <RESULT extends ENTITY> RESULT helpSelectEntityWithDeletedCheckInternally(CB cb,
+            Class<? extends RESULT> entityType) {
+        final RESULT entity = helpSelectEntityInternally(cb, entityType);
         assertEntityNotDeleted(entity, cb);
         return entity;
     }
@@ -250,31 +284,57 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         createBhvExThrower().throwSelectEntityConditionNotFoundException(cb);
     }
 
-    // ===================================================================================
-    //                                                                           List Read
-    //                                                                           =========
+    // -----------------------------------------------------
+    //                                    Interface Dispatch
+    //                                    ------------------
     /**
      * {@inheritDoc}
      */
-    public <ENTITY extends Entity> ListResultBean<ENTITY> readList(ConditionBean cb) {
+    public Entity readEntity(ConditionBean cb) {
         assertCBStateValid(cb);
-        @SuppressWarnings("unchecked")
-        final ListResultBean<ENTITY> entityList = (ListResultBean<ENTITY>) doReadList(cb);
-        return entityList;
+        return doReadEntity(cb);
     }
 
-    protected abstract ListResultBean<? extends Entity> doReadList(ConditionBean cb);
+    protected abstract Entity doReadEntity(ConditionBean cb);
 
-    protected boolean isSuppressSpecifyDerivedReferrerEntityPropertyCheck() {
-        return false;
+    protected <RESULT> OptionalEntity<RESULT> createOptionalEntity(RESULT entity, final Object... searchKey) {
+        return new OptionalEntity<RESULT>(entity, new OptionalObjectExceptionThrower() {
+            public void throwNotFoundException() {
+                throwSelectEntityAlreadyDeletedException(searchKey);
+            }
+        });
     }
 
-    protected void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String alias, Class<?> entityType) {
-        createCBExThrower().throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
+    /**
+     * {@inheritDoc}
+     */
+    public Entity readEntityWithDeletedCheck(ConditionBean cb) {
+        assertCBStateValid(cb);
+        return doReadEntityWithDeletedCheck(cb);
     }
 
-    protected <ENTITY extends Entity, CB extends ConditionBean> ListResultBean<ENTITY> helpSelectListInternally(CB cb,
-            Class<? extends ENTITY> entityType) {
+    protected Entity doReadEntityWithDeletedCheck(ConditionBean cb) {
+        return facadeSelectEntityWithDeletedCheck(downcast(cb));
+    }
+
+    // ===================================================================================
+    //                                                                         List Select
+    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                         Main Entrance
+    //                                         -------------
+    protected ListResultBean<ENTITY> facadeSelectList(CB cb) {
+        return doSelectList(cb, typeOfSelectedEntity());
+    }
+
+    protected <RESULT extends ENTITY> ListResultBean<ENTITY> doSelectList(CB cb, Class<? extends RESULT> entityType) {
+        return helpSelectListInternally(cb, entityType);
+    }
+
+    // -----------------------------------------------------
+    //                                       Internal Helper
+    //                                       ---------------
+    protected ListResultBean<ENTITY> helpSelectListInternally(CB cb, Class<? extends ENTITY> entityType) {
         assertConditionBeanSelectResource(cb, entityType);
         try {
             final List<ENTITY> selectedList = delegateSelectList(cb, entityType);
@@ -285,32 +345,59 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
     }
 
-    protected <ENTITY extends Entity> ListResultBean<ENTITY> createListResultBean(ConditionBean cb,
-            List<ENTITY> selectedList) {
-        return new ResultBeanBuilder<ENTITY>(getTableDbName()).buildListResultBean(cb, selectedList);
+    protected <RESULT extends Entity> ListResultBean<RESULT> createListResultBean(ConditionBean cb,
+            List<RESULT> selectedList) {
+        return new ResultBeanBuilder<RESULT>(getTableDbName()).buildListResultBean(cb, selectedList);
     }
 
-    // ===================================================================================
-    //                                                                           Page Read
-    //                                                                           =========
+    // -----------------------------------------------------
+    //                                       Option Handling
+    //                                       ---------------
+    protected boolean isSuppressSpecifyDerivedReferrerEntityPropertyCheck() {
+        return false;
+    }
+
+    protected void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String alias, Class<?> entityType) {
+        createCBExThrower().throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
+    }
+
+    // -----------------------------------------------------
+    //                                    Interface Dispatch
+    //                                    ------------------
     /**
      * {@inheritDoc}
      */
-    public <ENTITY extends Entity> PagingResultBean<ENTITY> readPage(final ConditionBean cb) {
+    public <RESULT extends Entity> ListResultBean<RESULT> readList(ConditionBean cb) {
         assertCBStateValid(cb);
         @SuppressWarnings("unchecked")
-        final PagingResultBean<ENTITY> entityList = (PagingResultBean<ENTITY>) doReadPage(cb);
+        final ListResultBean<RESULT> entityList = (ListResultBean<RESULT>) doReadList(cb);
         return entityList;
     }
 
-    protected abstract PagingResultBean<? extends Entity> doReadPage(ConditionBean cb);
+    protected ListResultBean<? extends Entity> doReadList(ConditionBean cb) {
+        return facadeSelectList(downcast(cb));
+    }
 
-    protected <ENTITY extends Entity, CB extends ConditionBean> PagingResultBean<ENTITY> helpSelectPageInternally(
-            CB cb, Class<? extends ENTITY> entityType) {
+    // ===================================================================================
+    //                                                                         Page Select
+    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                         Main Entrance
+    //                                         -------------
+    protected PagingResultBean<ENTITY> facadeSelectPage(CB cb) {
+        return doSelectPage(cb, typeOfSelectedEntity());
+    }
+
+    protected <RESULT extends ENTITY> PagingResultBean<RESULT> doSelectPage(CB cb, Class<? extends RESULT> entityType) {
+        return helpSelectPageInternally(cb, entityType);
+    }
+
+    protected <RESULT extends ENTITY> PagingResultBean<RESULT> helpSelectPageInternally(CB cb,
+            Class<? extends RESULT> entityType) {
         assertConditionBeanSelectResource(cb, entityType);
         try {
-            final PagingHandler<ENTITY> handler = createPagingHandler(cb, entityType);
-            final PagingInvoker<ENTITY> invoker = createPagingInvoker(cb);
+            final PagingHandler<RESULT> handler = createPagingHandler(cb, entityType);
+            final PagingInvoker<RESULT> invoker = createPagingInvoker(cb);
             return invoker.invokePaging(handler);
         } catch (PagingOverSafetySizeException e) {
             createBhvExThrower().throwDangerousResultSizeException(cb, e);
@@ -318,9 +405,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
     }
 
-    protected <ENTITY extends Entity, CB extends ConditionBean> PagingHandler<ENTITY> createPagingHandler(final CB cb,
-            final Class<? extends ENTITY> entityType) {
-        return new PagingHandler<ENTITY>() {
+    protected <RESULT extends ENTITY> PagingHandler<RESULT> createPagingHandler(final CB cb,
+            final Class<? extends RESULT> entityType) {
+        return new PagingHandler<RESULT>() {
             public PagingBean getPagingBean() {
                 return cb;
             }
@@ -334,7 +421,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
                 }
             }
 
-            public List<ENTITY> paging() {
+            public List<RESULT> paging() {
                 try {
                     cb.getSqlClause().enablePagingAdjustment();
                     return delegateSelectList(cb, entityType);
@@ -345,15 +432,51 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         };
     }
 
-    protected <ENTITY extends Entity, CB extends ConditionBean> PagingInvoker<ENTITY> createPagingInvoker(CB cb) {
+    protected <RESULT extends ENTITY> PagingInvoker<RESULT> createPagingInvoker(CB cb) {
         return cb.createPagingInvoker(getTableDbName());
     }
 
+    // -----------------------------------------------------
+    //                                    Interface Dispatch
+    //                                    ------------------
+    /**
+     * {@inheritDoc}
+     */
+    public <RESULT extends Entity> PagingResultBean<RESULT> readPage(final ConditionBean cb) {
+        assertCBStateValid(cb);
+        @SuppressWarnings("unchecked")
+        final PagingResultBean<RESULT> entityList = (PagingResultBean<RESULT>) doReadPage(cb);
+        return entityList;
+    }
+
+    protected PagingResultBean<? extends Entity> doReadPage(ConditionBean cb) {
+        return facadeSelectPage(downcast(cb));
+    }
+
     // ===================================================================================
-    //                                                                         Cursor Read
-    //                                                                         ===========
-    protected <ENTITY extends Entity, CB extends ConditionBean> void helpSelectCursorInternally(CB cb,
-            EntityRowHandler<ENTITY> handler, Class<? extends ENTITY> entityType) {
+    //                                                                       Cursor Select
+    //                                                                       =============
+    // -----------------------------------------------------
+    //                                         Main Entrance
+    //                                         -------------
+    protected void facadeSelectCursor(CB cb, EntityRowHandler<ENTITY> entityRowHandler) {
+        doSelectCursor(cb, entityRowHandler, typeOfSelectedEntity());
+    }
+
+    protected <RESULT extends ENTITY> void doSelectCursor(CB cb, EntityRowHandler<RESULT> handler,
+            Class<? extends RESULT> entityType) {
+        assertCBStateValid(cb);
+        assertObjectNotNull("entityRowHandler", handler);
+        assertObjectNotNull("entityType", entityType);
+        assertSpecifyDerivedReferrerEntityProperty(cb, entityType);
+        helpSelectCursorInternally(cb, handler, entityType);
+    }
+
+    // -----------------------------------------------------
+    //                                       Internal Helper
+    //                                       ---------------
+    protected <RESULT extends ENTITY> void helpSelectCursorInternally(CB cb, EntityRowHandler<RESULT> handler,
+            Class<? extends RESULT> entityType) {
         assertObjectNotNull("entityRowHandler", handler);
         assertConditionBeanSelectResource(cb, entityType);
         final CursorSelectOption option = cb.getCursorSelectOption();
@@ -364,16 +487,16 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
     }
 
-    protected <ENTITY extends Entity, CB extends ConditionBean> void helpSelectCursorHandlingByPaging(CB cb,
-            EntityRowHandler<ENTITY> entityRowHandler, Class<? extends ENTITY> entityType, CursorSelectOption option) {
+    protected <RESULT extends ENTITY> void helpSelectCursorHandlingByPaging(CB cb,
+            EntityRowHandler<RESULT> entityRowHandler, Class<? extends RESULT> entityType, CursorSelectOption option) {
         helpSelectCursorCheckingByPagingAllowed(cb, option);
         helpSelectCursorCheckingOrderByPK(cb, option);
         final int pageSize = option.getPageSize();
         int pageNumber = 1;
         while (true) {
             cb.paging(pageSize, pageNumber);
-            List<ENTITY> pageList = delegateSelectList(cb, entityType);
-            for (ENTITY entity : pageList) {
+            List<RESULT> pageList = delegateSelectList(cb, entityType);
+            for (RESULT entity : pageList) {
                 entityRowHandler.handle(entity);
             }
             if (pageList.size() < pageSize) { // means last page
@@ -383,14 +506,14 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
     }
 
-    protected <CB extends ConditionBean> void helpSelectCursorCheckingByPagingAllowed(CB cb, CursorSelectOption option) {
+    protected void helpSelectCursorCheckingByPagingAllowed(CB cb, CursorSelectOption option) {
         if (!cb.getSqlClause().isCursorSelectByPagingAllowed()) {
             String msg = "The cursor select by paging is not allowed at the DBMS.";
             throw new IllegalConditionBeanOperationException(msg);
         }
     }
 
-    protected <CB extends ConditionBean> void helpSelectCursorCheckingOrderByPK(CB cb, CursorSelectOption option) {
+    protected void helpSelectCursorCheckingOrderByPK(CB cb, CursorSelectOption option) {
         if (option.isOrderByPK()) {
             final OrderByClause orderByClause = cb.getOrderByComponent();
             final OrderByElement orderByFirstElement = orderByClause.getOrderByFirstElement();
@@ -402,8 +525,44 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     // ===================================================================================
-    //                                                                         Scalar Read
-    //                                                                         ===========
+    //                                                                       Scalar Select
+    //                                                                       =============
+    // -----------------------------------------------------
+    //                                         Main Entrance
+    //                                         -------------
+    protected <RESULT> HpSLSFunction<CB, RESULT> facadeScalarSelect(Class<RESULT> resultType) {
+        return doScalarSelect(resultType, newConditionBean());
+    }
+
+    protected <RESULT> HpSLSFunction<CB, RESULT> doScalarSelect(final Class<RESULT> resultType, final CB cb) {
+        assertObjectNotNull("resultType", resultType);
+        assertCBStateValid(cb);
+        cb.xsetupForScalarSelect();
+        cb.getSqlClause().disableSelectIndex(); // for when you use union
+        HpSLSExecutor<CB, RESULT> executor = createHpSLSExecutor(); // variable to resolve generic
+        return createSLSFunction(cb, resultType, executor);
+    }
+
+    protected <RESULT> HpSLSExecutor<CB, RESULT> createHpSLSExecutor() {
+        return new HpSLSExecutor<CB, RESULT>() {
+            public RESULT execute(CB cb, Class<RESULT> resultType, SelectClauseType selectClauseType) {
+                return invoke(createSelectScalarCBCommand(cb, resultType, selectClauseType));
+            }
+        };
+    }
+
+    protected <RESULT> HpSLSFunction<CB, RESULT> createSLSFunction(CB cb, Class<RESULT> resultType,
+            HpSLSExecutor<CB, RESULT> exec) {
+        return new HpSLSFunction<CB, RESULT>(cb, resultType, exec);
+    }
+
+    protected <RESULT> HpSLSFunction<? extends ConditionBean, RESULT> doReadScalar(Class<RESULT> resultTYpe) {
+        return facadeScalarSelect(resultTYpe);
+    }
+
+    // -----------------------------------------------------
+    //                                    Interface Dispatch
+    //                                    ------------------
     /**
      * {@inheritDoc}
      */
@@ -412,31 +571,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         final HpSLSFunction<ConditionBean, RESULT> func = (HpSLSFunction<ConditionBean, RESULT>) doReadScalar(resultType);
         return func;
     }
-
-    protected <RESULT, CB extends ConditionBean> HpSLSFunction<CB, RESULT> doScalarSelect(final Class<RESULT> tp,
-            final CB cb) {
-        assertObjectNotNull("resultType", tp);
-        assertCBStateValid(cb);
-        cb.xsetupForScalarSelect();
-        cb.getSqlClause().disableSelectIndex(); // for when you use union
-        HpSLSExecutor<CB, RESULT> executor = createHpSLSExecutor(); // variable to resolve generic
-        return createSLSFunction(cb, tp, executor);
-    }
-
-    protected <CB extends ConditionBean, RESULT> HpSLSExecutor<CB, RESULT> createHpSLSExecutor() {
-        return new HpSLSExecutor<CB, RESULT>() {
-            public RESULT execute(CB lcb, Class<RESULT> ltp, SelectClauseType sctp) {
-                return invoke(createSelectScalarCBCommand(lcb, ltp, sctp));
-            }
-        };
-    }
-
-    protected <CB extends ConditionBean, RESULT> HpSLSFunction<CB, RESULT> createSLSFunction(CB cb, Class<RESULT> tp,
-            HpSLSExecutor<CB, RESULT> exec) {
-        return new HpSLSFunction<CB, RESULT>(cb, tp, exec);
-    }
-
-    protected abstract <RESULT> HpSLSFunction<? extends ConditionBean, RESULT> doReadScalar(Class<RESULT> resultType);
 
     // ===================================================================================
     //                                                                          OutsideSql
@@ -1150,13 +1284,13 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         return invoke(createSelectCountCBCommand(cb, false));
     }
 
-    protected <ENTITY extends Entity> void delegateSelectCursor(ConditionBean cb, EntityRowHandler<ENTITY> handler,
-            Class<? extends ENTITY> entityType) {
+    protected <RESULT extends ENTITY> void delegateSelectCursor(ConditionBean cb, EntityRowHandler<RESULT> handler,
+            Class<? extends RESULT> entityType) {
         invoke(createSelectCursorCBCommand(cb, handler, entityType));
     }
 
-    protected <ENTITY extends Entity> List<ENTITY> delegateSelectList(ConditionBean cb,
-            Class<? extends ENTITY> entityType) {
+    protected <RESULT extends ENTITY> List<RESULT> delegateSelectList(ConditionBean cb,
+            Class<? extends RESULT> entityType) {
         return invoke(createSelectListCBCommand(cb, entityType));
     }
 
@@ -1194,8 +1328,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             invoke(cmd);
         }
         {
-            final Class<? extends Entity> entityType = getDBMeta().getEntityType();
-            final SelectListCBCommand<? extends Entity> cmd = createSelectListCBCommand(newConditionBean(), entityType);
+            @SuppressWarnings("unchecked")
+            final Class<? extends ENTITY> entityType = (Class<? extends ENTITY>) getDBMeta().getEntityType();
+            final SelectListCBCommand<? extends ENTITY> cmd = createSelectListCBCommand(newConditionBean(), entityType);
             cmd.setInitializeOnly(true);
             invoke(cmd);
         }
@@ -1217,10 +1352,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         return new SelectCountCBCommand();
     }
 
-    protected <ENTITY extends Entity> SelectCursorCBCommand<ENTITY> createSelectCursorCBCommand(ConditionBean cb,
-            EntityRowHandler<ENTITY> entityRowHandler, Class<? extends ENTITY> entityType) {
+    protected <RESULT extends ENTITY> SelectCursorCBCommand<RESULT> createSelectCursorCBCommand(ConditionBean cb,
+            EntityRowHandler<RESULT> entityRowHandler, Class<? extends RESULT> entityType) {
         assertBehaviorCommandInvoker("createSelectCursorCBCommand");
-        final SelectCursorCBCommand<ENTITY> cmd = newSelectCursorCBCommand();
+        final SelectCursorCBCommand<RESULT> cmd = newSelectCursorCBCommand();
         xsetupSelectCommand(cmd);
         cmd.setConditionBean(cb);
         cmd.setEntityType(entityType);
@@ -1228,22 +1363,22 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         return cmd;
     }
 
-    protected <ENTITY extends Entity> SelectCursorCBCommand<ENTITY> newSelectCursorCBCommand() {
-        return new SelectCursorCBCommand<ENTITY>();
+    protected <RESULT extends ENTITY> SelectCursorCBCommand<RESULT> newSelectCursorCBCommand() {
+        return new SelectCursorCBCommand<RESULT>();
     }
 
-    protected <ENTITY extends Entity> SelectListCBCommand<ENTITY> createSelectListCBCommand(ConditionBean cb,
-            Class<? extends ENTITY> entityType) {
+    protected <RESULT extends ENTITY> SelectListCBCommand<RESULT> createSelectListCBCommand(ConditionBean cb,
+            Class<? extends RESULT> entityType) {
         assertBehaviorCommandInvoker("createSelectListCBCommand");
-        final SelectListCBCommand<ENTITY> cmd = newSelectListCBCommand();
+        final SelectListCBCommand<RESULT> cmd = newSelectListCBCommand();
         xsetupSelectCommand(cmd);
         cmd.setConditionBean(cb);
         cmd.setEntityType(entityType);
         return cmd;
     }
 
-    protected <ENTITY extends Entity> SelectListCBCommand<ENTITY> newSelectListCBCommand() {
-        return new SelectListCBCommand<ENTITY>();
+    protected <RESULT extends ENTITY> SelectListCBCommand<RESULT> newSelectListCBCommand() {
+        return new SelectListCBCommand<RESULT>();
     }
 
     protected <RESULT> SelectNextValCommand<RESULT> createSelectNextValCommand(Class<RESULT> resultType) {
@@ -1417,14 +1552,24 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     // ===================================================================================
-    //                                                                     Downcast Helper
-    //                                                                     ===============
+    //                                                                         Type Helper
+    //                                                                         ===========
+    protected abstract Class<? extends ENTITY> typeOfSelectedEntity();
+
+    protected abstract Class<ENTITY> typeOfHandlingEntity();
+
+    protected abstract Class<CB> typeOfHandlingConditionBean();
+
+    protected ENTITY downcast(Entity entity) {
+        return helpEntityDowncastInternally(entity, typeOfHandlingEntity());
+    }
+
     @SuppressWarnings("unchecked")
-    protected <ENTITY extends Entity> ENTITY helpEntityDowncastInternally(Entity entity, Class<ENTITY> clazz) {
-        assertObjectNotNull("entity", entity);
+    protected <RESULT extends ENTITY> RESULT helpEntityDowncastInternally(Entity entity, Class<RESULT> clazz) {
+        assertEntityNotNull(entity);
         assertObjectNotNull("clazz", clazz);
         try {
-            return (ENTITY) entity;
+            return (RESULT) entity;
         } catch (ClassCastException e) {
             String classTitle = DfTypeUtil.toClassTitle(clazz);
             String msg = "The entity should be " + classTitle + " but it was: " + entity.getClass();
@@ -1432,9 +1577,13 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
     }
 
+    protected CB downcast(ConditionBean cb) {
+        return helpConditionBeanDowncastInternally(cb, typeOfHandlingConditionBean());
+    }
+
     @SuppressWarnings("unchecked")
-    protected <CB extends ConditionBean> CB helpConditionBeanDowncastInternally(ConditionBean cb, Class<CB> clazz) {
-        assertObjectNotNull("cb", cb);
+    protected CB helpConditionBeanDowncastInternally(ConditionBean cb, Class<CB> clazz) {
+        assertCBNotNull(cb);
         assertObjectNotNull("clazz", clazz);
         try {
             return (CB) cb;
@@ -1443,6 +1592,11 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             String msg = "The condition-bean should be " + classTitle + " but it was: " + cb.getClass();
             throw new IllegalStateException(msg, e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected List<ENTITY> downcast(List<? extends Entity> entityList) {
+        return (List<ENTITY>) entityList;
     }
 
     // ===================================================================================
@@ -1489,7 +1643,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param entity The instance of entity to be checked. (NotNull)
      */
     protected void assertEntityNotNull(Entity entity) {
-        assertObjectNotNull("entity", entity);
+        if (entity == null) {
+            String msg = "The entity should not be null: table=" + getTableDbName();
+            throw new IllegalArgumentException(msg);
+        }
     }
 
     /**
@@ -1517,12 +1674,14 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     /**
-     * Assert that the condition-bean state is valid.
-     * @param cb The instance of condition-bean to be checked. (NotNull)
+     * Assert that the entity list is not null.
+     * @param entityList The list of entity to be checked. (NotNull)
      */
-    protected void assertCBStateValid(ConditionBean cb) {
-        assertCBNotNull(cb);
-        assertCBNotDreamCruise(cb);
+    protected void assertEntityListNotNull(List<? extends Entity> entityList) {
+        if (entityList == null) {
+            String msg = "The list of entity should not be null: table=" + getTableDbName();
+            throw new IllegalArgumentException(msg);
+        }
     }
 
     /**
@@ -1530,7 +1689,19 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param cb The instance of condition-bean to be checked. (NotNull)
      */
     protected void assertCBNotNull(ConditionBean cb) {
-        assertObjectNotNull("cb", cb);
+        if (cb == null) {
+            String msg = "The condition-bean should not be null: table=" + getTableDbName();
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    /**
+     * Assert that the condition-bean state is valid.
+     * @param cb The instance of condition-bean to be checked. (NotNull)
+     */
+    protected void assertCBStateValid(ConditionBean cb) {
+        assertCBNotNull(cb);
+        assertCBNotDreamCruise(cb);
     }
 
     /**
@@ -1544,15 +1715,14 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
     }
 
-    protected <ENTITY extends Entity, CB extends ConditionBean> void assertConditionBeanSelectResource(CB cb,
-            Class<ENTITY> entityType) {
+    protected <RESULT extends ENTITY> void assertConditionBeanSelectResource(CB cb, Class<RESULT> entityType) {
         assertCBStateValid(cb);
         assertObjectNotNull("entityType", entityType);
         assertSpecifyDerivedReferrerEntityProperty(cb, entityType);
     }
 
-    protected <ENTITY extends Entity> void assertSpecifyDerivedReferrerEntityProperty(ConditionBean cb,
-            Class<ENTITY> entityType) {
+    protected <RESULT extends ENTITY> void assertSpecifyDerivedReferrerEntityProperty(ConditionBean cb,
+            Class<RESULT> entityType) {
         if (isSuppressSpecifyDerivedReferrerEntityPropertyCheck()) {
             return;
         }

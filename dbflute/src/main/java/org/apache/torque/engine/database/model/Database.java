@@ -2046,10 +2046,6 @@ public class Database {
         return getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
     }
 
-    public boolean isMakeFlatExpansion() {
-        return getLittleAdjustmentProperties().isMakeFlatExpansion();
-    }
-
     public boolean isMakeDaoInterface() {
         return getLittleAdjustmentProperties().isMakeDaoInterface();
     }

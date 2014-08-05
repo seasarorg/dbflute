@@ -1010,9 +1010,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                      Flat Expansion
     //                                                                      ==============
-    public boolean isMakeFlatExpansion() { // closet, closed function permanently
-        return isProperty("isMakeFlatExpansion", false);
-    }
+    // unsupported completely @since 1.0.5K
+    //public boolean isMakeFlatExpansion() { // closet, closed function permanently
+    //    return isProperty("isMakeFlatExpansion", false);
+    //}
 
     // ===================================================================================
     //                                                                               S2Dao
