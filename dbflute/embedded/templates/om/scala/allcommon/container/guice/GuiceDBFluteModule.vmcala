@@ -24,6 +24,8 @@ import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
 import org.seasar.dbflute.bhv.core.InvokerAssistant;
 import ${glPackageExtendedBhv}._;
+import ${glPackageCB}._;
+import ${glPackageExtendedEntity}._;
 
 /**
  * @author ${database.classAuthor}
@@ -77,7 +79,7 @@ class ${glDBFluteModule}(dataSource: DataSource) extends AbstractModule {
         // if directly create the behaviors so use reflection here
 #foreach ($table in $database.behaviorTableList)
         {
-            val bhv: ${table.baseBehaviorExtendsClassName} = Class.forName("${table.extendedBehaviorFullClassName}").newInstance().asInstanceOf[${table.baseBehaviorExtendsClassName}];
+            val bhv = Class.forName("${table.extendedBehaviorFullClassName}").newInstance().asInstanceOf[${table.baseBehaviorExtendsClassName}[${table.extendedEntityClassName}, ${table.extendedConditionBeanClassName}]];
 #if ($table.isWritable())
             bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor); bhv.setCommonColumnAutoSetupper(per);
 #else

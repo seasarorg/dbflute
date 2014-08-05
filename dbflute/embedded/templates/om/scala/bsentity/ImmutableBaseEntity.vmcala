@@ -352,12 +352,17 @@ abstract class ${myMutableBaseObjectClassName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    val dble: ${myExtendedObjectClassName} = new ${myExtendedObjectClassName}();
+    protected val dble: ${myExtendedObjectClassName} = new ${myExtendedObjectClassName}();
 
     // ===================================================================================
     //                                                                      DB-able Entity
     //                                                                      ==============
     def toDBable(): ${myExtendedObjectClassName} = { dble }
+
+    // ===================================================================================
+    //                                                                    Immutable Entity
+    //                                                                    ================
+    def toImmutable(): ${myImmutableExtendedObjectClassName} = { dble.toImmutable() }
 
     // ===================================================================================
     //                                                                          Unique Key

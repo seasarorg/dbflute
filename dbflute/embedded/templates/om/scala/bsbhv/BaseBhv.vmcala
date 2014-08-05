@@ -80,19 +80,13 @@ import ${glPackageCB}._;
  * </pre>
  * @author ${database.classAuthor}
  */
-abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
+abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${myExtendedObjectClassName}, ${myConditionBeanClassName}] {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     ${database.behaviorQueryPathBeginMark}
     ${database.behaviorQueryPathEndMark}
-
-    // ===================================================================================
-    //                                                                          Table name
-    //                                                                          ==========
-    /** @return The name on database of table. (NotNull) */
-    def getTableDbName(): String = { return "${table.tableDbName}"; }
 
     // ===================================================================================
     //                                                                              DBMeta
@@ -103,9 +97,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     // ===================================================================================
     //                                                                        New Instance
     //                                                                        ============
-    /** {@inheritDoc} */
-    def newEntity(): ${myExtendedObjectClassName} = { return new ${myExtendedObjectClassName}(); }
-
     /** {@inheritDoc} */
     def newConditionBean(): ${myConditionBeanClassName} = { return new ${myConditionBeanClassName}(); }
 
@@ -125,24 +116,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      */
     def selectCount(cbCall: (${myConditionBeanClassName}) => Unit): Int = {
         return facadeSelectCount(callbackCB(cbCall));
-    }
-
-    protected def facadeSelectCount(cb: ${myConditionBeanClassName}): Int = {
-        return doSelectCountUniquely(cb);
-    }
-
-    protected def doSelectCountUniquely(cb: ${myConditionBeanClassName}): Int = { // called by selectCount(cb)
-        assertCBStateValid(cb);
-        return delegateSelectCountUniquely(cb);
-    }
-
-    protected def doSelectCountPlainly(cb: ${myConditionBeanClassName}): Int = { // called by selectPage(cb)
-        assertCBStateValid(cb);
-        return delegateSelectCountPlainly(cb);
-    }
-
-    override protected def doReadCount(cb: ConditionBean): Int = {
-        return facadeSelectCount(downcast(cb));
     }
 
     // ===================================================================================
@@ -202,7 +175,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return ${database.basicOptionalEntitySimpleName}.apply(doSelectEntity(cb, tp)(loaderCall));
     }
 
-    protected def doReadEntity(cb: ConditionBean): Entity = { facadeSelectEntity(downcast(cb))().orNull }
+    override protected def doReadEntity(cb: ConditionBean): Entity = { facadeSelectEntity(downcast(cb))().orNull }
 
     /**
      * Select the entity by the condition-bean with deleted check. <br />
@@ -235,7 +208,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return dble;
     }
 
-    protected def doReadEntityWithDeletedCheck(cb: ConditionBean): Entity = { facadeSelectEntityWithDeletedCheck(downcast(cb))() }
+    override protected def doReadEntityWithDeletedCheck(cb: ConditionBean): Entity = { facadeSelectEntityWithDeletedCheck(downcast(cb))() }
 #if ($table.hasPrimaryKey())
 
     /**
@@ -318,13 +291,13 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return doSelectList(cb, typeOfSelectedEntity())(loaderCall);
     }
 
-    protected def doSelectList[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[_ <: ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ListResultBean[ENTITY] = {
+    protected def doSelectList[RESULT <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[RESULT])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ListResultBean[RESULT] = {
         val dbleList = helpSelectListInternally(cb, tp);
         callbackLoader(dbleList.asInstanceOf[List[${myExtendedObjectClassName}]], loaderCall);
         return dbleList;
     }
 
-    protected def doReadList(cb: ConditionBean): ListResultBean[_ <: Entity] = { facadeSelectList(downcast(cb))() }
+    override protected def doReadList(cb: ConditionBean): ListResultBean[_ <: Entity] = { facadeSelectList(downcast(cb))() }
 #if ($table.isEntityDerivedMappable())
 
     override protected def isSuppressSpecifyDerivedReferrerEntityPropertyCheck(): Boolean = { true }
@@ -364,11 +337,13 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return doSelectPage(cb, typeOfSelectedEntity())(loaderCall);
     }
 
-    protected def doSelectPage[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[_ <: ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): PagingResultBean[ENTITY] = {
-        return helpSelectPageInternally(cb, tp);
+    protected def doSelectPage[RESULT <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[RESULT])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): PagingResultBean[RESULT] = {
+        val dbleList = helpSelectPageInternally(cb, tp);
+        callbackLoader(dbleList.asInstanceOf[List[${myExtendedObjectClassName}]], loaderCall);
+        return dbleList;
     }
 
-    protected def doReadPage(cb: ConditionBean): PagingResultBean[_ <: Entity] = { facadeSelectPage(downcast(cb))() }
+    override protected def doReadPage(cb: ConditionBean): PagingResultBean[_ <: Entity] = { facadeSelectPage(downcast(cb))() }
 
     // ===================================================================================
     //                                                                       Cursor Select
@@ -391,14 +366,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         facadeSelectCursor(callbackCB(cbCall), new EntityRowHandler[${myExtendedObjectClassName}]() {
             def handle(entity: ${myExtendedObjectClassName}): Unit = { rowCall(entity.toImmutable) }
         });
-    }
-
-    protected def facadeSelectCursor(cb: ${myConditionBeanClassName}, handler: EntityRowHandler[${myExtendedObjectClassName}]): Unit = {
-        doSelectCursor(cb, handler, typeOfSelectedEntity());
-    }
-
-    protected def doSelectCursor[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, handler: EntityRowHandler[ENTITY], tp: Class[_ <: ENTITY]): Unit = {
-        helpSelectCursorInternally(cb, handler, tp);
     }
 
     // ===================================================================================
@@ -426,12 +393,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     protected def toScalaSLSFunction[RESULT](function: HpSLSFunction[${myConditionBeanClassName}, RESULT]): ScrHpSLSFunction[${myConditionBeanClassName}, RESULT] =
     { new ScrHpSLSFunction[${myConditionBeanClassName}, RESULT](function) }
 
-    protected def facadeScalarSelect[RESULT](resultType: Class[RESULT]): HpSLSFunction[${myConditionBeanClassName}, RESULT] = {
-        return doScalarSelect(resultType, newConditionBean());
-    }
-
-    protected def doReadScalar[RESULT](tp: Class[RESULT]): HpSLSFunction[_ <: ConditionBean, RESULT] = { facadeScalarSelect(tp) }
-
     // ===================================================================================
     //                                                                            Sequence
     //                                                                            ========
@@ -455,8 +416,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     }
 
 #end
-    @Override
-    protected def doReadNextVal(): Number = {
+    override protected def doReadNextVal(): Number = {
 #if ($table.isUseSequence())
         return facadeSelectNextVal();
 #else
@@ -656,23 +616,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         doInsert(callbackMbleEntityToDBable(entityCall), callbackInsertOption(optionCall));
     }
 
-    protected def doInsert(et: ${myExtendedObjectClassName}, op: InsertOption[${myConditionBeanClassName}]): Unit = {
-        assertObjectNotNull("${myEntityVariableName}", et); prepareInsertOption(op); delegateInsert(et, op);
-    }
-
-    protected def prepareInsertOption(op: InsertOption[${myConditionBeanClassName}]): Unit = {
-        if (op == null) { return; }
-        assertInsertOptionStatus(op);
-        if (op.hasSpecifiedInsertColumn()) {
-            op.resolveInsertColumnSpecification(createCBForSpecifiedUpdate());
-        }
-    }
-
-    @Override
-    protected def doCreate(et: Entity, op: InsertOption[_ <: ConditionBean]): Unit = {
-        doInsert(downcast(et), downcast(op));
-    }
-
     /**
 #if ($table.hasOptimisticLock())
      * Update the entity modified-only. (ZeroUpdateException, ExclusiveControl)
@@ -712,25 +655,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         assertObjectNotNull("entityCall", entityCall);
         doUpdate(callbackMbleEntityToDBable(entityCall), callbackUpdateOption(optionCall));
     }
-
-    protected def doUpdate(et: ${myExtendedObjectClassName}, op: UpdateOption[${myConditionBeanClassName}]): Unit = {
-        assertObjectNotNull("${myEntityVariableName}", et); prepareUpdateOption(op); helpUpdateInternally(et, op);
-    }
-
-    protected def prepareUpdateOption(op: UpdateOption[${myConditionBeanClassName}]): Unit = {
-        if (op == null) { return; }
-        assertUpdateOptionStatus(op);
-        if (op.hasSelfSpecification()) { op.resolveSelfSpecification(createCBForVaryingUpdate()); }
-        if (op.hasSpecifiedUpdateColumn()) { op.resolveUpdateColumnSpecification(createCBForSpecifiedUpdate()); }
-    }
-
-    protected def createCBForVaryingUpdate(): ${myConditionBeanClassName} =
-    { val cb: ${myConditionBeanClassName} = newConditionBean(); cb.xsetupForVaryingUpdate(); return cb; }
-
-    protected def createCBForSpecifiedUpdate(): ${myConditionBeanClassName} =
-    { val cb: ${myConditionBeanClassName} = newConditionBean(); cb.xsetupForSpecifiedUpdate(); return cb; }
-
-    protected def doModify(et: Entity, op: UpdateOption[_ <: ConditionBean]): Unit = { doUpdate(downcast(et), downcast(op)) }
 #if ($table.hasOptimisticLock())
 
     /**
@@ -756,17 +680,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     def updateNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         doUpdateNonstrict(callbackMbleEntityToDBable(entityCall), callbackUpdateOption(optionCall));
     }
-
-    protected def doUpdateNonstrict(et: ${myExtendedObjectClassName}, op: UpdateOption[${myConditionBeanClassName}]): Unit = {
-        assertObjectNotNull("${myEntityVariableName}", et); prepareUpdateOption(op); helpUpdateNonstrictInternally(et, op);
-    }
-#end
-
-    protected def doModifyNonstrict(et: Entity, op: UpdateOption[_ <: ConditionBean]): Unit =
-#if ($table.hasOptimisticLock())
-    { doUpdateNonstrict(downcast(et), downcast(op)) }
-#else
-    { doModify(et, op) }
 #end
 
     /**
@@ -791,13 +704,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     def insertOrUpdate(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit insertOptionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit = null, updateOptionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         doInsertOrUpdate(callbackMbleEntityToDBable(entityCall), callbackInsertOption(insertOptionCall), callbackUpdateOption(updateOptionCall));
     }
-
-    protected def doInsertOrUpdate(et: ${myExtendedObjectClassName}, iop: InsertOption[${myConditionBeanClassName}], uop: UpdateOption[${myConditionBeanClassName}]): Unit = {
-        assertObjectNotNull("${myEntityVariableName}", et); helpInsertOrUpdateInternally(et, iop, uop);
-    }
-
-    protected def doCreateOrModify(et: Entity, iop: InsertOption[_ <: ConditionBean], uop: UpdateOption[_ <: ConditionBean]): Unit =
-    { doInsertOrUpdate(downcast(et), downcast(iop), downcast(uop)) }
 #if ($table.hasOptimisticLock())
 
     /**
@@ -814,20 +720,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     def insertOrUpdateNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit insertOptionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit = null, updateOptionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         doInsertOrUpdateNonstrict(callbackMbleEntityToDBable(entityCall), callbackInsertOption(insertOptionCall), callbackUpdateOption(updateOptionCall));
     }
-
-    protected def doInsertOrUpdateNonstrict(et: ${myExtendedObjectClassName}, iop: InsertOption[${myConditionBeanClassName}], uop: UpdateOption[${myConditionBeanClassName}]): Unit = {
-        assertObjectNotNull("${myEntityVariableName}", et); helpInsertOrUpdateInternally(et, iop, uop);
-    }
 #end
-
-    @Override
-    protected def doCreateOrModifyNonstrict(et: Entity, iop: InsertOption[_ <: ConditionBean], uop: UpdateOption[_ <: ConditionBean]): Unit = {
-#if ($table.hasOptimisticLock())
-        doInsertOrUpdateNonstrict(downcast(et), downcast(iop), downcast(uop));
-#else
-        doCreateOrModify(et, iop, uop);
-#end
-    }
 
     /**
 #if ($table.hasOptimisticLock())
@@ -858,14 +751,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     def delete(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         doDelete(callbackMbleEntityToDBable(entityCall), callbackDeleteOption(optionCall));
     }
-
-    protected def doDelete(et: ${myExtendedObjectClassName}, op: DeleteOption[${myConditionBeanClassName}]): Unit = {
-        assertObjectNotNull("${myEntityVariableName}", et); prepareDeleteOption(op); helpDeleteInternally(et, op);
-    }
-
-    protected def prepareDeleteOption(op: DeleteOption[${myConditionBeanClassName}]): Unit = { if (op != null) { assertDeleteOptionStatus(op); } }
-
-    protected def doRemove(et: Entity, op: DeleteOption[_ <: ConditionBean]): Unit = { doDelete(downcast(et), downcast(op)) }
 #if ($table.hasOptimisticLock())
 
     /**
@@ -886,17 +771,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     def deleteNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         doDeleteNonstrict(callbackMbleEntityToDBable(entityCall), callbackDeleteOption(optionCall));
     }
-
-    protected def doDeleteNonstrict(et: ${myExtendedObjectClassName}, op: DeleteOption[${myConditionBeanClassName}]): Unit = {
-        assertObjectNotNull("${myEntityVariableName}", et); prepareDeleteOption(op); helpDeleteNonstrictInternally(et, op);
-    }
-#end
-
-    protected def doRemoveNonstrict(et: Entity, op: DeleteOption[_ <: ConditionBean]): Unit =
-#if ($table.hasOptimisticLock())
-    { doDeleteNonstrict(downcast(et), downcast(op)) }
-#else
-    { doRemove(et, op) }
 #end
 
     // ===================================================================================
@@ -929,13 +803,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     def batchInsert(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
         return doBatchInsert(callbackBatch(batchCall), callbackInsertOption(optionCall));
     }
-
-    protected def doBatchInsert(ls: List[${myExtendedObjectClassName}], op: InsertOption[${myConditionBeanClassName}]): Array[Int] = {
-        assertObjectNotNull("${myEntityListVariableName}", ls);
-        val rlop: InsertOption[${myConditionBeanClassName}] = if (op != null) { op } else { createPlainInsertOption() }
-        prepareBatchInsertOption(ls, op); // required
-        return delegateBatchInsert(ls, op);
-    }
 #if ($database.isBatchInsertColumnModifiedPropertiesFragmentedDisallowed())
 
     override protected def isBatchUpdateColumnModifiedPropertiesFragmentedDisallowed(): Boolean = { true }
@@ -944,8 +811,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     override protected def isCompatibleBatchInsertDefaultEveryColumn(): Boolean = { true }
 #end
-
-    protected def doLumpCreate(ls: List[Entity], op: InsertOption[_ <: ConditionBean]): Array[Int] = { doBatchInsert(downcast(ls), downcast(op)) }
 
     /**
 #if ($table.hasOptimisticLock())
@@ -982,13 +847,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     def batchUpdate(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
         return doBatchUpdate(callbackBatch(batchCall), callbackUpdateOption(optionCall));
     }
-
-    protected def doBatchUpdate(ls: List[${myExtendedObjectClassName}], op: UpdateOption[${myConditionBeanClassName}]): Array[Int] = {
-        assertObjectNotNull("${myEntityListVariableName}", ls);
-        val rlop: UpdateOption[${myConditionBeanClassName}] = if (op != null) { op } else { createPlainUpdateOption() }
-        prepareBatchUpdateOption(ls, rlop); // required
-        return delegateBatchUpdate(ls, rlop);
-    }
 #if ($database.isBatchUpdateColumnModifiedPropertiesFragmentedAllowed())
 
     override protected def isBatchUpdateColumnModifiedPropertiesFragmentedAllowed(): Boolean = { true }
@@ -997,8 +855,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 
     override protected def isCompatibleBatchUpdateDefaultEveryColumn(): Boolean = { true }
 #end
-
-    protected def doLumpModify(ls: List[Entity], op: UpdateOption[_ <: ConditionBean]): Array[Int] = { doBatchUpdate(downcast(ls), downcast(op)) }
 #if ($table.hasOptimisticLock())
 
     /**
@@ -1028,20 +884,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     def batchUpdateNonstrict(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
         return doBatchUpdateNonstrict(callbackBatch(batchCall), callbackUpdateOption(optionCall));
     }
-
-    protected def doBatchUpdateNonstrict(ls: List[${myExtendedObjectClassName}], op: UpdateOption[${myConditionBeanClassName}]): Array[Int] = {
-        assertObjectNotNull("${myEntityListVariableName}", ls);
-        val rlop: UpdateOption[${myConditionBeanClassName}] = if (op != null) { op } else { createPlainUpdateOption() }
-        prepareBatchUpdateOption(ls, rlop);
-        return delegateBatchUpdateNonstrict(ls, rlop);
-    }
-#end
-
-    protected def doLumpModifyNonstrict(ls: List[Entity], op: UpdateOption[_ <: ConditionBean]): Array[Int] =
-#if ($table.hasOptimisticLock())
-    { doBatchUpdateNonstrict(downcast(ls), downcast(op)) }
-#else
-    { doLumpModify(ls, op) }
 #end
 
     /**
@@ -1062,13 +904,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     def batchDelete(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
         return doBatchDelete(callbackBatch(batchCall), callbackDeleteOption(optionCall));
     }
-
-    protected def doBatchDelete(ls: List[${myExtendedObjectClassName}], op: DeleteOption[${myConditionBeanClassName}]): Array[Int] = {
-        assertObjectNotNull("${myEntityListVariableName}", ls); prepareDeleteOption(op);
-        return delegateBatchDelete(ls, op);
-    }
-
-    protected def doLumpRemove(ls: List[Entity], op: DeleteOption[_ <: ConditionBean]): Array[Int] = { doBatchDelete(downcast(ls), downcast(op)) }
 #if ($table.hasOptimisticLock())
 
     /**
@@ -1081,19 +916,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
     def batchDeleteNonstrict(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
         return doBatchDeleteNonstrict(callbackBatch(batchCall), callbackDeleteOption(optionCall));
     }
-
-    protected def doBatchDeleteNonstrict(ls: List[${myExtendedObjectClassName}], op: DeleteOption[${myConditionBeanClassName}]): Array[Int] = {
-        assertObjectNotNull("${myEntityListVariableName}", ls);
-        prepareDeleteOption(op);
-        return delegateBatchDeleteNonstrict(ls, op);
-    }
-#end
-
-    protected def doLumpRemoveNonstrict(ls: List[Entity], op: DeleteOption[_ <: ConditionBean]): Array[Int] =
-#if ($table.hasOptimisticLock())
-    { return doBatchDeleteNonstrict(downcast(ls), downcast(op)); }
-#else
-    { return doLumpRemove(ls, op); }
 #end
 
     // ===================================================================================
@@ -1103,7 +925,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      * Insert the several entities by query (modified-only for fixed value).
      * <pre>
      * ${myEntityVariableName}Bhv.<span style="color: #DD4747">queryInsert</span>(new QueryInsertSetupper&lt;${myExtendedObjectClassName}, ${myConditionBeanClassName}&gt;() {
-     *     public ConditionBean setup(${myEntityVariableName} entity, ${myConditionBeanClassName} intoCB) {
+     *     public ConditionBean setup(${myExtendedObjectClassName} entity, ${myConditionBeanClassName} intoCB) {
      *         FooCB cb = FooCB();
      *         cb.setupSelect_Bar();
      *
@@ -1122,22 +944,12 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
      *     }
      * });
      * </pre>
-     * @param setupper The setup-per of query-insert. (NotNull)
+     * @param setupperCall The callback for set-upper of query-insert. (NotNull)
      * @return The inserted count.
      */
-    def queryInsert(setupper: QueryInsertSetupper[${myExtendedObjectClassName}, ${myConditionBeanClassName}]): Int = {
-        return doQueryInsert(setupper, null);
+    def queryInsert(setupperCall: (${myMutableExtendedObjectClassName}, ${myConditionBeanClassName}) => ConditionBean): Int = {
+        return doQueryInsert(callbackQueryInsertSetupper(setupperCall), null);
     }
-
-    protected def doQueryInsert(sp: QueryInsertSetupper[${myExtendedObjectClassName}, ${myConditionBeanClassName}], op: InsertOption[${myConditionBeanClassName}]): Int = {
-        assertObjectNotNull("setupper", sp); prepareInsertOption(op);
-        val et: ${myExtendedObjectClassName} = newEntity();
-        val cb: ${myConditionBeanClassName} = createCBForQueryInsert();
-        return delegateQueryInsert(et, cb, sp.setup(et, cb), op);
-    }
-
-    protected def doRangeCreate(setupper: QueryInsertSetupper[_ <: Entity, _ <: ConditionBean], option: InsertOption[_ <: ConditionBean]): Int =
-    { doQueryInsert(downcast(setupper), downcast(option)) }
 
     /**
      * Update the several entities by query non-strictly modified-only. (NonExclusiveControl)
@@ -1166,14 +978,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         return doQueryUpdate(callbackMbleEntityToDBable(entityCall), callbackCB(cbCall), null);
     }
 
-    protected def doQueryUpdate(${myEntityVariableName}: ${myExtendedObjectClassName}, cb: ${myConditionBeanClassName}, op: UpdateOption[${myConditionBeanClassName}]): Int = {
-        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); assertCBStateValid(cb); prepareUpdateOption(op);
-        return if (checkCountBeforeQueryUpdateIfNeeds(cb)) { delegateQueryUpdate(${myEntityVariableName}, cb, op) } else { 0 };
-    }
-
-    protected def doRangeModify(et: Entity, cb: ConditionBean, op: UpdateOption[_ <: ConditionBean]): Int =
-    { doQueryUpdate(downcast(et), downcast(cb), downcast(op)) }
-
     /**
      * Delete the several entities by query. (NonExclusiveControl)
      * <pre>
@@ -1189,13 +993,6 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         assertObjectNotNull("cbCall", cbCall);
         return doQueryDelete(callbackCB(cbCall), null);
     }
-
-    protected def doQueryDelete(cb: ${myConditionBeanClassName}, op: DeleteOption[${myConditionBeanClassName}]): Int = {
-        assertCBStateValid(cb); prepareDeleteOption(op);
-        return if (checkCountBeforeQueryUpdateIfNeeds(cb)) { delegateQueryDelete(cb, op) } else { 0 };
-    }
-
-    protected def doRangeRemove(cb: ConditionBean, op: DeleteOption[_ <: ConditionBean]): Int = { doQueryDelete(downcast(cb), downcast(op)) }
 #else
 #if ($table.isAvailableNonPrimaryKeyWritable())
 
@@ -1307,8 +1104,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
 #end
 #end
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
+    //                                                                     Callback Helper
+    //                                                                     ===============
     protected def callbackCB(cbCall: (${myConditionBeanClassName}) => Unit): ${myConditionBeanClassName} = {
         assertObjectNotNull("cbCall", cbCall);
         val cb = newConditionBean(); cbCall(cb); return cb;
@@ -1349,6 +1146,18 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         val option = new ScrDeleteOption[${myConditionBeanClassName}](new DeleteOption[${myConditionBeanClassName}]()); optionCall(option); return option.toNative;
     }
 
+    protected def callbackQueryInsertSetupper(setupperCall: (${myMutableExtendedObjectClassName}, ${myConditionBeanClassName}) => ConditionBean): QueryInsertSetupper[${myExtendedObjectClassName}, ${myConditionBeanClassName}] = {
+        assertObjectNotNull("setupperCall", setupperCall);
+        return new QueryInsertSetupper[${myExtendedObjectClassName}, ${myConditionBeanClassName}]() {
+            def setup(entity: ${myExtendedObjectClassName}, intoCB: ${myConditionBeanClassName}): ConditionBean = {
+                val mble = newMbleEntity();
+                val resultCB = setupperCall(mble, intoCB);
+                entity.acceptImmutable(mble.toImmutable());
+                return resultCB;
+            }
+        };
+    }
+
     protected def callbackLoader(dbleList: List[${myExtendedObjectClassName}], loaderCall: (${myReferrerLoaderClassName}) => Unit = null): Unit = {
         if (loaderCall == null) { return; }
         val loader = new ${myReferrerLoaderClassName}();
@@ -1356,21 +1165,15 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName} {
         loaderCall(loader);
     }
 
+    // ===================================================================================
+    //                                                                         Type Helper
+    //                                                                         ===========
+    override protected def typeOfSelectedEntity(): Class[${myExtendedObjectClassName}] = { classOf[${myExtendedObjectClassName}] }
+    override protected def typeOfHandlingEntity(): Class[${myExtendedObjectClassName}] = { classOf[${myExtendedObjectClassName}] }
+    override protected def typeOfHandlingConditionBean(): Class[${myConditionBeanClassName}] = { classOf[${myConditionBeanClassName}] }
     protected def newMbleEntity(): ${myMutableExtendedObjectClassName} = { new ${myMutableExtendedObjectClassName}() }
     protected def newPagingView(rb: PagingResultBean[${myExtendedObjectClassName}]): ScrPagingView[${myImmutableExtendedObjectClassName}] =
     { new ScrPagingView(toImmutableEntityList(rb), rb) }
-
-    protected def typeOfSelectedEntity(): Class[${myExtendedObjectClassName}] = { classOf[${myExtendedObjectClassName}] }
-    protected def downcast(et: Entity): ${myExtendedObjectClassName} = { helpEntityDowncastInternally(et, classOf[${myExtendedObjectClassName}]) }
-    protected def downcast(cb: ConditionBean): ${myConditionBeanClassName} = { helpConditionBeanDowncastInternally(cb, classOf[${myConditionBeanClassName}]) }
-    protected def downcast(ls: List[_ <: Entity]): List[${myExtendedObjectClassName}] = { ls.asInstanceOf[List[${myExtendedObjectClassName}]] }
-#if ($table.isWritable())
-    protected def downcast(op: InsertOption[_ <: ConditionBean]): InsertOption[${myConditionBeanClassName}] = { op.asInstanceOf[InsertOption[${myConditionBeanClassName}]] }
-    protected def downcast(op: UpdateOption[_ <: ConditionBean]): UpdateOption[${myConditionBeanClassName}] = { op.asInstanceOf[UpdateOption[${myConditionBeanClassName}]] }
-    protected def downcast(op: DeleteOption[_ <: ConditionBean]): DeleteOption[${myConditionBeanClassName}] = { op.asInstanceOf[DeleteOption[${myConditionBeanClassName}]] }
-    protected def downcast(sp: QueryInsertSetupper[_ <: Entity, _ <: ConditionBean]): QueryInsertSetupper[${myExtendedObjectClassName}, ${myConditionBeanClassName}] =
-    { sp.asInstanceOf[QueryInsertSetupper[${myExtendedObjectClassName}, ${myConditionBeanClassName}]] }
-#end
 
     // ===================================================================================
     //                                                                        Scala Helper
