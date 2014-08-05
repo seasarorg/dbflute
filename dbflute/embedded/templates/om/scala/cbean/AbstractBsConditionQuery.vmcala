@@ -582,7 +582,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
 #end
 #end
 #if (${col.isJavaNativeNumberObject()})
-    
+
     /**
      * Equal(=). And NullIgnored, OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
