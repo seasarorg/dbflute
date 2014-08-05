@@ -914,6 +914,7 @@ public class ConditionBeanExceptionThrower {
         br.addNotice("The query has been already registered. (cannot override it)");
         br.addItem("Advice");
         br.addElement("Overriding query is not allowed as default setting.");
+        br.addElement("Mistake? Or do you really want to override it?");
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    MemberCB cb = new MemberCB();");
@@ -925,13 +926,12 @@ public class ConditionBeanExceptionThrower {
         br.addElement("    cb.query().setMemberId_Equal(3); // *NG");
         br.addElement("  (o):");
         br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.enableOverrideQuery();");
         br.addElement("    cb.query().setMemberId_Equal(3);");
         br.addElement("    cb.query().setMemberAccount_Equal(\"Pixy\"); // OK");
         br.addElement("  (o):");
         br.addElement("    MemberCB cb = new MemberCB();");
         br.addElement("    cb.enableOverridingQuery();");
-        br.addElement("    cb.query().setMemberId_Equal(3);");
+        br.addElement("    cb.query().setMemberId_Equal(3); // overridden");
         br.addElement("    cb.query().setMemberId_Equal(4); // OK");
         br.addItem("Column Name");
         br.addElement(columnDbName);

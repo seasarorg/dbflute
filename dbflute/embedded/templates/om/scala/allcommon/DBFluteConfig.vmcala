@@ -78,6 +78,7 @@ object ${glDBFluteConfig} {
     protected var _nullOrEmptyQueryAllowed: Boolean = ${database.isNullOrEmptyQueryAllowed()};
     protected var _emptyStringQueryAllowed: Boolean = false;
     protected var _emptyStringParameterAllowed: Boolean = false;
+    protected var _overridingQueryAllowed: Boolean = ${database.isOverridingQueryAllowed()};
     protected var _disableSelectIndex: Boolean = false;
     protected var _queryUpdateCountPreCheck: Boolean = ${database.isQueryUpdateCountPreCheck()};
 
@@ -258,6 +259,23 @@ object ${glDBFluteConfig} {
             _log.info("...Setting emptyStringParameterAllowed: " + emptyStringParameterAllowed);
         }
         _emptyStringParameterAllowed = emptyStringParameterAllowed;
+    }
+
+    def isOverridingQueryAllowed(): Boolean = {
+        return _overridingQueryAllowed;
+    }
+
+    /**
+     * Set whether overriding query is allowed or not. <br />
+     * This configuration is only for ConditionBean.
+     * @param overridingQueryAllowed The determination, true or false.
+     */
+    def setOverridingQueryAllowed(overridingQueryAllowed: Boolean): Unit = {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting overridingQueryAllowed: " + overridingQueryAllowed);
+        }
+        _overridingQueryAllowed = overridingQueryAllowed;
     }
 
     // ===================================================================================
