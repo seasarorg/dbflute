@@ -986,6 +986,9 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                  Invalid Query Info
     //                                                                  ==================
+    // -----------------------------------------------------
+    //                                     NullOrEmpty Query
+    //                                     -----------------
     /**
      * Check null-or-empty query. <br />
      * The default is ignored, but public default is checked by DBFluteConfig
@@ -997,8 +1000,27 @@ public interface SqlClause {
      */
     void ignoreNullOrEmptyQuery();
 
+    /**
+     * Is null-or-empty query checked?
+     * @return The determination, true or false.
+     */
     boolean isNullOrEmptyQueryChecked();
 
+    /**
+     * Get the list of invalid query. (basically for logging)
+     * @return The list of invalid query. (NotNull, ReadOnly)
+     */
+    List<HpInvalidQueryInfo> getInvalidQueryList();
+
+    /**
+     * Save the invalid query.
+     * @param invalidQueryInfo The information of invalid query. (NotNull)
+     */
+    void saveInvalidQuery(HpInvalidQueryInfo invalidQueryInfo);
+
+    // -----------------------------------------------------
+    //                                          Empty String
+    //                                          ------------
     /**
      * Enable empty string query. (default is disabled)
      */
@@ -1009,15 +1031,30 @@ public interface SqlClause {
      */
     void disableEmptyStringQuery();
 
+    /**
+     * Is empty string checked?
+     * @return The determination, true or false.
+     */
     boolean isEmptyStringQueryEnabled();
 
+    // -----------------------------------------------------
+    //                                      Overriding Query
+    //                                      ----------------
     /**
-     * Get the list of invalid query. (basically for logging)
-     * @return The list of invalid query. (NotNull, ReadOnly)
+     * Enable overriding query. (default is disabled)
      */
-    List<HpInvalidQueryInfo> getInvalidQueryList();
+    void enableOverridingQuery();
 
-    void saveInvalidQuery(HpInvalidQueryInfo invalidQueryInfo);
+    /**
+     * Disable overriding query. (back to default)
+     */
+    void disableOverridingQuery();
+
+    /**
+     * Is overriding query checked?
+     * @return The determination, true or false.
+     */
+    boolean isOverridingQueryEnabled();
 
     // [DBFlute-0.8.6]
     // ===================================================================================

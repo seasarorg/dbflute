@@ -24,6 +24,8 @@ import org.seasar.dbflute.cbean.ManualOrderBean;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
+import org.seasar.dbflute.cbean.ckey.ConditionKey;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.ColumnQueryInvalidColumnSpecificationException;
@@ -34,6 +36,7 @@ import org.seasar.dbflute.exception.OrScopeQueryAndPartAlreadySetupException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartNotOrScopeException;
 import org.seasar.dbflute.exception.OrderByIllegalPurposeException;
 import org.seasar.dbflute.exception.PagingPageSizeNotPlusException;
+import org.seasar.dbflute.exception.QueryAlreadyRegisteredException;
 import org.seasar.dbflute.exception.QueryDerivedReferrerInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.QueryDerivedReferrerSelectAllPossibleException;
 import org.seasar.dbflute.exception.QueryDerivedReferrerUnmatchedColumnTypeException;
@@ -903,6 +906,43 @@ public class ConditionBeanExceptionThrower {
         br.addElement("(" + lockedCB.getPurpose() + ")");
         final String msg = br.buildExceptionMessage();
         throw new QueryThatsBadTimingException(msg);
+    }
+
+    public void throwQueryAlreadyRegisteredException(ConditionKey key, Object value, ConditionValue cvalue,
+            String columnDbName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The query has been already registered. (cannot override it)");
+        br.addItem("Advice");
+        br.addElement("Overriding query is not allowed as default setting.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    cb.query().setMemberId_Equal(3);");
+        br.addElement("    cb.query().setMemberId_Equal(4); // *NG");
+        br.addElement("  (x):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    cb.query().setMemberId_Equal(3);");
+        br.addElement("    cb.query().setMemberId_Equal(3); // *NG");
+        br.addElement("  (o):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    cb.enableOverrideQuery();");
+        br.addElement("    cb.query().setMemberId_Equal(3);");
+        br.addElement("    cb.query().setMemberAccount_Equal(\"Pixy\"); // OK");
+        br.addElement("  (o):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    cb.enableOverridingQuery();");
+        br.addElement("    cb.query().setMemberId_Equal(3);");
+        br.addElement("    cb.query().setMemberId_Equal(4); // OK");
+        br.addItem("Column Name");
+        br.addElement(columnDbName);
+        br.addItem("Condition Key");
+        br.addElement(key);
+        br.addItem("New Value");
+        br.addElement(value);
+        br.addItem("Condition Value");
+        br.addElement(value);
+        final String msg = br.buildExceptionMessage();
+        throw new QueryAlreadyRegisteredException(msg);
     }
 
     public void throwInvalidQueryRegisteredException(HpInvalidQueryInfo... invalidQueryInfoAry) {

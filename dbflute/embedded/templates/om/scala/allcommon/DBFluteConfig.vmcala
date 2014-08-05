@@ -75,9 +75,9 @@ object ${glDBFluteConfig} {
     protected var _pagingCountLeastJoin: Boolean = ${database.isPagingCountLeastJoin()};
     protected var _innerJoinAutoDetect: Boolean = ${database.isInnerJoinAutoDetect()};
     protected var _thatsBadTimingDetect: Boolean = ${database.isThatsBadTimingDetect()};
+    protected var _nullOrEmptyQueryAllowed: Boolean = ${database.isNullOrEmptyQueryAllowed()};
     protected var _emptyStringQueryAllowed: Boolean = false;
     protected var _emptyStringParameterAllowed: Boolean = false;
-    protected var _nullOrEmptyChecked: Boolean = false;
     protected var _disableSelectIndex: Boolean = false;
     protected var _queryUpdateCountPreCheck: Boolean = ${database.isQueryUpdateCountPreCheck()};
 
@@ -209,12 +209,29 @@ object ${glDBFluteConfig} {
     // ===================================================================================
     //                                                                       Invalid Query
     //                                                                       =============
+    def isNullOrEmptyQueryAllowed(): Boolean = {
+        return _nullOrEmptyQueryAllowed;
+    }
+
+    /**
+     * Set whether null-or-empty query is allowed or not. <br />
+     * This configuration is only for ConditionBean.
+     * @param nullOrEmptyQueryAllowed The determination, true or false.
+     */
+    def setNullOrEmptyQueryAllowed(nullOrEmptyQueryAllowed: Boolean): Unit = {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting nullOrEmptyQueryAllowed: " + nullOrEmptyQueryAllowed);
+        }
+        _nullOrEmptyQueryAllowed = nullOrEmptyQueryAllowed;
+    }
+
     def isEmptyStringQueryAllowed(): Boolean = {
         return _emptyStringQueryAllowed;
     }
 
     /**
-     * Set whether an empty string for query is allowed or not. {default: false}<br />
+     * Set whether an empty string for query is allowed or not. <br />
      * This configuration is only for ConditionBean.
      * @param emptyStringQueryAllowed The determination, true or false.
      */
@@ -231,7 +248,7 @@ object ${glDBFluteConfig} {
     }
 
     /**
-     * Set whether an empty string for parameter is allowed or not. {default: false}<br />
+     * Set whether an empty string for parameter is allowed or not. <br />
      * This configuration is only for ParameterBean.
      * @param emptyStringParameterAllowed The determination, true or false.
      */
@@ -241,23 +258,6 @@ object ${glDBFluteConfig} {
             _log.info("...Setting emptyStringParameterAllowed: " + emptyStringParameterAllowed);
         }
         _emptyStringParameterAllowed = emptyStringParameterAllowed;
-    }
-
-    def isNullOrEmptyQueryChecked(): Boolean = {
-        return _nullOrEmptyChecked;
-    }
-
-    /**
-     * Set whether an invalid query is checked or not. {default: false}<br />
-     * This configuration is only for ConditionBean.
-     * @param nullOrEmptyChecked The determination, true or false.
-     */
-    def setNullOrEmptyQueryChecked(nullOrEmptyChecked: Boolean): Unit = {
-        assertNotLocked();
-        if (_log.isInfoEnabled()) {
-            _log.info("...Setting nullOrEmptyChecked: " + nullOrEmptyChecked);
-        }
-        _nullOrEmptyChecked = nullOrEmptyChecked;
     }
 
     // ===================================================================================

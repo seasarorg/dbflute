@@ -683,6 +683,20 @@ public abstract class AbstractConditionBean implements ConditionBean {
         getSqlClause().disableEmptyStringQuery();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void enableOverridingQuery() {
+        getSqlClause().enableOverridingQuery();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void disableOverridingQuery() {
+        getSqlClause().disableOverridingQuery();
+    }
+
     // ===================================================================================
     //                                                                   Accept PrimaryKey
     //                                                                   =================
@@ -1638,11 +1652,20 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected void xinheritInvalidQueryInfo(ConditionQuery mainCQ) {
-        if (mainCQ.xgetSqlClause().isEmptyStringQueryEnabled()) {
-            enableEmptyStringQuery();
-        }
         if (mainCQ.xgetSqlClause().isNullOrEmptyQueryChecked()) {
             checkNullOrEmptyQuery();
+        } else {
+            ignoreNullOrEmptyQuery();
+        }
+        if (mainCQ.xgetSqlClause().isEmptyStringQueryEnabled()) {
+            enableEmptyStringQuery();
+        } else {
+            disableEmptyStringQuery();
+        }
+        if (mainCQ.xgetSqlClause().isOverridingQueryEnabled()) {
+            enableOverridingQuery();
+        } else {
+            disableOverridingQuery();
         }
     }
 

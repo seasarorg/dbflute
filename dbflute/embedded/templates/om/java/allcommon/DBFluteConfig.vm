@@ -93,9 +93,10 @@ public class ${glDBFluteConfig} {
     protected boolean _pagingCountLeastJoin = ${database.isPagingCountLeastJoin()};
     protected boolean _innerJoinAutoDetect = ${database.isInnerJoinAutoDetect()};
     protected boolean _thatsBadTimingDetect = ${database.isThatsBadTimingDetect()};
+    protected boolean _nullOrEmptyQueryAllowed = ${database.isNullOrEmptyQueryAllowed()};
     protected boolean _emptyStringQueryAllowed;
     protected boolean _emptyStringParameterAllowed;
-    protected boolean _nullOrEmptyQueryChecked = ${database.isNullOrEmptyQueryChecked()};
+    protected boolean _overridingQueryAllowed = ${database.isOverridingQueryAllowed()};
     protected boolean _disableSelectIndex;
     protected boolean _queryUpdateCountPreCheck = ${database.isQueryUpdateCountPreCheck()};
 
@@ -256,12 +257,35 @@ public class ${glDBFluteConfig} {
     // ===================================================================================
     //                                                                       Invalid Query
     //                                                                       =============
+    public boolean isNullOrEmptyQueryAllowed() {
+        return _nullOrEmptyQueryAllowed;
+    }
+
+    /**
+     * Set whether null-or-empty query is allowed or not. <br />
+     * This configuration is only for ConditionBean.
+     * @param nullOrEmptyQueryAllowed The determination, true or false.
+     */
+    public void setNullOrEmptyQueryAllowed(boolean nullOrEmptyQueryAllowed) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting nullOrEmptyQueryAllowed: " + nullOrEmptyQueryAllowed);
+        }
+        _nullOrEmptyQueryAllowed = nullOrEmptyQueryAllowed;
+    }
+#if ($database.isCompatibleConditionBeanOldNamingCheckInvalid())
+
+    public void setInvalidQueryChecked(boolean invalidQueryChecked) { // for compatible
+        setNullOrEmptyQueryAllowed(invalidQueryChecked);
+    }
+#end
+
     public boolean isEmptyStringQueryAllowed() {
         return _emptyStringQueryAllowed;
     }
 
     /**
-     * Set whether an empty string for query is allowed or not. {default: false}<br />
+     * Set whether an empty string for query is allowed or not. <br />
      * This configuration is only for ConditionBean.
      * @param emptyStringQueryAllowed The determination, true or false.
      */
@@ -278,7 +302,7 @@ public class ${glDBFluteConfig} {
     }
 
     /**
-     * Set whether an empty string for parameter is allowed or not. {default: false}<br />
+     * Set whether an empty string for parameter is allowed or not. <br />
      * This configuration is only for ParameterBean.
      * @param emptyStringParameterAllowed The determination, true or false.
      */
@@ -290,28 +314,22 @@ public class ${glDBFluteConfig} {
         _emptyStringParameterAllowed = emptyStringParameterAllowed;
     }
 
-    public boolean isNullOrEmptyQueryChecked() {
-        return _nullOrEmptyQueryChecked;
+    public boolean isOverridingQueryAllowed() {
+        return _overridingQueryAllowed;
     }
 
     /**
-     * Set whether an invalid query is checked or not. {default: false}<br />
+     * Set whether overriding query is allowed or not. <br />
      * This configuration is only for ConditionBean.
-     * @param nullOrEmptyQueryChecked The determination, true or false.
+     * @param overridingQueryAllowed The determination, true or false.
      */
-    public void setNullOrEmptyQueryChecked(boolean nullOrEmptyQueryChecked) {
+    public void setOverridingQueryAllowed(boolean overridingQueryAllowed) {
         assertNotLocked();
         if (_log.isInfoEnabled()) {
-            _log.info("...Setting nullOrEmptyQueryChecked: " + nullOrEmptyQueryChecked);
+            _log.info("...Setting overridingQueryAllowed: " + overridingQueryAllowed);
         }
-        _nullOrEmptyQueryChecked = nullOrEmptyQueryChecked;
+        _overridingQueryAllowed = overridingQueryAllowed;
     }
-#if ($database.isCompatibleConditionBeanOldNamingCheckInvalid())
-
-    public void setInvalidQueryChecked(boolean invalidQueryChecked) { // for compatible
-        setNullOrEmptyQueryChecked(invalidQueryChecked);
-    }
-#end
 
     // ===================================================================================
     //                                                                        Select Index

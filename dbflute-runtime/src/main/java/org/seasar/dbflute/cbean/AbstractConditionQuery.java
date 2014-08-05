@@ -623,7 +623,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          Normal Query
     //                                          ------------
     protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
-        if (!isValidQueryChecked(key, value, cvalue, columnDbName)) {
+        if (!prepareQueryChecked(key, value, cvalue, columnDbName)) {
             return;
         }
         setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName);
@@ -631,34 +631,48 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
             ConditionOption option) {
-        if (!isValidQueryChecked(key, value, cvalue, columnDbName)) {
+        if (!prepareQueryChecked(key, value, cvalue, columnDbName)) {
             return;
         }
         setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName, option);
     }
 
-    protected boolean isValidQueryChecked(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
-        return xdoIsValidQuery(key, value, cvalue, columnDbName, true);
+    protected boolean prepareQueryChecked(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
+        return xdoPrepareQuery(key, value, cvalue, columnDbName, true);
     }
 
-    protected boolean isValidQueryNoCheck(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
-        return xdoIsValidQuery(key, value, cvalue, columnDbName, false);
+    protected boolean prepareQueryNoCheck(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
+        return xdoPrepareQuery(key, value, cvalue, columnDbName, false);
     }
 
-    protected boolean xdoIsValidQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
+    protected boolean xdoPrepareQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
             boolean checked) {
         final ColumnRealName callerName = toColumnRealName(columnDbName); // logging only
-        if (key.isValidRegistration(xcreateQueryModeProvider(), cvalue, value, callerName)) {
+        if (key.needsOverrideValue(cvalue)) {
+            handleOverridingQuery(key, value, cvalue, columnDbName);
+        }
+        if (key.prepareQuery(xcreateQueryModeProvider(), cvalue, value, callerName)) {
             return true;
         } else {
             if (checked) {
-                handleInvalidQuery(key, value, columnDbName);
+                handleInvalidQuery(key, value, cvalue, columnDbName);
             }
             return false;
         }
     }
 
-    protected void handleInvalidQuery(ConditionKey key, Object value, String columnDbName) {
+    protected void handleOverridingQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
+        if (isOverrideQueryAllowed(key, value, cvalue, columnDbName)) {
+            return;
+        }
+        throwQueryAlreadyRegisteredException(key, value, cvalue, columnDbName);
+    }
+
+    protected boolean isOverrideQueryAllowed(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
+        return false; // as default (generator's option might override to return true)
+    }
+
+    protected void handleInvalidQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         final HpInvalidQueryInfo invalidQueryInfo = xcreateInvalidQueryInfo(key, value, columnDbName);
         xdoHandleInvalidQuery(columnDbName, invalidQueryInfo);
     }
@@ -718,6 +732,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         };
     }
 
+    protected void throwQueryAlreadyRegisteredException(ConditionKey key, Object value, ConditionValue cvalue,
+            String columnDbName) {
+        createCBExThrower().throwQueryAlreadyRegisteredException(key, value, cvalue, columnDbName);
+    }
+
     protected void throwInvalidQueryRegisteredException(HpInvalidQueryInfo... invalidQueryInfoAry) {
         createCBExThrower().throwInvalidQueryRegisteredException(invalidQueryInfoAry);
     }
@@ -736,7 +755,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             throwLikeSearchOptionNotFoundException(columnDbName, value);
             return; // unreachable
         }
-        if (!isValidQueryChecked(key, value, cvalue, columnDbName)) {
+        if (!prepareQueryChecked(key, value, cvalue, columnDbName)) {
             return;
         }
         if (xsuppressEscape()) {
@@ -828,7 +847,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         // but if all elements are invalid, it is an exception
         final String[] strArray = option.generateSplitValueArray(value);
         if (strArray.length == 0) {
-            handleInvalidQuery(key, value, columnDbName);
+            handleInvalidQuery(key, value, cvalue, columnDbName);
             return;
         }
         if (!option.isAsOrSplit()) {
@@ -910,11 +929,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         filterFromToOption(option); // for fixed option
         final Date filteredFromDate = option.filterFromDate(fromDate);
         final ConditionKey fromKey = option.getFromDateConditionKey();
-        final boolean fromValidQuery = isValidQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName);
+        final boolean fromValidQuery = prepareQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName);
 
         final Date filteredToDate = option.filterToDate(toDate);
         final ConditionKey toKey = option.getToDateConditionKey();
-        final boolean toValidQuery = isValidQueryNoCheck(toKey, filteredToDate, cvalue, columnDbName);
+        final boolean toValidQuery = prepareQueryNoCheck(toKey, filteredToDate, cvalue, columnDbName);
 
         final boolean needsAndPart = isOrScopeQueryDirectlyUnder() && fromValidQuery && toValidQuery;
         if (needsAndPart) {
@@ -962,10 +981,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             option.xinitCalculationRange(xgetBaseCB(), dreamCruiseCB);
         }
         final ConditionKey minKey = option.getMinNumberConditionKey();
-        final boolean minValidQuery = isValidQueryNoCheck(minKey, minNumber, cvalue, columnDbName);
+        final boolean minValidQuery = prepareQueryNoCheck(minKey, minNumber, cvalue, columnDbName);
 
         final ConditionKey maxKey = option.getMaxNumberConditionKey();
-        final boolean maxValidQuery = isValidQueryNoCheck(maxKey, maxNumber, cvalue, columnDbName);
+        final boolean maxValidQuery = prepareQueryNoCheck(maxKey, maxNumber, cvalue, columnDbName);
 
         final boolean needsAndPart = isOrScopeQueryDirectlyUnder() && minValidQuery && maxValidQuery;
         if (needsAndPart) {
@@ -995,7 +1014,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                         InScope Query
     //                                         -------------
     protected void regINS(ConditionKey key, List<?> value, ConditionValue cvalue, String columnDbName) {
-        if (!isValidQueryChecked(key, value, cvalue, columnDbName)) {
+        if (!prepareQueryChecked(key, value, cvalue, columnDbName)) {
             return;
         }
         final int inScopeLimit = xgetSqlClause().getInScopeLimit();
@@ -1059,7 +1078,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void doRegIQ(final ConditionKey key, final Object value, final ConditionValue cvalue,
             final String columnDbName, final ConditionOption option) {
-        if (!isValidQueryChecked(key, value, cvalue, columnDbName)) {
+        if (!prepareQueryChecked(key, value, cvalue, columnDbName)) {
             return;
         }
         final DBMeta dbmeta = xgetDBMetaProvider().provideDBMetaChecked(getTableDbName());

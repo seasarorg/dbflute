@@ -44,24 +44,41 @@ public class ConditionKeyNotInScope extends ConditionKey {
     }
 
     // ===================================================================================
-    //                                                                      Implementation
-    //                                                                      ==============
+    //                                                                       Prepare Query
+    //                                                                       =============
     @Override
-    protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
+    protected boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName) {
         return value != null && value instanceof List<?> && !((List<?>) value).isEmpty();
     }
 
+    // ===================================================================================
+    //                                                                      Override Check
+    //                                                                      ==============
+    @Override
+    public boolean needsOverrideValue(ConditionValue cvalue) {
+        return false; // for not fixed query
+    }
+
+    // ===================================================================================
+    //                                                                        Where Clause
+    //                                                                        ============
     @Override
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
         conditionList.add(buildBindClause(columnRealName, value.getNotInScopeLatestLocation(), cipher, option));
     }
 
+    // ===================================================================================
+    //                                                                         Bind Clause
+    //                                                                         ===========
     @Override
     protected String getBindVariableDummyValue() {
         return "('a1', 'a2')";
     }
 
+    // ===================================================================================
+    //                                                                     Condition Value
+    //                                                                     ===============
     @Override
     protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
         cvalue.setupNotInScope(value, location);

@@ -44,23 +44,37 @@ public class ConditionKeyIsNotNull extends ConditionKey {
     }
 
     // ===================================================================================
-    //                                                                      Implementation
-    //                                                                      ==============
+    //                                                                       Prepare Query
+    //                                                                       =============
     @Override
-    protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
-        if (cvalue.isFixedQuery() && cvalue.hasIsNotNull()) {
+    protected boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName) {
+        if (needsOverrideValue(cvalue)) {
             noticeRegistered(callerName, value);
             return false;
         }
         return true;
     }
 
+    // ===================================================================================
+    //                                                                      Override Check
+    //                                                                      ==============
+    @Override
+    public boolean needsOverrideValue(ConditionValue cvalue) {
+        return cvalue.isFixedQuery() && cvalue.hasIsNotNull();
+    }
+
+    // ===================================================================================
+    //                                                                        Where Clause
+    //                                                                        ============
     @Override
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
         conditionList.add(buildClauseWithoutValue(columnRealName));
     }
 
+    // ===================================================================================
+    //                                                                     Condition Value
+    //                                                                     ===============
     @Override
     protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
         cvalue.setIsNotNull(DUMMY_OBJECT);

@@ -254,14 +254,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                    Invalid Query Info
     //                                    ------------------
-    /** Does it accept an empty string for query? */
-    protected boolean _emptyStringQueryEnabled;
-
     /** Does it check an invalid query? */
     protected boolean _nullOrEmptyChecked;
 
     /** The list of invalid query info. (NullAllowed: lazy-load) */
     protected List<HpInvalidQueryInfo> _invalidQueryList;
+
+    /** Does it accept an empty string for query? */
+    protected boolean _emptyStringQueryEnabled;
+
+    /** Does it allow overriding query? */
+    protected boolean _overridingQueryEnabled;
 
     // -----------------------------------------------------
     //                               WhereClauseSimpleFilter
@@ -2849,6 +2852,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                  Invalid Query Info
     //                                                                  ==================
+    // -----------------------------------------------------
+    //                                     NullOrEmpty Query
+    //                                     -----------------
     public void checkNullOrEmptyQuery() {
         _nullOrEmptyChecked = true;
     }
@@ -2859,18 +2865,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public boolean isNullOrEmptyQueryChecked() {
         return _nullOrEmptyChecked;
-    }
-
-    public void enableEmptyStringQuery() {
-        _emptyStringQueryEnabled = true;
-    }
-
-    public void disableEmptyStringQuery() {
-        _emptyStringQueryEnabled = false;
-    }
-
-    public boolean isEmptyStringQueryEnabled() {
-        return _emptyStringQueryEnabled;
     }
 
     /**
@@ -2889,6 +2883,36 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             _invalidQueryList = new ArrayList<HpInvalidQueryInfo>();
         }
         return _invalidQueryList;
+    }
+
+    // -----------------------------------------------------
+    //                                          Empty String
+    //                                          ------------
+    public void enableEmptyStringQuery() {
+        _emptyStringQueryEnabled = true;
+    }
+
+    public void disableEmptyStringQuery() {
+        _emptyStringQueryEnabled = false;
+    }
+
+    public boolean isEmptyStringQueryEnabled() {
+        return _emptyStringQueryEnabled;
+    }
+
+    // -----------------------------------------------------
+    //                                      Overriding Query
+    //                                      ----------------
+    public void enableOverridingQuery() {
+        _overridingQueryEnabled = true;
+    }
+
+    public void disableOverridingQuery() {
+        _overridingQueryEnabled = false;
+    }
+
+    public boolean isOverridingQueryEnabled() {
+        return _overridingQueryEnabled;
     }
 
     // ===================================================================================

@@ -160,11 +160,18 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
         if (isThatsBadTimingDetect()) {
             sqlClause.enableThatsBadTimingDetect();
         }
+        if (isNullOrEmptyQueryAllowed()) { // default for 1.0.5
+            sqlClause.ignoreNullOrEmptyQuery();
+        } else { // default for 1.1
+            sqlClause.checkNullOrEmptyQuery();
+        }
         if (isEmptyStringQueryAllowed()) {
             sqlClause.enableEmptyStringQuery();
         }
-        if (isNullOrEmptyQueryChecked()) {
-            sqlClause.checkNullOrEmptyQuery();
+        if (isOverridingQueryAllowed()) { // default for 1.0.5
+            sqlClause.enableOverridingQuery();
+        } else { // default for 1.1
+            sqlClause.disableOverridingQuery();
         }
         if (isDisableSelectIndex()) {
             sqlClause.disableSelectIndex();
@@ -186,12 +193,16 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 	    return ${glDBFluteConfig}.getInstance().isThatsBadTimingDetect();
     }
 
+    protected boolean isNullOrEmptyQueryAllowed() {
+	    return ${glDBFluteConfig}.getInstance().isNullOrEmptyQueryAllowed();
+    }
+
     protected boolean isEmptyStringQueryAllowed() {
 	    return ${glDBFluteConfig}.getInstance().isEmptyStringQueryAllowed();
     }
 
-    protected boolean isNullOrEmptyQueryChecked() {
-	    return ${glDBFluteConfig}.getInstance().isNullOrEmptyQueryChecked();
+    protected boolean isOverridingQueryAllowed() {
+	    return ${glDBFluteConfig}.getInstance().isOverridingQueryAllowed();
     }
 
     protected boolean isDisableSelectIndex() {

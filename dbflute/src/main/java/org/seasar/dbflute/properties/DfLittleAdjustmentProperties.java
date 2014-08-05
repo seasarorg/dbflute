@@ -333,9 +333,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //    return isProperty("isMakeConditionBeanCBDrivenLoadReferrer", false);
     //}
 
-    public boolean isNullOrEmptyQueryChecked() { // closet
+    public boolean isNullOrEmptyQueryAllowed() { // closet
         final boolean defaultValue = isProperty("isInvalidQueryChecked", !isCompatibleBeforeJava8());
-        return isProperty("isNullOrEmptyQueryChecked", defaultValue);
+        return isProperty("isNullOrEmptyQueryAllowed", !defaultValue);
+    }
+
+    public boolean isOverridingQueryAllowed() { // closet
+        return isProperty("isOverridingQueryAllowed", isCompatibleBeforeJava8());
     }
 
     // ===================================================================================

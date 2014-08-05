@@ -273,6 +273,12 @@ public class MockConditionBean implements ConditionBean {
     public void disableEmptyStringQuery() {
     }
 
+    public void enableOverridingQuery() {
+    }
+
+    public void disableOverridingQuery() {
+    }
+
     public void enableInnerJoinAutoDetect() {
     }
 

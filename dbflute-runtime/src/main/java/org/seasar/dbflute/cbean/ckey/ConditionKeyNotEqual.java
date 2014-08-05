@@ -46,14 +46,14 @@ public abstract class ConditionKeyNotEqual extends ConditionKey {
     protected abstract String defineOperand();
 
     // ===================================================================================
-    //                                                                      Implementation
-    //                                                                      ==============
+    //                                                                       Prepare Query
+    //                                                                       =============
     @Override
-    protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
+    protected boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName) {
         if (value == null) {
             return false;
         }
-        if (cvalue.isFixedQuery() && cvalue.hasNotEqual()) {
+        if (needsOverrideValue(cvalue)) {
             if (cvalue.equalNotEqual(value)) {
                 noticeRegistered(callerName, value);
                 return false;
@@ -65,17 +65,34 @@ public abstract class ConditionKeyNotEqual extends ConditionKey {
         return true;
     }
 
+    // ===================================================================================
+    //                                                                      Override Check
+    //                                                                      ==============
+    @Override
+    public boolean needsOverrideValue(ConditionValue cvalue) {
+        return cvalue.isFixedQuery() && cvalue.hasNotEqual();
+    }
+
+    // ===================================================================================
+    //                                                                        Where Clause
+    //                                                                        ============
     @Override
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
         conditionList.add(buildBindClause(columnRealName, value.getNotEqualLatestLocation(), cipher, option));
     }
 
+    // ===================================================================================
+    //                                                                         Bind Clause
+    //                                                                         ===========
     @Override
     protected boolean isPossibleBindEncryptConditionKey() {
         return true;
     }
 
+    // ===================================================================================
+    //                                                                     Condition Value
+    //                                                                     ===============
     @Override
     protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
         cvalue.setupNotEqual(value, location);

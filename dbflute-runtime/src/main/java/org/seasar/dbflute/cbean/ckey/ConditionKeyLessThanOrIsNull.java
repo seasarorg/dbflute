@@ -42,8 +42,8 @@ public class ConditionKeyLessThanOrIsNull extends ConditionKeyLessThan {
     }
 
     // ===================================================================================
-    //                                                                      Implementation
-    //                                                                      ==============
+    //                                                                         Bind Clause
+    //                                                                         ===========
     @Override
     protected QueryClause buildBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher,
             ConditionOption option) {

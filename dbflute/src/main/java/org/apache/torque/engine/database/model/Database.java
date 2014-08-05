@@ -1937,8 +1937,12 @@ public class Database {
         return getLittleAdjustmentProperties().isThatsBadTimingDetect();
     }
 
-    public boolean isNullOrEmptyQueryChecked() {
-        return getLittleAdjustmentProperties().isNullOrEmptyQueryChecked();
+    public boolean isNullOrEmptyQueryAllowed() {
+        return getLittleAdjustmentProperties().isNullOrEmptyQueryAllowed();
+    }
+
+    public boolean isOverridingQueryAllowed() {
+        return getLittleAdjustmentProperties().isOverridingQueryAllowed();
     }
 
     public boolean isAvailableDatabaseNativeJDBC() {

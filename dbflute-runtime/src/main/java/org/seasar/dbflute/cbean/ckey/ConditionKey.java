@@ -137,21 +137,21 @@ public abstract class ConditionKey implements Serializable {
     protected String _operand;
 
     // ===================================================================================
-    //                                                                          Validation
-    //                                                                          ==========
+    //                                                                       Prepare Query
+    //                                                                       =============
     /**
-     * Is valid registration?
+     * Prepare the query of the condition value to register the condition.
      * @param provider The provider of query mode. (NotNull)
-     * @param cvalue Condition value. (NotNull)
-     * @param value Value. (NotNull)
+     * @param cvalue The object of condition value. (NotNull)
+     * @param value The value of the condition. (NotNull)
      * @param callerName Caller's real name. (NotNull)
-     * @return The determination, true or false.
+     * @return Is the query valid?
      */
-    public boolean isValidRegistration(final QueryModeProvider provider, final ConditionValue cvalue,
-            final Object value, final ColumnRealName callerName) {
+    public boolean prepareQuery(final QueryModeProvider provider, final ConditionValue cvalue, final Object value,
+            final ColumnRealName callerName) {
         return cvalue.process(new CallbackProcessor<Boolean>() {
             public Boolean process() {
-                return doIsValidRegistration(cvalue, value, callerName);
+                return doPrepareQuery(cvalue, value, callerName);
             }
 
             public QueryModeProvider getProvider() {
@@ -160,7 +160,17 @@ public abstract class ConditionKey implements Serializable {
         });
     }
 
-    protected abstract boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName);
+    protected abstract boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName);
+
+    // ===================================================================================
+    //                                                                      Override Check
+    //                                                                      ==============
+    /**
+     * Does it need to override the existing value to register the value?
+     * @param cvalue The object of condition value. (NotNull)
+     * @return The determination, true or false.
+     */
+    public abstract boolean needsOverrideValue(ConditionValue cvalue);
 
     // ===================================================================================
     //                                                                        Where Clause

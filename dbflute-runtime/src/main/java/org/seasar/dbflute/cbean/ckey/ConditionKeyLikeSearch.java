@@ -53,13 +53,24 @@ public class ConditionKeyLikeSearch extends ConditionKey {
     }
 
     // ===================================================================================
-    //                                                                      Implementation
-    //                                                                      ==============
+    //                                                                       Prepare Query
+    //                                                                       =============
     @Override
-    protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
+    protected boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName) {
         return value != null;
     }
 
+    // ===================================================================================
+    //                                                                      Override Check
+    //                                                                      ==============
+    @Override
+    public boolean needsOverrideValue(ConditionValue cvalue) {
+        return false; // for not fixed query
+    }
+
+    // ===================================================================================
+    //                                                                        Where Clause
+    //                                                                        ============
     @Override
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
@@ -85,11 +96,17 @@ public class ConditionKeyLikeSearch extends ConditionKey {
         return value.getLikeSearchLatestLocation();
     }
 
+    // ===================================================================================
+    //                                                                         Bind Clause
+    //                                                                         ===========
     @Override
     protected boolean isOutOfBindEncryptConditionKey() { // to override
         return true; // because wild cards are embedded in condition value for likeSearch
     }
 
+    // ===================================================================================
+    //                                                                     Condition Value
+    //                                                                     ===============
     @Override
     protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
         cvalue.setupLikeSearch((String) value, (LikeSearchOption) option, location);

@@ -45,19 +45,25 @@ public class ConditionKeyNotLikeSearch extends ConditionKeyLikeSearch {
     }
 
     // ===================================================================================
-    //                                                                      Implementation
-    //                                                                      ==============
+    //                                                                        Where Clause
+    //                                                                        ============
     @Override
     protected String getLocation(ConditionValue value) {
         return value.getNotLikeSearchLatestLocation();
     }
 
+    // ===================================================================================
+    //                                                                         Bind Clause
+    //                                                                         ===========
     @Override
     protected String extractExtOperand(ConditionOption option) {
         final String extOperand = super.extractExtOperand(option);
         return extOperand != null ? "not " + extOperand : null;
     }
 
+    // ===================================================================================
+    //                                                                     Condition Value
+    //                                                                     ===============
     @Override
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
             ConditionOption option) {

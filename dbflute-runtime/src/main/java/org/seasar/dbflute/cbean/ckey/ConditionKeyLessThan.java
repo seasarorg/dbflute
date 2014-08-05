@@ -52,14 +52,14 @@ public class ConditionKeyLessThan extends ConditionKey {
     }
 
     // ===================================================================================
-    //                                                                      Implementation
-    //                                                                      ==============
+    //                                                                Prepare Registration
+    //                                                                ====================
     @Override
-    protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
+    protected boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName) {
         if (value == null) {
             return false;
         }
-        if (cvalue.isFixedQuery() && cvalue.hasLessThan()) {
+        if (needsOverrideValue(cvalue)) {
             if (cvalue.equalLessThan(value)) {
                 noticeRegistered(callerName, value);
                 return false;
@@ -71,12 +71,26 @@ public class ConditionKeyLessThan extends ConditionKey {
         return true;
     }
 
+    // ===================================================================================
+    //                                                                      Override Check
+    //                                                                      ==============
+    @Override
+    public boolean needsOverrideValue(ConditionValue cvalue) {
+        return cvalue.isFixedQuery() && cvalue.hasLessThan();
+    }
+
+    // ===================================================================================
+    //                                                                        Where Clause
+    //                                                                        ============
     @Override
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
         conditionList.add(buildBindClause(columnRealName, value.getLessThanLatestLocation(), cipher, option));
     }
 
+    // ===================================================================================
+    //                                                                     Condition Value
+    //                                                                     ===============
     @Override
     protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
         cvalue.setupLessThan(value, location);

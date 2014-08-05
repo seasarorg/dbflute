@@ -261,6 +261,20 @@ public interface ConditionBean extends PagingBean {
      */
     void disableEmptyStringQuery();
 
+    /**
+     * Enable overriding query. (default is disabled) <br />
+     * (you can override existing value as condition) <br />
+     * You should call this before registrations of where clause and other queries. <br />
+     * Union and SubQuery and other sub condition-bean inherit this.
+     */
+    void enableOverridingQuery();
+
+    /**
+     * Disable overriding query. (back to default) <br />
+     * You should set query to same column and same condition once.
+     */
+    void disableOverridingQuery();
+
     // ===================================================================================
     //                                                                      Paging Setting
     //                                                                      ==============
