@@ -62,15 +62,19 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         return "${table.tableDbName}";
     }
 
+#set ($columnLoopIndex = 0)
+#foreach ($col in $table.columns)
+#if ($columnLoopIndex == 0)
     // ===================================================================================
     //                                                                               Query
     //                                                                               =====
-#foreach ($col in $table.columns)
+#else
+
+#end
 #set ($tmpJavaName = "${col.javaName}")
 #set ($tmpUncapitalisedJavaName = "${col.uncapitalisedJavaName}")
 #set ($fk = $col.foreignKey)
 #if (${col.isJavaNativeStringObject()})
-
     /**
      * Equal(=). And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
@@ -586,7 +590,6 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 #end
 #if (${col.isJavaNativeNumberObject()})
-
     /**
      * Equal(=). And NullIgnored, OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
@@ -1052,7 +1055,6 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 #end
 #if (${col.isJavaNativeDateObject()})
-
     /**
      * Equal(=). And NullIgnored, OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
@@ -1186,7 +1188,6 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 #end
 #if (${col.isJavaNativeBooleanObject()})
-
     /**
      * Equal(=). And NullIgnored, OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
@@ -1212,7 +1213,6 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 #end
 #if (${col.isJavaNativeUUIDObject()})
-
     /**
      * Equal(=). And NullIgnored, OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
@@ -1264,6 +1264,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     protected void reg${tmpJavaName}(ConditionKey ky, Object vl) { regQ(ky, vl, getCValue${tmpJavaName}(), "${col.name}"); }
     protected abstract ConditionValue getCValue${tmpJavaName}();
+#set ($columnLoopIndex = $columnLoopIndex + 1)
 #end
 #if ($table.isAvailableMyselfScalarCondition())
 

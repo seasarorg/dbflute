@@ -328,9 +328,9 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     protected void doCreateOrModifyNonstrict(Entity entity, InsertOption<? extends ConditionBean> insertOption,
             UpdateOption<? extends ConditionBean> updateOption) {
         if (getDBMeta().hasOptimisticLock()) {
-            doCreateOrModifyNonstrict(entity, insertOption, updateOption);
+            doInsertOrUpdateNonstrict(downcast(entity), downcast(insertOption), downcast(updateOption));
         } else {
-            doCreateOrModify(entity, insertOption, updateOption);
+            doInsertOrUpdate(downcast(entity), downcast(insertOption), downcast(updateOption));
         }
     }
 
