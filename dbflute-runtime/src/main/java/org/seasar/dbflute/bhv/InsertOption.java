@@ -209,7 +209,6 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     }
 
     public void xdisallowInsertColumnModifiedPropertiesFragmented() { // might be called by generator for option
-        System.out.println("**");
         _insertColumnModifiedPropertiesFragmentedAllowed = false;
     }
 
@@ -218,7 +217,6 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     }
 
     protected Set<String> xgatherInsertColumnModifiedProperties(List<? extends Entity> entityList, Entity firstEntity) {
-        System.out.println("***: " + xisInsertColumnModifiedPropertiesFragmentedAllowed());
         if (xisInsertColumnModifiedPropertiesFragmentedAllowed()) { // least common multiple (mainly here)
             final Set<String> mergedProps = new LinkedHashSet<String>();
             for (Entity entity : entityList) {
