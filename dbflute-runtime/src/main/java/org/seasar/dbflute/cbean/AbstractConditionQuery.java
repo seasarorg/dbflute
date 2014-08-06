@@ -648,13 +648,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected boolean xdoPrepareQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
             boolean checked) {
         final ColumnRealName callerName = toColumnRealName(columnDbName); // logging only
-        if (key.needsOverrideValue(cvalue)) {
+        final boolean overrideValue = key.needsOverrideValue(cvalue);
+        if (overrideValue) {
             handleOverridingQuery(key, value, cvalue, columnDbName);
         }
         if (key.prepareQuery(xcreateQueryModeProvider(), cvalue, value, callerName)) {
             return true;
         } else {
-            if (checked) {
+            if (!overrideValue && checked) {
                 handleInvalidQuery(key, value, cvalue, columnDbName);
             }
             return false;
