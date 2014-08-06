@@ -661,6 +661,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
+    // -----------------------------------------------------
+    //                                      Overriding Query
+    //                                      ----------------
     protected void handleOverridingQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         if (isOverrideQueryAllowed(key, value, cvalue, columnDbName)) {
             return;
@@ -669,9 +672,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected boolean isOverrideQueryAllowed(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
-        return false; // as default (generator's option might override to return true)
+        return xgetSqlClause().isOverridingQueryEnabled();
     }
 
+    // -----------------------------------------------------
+    //                                         Invalid Query
+    //                                         -------------
     protected void handleInvalidQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         final HpInvalidQueryInfo invalidQueryInfo = xcreateInvalidQueryInfo(key, value, columnDbName);
         xdoHandleInvalidQuery(columnDbName, invalidQueryInfo);
