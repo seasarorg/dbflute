@@ -40,7 +40,6 @@ public interface FileMakingCallback {
     /**
      * Make (write) token file by row writer that accepts row resources.
      * @param writer The row writer of file-making. (NotNull)
-     * @param acceptor The acceptor of row data to provide row resource. (NotNull)
      * @throws IOException When the IO handling fails in the row writing process.
      * @throws SQLException When the SQL handling fails in the row writing process.
      */
