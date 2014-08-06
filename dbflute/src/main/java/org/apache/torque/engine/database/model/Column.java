@@ -1589,7 +1589,7 @@ public class Column {
         if (getLittleAdjustmentProperties().isAvailableJava8OrJodaTimeEntity()) {
             definedDate = getJavaNative();
         } else { // normally here
-            definedDate = "Date"; // java.util.Date
+            definedDate = "Date"; // java.util.Date, package already imported
         }
         return definedDate;
     }
@@ -1668,6 +1668,14 @@ public class Column {
 
     public boolean isJavaNativeHandlingAsTime() { // as pinpoint
         return isJavaNativeTime() || isJavaNativeJava8LocalTime() || isJavaNativeJodaLocalTime();
+    }
+
+    public boolean isJavaNativeNextLocalDate() { // as pinpoint
+        return isJavaNativeJava8LocalDate() || isJavaNativeJodaLocalDate();
+    }
+
+    public boolean isJavaNativeNextLocalDateTime() { // as pinpoint
+        return isJavaNativeJava8LocalDateTime() || isJavaNativeJodaLocalDateTime();
     }
 
     public boolean isJavaNativeJava8LocalDate() { // as pinpoint

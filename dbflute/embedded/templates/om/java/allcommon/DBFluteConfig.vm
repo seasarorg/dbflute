@@ -179,7 +179,7 @@ public class ${glDBFluteConfig} {
 #end
 #if ($database.isAvailableJodaTimeLocalDateEntity())
 
-        // uses Joda-Time
+        // uses JodaTime
         TnValueTypes.registerBasicValueType(currentDBDef(), LocalDate.class, new JodaLocalDateType());
         TnValueTypes.registerBasicValueType(currentDBDef(), LocalDateTime.class, new JodaLocalDateTimeType());
         TnValueTypes.registerBasicValueType(currentDBDef(), LocalTime.class, new JodaLocalTimeType());
@@ -1023,8 +1023,8 @@ public class ${glDBFluteConfig} {
 #if ($database.isAvailableJodaTimeLocalDateEntity())
 
     // ===================================================================================
-    //                                                                     Joda-Time Class
-    //                                                                     ===============
+    //                                                                      JodaTime Class
+    //                                                                      ==============
     public static class JodaLocalDateType extends TnAbstractValueType {
 
         public JodaLocalDateType() {

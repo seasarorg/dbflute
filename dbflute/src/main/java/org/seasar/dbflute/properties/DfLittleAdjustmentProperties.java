@@ -164,9 +164,9 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // -----------------------------------------------------
-    //                              Java8-Time and Joda-Time
-    //                              ------------------------
-    // Java8-Time and Joda-Time support
+    //                                Java8Time and JodaTime
+    //                                ----------------------
+    // Java8-Time and JodaTime support
     // DfTypeMappingProperties.java, Column.java
     // DBFluteConfig.vm, AbstractBsConditionQuery.vm, BsParameterBean.vm
     public boolean isAvailableJava8OrJodaTimeEntity() {

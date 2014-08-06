@@ -948,10 +948,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         try {
             if (fromValidQuery) {
-                setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, columnDbName);
+                final Object registered = filterFromToRegisteredDate(filteredFromDate, columnDbName);
+                setupConditionValueAndRegisterWhereClause(fromKey, registered, cvalue, columnDbName);
             }
             if (toValidQuery) {
-                setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, columnDbName);
+                final Object registered = filterFromToRegisteredDate(filteredToDate, columnDbName);
+                setupConditionValueAndRegisterWhereClause(toKey, registered, cvalue, columnDbName);
             }
             if (!fromValidQuery && !toValidQuery) { // both no condition
                 final List<ConditionKey> keyList = newArrayList(fromKey, toKey);
@@ -973,6 +975,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void filterFromToOption(FromToOption option) {
         // do nothing as default, basically for option default
+    }
+
+    protected Object filterFromToRegisteredDate(Date date, String columnDbName) {
+        return date; // do nothing as default, basically for converting to next date
     }
 
     // -----------------------------------------------------

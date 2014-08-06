@@ -151,7 +151,7 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
         final Map<String, String> jdbcToJavaNativeMap = newLinkedHashMap();
         jdbcToJavaNativeMap.putAll(getLanguageTypeMapping().getJdbcToJavaNativeMap()); // language definition at first
 
-        // Java8-Time and Joda-Time support
+        // Java8-Time and JodaTime support
         prepareJava8OrJodaTimeMappingIfNeeds(jdbcToJavaNativeMap);
 
         for (Entry<String, String> entry : getJdbcTypeMappingMap().entrySet()) {

@@ -27,6 +27,8 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 #if ($database.isAvailableJodaTimeEntity())
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
 #end
@@ -1132,8 +1134,10 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public void set${tmpJavaName}_FromTo(${col.fromToJavaNativeDate} fromDatetime, ${col.fromToJavaNativeDate} toDatetime, FromToOption fromToOption) {
 #if ($col.isJavaNativeUtilDate())
         regFTQ(fCTPD(fromDatetime), fCTPD(toDatetime), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
-#elseif ($col.isJavaNativeJodaTimeLocal())
+#elseif ($col.isJavaNativeNextLocalDate())
         regFTQ(toUtilDate(fromDatetime), toUtilDate(toDatetime), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
+#elseif ($col.isJavaNativeNextLocalDateTime())
+        regFTQ(toTimestamp(fromDatetime), toTimestamp(toDatetime), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
 #else
         regFTQ((fromDatetime != null ? new ${col.javaNative}(fromDatetime.getTime()) : null), (toDatetime != null ? new ${col.javaNative}(toDatetime.getTime()) : null), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
 #end
@@ -1614,7 +1618,6 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     //                                                                    Small Adjustment
     //                                                                    ================
 #if ($table.isMakeConditionQueryPlainListManualOrder())
-
     /**
      * Order along the list of manual values. #beforejava8 <br />
      * This function with Union is unsupported! <br />
@@ -1642,9 +1645,16 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         manualOrderBean.acceptOrderValueList(orderValueList);
         withManualOrder(manualOrderBean);
     }
+
+#end
+#if ($table.isCompatibleConditionBeanFromToOneSideAllowed())
+    @Override
+    protected void filterFromToOption(FromToOption option) {
+        option.allowOneSide();
+    }
+
 #end
 #if ($database.isAvailableJodaTimeEntity())
-
     protected Date toUtilDate(Object date) {
         if (date != null && date instanceof ReadablePartial) {
             return new Date(((ReadablePartial) date).toDateTime(null).getMillis());
@@ -1653,15 +1663,26 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         }
         return DfTypeUtil.toDate(date);
     }
-#end
-#if ($table.isCompatibleConditionBeanFromToOneSideAllowed())
+
+    protected java.sql.Timestamp toTimestamp(Object date) {
+        if (date != null && date instanceof ReadablePartial) {
+            return new java.sql.Timestamp(((ReadablePartial) date).toDateTime(null).getMillis());
+        } else if (date != null && date instanceof ReadableInstant) {
+            return new java.sql.Timestamp(((ReadableInstant) date).getMillis());
+        }
+        return DfTypeUtil.toTimestamp(date);
+    }
 
     @Override
-    protected void filterFromToOption(FromToOption option) {
-        option.allowOneSide();
+    protected Object filterFromToRegisteredDate(Date date, String columnDbName) {
+        if (date instanceof java.sql.Timestamp) {
+            return LocalDateTime.fromDateFields(date);
+        } else { // basically pure Date
+            return LocalDate.fromDateFields(date);
+        }
     }
-#end
 
+#end
     // ===================================================================================
     //                                                                       Very Internal
     //                                                                       =============
@@ -1669,6 +1690,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         return new ${myConditionBeanClassName}();
     }
     // very internal (for suppressing warn about 'Not Use Import')
+    protected String xabUDT() { return Date.class.getName(); }
     protected String xabCQ() { return ${myConditionQueryClassName}.class.getName(); }
     protected String xabLSO() { return LikeSearchOption.class.getName(); }
     protected String xabSSQS() { return HpSSQSetupper.class.getName(); }
