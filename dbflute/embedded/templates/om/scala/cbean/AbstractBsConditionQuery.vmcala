@@ -16,7 +16,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCQ};
 #set ($myClassName = "${myAbstractBaseConditionQueryClassName}")
 
-import scala.collection.immutable._;
+import scala.collection.immutable;
 import scala.collection.JavaConverters._;
 
 import java.util.Collection;
@@ -1636,7 +1636,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         return immutable.List.fromArray(javaList.toArray()).asInstanceOf[immutable.List[ENTITY]];
     }
 
-    protected def toMutableValueCollectionImplicitly[SCALA, JAVA](ls: List[SCALA]): Collection[JAVA] =
+    protected def toMutableValueCollectionImplicitly[SCALA, JAVA](ls: immutable.List[SCALA]): Collection[JAVA] =
     { if (ls != null) { ls.map(_.asInstanceOf[JAVA]).asJava } else { null } }
 
     protected def toScalaQDRFunction[CB <: ConditionBean](function: HpQDRFunction[CB]): ScrHpQDRFunction[CB] =

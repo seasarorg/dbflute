@@ -276,7 +276,7 @@ public class ${glDBFluteConfig} {
 #if ($database.isCompatibleConditionBeanOldNamingCheckInvalid())
 
     public void setInvalidQueryChecked(boolean invalidQueryChecked) { // for compatible
-        setNullOrEmptyQueryAllowed(invalidQueryChecked);
+        setNullOrEmptyQueryAllowed(!invalidQueryChecked);
     }
 #end
 
