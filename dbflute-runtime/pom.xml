@@ -43,18 +43,18 @@
 	</issueManagement>
 	<mailingLists>
 		<mailingList>
-			<name>Seasar-user</name>
-			<subscribe>https://www.seasar.org/mailman/listinfo/seasar-user</subscribe>
-			<unsubscribe>https://www.seasar.org/mailman/listinfo/seasar-user</unsubscribe>
-			<post>seasar-user@ml.seasar.org</post>
-			<archive>https://www.seasar.org/mailman/listinfo/seasar-user</archive>
+			<name>dbflute-user</name>
+			<subscribe>https://groups.google.com/forum/#!forum/dbflute</subscribe>
+			<unsubscribe>https://groups.google.com/forum/#!forum/dbflute</unsubscribe>
+			<post>dbflute@googlegroups.com</post>
+			<archive>https://groups.google.com/forum/#!forum/dbflute</archive>
 		</mailingList>
 	</mailingLists>
 
 	<scm>
-		<connection>scm:svn:https://www.seasar.org/svn/dbflute/trunk/dbflute-runtime/</connection>
-		<developerConnection>scm:svn:https://www.seasar.org/svn/dbflute/trunk/dbflute-runtime/</developerConnection>
-		<url>http://svn.seasar.org/browse/?root=dbflute</url>
+		<url>https://github.com/seasarorg/dbflute</url>
+		<connection>scm:git:https://github.com/seasarorg/dbflute.git</connection>
+		<developerConnection>scm:git:https://github.com/seasarorg/dbflute.git</developerConnection>
 	</scm>
 
 	<build>

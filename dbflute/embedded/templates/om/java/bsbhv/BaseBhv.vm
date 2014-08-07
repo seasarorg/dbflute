@@ -1626,15 +1626,4 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     protected Class<? extends ${myExtendedObjectClassName}> typeOfSelectedEntity() { return ${myExtendedObjectClassName}.class; }
     protected Class<${myExtendedObjectClassName}> typeOfHandlingEntity() { return ${myExtendedObjectClassName}.class; }
     protected Class<${myConditionBeanClassName}> typeOfHandlingConditionBean() { return ${myConditionBeanClassName}.class; }
-#if ($table.isWritable())
-    @SuppressWarnings("unchecked")
-    protected InsertOption<${myConditionBeanClassName}> downcast(InsertOption<? extends ConditionBean> op) { return (InsertOption<${myConditionBeanClassName}>)op; }
-    @SuppressWarnings("unchecked")
-    protected UpdateOption<${myConditionBeanClassName}> downcast(UpdateOption<? extends ConditionBean> op) { return (UpdateOption<${myConditionBeanClassName}>)op; }
-    @SuppressWarnings("unchecked")
-    protected DeleteOption<${myConditionBeanClassName}> downcast(DeleteOption<? extends ConditionBean> op) { return (DeleteOption<${myConditionBeanClassName}>)op; }
-    @SuppressWarnings("unchecked")
-    protected QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> downcast(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> sp)
-    { return (QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}>)sp; }
-#end
 }
