@@ -57,7 +57,7 @@ public class DfFlutistLog4JLogSystem extends Log4JLogChute {
 
             final DfFlutistRollingFileAppender appender = createOriginalRollingFileAppender(logfile);
             appender.setMaxBackupIndex(2);
-            appender.setMaximumFileSize(100000);
+            appender.setMaximumFileSize(300000);
             logger.addAppender(appender);
 
             log(0, ""); // as begin mark.
