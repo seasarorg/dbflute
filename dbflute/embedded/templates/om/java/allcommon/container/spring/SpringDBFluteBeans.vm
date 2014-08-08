@@ -18,6 +18,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
     ${database.DBFluteBeansDefaultAttribute}>
+
     <!-- The components of DBFlute Runtime. -->
     <bean id="${database.DBFluteInitializerComponentName}" class="${database.DBFluteInitializerClass}">
         <constructor-arg index="0"><ref bean="${database.DBFluteBeansDataSourceName}"/></constructor-arg>

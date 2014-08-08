@@ -220,7 +220,7 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
 
     public String getDBFluteBeansDefaultAttribute() { // Java Only
         final String prop = getProperty("dbfluteBeansDefaultAttribute", null);
-        return prop != null ? " " + prop : "";
+        return prop != null ? prop : "";
     }
 
     // ===================================================================================
