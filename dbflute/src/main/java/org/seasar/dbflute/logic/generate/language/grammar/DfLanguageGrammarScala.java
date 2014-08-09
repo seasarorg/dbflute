@@ -81,9 +81,6 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
     // ===================================================================================
     //                                                              Programming Expression
     //                                                              ======================
-    // #pending jflute Scala's collections
-    // #pending jflute same as Java for now
-
     public String buildVariableSimpleDefinition(String type, String variable) {
         return variable + ": " + type;
     }
@@ -111,11 +108,11 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
     }
 
     public String buildGenericListClassName(String element) {
-        return _grammarJava.buildGenericListClassName(element);
+        return "List" + buildGenericOneClassHint(element);
     }
 
     public String buildGenericMapListClassName(String key, String value) {
-        return _grammarJava.buildGenericMapListClassName(key, value);
+        return buildGenericListClassName("Map" + buildGenericTwoClassHint(key, value));
     }
 
     public String buildGenericOneClassHint(String first) {
@@ -148,7 +145,14 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
 
     public String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber,
             boolean toBoolean) {
-        return _grammarJava.buildCDefElementValue(cdefBase, propertyName, valueType, toNumber, toBoolean);
+        final String cdefCode = cdefBase + ".code";
+        if (toNumber) {
+            return "toNumber(" + cdefCode + ", classOf[" + valueType + "])";
+        } else if (toBoolean) {
+            return "toBoolean(" + cdefCode + ")";
+        } else {
+            return cdefCode;
+        }
     }
 
     public String buildOneLinerListNewBackStage(List<String> elementList) {

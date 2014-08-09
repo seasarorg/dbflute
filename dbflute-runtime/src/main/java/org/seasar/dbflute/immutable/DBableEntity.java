@@ -20,7 +20,7 @@ package org.seasar.dbflute.immutable;
  * The word 'DB-able' means entity that can be DBFlute handling.
  * @param <IMMU> The type of immutable entity corresponding the DB-able entity.
  * @author jflute
- * @since 1.0.6A (2014/06/15 Sunday)
+ * @since 1.0.5J (2014/06/15 Sunday)
  */
 public interface DBableEntity<IMMU> {
 

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -110,7 +111,11 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
     }
 
     public String switchParameterBeanTestValueType(String plainTypeName) {
-        return _mappingJava.switchParameterBeanTestValueType(plainTypeName);
+        if (Srl.equalsPlain(plainTypeName, "boolean")) {
+            return "Boolean";
+        } else {
+            return plainTypeName;
+        }
     }
 
     public String convertToImmutableJavaNativeType(String javaNative) {
@@ -125,13 +130,13 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
         return converted;
     }
 
-    public String convertToImmutableJavaNativeDefaultValue(String immutablePropertyNative) {
+    public String convertToImmutableJavaNativeDefaultValue(String immutableJavaNative) {
         final String defaultValue;
-        if (SCALA_NATIVE_INTEGER.equals(immutablePropertyNative) || SCALA_NATIVE_LONG.equals(immutablePropertyNative)) {
+        if (SCALA_NATIVE_INTEGER.equals(immutableJavaNative) || SCALA_NATIVE_LONG.equals(immutableJavaNative)) {
             defaultValue = "0";
-        } else if (SCALA_NATIVE_BIG_DECIMAL.equals(immutablePropertyNative)) {
+        } else if (SCALA_NATIVE_BIG_DECIMAL.equals(immutableJavaNative)) {
             defaultValue = "0";
-        } else if (SCALA_NATIVE_BOOLEAN.equals(immutablePropertyNative)) {
+        } else if (SCALA_NATIVE_BOOLEAN.equals(immutableJavaNative)) {
             defaultValue = "false";
         } else {
             defaultValue = "null";
@@ -139,8 +144,7 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
         return defaultValue;
     }
 
-    public String convertToJavaNativeValueFromImmutable(String immutablePropertyNative, String javaNative,
-            String variable) {
+    public String convertToJavaNativeValueFromImmutable(String immutableJavaNative, String javaNative, String variable) {
         // quit because variable might have orNull
         //if (DfLanguageTypeMappingScala.SCALA_NATIVE_INTEGER.equals(immutableJavaNative)) {
         //    return "int2Integer(" + variable + ")";
@@ -148,10 +152,10 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
         //if (DfLanguageTypeMappingScala.SCALA_NATIVE_LONG.equals(immutableJavaNative)) {
         //    return "long2Long(" + variable + ")";
         //}
-        if (SCALA_NATIVE_BIG_DECIMAL.equals(immutablePropertyNative)) {
+        if (SCALA_NATIVE_BIG_DECIMAL.equals(immutableJavaNative)) {
             return variable + ".asInstanceOf[" + javaNative + "]";
         }
-        if (SCALA_NATIVE_RICH_LOCAL_DATE.equals(immutablePropertyNative)) {
+        if (SCALA_NATIVE_RICH_LOCAL_DATE.equals(immutableJavaNative)) {
             return variable + ".asInstanceOf[" + javaNative + "]";
         }
         return variable;

@@ -119,11 +119,11 @@ public class DfLanguageGrammarJava implements DfLanguageGrammar {
     }
 
     public String buildGenericListClassName(String element) {
-        return "List<" + element + ">";
+        return "List" + buildGenericOneClassHint(element);
     }
 
     public String buildGenericMapListClassName(String key, String value) {
-        return "List<Map<" + key + ", " + value + ">>";
+        return buildGenericListClassName("Map" + buildGenericTwoClassHint(key, value));
     }
 
     public String buildGenericOneClassHint(String first) {

@@ -2606,7 +2606,8 @@ public class Column {
     //}
     //
     //protected String buildOptionalExpression(String javaNative) {
-    //    return getEntityOptionalPropertyClassSimpleName() + "<" + javaNative + ">";
+    //    final DfLanguageGrammar grammar = getLanguageDependency().getLanguageGrammar();
+    //    return getEntityOptionalPropertyClassSimpleName() + grammar.buildGenericOneClassHint(javaNative);
     //}
 
     // ===================================================================================

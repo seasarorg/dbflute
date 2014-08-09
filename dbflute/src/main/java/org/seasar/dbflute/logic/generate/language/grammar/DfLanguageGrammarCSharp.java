@@ -117,11 +117,11 @@ public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
     }
 
     public String buildGenericListClassName(String element) {
-        return "IList<" + element + ">";
+        return "IList" + buildGenericOneClassHint(element);
     }
 
     public String buildGenericMapListClassName(String key, String value) {
-        return "IList<IDictionary<" + key + ", " + value + ">>";
+        return buildGenericListClassName("IDictionary" + buildGenericTwoClassHint(key, value));
     }
 
     public String buildGenericOneClassHint(String first) {

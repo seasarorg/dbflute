@@ -109,4 +109,8 @@ public class DfLanguageImplStyleScala implements DfLanguageImplStyle {
     public boolean isEntityDerivedMappable() {
         return true;
     }
+
+    public boolean isOutsideSqlCursorGenericVoidable() {
+        return false;
+    }
 }

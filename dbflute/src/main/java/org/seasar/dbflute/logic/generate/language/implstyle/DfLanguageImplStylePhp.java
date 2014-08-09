@@ -94,4 +94,8 @@ public class DfLanguageImplStylePhp implements DfLanguageImplStyle {
     public boolean isEntityDerivedMappable() {
         return false;
     }
+
+    public boolean isOutsideSqlCursorGenericVoidable() {
+        return false;
+    }
 }

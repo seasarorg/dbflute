@@ -58,20 +58,18 @@ class ${myClassName} {
 #end
 #end
 
-    protected def vt(type: Class[_]): ValueType = {
-        return TnValueTypes.getValueType(type);
+    protected def vt(tp: Class[_]): ValueType = {
+        return TnValueTypes.getValueType(tp);
     }
 
-    protected def vt(type: Class[_], name: String): ValueType = {
+    protected def vt(tp: Class[_], name: String): ValueType = {
         val valueType: ValueType = TnValueTypes.getPluginValueType(name);
-        return valueType != null ? valueType : vt(type);
+        return if (valueType != null) { valueType } else { vt(tp) };
     }
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${myClassName}() {
-    }
 
     // ===================================================================================
     //                                                                             Prepare
@@ -103,7 +101,7 @@ class ${myClassName} {
      * @return Is exist next result.
      * @throws SQLException
      */
-    public boolean next() throws SQLException {
+    def next(): Boolean = {
         return _rs.next();
     }
 
@@ -119,8 +117,8 @@ class ${myClassName} {
      * @return The value of ${col.uncapitalisedJavaName}. (NullAllowed)
      * @throws java.sql.SQLException
      */
-    public ${col.javaNative} get${col.javaName}() throws SQLException {
-        return .asInstanceOf[${col.javaNative})_vt${col.javaName}.getValue(_rs, DB_NAME_${col.name}];
+    def get${col.javaName}(): ${col.javaNative} = {
+        return _vt${col.javaName}.getValue(_rs, DB_NAME_${col.name}).asInstanceOf[${col.javaNative}];
     }
 
 #end

@@ -97,15 +97,6 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     /** The factory of outside-SQL executor. (NotNull) */
     protected final OutsideSqlExecutorFactory _outsideSqlExecutorFactory;
 
-    /** Does it remove block comments from the SQL? */
-    protected boolean _removeBlockComment;
-
-    /** Does it remove line comments from the SQL? */
-    protected boolean _removeLineComment;
-
-    /** Does it format the SQL? */
-    protected boolean _formatSql;
-
     /** The configuration of statement. (NullAllowed) */
     protected StatementConfig _statementConfig;
 

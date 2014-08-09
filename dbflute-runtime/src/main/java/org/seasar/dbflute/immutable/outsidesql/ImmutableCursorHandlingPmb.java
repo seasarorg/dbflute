@@ -24,7 +24,7 @@ import org.seasar.dbflute.outsidesql.typed.CursorHandlingPmb;
  * @param <IMMU> The type of immutable entity (may be scalar) for result.
  * @param <DBLE> The type of entity (may be scalar) for result.
  * @author jflute
- * @since 1.0.6A (2014/06/16 Monday)
+ * @since 1.0.5J (2014/06/16 Monday)
  */
 public interface ImmutableCursorHandlingPmb<BEHAVIOR, IMMU, DBLE extends DBableEntity<IMMU>> extends
         CursorHandlingPmb<BEHAVIOR, DBLE> {

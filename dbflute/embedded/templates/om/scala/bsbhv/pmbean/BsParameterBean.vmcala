@@ -69,9 +69,7 @@ import ${database.libraryEntityPackage}._;
 import ${glPackageExtendedEntity}._;
 #end
 #end
-#if ($database.isPmbMetaDataTypedReturnCustomizeEntityPmb($pmbClassName) || $database.isPmbMetaDataProcedureRefCustomizeEntity($pmbClassName))
 import ${glPackageExtendedCustomizeEntity}._;
-#end
 
 /**
  * The base class of companion object defined at extended class to create parameter-bean.
@@ -171,7 +169,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 
 #else
     /** The parameter of ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}. */
-    protected var ${variableName}: ${propertyType} = null;
+    protected var ${variableName}: ${propertyType} =#if ($propertyType == "Boolean") false#else null#end;
 
 #end
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
@@ -338,7 +336,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
     protected def assertLikeSearchOptionValid(name: String, option: LikeSearchOption): Unit = {
-        if (option == null) {
+        if (option == null) { // relic
             val msg: String = "The like-search option is required!";
             throw new RequiredOptionNotFoundException(msg);
         }
@@ -349,14 +347,22 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
         }
     }
 
+    protected def callbackLSOP(optionCall: (ScrLikeSearchOption) => Unit): LikeSearchOption =
+    { val op = createLikeSearchOption(); optionCall(op); return op; }
+    protected def createLikeSearchOption(): ScrLikeSearchOption = { new ScrLikeSearchOption() }
+
 #end
 #if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
     protected def assertFromToOptionValid(name: String, option: FromToOption): Unit = {
-        if (option == null) {
+        if (option == null) { // relic
             val msg: String = "The from-to option is required!";
             throw new RequiredOptionNotFoundException(msg);
         }
     }
+
+    protected def callbackFTOP(optionCall: (ScrFromToOption) => Unit): FromToOption =
+    { val op = createFromToOption(); optionCall(op); return op; }
+    protected def createFromToOption(): ScrFromToOption = { new ScrFromToOption() }
 
 #end
     // ===================================================================================
@@ -412,7 +418,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
     def get${database.initCap($propertyName)}(): ${propertyType} = {
 #if ($propertyType.endsWith("String"))
 #if ($database.isShortCharHandlingValid() && $database.isPmbMetaDataPropertyRefColumnChar($pmbClassName, $propertyName))
-        val filtered: String = filterStringParameter(${variableName});
+        var filtered: String = filterStringParameter(${variableName});
         filtered = handleShortChar("${propertyName}", filtered, ${database.getPmbMetaDataPropertyRefSize($pmbClassName, $propertyName)});
         return filtered;
 #else
@@ -447,12 +453,13 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
 #end
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
-     * @param ${argumentName}Option The option of likeSearch for ${propertyName} which is NOT split mode. (NotNull)
+     * @param optionCall The callback for option of likeSearch for ${propertyName} which is NOT split mode. (NotNull)
      */
-    def set${database.initCap($propertyName)}(${argumentName}: ${propertyType}, ${argumentName}Option: LikeSearchOption): Unit = {
-        assertLikeSearchOptionValid("${argumentName}Option", ${argumentName}Option);
+    def set${database.initCap($propertyName)}(${argumentName}: ${propertyType})(optionCall: (ScrLikeSearchOption) => Unit): Unit = {
+        val option = callbackLSOP(optionCall);
+        assertLikeSearchOptionValid("option for ${argumentName}", option);
         ${variableName} = ${argumentName};
-        ${variableName}InternalLikeSearchOption = ${argumentName}Option;
+        ${variableName}InternalLikeSearchOption = option;
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionPrefixSearch($pmbClassName, $propertyName))
@@ -466,7 +473,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
      */
     def set${database.initCap($propertyName)}_PrefixSearch(${argumentName}: ${propertyType}): Unit = {
         ${variableName} = ${argumentName};
-        ${variableName}InternalLikeSearchOption = new LikeSearchOption().likePrefix();
+        ${variableName}InternalLikeSearchOption = createLikeSearchOption().likePrefix();
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionContainSearch($pmbClassName, $propertyName))
@@ -480,7 +487,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
      */
     def set${database.initCap($propertyName)}_ContainSearch(${argumentName}: ${propertyType}): Unit = {
         ${variableName} = ${argumentName};
-        ${variableName}InternalLikeSearchOption = new LikeSearchOption().likeContain();
+        ${variableName}InternalLikeSearchOption = createLikeSearchOption().likeContain();
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionSuffixSearch($pmbClassName, $propertyName))
@@ -494,7 +501,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
      */
     def set${database.initCap($propertyName)}_SuffixSearch(${argumentName}: ${propertyType}): Unit = {
         ${variableName} = ${argumentName};
-        ${variableName}InternalLikeSearchOption = new LikeSearchOption().likeSuffix();
+        ${variableName}InternalLikeSearchOption = createLikeSearchOption().likeSuffix();
     }
 #end
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
@@ -518,9 +525,9 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
      */
     def set${database.initCap($propertyName)}_FromDate(${argumentName}: ${propertyType}): Unit = {
 #if ($database.isAvailableJodaTimeLocalDateEntity())
-        ${variableName} = toLocalDate(new FromToOption().compareAsDate().filterFromDate(toUtilDate(${argumentName})), ${propertyType}.class);
+        ${variableName} = toLocalDate(createFromToOption().compareAsDate().filterFromDate(toUtilDate(${argumentName})), classOf[${propertyType}]);
 #else
-        ${variableName} = new FromToOption().compareAsDate().filterFromDate(${argumentName});
+        ${variableName} = createFromToOption().compareAsDate().filterFromDate(${argumentName});
 #end
     }
 #end
@@ -532,14 +539,15 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
 #end
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
-     * @param ${argumentName}Option The option of from-to scope for ${propertyName}. (NotNull)
+     * @param optionCall The callback for option of from-to scope for ${propertyName}. (NotNull)
      */
-    def set${database.initCap($propertyName)}_FromDate(${argumentName}: ${propertyType}, ${argumentName}Option: FromToOption): Unit = {
-        assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
+    def set${database.initCap($propertyName)}_FromDate(${argumentName}: ${propertyType})(optionCall: (ScrFromToOption) => Unit): Unit = {
+        val option = callbackFTOP(optionCall);
+        assertFromToOptionValid("option for ${argumentName}", option);
 #if ($database.isAvailableJodaTimeLocalDateEntity())
-        ${variableName} = toLocalDate(${argumentName}Option.filterFromDate(toUtilDate(${argumentName})), ${propertyType}.class);
+        ${variableName} = toLocalDate(option.filterFromDate(toUtilDate(${argumentName})), classOf[${propertyType}]);
 #else
-        ${variableName} = ${argumentName}Option.filterFromDate(${argumentName});
+        ${variableName} = option.filterFromDate(${argumentName});
 #end
     }
 #end
@@ -554,9 +562,9 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
      */
     def set${database.initCap($propertyName)}_ToDate(${argumentName}: ${propertyType}): Unit = {
 #if ($database.isAvailableJodaTimeLocalDateEntity())
-        ${variableName} = toLocalDate(new FromToOption().compareAsDate().filterToDate(toUtilDate(${argumentName})), ${propertyType}.class);
+        ${variableName} = toLocalDate(createFromToOption().compareAsDate().filterToDate(toUtilDate(${argumentName})), classOf[${propertyType}]);
 #else
-        ${variableName} = new FromToOption().compareAsDate().filterToDate(${argumentName});
+        ${variableName} = createFromToOption().compareAsDate().filterToDate(${argumentName});
 #end
     }
 #end
@@ -568,14 +576,15 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
 #end
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
-     * @param ${argumentName}Option The option of from-to scope for ${propertyName}. (NotNull)
+     * @param optionCall The callback for option of from-to scope for ${propertyName}. (NotNull)
      */
-    def set${database.initCap($propertyName)}_ToDate(${argumentName}: ${propertyType}, ${argumentName}Option: FromToOption): Unit = {
-        assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
+    def set${database.initCap($propertyName)}_ToDate(${argumentName}: ${propertyType})(optionCall: (ScrFromToOption) => Unit): Unit = {
+        val option = callbackFTOP(optionCall);
+        assertFromToOptionValid("option for ${argumentName}", option);
 #if ($database.isAvailableJodaTimeLocalDateEntity())
-        ${variableName} = toLocalDate(${argumentName}Option.filterToDate(toUtilDate(${argumentName})), ${propertyType}.class);
+        ${variableName} = toLocalDate(option.filterToDate(toUtilDate(${argumentName})), classOf[${propertyType}]);
 #else
-        ${variableName} = ${argumentName}Option.filterToDate(${argumentName});
+        ${variableName} = option.filterToDate(${argumentName});
 #end
     }
 #end

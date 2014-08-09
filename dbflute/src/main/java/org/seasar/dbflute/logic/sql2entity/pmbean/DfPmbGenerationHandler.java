@@ -27,6 +27,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.cbean.SimplePagingBean;
 import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
+import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -93,35 +94,28 @@ public class DfPmbGenerationHandler {
 
     public String getInterfaceDefinition(String className) {
         assertArgumentPmbMetaDataClassName(className);
-        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
-        if (!lang.getLanguageImplStyle().isTypedParameterBeanEnabled()) {
+        final DfLanguageImplStyle implStyle = getLanguageImplStyle();
+        if (!implStyle.isTypedParameterBeanEnabled()) {
             return "";
         }
-        final boolean immutable = lang.getLanguageImplStyle().isMakeImmutableEntity();
+        final boolean immutable = implStyle.isMakeImmutableEntity();
         final String immuPrefix = immutable ? "Immutable" : "";
-        final DfLanguageGrammar grammar = lang.getLanguageGrammar();
+        final DfLanguageGrammar grammar = getLanguageGrammar();
         final String delimiter = grammar.getImplementsDelimiter();
         final StringBuilder sb = new StringBuilder();
         if (isTypedParameterBean(className)) {
             final String bhvType = getBehaviorClassName(className);
-            final String entityGenericDef;
-            {
-                final String customizeType;
-                final String immuType;
-                if (isRelatedToCustomizeEntity(className)) {
-                    customizeType = getCustomizeEntityType(className);
-                    immuType = immutable ? getImmutableCustomizeEntityType(className) : null;
-                } else { // these are no used
-                    customizeType = null;
-                    immuType = null;
-                }
-                if (immutable) { // e.g. Scala, ImmutableListHandlingPmb<BEHAVIOR, IMMU, DBLE>
-                    entityGenericDef = grammar.buildGenericThreeClassHint(bhvType, immuType, customizeType);
-                } else { // normally here in Java
-                    entityGenericDef = grammar.buildGenericTwoClassHint(bhvType, customizeType);
-                }
+            final String customizeType;
+            final String immuType;
+            if (isRelatedToCustomizeEntity(className)) {
+                customizeType = getCustomizeEntityType(className);
+                immuType = immutable ? getImmutableCustomizeEntityType(className) : null;
+            } else { // these are no used
+                customizeType = null;
+                immuType = null;
             }
-            final String voidResultGenericDef = grammar.buildGenericTwoClassHint(bhvType, "Void");
+            final String entityGenericDef = prepareEntityGenericDef(immutable, bhvType, customizeType, immuType);
+            final String voidResultGenericDef = prepareVoidResultGenericDef(immutable, bhvType, customizeType, immuType);
             final String noResultGenericDef = grammar.buildGenericOneClassHint(bhvType);
 
             // several typed interfaces can be implemented
@@ -176,6 +170,36 @@ public class DfPmbGenerationHandler {
             implementsPrefix = " " + implementsMark + " ";
         }
         return implementsPrefix + sb.toString();
+    }
+
+    protected String prepareEntityGenericDef(boolean immutable, String bhvType, String customizeType, String immuType) {
+        final DfLanguageGrammar grammar = getLanguageGrammar();
+        final String entityGenericDef;
+        {
+            if (immutable) { // e.g. Scala, ImmutableListHandlingPmb<BEHAVIOR, IMMU, DBLE>
+                entityGenericDef = grammar.buildGenericThreeClassHint(bhvType, immuType, customizeType);
+            } else { // normally here in Java
+                entityGenericDef = grammar.buildGenericTwoClassHint(bhvType, customizeType);
+            }
+        }
+        return entityGenericDef;
+    }
+
+    protected String prepareVoidResultGenericDef(boolean immutable, String bhvType, String customizeType,
+            String immuType) {
+        // it works when not use void in Java but not need it and also for compatibility 
+        // (Scala cannot use void in the generic so customize this logic here)
+        final DfLanguageGrammar grammar = getLanguageGrammar();
+        final boolean voidable = isOutsideSqlCursorGenericVoidable(); // e.g. true if Java
+        final String voidResultGenericDef;
+        if (immutable) {
+            final String immuDef = voidable ? "Void" : immuType;
+            voidResultGenericDef = grammar.buildGenericThreeClassHint(bhvType, immuDef, customizeType);
+        } else {
+            final String entity = voidable ? "Void" : customizeType;
+            voidResultGenericDef = grammar.buildGenericTwoClassHint(bhvType, entity);
+        }
+        return voidResultGenericDef;
     }
 
     public boolean hasSuperClassDefinition(String className) {
@@ -615,6 +639,18 @@ public class DfPmbGenerationHandler {
 
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
+    }
+
+    protected DfLanguageGrammar getLanguageGrammar() {
+        return getBasicProperties().getLanguageDependency().getLanguageGrammar();
+    }
+
+    protected DfLanguageImplStyle getLanguageImplStyle() {
+        return getBasicProperties().getLanguageDependency().getLanguageImplStyle();
+    }
+
+    protected boolean isOutsideSqlCursorGenericVoidable() {
+        return getLanguageImplStyle().isOutsideSqlCursorGenericVoidable();
     }
 
     protected DfClassificationProperties getClassificationProperties() {

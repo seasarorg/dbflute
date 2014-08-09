@@ -98,4 +98,8 @@ public class DfLanguageImplStyleCSharp implements DfLanguageImplStyle {
     public boolean isEntityDerivedMappable() {
         return false;
     }
+
+    public boolean isOutsideSqlCursorGenericVoidable() {
+        return true;
+    }
 }

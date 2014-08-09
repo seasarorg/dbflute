@@ -90,7 +90,7 @@ public class DfLanguageTypeMappingCSharp implements DfLanguageTypeMapping {
     //                                                                JDBC Type Adjustment
     //                                                                ====================
     public String getSequenceJavaNativeType() {
-        return "int?"; // #pending jflute long?
+        return "int?"; // #future jflute long?
     }
 
     public String getDefaultNumericJavaNativeType() {

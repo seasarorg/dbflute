@@ -798,14 +798,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                      Generic Helper
     //                                                                      ==============
     // It's not property!
-    public String filterGenericsString(String genericsString) {
-        return "<" + genericsString + ">";
-    }
-
-    public String filterGenericsDowncast(String genericsDowncast) {
-        return "(" + genericsDowncast + ")";
-    }
-
     public String filterGenericsParamOutput(String variableName, String description) {
         return filterGenericsGeneralOutput("@param " + variableName + " " + description);
     }

@@ -21,7 +21,7 @@ import org.seasar.dbflute.outsidesql.typed.ExecuteHandlingPmb;
  * The parameter-bean for immutable execute handling.
  * @param <BEHAVIOR> The type of a corresponding behavior.
  * @author jflute
- * @since 1.0.6A (2014/06/16 Monday)
+ * @since 1.0.5J (2014/06/16 Monday)
  */
 public interface ImmutableExecuteHandlingPmb<BEHAVIOR> extends ExecuteHandlingPmb<BEHAVIOR> {
 }

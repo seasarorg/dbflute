@@ -21,7 +21,7 @@ package org.seasar.dbflute.logic.generate.language.pkgstyle;
  */
 public class DfLanguagePropertyPackageResolverScala extends DfLanguagePropertyPackageResolver {
 
-    protected final DfLanguagePropertyPackageResolver _resolverJava = new DfLanguagePropertyPackageResolverJava() {
+    protected final DfLanguagePropertyPackageResolverJava _resolverJava = new DfLanguagePropertyPackageResolverJava() {
 
         @Override
         protected String getListPackage() {
@@ -59,7 +59,6 @@ public class DfLanguagePropertyPackageResolverScala extends DfLanguagePropertyPa
     };
 
     protected String processLanguageType(String typeName, boolean exceptUtil) {
-        // #pending jflute same as Java for now
         return _resolverJava.processLanguageType(typeName, exceptUtil);
     }
 }

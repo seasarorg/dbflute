@@ -652,9 +652,6 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
     protected def callbackFTOP(optionCall: (FromToOption) => Unit): FromToOption =
     { val op = createFromToOption(); optionCall(op); return op; }
     protected def createFromToOption(): FromToOption = { new FromToOption() }
-
-    protected def toJavaType(value: PARAMETER): PARAMETER =
-    { value } // #pending convert to java type
 }
 
 /* _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */

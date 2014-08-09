@@ -27,6 +27,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
+import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
@@ -406,7 +407,8 @@ public class DfPmbMetaData {
             String msg = "This parameter-bean was not related to customize entity.";
             throw new IllegalStateException(msg);
         }
-        if (_customizeEntityInfo.isCursorHandling() && !isTypedPagingHandling()) { // pure cursor
+        final boolean voidable = isOutsideSqlCursorGenericVoidable();
+        if (voidable && _customizeEntityInfo.isCursorHandling() && !isTypedPagingHandling()) { // pure cursor
             return "Void";
         }
         if (_customizeEntityInfo.isScalarHandling()) {
@@ -472,7 +474,8 @@ public class DfPmbMetaData {
             String msg = "This parameter-bean was not related to immutable customize entity.";
             throw new IllegalStateException(msg);
         }
-        if (_customizeEntityInfo.isCursorHandling() && !isTypedPagingHandling()) { // pure cursor
+        final boolean voidable = isOutsideSqlCursorGenericVoidable();
+        if (voidable && _customizeEntityInfo.isCursorHandling() && !isTypedPagingHandling()) { // pure cursor
             return "Void";
         }
         if (_customizeEntityInfo.isScalarHandling()) {
@@ -1180,6 +1183,14 @@ public class DfPmbMetaData {
 
     protected DfLanguageGrammar getLanguageGrammar() {
         return getBasicProperties().getLanguageDependency().getLanguageGrammar();
+    }
+
+    protected DfLanguageImplStyle getLanguageImplStyle() {
+        return getBasicProperties().getLanguageDependency().getLanguageImplStyle();
+    }
+
+    protected boolean isOutsideSqlCursorGenericVoidable() {
+        return getLanguageImplStyle().isOutsideSqlCursorGenericVoidable();
     }
 
     protected DfOutsideSqlProperties getOutsideSqlProperties() {

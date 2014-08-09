@@ -24,7 +24,7 @@ import org.seasar.dbflute.outsidesql.typed.ListHandlingPmb;
  * @param <IMMU> The type of immutable entity (may be scalar) for result.
  * @param <DBLE> The type of entity (may be scalar) for result.
  * @author jflute
- * @since 1.0.6A (2014/06/15 Sunday)
+ * @since 1.0.5J (2014/06/15 Sunday)
  */
 public interface ImmutableListHandlingPmb<BEHAVIOR, IMMU, DBLE extends DBableEntity<IMMU>> extends
         ListHandlingPmb<BEHAVIOR, DBLE> {

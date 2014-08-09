@@ -244,7 +244,7 @@ public class DfParameterBeanResolver {
                 throw new IllegalStateException(msg);
             }
             // ParameterBean has the "import" clause of language-embedded utility
-            final String typeName = resolvePackageNameExceptUtil(propertyDef.substring(0, nameIndex).trim());
+            final String typeName = prepareDefinedPropertyType(propertyDef, nameIndex);
             final String propertyName = propertyDef.substring(nameIndex + nameDelimiter.length()).trim();
             if (propertyNameTypeMap.containsKey(propertyName)) {
                 // means the auto-detected property is found,
@@ -262,6 +262,10 @@ public class DfParameterBeanResolver {
             final Map<String, String> bqpElementMap = bqpMap.values().iterator().next();
             pmbMetaData.setBqpElementMap(bqpElementMap);
         }
+    }
+
+    protected String prepareDefinedPropertyType(String propertyDef, int nameIndex) {
+        return switchPlainTypeName(resolvePackageNameExceptUtil(propertyDef.substring(0, nameIndex).trim()));
     }
 
     protected String resolvePackageNameExceptUtil(String typeName) {

@@ -60,5 +60,7 @@ public interface DfLanguageImplStyle {
 
     boolean isCompatibleBeforeJava8();
 
-    boolean isEntityDerivedMappable();
+    boolean isEntityDerivedMappable(); // as default of DBFlute property
+
+    boolean isOutsideSqlCursorGenericVoidable();
 }

@@ -33,7 +33,7 @@ abstract class ${myClassName} extends CursorHandler {
      * @return The result object of handling process. (NullAllowed)
      * @throws SQLException
      */
-    public Object handle(ResultSet rs) throws SQLException {
+    def handle(rs: ResultSet): Object = {
         return fetchCursor(createTypeSafeCursor(rs));
     }
 
@@ -43,8 +43,8 @@ abstract class ${myClassName} extends CursorHandler {
      * @return The created type-safe cursor. (NotNull)
      * @throws SQLException
      */
-    protected ${myExtendedTypeSafeCursorClassName} createTypeSafeCursor(ResultSet rs) throws SQLException {
-        val cursor: ${myExtendedTypeSafeCursorClassName} = new ${myExtendedTypeSafeCursorClassName}();
+    protected def createTypeSafeCursor(rs: ResultSet): ${myExtendedTypeSafeCursorClassName} = {
+        val cursor = new ${myExtendedTypeSafeCursorClassName}();
         cursor.accept(rs);
         return cursor;
     }
@@ -55,5 +55,5 @@ abstract class ${myClassName} extends CursorHandler {
      * @return The result object of handling process. (NullAllowed)
      * @throws SQLException
      */
-    protected abstract Object fetchCursor(${myExtendedTypeSafeCursorClassName} cursor) throws SQLException;
+    protected def fetchCursor(cursor: ${myExtendedTypeSafeCursorClassName}): Object;
 }
