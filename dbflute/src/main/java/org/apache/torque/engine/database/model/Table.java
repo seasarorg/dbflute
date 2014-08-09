@@ -2053,11 +2053,8 @@ public class Table {
     }
 
     // ===================================================================================
-    //                                                                     Java Definition
-    //                                                                     ===============
-    // -----------------------------------------------------
-    //                                             Java Name
-    //                                             ---------
+    //                                                                           Java Name
+    //                                                                           =========
     protected boolean _needsJavaNameConvert = true;
 
     public void suppressJavaNameConvert() {
@@ -2125,9 +2122,12 @@ public class Table {
         return Srl.initBeansProp(getJavaName());
     }
 
+    // ===================================================================================
+    //                                                                     Base Class Name
+    //                                                                     ===============
     // -----------------------------------------------------
-    //                                       Base Class Name
-    //                                       ---------------
+    //                                                Entity
+    //                                                ------
     public String getBaseEntityClassName() { // mutable entity
         // basically pure name sometimes it has mutable mark
         //  e.g. MEMBER_SERVICE -> BsMemberService (normally)
@@ -2155,14 +2155,25 @@ public class Table {
 
     protected String buildBaseEntityClassName(String symbolPrefix) {
         // there is same logic in old class handler too
-        final String projectPrefix = getDatabase().getProjectPrefix();
-        final String basePrefix = getDatabase().getBasePrefix();
+        final String projectPrefix = getProjectPrefix();
+        final String basePrefix = getBasePrefix();
         final String schemaClassPrefix = getSchemaClassPrefix();
         final String javaName = getJavaName();
         final String baseSuffixForEntity = getDatabase().getBaseSuffixForEntity();
         return projectPrefix + basePrefix + symbolPrefix + schemaClassPrefix + javaName + baseSuffixForEntity;
     }
 
+    protected String getProjectPrefix() {
+        return getBasicProperties().getProjectPrefix();
+    }
+
+    protected String getBasePrefix() {
+        return getBasicProperties().getBasePrefix();
+    }
+
+    // -----------------------------------------------------
+    //                                              Behavior
+    //                                              --------
     public String getBaseDaoClassName() {
         return getPureBaseEntityClassName() + "Dao";
     }
@@ -2185,13 +2196,16 @@ public class Table {
         return isWritable() ? "AbstractBehaviorWritable" : "AbstractBehaviorReadable";
     }
 
+    // -----------------------------------------------------
+    //                                         ConditionBean
+    //                                         -------------
     public String getBaseConditionBeanClassName() {
         return getPureBaseEntityClassName() + "CB";
     }
 
     public String getAbstractBaseConditionQueryClassName() {
-        final String projectPrefix = getBasicProperties().getProjectPrefix();
-        final String basePrefix = getBasicProperties().getBasePrefix();
+        final String projectPrefix = getProjectPrefix();
+        final String basePrefix = getBasePrefix();
         return projectPrefix + "Abstract" + basePrefix + getSchemaClassPrefix() + getJavaName() + "CQ";
     }
 
@@ -2200,13 +2214,31 @@ public class Table {
     }
 
     // -----------------------------------------------------
-    //                                   Extended Class Name
-    //                                   -------------------
+    //                                            Sql2Entity
+    //                                            ----------
+    public String getBaseTypeSafeCursorClassName() {
+        return getProjectPrefix() + getBasePrefix() + getJavaName() + "Cursor";
+    }
+
+    public String getBaseTypeSafeCursorHandlerClassName() {
+        return getProjectPrefix() + getBasePrefix() + getJavaName() + "CursorHandler";
+    }
+
+    public String getCompanionBaseTypeSafeCursorHandlerClassName() {
+        return "Cpon" + getBaseTypeSafeCursorHandlerClassName();
+    }
+
+    // ===================================================================================
+    //                                                                 Extended Class Name
+    //                                                                 ===================
+    // -----------------------------------------------------
+    //                                                Entity
+    //                                                ------
     public String getExtendedEntityClassName() { // mutable entity
         // basically pure name sometimes it has mutable mark
         //  e.g. MEMBER_SERVICE -> MemberService (normally)
         //  e.g. MEMBER_SERVICE -> DbleMemberService (e.g. in Scala)
-        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        final String projectPrefix = getProjectPrefix();
         final String dbablePrefix = getLittleAdjustmentProperties().getEntityDBablePrefix();
         return buildExtendedEntityClassName(projectPrefix, dbablePrefix);
     }
@@ -2216,13 +2248,13 @@ public class Table {
     }
 
     public String getMutableExtendedEntityClassName() { // mutable entity, basically for Scala
-        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        final String projectPrefix = getProjectPrefix();
         final String mutablePrefix = getLittleAdjustmentProperties().getEntityMutablePrefix();
         return buildExtendedEntityClassName(projectPrefix, mutablePrefix);
     }
 
     protected String getPureExtendedEntityClassName() { // e.g. MEMBER_SERVICE -> MemberService
-        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        final String projectPrefix = getProjectPrefix();
         return buildExtendedEntityClassName(projectPrefix, "");
     }
 
@@ -2235,6 +2267,9 @@ public class Table {
         return getSchemaClassPrefix() + getJavaName();
     }
 
+    // -----------------------------------------------------
+    //                                                DBMeta
+    //                                                ------
     public String getDBMetaClassName() {
         return getPureExtendedEntityClassName() + "Dbm";
     }
@@ -2243,6 +2278,9 @@ public class Table {
         return getDatabase().getBaseEntityPackage() + ".dbmeta." + getDBMetaClassName();
     }
 
+    // -----------------------------------------------------
+    //                                              Behavior
+    //                                              --------
     public String getExtendedDaoClassName() {
         return getPureExtendedEntityClassName() + "Dao";
     }
@@ -2281,10 +2319,13 @@ public class Table {
     }
 
     protected String getExtendedReferrerLoaderClassName() {
-        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        final String projectPrefix = getProjectPrefix();
         return buildExtendedEntityClassName(projectPrefix, "LoaderOf");
     }
 
+    // -----------------------------------------------------
+    //                                         ConditionBean
+    //                                         -------------
     public String getExtendedConditionBeanClassName() {
         return getPureExtendedEntityClassName() + "CB";
     }
@@ -2318,8 +2359,23 @@ public class Table {
     }
 
     // -----------------------------------------------------
-    //                                   Schema Class Prefix
-    //                                   -------------------
+    //                                            Sql2Entity
+    //                                            ----------
+    public String getExtendedTypeSafeCursorClassName() {
+        return getProjectPrefix() + getJavaName() + "Cursor";
+    }
+
+    public String getExtendedTypeSafeCursorHandlerClassName() {
+        return getProjectPrefix() + getJavaName() + "CursorHandler";
+    }
+
+    public String getCompanionExtendedTypeSafeCursorHandlerClassName() {
+        return getExtendedTypeSafeCursorHandlerClassName();
+    }
+
+    // ===================================================================================
+    //                                                                 Schema Class Prefix
+    //                                                                 ===================
     protected String _schemaClassPrefix;
 
     protected String getSchemaClassPrefix() {
@@ -2392,9 +2448,9 @@ public class Table {
         }
     }
 
-    // -----------------------------------------------------
-    //                                Behavior Handling Name
-    //                                -----------s-----------
+    // ===================================================================================
+    //                                                              Behavior Handling Name
+    //                                                              ======================
     public String getBehaviorComponentName() {
         final String componentName = Srl.initUncap(getExtendedBehaviorClassName());
 

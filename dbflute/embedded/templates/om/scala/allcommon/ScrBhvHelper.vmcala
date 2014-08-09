@@ -292,7 +292,7 @@ class ScrOutsideSqlBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecutor[BEH
      * </pre>
      * @return The executor of paging that the paging mode is manual. (NotNull)
      */
-    def pagingBySqlSkip(): ScrOutsideSqlPagingBySqlSkipExecutor[BEHAVIOR] = {
+    def paging(): ScrOutsideSqlPagingBySqlSkipExecutor[BEHAVIOR] = {
         return createOutsideSqlPagingBySqlSkipExecutor();
     }
 
