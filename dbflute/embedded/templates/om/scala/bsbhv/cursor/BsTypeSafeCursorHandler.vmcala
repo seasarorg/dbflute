@@ -20,6 +20,20 @@ import java.sql.SQLException;
 
 import org.seasar.dbflute.jdbc.CursorHandler;
 import ${myExtendedCursorPackageName}.${myExtendedTypeSafeCursorClassName};
+import ${myExtendedCursorPackageName}.${myExtendedTypeSafeCursorHandlerClassName};
+
+/**
+ * The base class of companion object defined at extended class to create cursor handler.
+ * @author ${database.classAuthor}
+ */
+abstract class ${myCompanionBaseTypeSafeCursorHandlerClassName} {
+    def apply(handlerCall: (${myExtendedTypeSafeCursorClassName}) => Unit): ${myExtendedTypeSafeCursorHandlerClassName} = {
+        return new ${myExtendedTypeSafeCursorHandlerClassName}() {
+            protected def fetchCursor(cursor: ${myExtendedTypeSafeCursorClassName}): Object =
+            { handlerCall(cursor); return null; }
+        }
+    }
+}
 
 /**
  * The cursor handler of ${table.tableDbName}.

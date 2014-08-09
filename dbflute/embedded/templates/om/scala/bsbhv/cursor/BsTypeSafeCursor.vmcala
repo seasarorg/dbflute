@@ -117,8 +117,8 @@ class ${myClassName} {
      * @return The value of ${col.uncapitalisedJavaName}. (NullAllowed)
      * @throws java.sql.SQLException
      */
-    def get${col.javaName}(): ${col.javaNative} = {
-        return _vt${col.javaName}.getValue(_rs, DB_NAME_${col.name}).asInstanceOf[${col.javaNative}];
+    def ${col.uncapitalisedJavaName}: ${col.immutableJavaNative} = {
+        return _vt${col.javaName}.getValue(_rs, DB_NAME_${col.name}).asInstanceOf[${col.immutableJavaNative}];
     }
 
 #end

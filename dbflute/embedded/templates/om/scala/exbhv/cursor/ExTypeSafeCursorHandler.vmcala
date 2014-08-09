@@ -16,7 +16,15 @@
 ${database.allClassCopyright}package ${myExtendedCursorPackageName};
 #set ($myClassName = "${myExtendedTypeSafeCursorHandlerClassName}")
 
+import ${myBaseCursorPackageName}.${myCompanionBaseTypeSafeCursorHandlerClassName};
 import ${myBaseCursorPackageName}.${myBaseTypeSafeCursorHandlerClassName};
+
+/**
+ * The companion object to create ${myClassName} by apply().
+ * @author ${database.classAuthor}
+ */
+object ${myCompanionExtendedTypeSafeCursorHandlerClassName} extends ${myCompanionBaseTypeSafeCursorHandlerClassName} {
+}
 
 /**
  * The cursor handler of ${table.tableDbName}.
