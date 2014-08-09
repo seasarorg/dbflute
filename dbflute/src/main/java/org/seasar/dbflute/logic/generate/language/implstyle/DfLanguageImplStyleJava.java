@@ -75,15 +75,15 @@ public class DfLanguageImplStyleJava implements DfLanguageImplStyle {
         return !column.isNotNull();
     }
 
-    public String adjustImmutablePropertyOptionalType(String immutableJavaNative) {
-        return "OptionalProperty<" + immutableJavaNative + ">";
+    public String adjustImmutablePropertyOptionalType(String immutablePropertyNative) {
+        return "OptionalProperty<" + immutablePropertyNative + ">";
     }
 
     public String adjustImmutablePropertyOptionalValue(String nativeExp) {
         return "OptionalProperty.of(" + nativeExp + ")";
     }
 
-    public String adjustImmutablePropertyOptionalOrElseNull(String immutableJavaNative, String variable) {
+    public String adjustImmutablePropertyOptionalOrElseNull(String immutablePropertyNative, String variable) {
         return variable + ".orElseNull()";
     }
 

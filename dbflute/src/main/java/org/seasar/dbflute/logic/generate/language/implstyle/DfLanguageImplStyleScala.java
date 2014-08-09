@@ -80,21 +80,21 @@ public class DfLanguageImplStyleScala implements DfLanguageImplStyle {
         return !column.isNotNull();
     }
 
-    public String adjustImmutablePropertyOptionalType(String immutableJavaNative) {
-        return "Option[" + immutableJavaNative + "]";
+    public String adjustImmutablePropertyOptionalType(String immutablePropertyNative) {
+        return "Option[" + immutablePropertyNative + "]";
     }
 
     public String adjustImmutablePropertyOptionalValue(String nativeExp) {
         return "Option(" + nativeExp + ")";
     }
 
-    public String adjustImmutablePropertyOptionalOrElseNull(String immutableJavaNative, String variable) {
+    public String adjustImmutablePropertyOptionalOrElseNull(String immutablePropertyNative, String variable) {
         final String exp;
-        if (immutableJavaNative.equals(DfLanguageTypeMappingScala.SCALA_NATIVE_INTEGER)) {
+        if (immutablePropertyNative.equals(DfLanguageTypeMappingScala.SCALA_NATIVE_INTEGER)) {
             exp = variable + ".map(int2Integer(_)).orNull";
-        } else if (immutableJavaNative.equals(DfLanguageTypeMappingScala.SCALA_NATIVE_LONG)) {
+        } else if (immutablePropertyNative.equals(DfLanguageTypeMappingScala.SCALA_NATIVE_LONG)) {
             exp = variable + ".map(long2Long(_)).orNull";
-        } else if (immutableJavaNative.equals(DfLanguageTypeMappingScala.SCALA_NATIVE_BOOLEAN)) {
+        } else if (immutablePropertyNative.equals(DfLanguageTypeMappingScala.SCALA_NATIVE_BOOLEAN)) {
             exp = variable + ".map(boolean2Boolean(_)).orNull";
         } else {
             exp = variable + ".orNull";

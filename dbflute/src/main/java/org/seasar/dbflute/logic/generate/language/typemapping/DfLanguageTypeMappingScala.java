@@ -40,8 +40,9 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
     }
     public static final String SCALA_NATIVE_INTEGER = "Int";
     public static final String SCALA_NATIVE_LONG = "Long";
-    public static final String SCALA_NATIVE_BIGINTEGER = "scala.math.BigInt";
-    public static final String SCALA_NATIVE_BIGDECIMAL = "scala.math.BigDecimal";
+    public static final String SCALA_NATIVE_BIG_INTEGER = "scala.math.BigInt";
+    public static final String SCALA_NATIVE_BIG_DECIMAL = "scala.math.BigDecimal";
+    public static final String SCALA_NATIVE_RICH_LOCAL_DATE = "com.github.nscala_time.time.RichLocalDate";
     public static final String SCALA_NATIVE_BOOLEAN = "Boolean";
     // DB-able entity same as Java 
     //protected static final List<String> _numberList;
@@ -93,7 +94,7 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
     //                                                                    Small Adjustment
     //                                                                    ================
     public String getSequenceJavaNativeType() {
-        return SCALA_NATIVE_BIGINTEGER;
+        return SCALA_NATIVE_BIG_INTEGER;
     }
 
     public String getDefaultNumericJavaNativeType() {
@@ -117,20 +118,20 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
         if (javaNative.endsWith("Integer")) {
             converted = SCALA_NATIVE_INTEGER;
         } else if ("java.math.BigDecimal".equals(javaNative)) {
-            converted = SCALA_NATIVE_BIGDECIMAL;
+            converted = SCALA_NATIVE_BIG_DECIMAL;
         } else {
             converted = javaNative;
         }
         return converted;
     }
 
-    public String convertToImmutableJavaNativeDefaultValue(String immutableJavaNative) {
+    public String convertToImmutableJavaNativeDefaultValue(String immutablePropertyNative) {
         final String defaultValue;
-        if (SCALA_NATIVE_INTEGER.equals(immutableJavaNative) || SCALA_NATIVE_LONG.equals(immutableJavaNative)) {
+        if (SCALA_NATIVE_INTEGER.equals(immutablePropertyNative) || SCALA_NATIVE_LONG.equals(immutablePropertyNative)) {
             defaultValue = "0";
-        } else if (SCALA_NATIVE_BIGDECIMAL.equals(immutableJavaNative)) {
+        } else if (SCALA_NATIVE_BIG_DECIMAL.equals(immutablePropertyNative)) {
             defaultValue = "0";
-        } else if (SCALA_NATIVE_BOOLEAN.equals(immutableJavaNative)) {
+        } else if (SCALA_NATIVE_BOOLEAN.equals(immutablePropertyNative)) {
             defaultValue = "false";
         } else {
             defaultValue = "null";
@@ -138,7 +139,8 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
         return defaultValue;
     }
 
-    public String convertToJavaNativeFromImmutable(String immutableJavaNative, String javaNative, String variable) {
+    public String convertToJavaNativeValueFromImmutable(String immutablePropertyNative, String javaNative,
+            String variable) {
         // quit because variable might have orNull
         //if (DfLanguageTypeMappingScala.SCALA_NATIVE_INTEGER.equals(immutableJavaNative)) {
         //    return "int2Integer(" + variable + ")";
@@ -146,7 +148,10 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
         //if (DfLanguageTypeMappingScala.SCALA_NATIVE_LONG.equals(immutableJavaNative)) {
         //    return "long2Long(" + variable + ")";
         //}
-        if (DfLanguageTypeMappingScala.SCALA_NATIVE_BIGDECIMAL.equals(immutableJavaNative)) {
+        if (SCALA_NATIVE_BIG_DECIMAL.equals(immutablePropertyNative)) {
+            return variable + ".asInstanceOf[" + javaNative + "]";
+        }
+        if (SCALA_NATIVE_RICH_LOCAL_DATE.equals(immutablePropertyNative)) {
             return variable + ".asInstanceOf[" + javaNative + "]";
         }
         return variable;

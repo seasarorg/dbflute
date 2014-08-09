@@ -52,6 +52,21 @@ import org.seasar.framework.exception.SQLRuntimeException;
 #if ($database.isTargetContainerSpring())
 import org.springframework.jdbc.datasource.DataSourceUtils;
 #end
+#if ($database.isAvailableJodaTimeEntity())
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Types;
+#if ($database.isAvailableJodaTimeLocalDateEntity())
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+import org.joda.time.LocalTime;
+#end
+import org.joda.time.ReadableInstant;
+import org.joda.time.ReadablePartial;
+import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
+import org.seasar.dbflute.util.DfTypeUtil;
+#end
 
 /**
  * @author ${database.classAuthor}
@@ -148,6 +163,20 @@ object ${glDBFluteConfig} {
 
     // treats as uses Oracle date of database native JDBC to get best performances
     TnValueTypes.registerBasicValueType(DBDef.Oracle, java.util.Date.class, new ImplementedOracleDateType());
+#end
+#if ($database.isAvailableJava8TimeLocalDateEntity())
+
+    // uses Java8-Time
+    TnValueTypes.registerBasicValueType(currentDBDef(), classOf[LocalDate], new LocalDateType());
+    TnValueTypes.registerBasicValueType(currentDBDef(), classOf[LocalDateTime], new LocalDateTimeType());
+    TnValueTypes.registerBasicValueType(currentDBDef(), classOf[LocalTime], new LocalDateTimeType());
+#end
+#if ($database.isAvailableJodaTimeLocalDateEntity())
+
+    // uses JodaTime
+    TnValueTypes.registerBasicValueType(currentDBDef(), classOf[LocalDate], new JodaLocalDateType());
+    TnValueTypes.registerBasicValueType(currentDBDef(), classOf[LocalDateTime], new JodaLocalDateTimeType());
+    TnValueTypes.registerBasicValueType(currentDBDef(), classOf[LocalTime], new JodaLocalTimeType());
 #end
 
     // ===================================================================================
@@ -954,5 +983,154 @@ object ${glDBFluteConfig} {
             }
             return null;
         }
-    }    
+    }
+#if ($database.isAvailableJodaTimeLocalDateEntity())
+
+    // ===================================================================================
+    //                                                                      JodaTime Class
+    //                                                                      ==============
+    class JodaLocalDateType extends TnAbstractValueType(Types.DATE) {
+
+        def getValue(rs: ResultSet, index: Int): Object = {
+            return toLocalDate(rs.getDate(index));
+        }
+
+        def getValue(rs: ResultSet, columnName: String): Object = {
+            return toLocalDate(rs.getDate(columnName));
+        }
+
+        def getValue(cs: CallableStatement, index: Int): Object = {
+            return toLocalDate(cs.getDate(index));
+        }
+
+        def getValue(cs: CallableStatement, parameterName: String): Object = {
+            return toLocalDate(cs.getDate(parameterName));
+        }
+
+        def bindValue(conn: Connection, ps: PreparedStatement, index: Int, value: Object): Unit = {
+            if (value == null) {
+                setNull(ps, index);
+            } else {
+                ps.setDate(index, toSqlDate(value));
+            }
+        }
+
+        def bindValue(conn: Connection, cs: CallableStatement, parameterName: String, value: Object): Unit = {
+            if (value == null) {
+                setNull(cs, parameterName);
+            } else {
+                cs.setDate(parameterName, toSqlDate(value));
+            }
+        }
+
+        protected def toLocalDate(date: java.sql.Date): LocalDate = {
+            return if (date != null) { LocalDate.fromDateFields(date) } else { null };
+        }
+
+        protected def toSqlDate(date: Object): java.sql.Date = {
+            if (date != null && date.isInstanceOf[ReadablePartial]) {
+                return new java.sql.Date(date.asInstanceOf[ReadablePartial].toDateTime(null).withTimeAtStartOfDay().getMillis());
+            } else if (date != null && date.isInstanceOf[ReadableInstant]) {
+                return new java.sql.Date(date.asInstanceOf[ReadableInstant].getMillis());
+            }
+            return DfTypeUtil.toSqlDate(date);
+        }
+    }
+
+    class JodaLocalDateTimeType extends TnAbstractValueType(Types.TIMESTAMP) {
+
+        def getValue(rs: ResultSet, index: Int): Object = {
+            return toLocalDateTime(rs.getTimestamp(index));
+        }
+
+        def getValue(rs: ResultSet, columnName: String ): Object = {
+            return toLocalDateTime(rs.getTimestamp(columnName));
+        }
+
+        def getValue(cs: CallableStatement, index: Int): Object = {
+            return toLocalDateTime(cs.getTimestamp(index));
+        }
+
+        def getValue(cs: CallableStatement, parameterName: String): Object = {
+            return toLocalDateTime(cs.getTimestamp(parameterName));
+        }
+
+        def bindValue(conn: Connection, ps: PreparedStatement, index: Int, value: Object): Unit = {
+            if (value == null) {
+                setNull(ps, index);
+            } else {
+                ps.setTimestamp(index, toTimestamp(value));
+            }
+        }
+
+        def bindValue(conn: Connection, cs: CallableStatement, parameterName: String, value: Object): Unit = {
+            if (value == null) {
+                setNull(cs, parameterName);
+            } else {
+                cs.setTimestamp(parameterName, toTimestamp(value));
+            }
+        }
+
+        protected def toLocalDateTime(timestamp: java.sql.Timestamp): LocalDateTime = {
+            return if (timestamp != null) { LocalDateTime.fromDateFields(timestamp) } else { null };
+        }
+
+        protected def toTimestamp(date: Object): java.sql.Timestamp = {
+            if (date != null && date.isInstanceOf[ReadablePartial]) {
+                return new java.sql.Timestamp(date.asInstanceOf[ReadablePartial].toDateTime(null).getMillis());
+            } else if (date != null && date.isInstanceOf[ReadableInstant]) {
+                return new java.sql.Timestamp(date.asInstanceOf[ReadableInstant].getMillis());
+            }
+            return DfTypeUtil.toTimestamp(date);
+        }
+    }
+
+    class JodaLocalTimeType extends TnAbstractValueType(Types.TIME) {
+
+        def getValue(rs: ResultSet, index: Int): Object = {
+            return toLocalTime(rs.getTime(index));
+        }
+
+        def getValue(rs: ResultSet, columnName: String ): Object = {
+            return toLocalTime(rs.getTime(columnName));
+        }
+
+        def getValue(cs: CallableStatement, index: Int): Object = {
+            return toLocalTime(cs.getTime(index));
+        }
+
+        def getValue(cs: CallableStatement, parameterName: String): Object = {
+            return toLocalTime(cs.getTime(parameterName));
+        }
+
+        def bindValue(conn: Connection, ps: PreparedStatement, index: Int, value: Object): Unit = {
+            if (value == null) {
+                setNull(ps, index);
+            } else {
+                ps.setTime(index, toTime(value));
+            }
+        }
+
+        def bindValue(conn: Connection, cs: CallableStatement, parameterName: String, value: Object): Unit = {
+            if (value == null) {
+                setNull(cs, parameterName);
+            } else {
+                cs.setTime(parameterName, toTime(value));
+            }
+        }
+
+        protected def toLocalTime(time: java.sql.Time): LocalTime = {
+            return if (time != null) { LocalTime.fromDateFields(time) } else { null };
+        }
+
+        protected def toTime(date: Object): java.sql.Time = {
+            if (date != null && date.isInstanceOf[ReadablePartial]) {
+                return new java.sql.Time(date.asInstanceOf[ReadablePartial].toDateTime(null).getMillis());
+            } else if (date != null && date.isInstanceOf[ReadableInstant]) {
+                return new java.sql.Time(date.asInstanceOf[ReadableInstant].getMillis());
+            }
+            return DfTypeUtil.toTime(date);
+        }
+    }
+#end
 }

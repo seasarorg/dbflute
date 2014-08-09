@@ -106,5 +106,5 @@ public interface DfLanguageTypeMapping {
      * @param variable The expression of variable for the column. (NotNull)
      * @return The converted value to java native. (NotNull)
      */
-    String convertToJavaNativeFromImmutable(String immutableJavaNative, String javaNative, String variable);
+    String convertToJavaNativeValueFromImmutable(String immutableJavaNative, String javaNative, String variable);
 }

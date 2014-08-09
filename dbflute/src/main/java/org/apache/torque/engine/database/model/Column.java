@@ -1871,37 +1871,38 @@ public class Column {
     // ===================================================================================
     //                                                                           Immutable
     //                                                                           =========
-
+    // -----------------------------------------------------
+    //                                       Type Expression
+    //                                       ---------------
     public String getImmutableJavaNative() {
-        if (hasClassification()) {
-            return getClassificationDefinitionType();
-        } else {
-            return getLanguageTypeMapping().convertToImmutableJavaNativeType(getJavaNative());
-        }
+        return getLanguageTypeMapping().convertToImmutableJavaNativeType(getJavaNative());
     }
 
-    public String getImmutableJavaNativeDefaultValue() {
-        if (hasClassification()) {
-            return "null";
-        } else {
-            return getLanguageTypeMapping().convertToImmutableJavaNativeDefaultValue(getImmutableJavaNative());
-        }
-    }
-
-    public boolean isImmutablePropertyOptional() {
-        final DfLanguageImplStyle implStyle = getLanguageImplStyle();
-        return implStyle.isImmutablePropertyOptional(this);
+    protected String getImmutablePropertyNative() {
+        return hasClassification() ? getClassificationDefinitionType() : getImmutableJavaNative();
     }
 
     public String getImmutablePropertyDefinitionType() {
-        final String immutableJavaNative = getImmutableJavaNative();
+        final String propertyNative = getImmutablePropertyNative();
         final String definitionType;
         if (isImmutablePropertyOptional()) {
-            definitionType = getLanguageImplStyle().adjustImmutablePropertyOptionalType(immutableJavaNative);
+            // e.g. Option[String] or Option[CDef.MemberStatus]
+            definitionType = getLanguageImplStyle().adjustImmutablePropertyOptionalType(propertyNative);
         } else {
-            definitionType = immutableJavaNative;
+            definitionType = propertyNative; // e.g. String, Long
         }
         return definitionType;
+    }
+
+    public boolean isImmutablePropertyOptional() {
+        return getLanguageImplStyle().isImmutablePropertyOptional(this);
+    }
+
+    // -----------------------------------------------------
+    //                                            Type Value
+    //                                            ----------
+    public String getImmutablePropertyDefaultValue() {
+        return getLanguageTypeMapping().convertToImmutableJavaNativeDefaultValue(getImmutablePropertyNative());
     }
 
     public String getImmutablePropertyGetterReturningValue(String gettingExp) {
@@ -1916,6 +1917,9 @@ public class Column {
         return convertToImmutablePropertyValue(nativeExp);
     }
 
+    // -----------------------------------------------------
+    //                                  Convert to Immutable
+    //                                  --------------------
     public String convertToImmutablePropertyValue(String nativeExp) {
         final String converted;
         if (isImmutablePropertyOptional()) {
@@ -1929,21 +1933,30 @@ public class Column {
     public String convertToImmutablePropertyOrElseNull(String propertyExp) {
         final String converted;
         if (isImmutablePropertyOptional()) {
-            final String immutableJavaNative = getImmutableJavaNative();
-            converted = getLanguageImplStyle().adjustImmutablePropertyOptionalOrElseNull(immutableJavaNative,
-                    propertyExp);
+            final String propertyNative = getImmutablePropertyNative();
+            converted = getLanguageImplStyle().adjustImmutablePropertyOptionalOrElseNull(propertyNative, propertyExp);
         } else {
             converted = propertyExp;
         }
         return converted;
     }
 
+    // -----------------------------------------------------
+    //                                    Convert to Mutable
+    //                                    ------------------
+    public String convertToMutableJavaNativeValue(String propertyExp) {
+        final DfLanguageTypeMapping mapping = getLanguageTypeMapping();
+        final String propertyNative = getImmutablePropertyNative();
+        final String javaNative = getJavaNative();
+        return mapping.convertToJavaNativeValueFromImmutable(propertyNative, javaNative, propertyExp);
+    }
+
     public String convertToMutablePropertyValue(String propertyExp) {
         final String resolvedOption = convertToImmutablePropertyOrElseNull(propertyExp);
         final DfLanguageTypeMapping mapping = getLanguageTypeMapping();
-        final String immutableJavaNative = getImmutableJavaNative();
+        final String propertyNative = getImmutablePropertyNative();
         final String javaNative = getJavaNative();
-        return mapping.convertToJavaNativeFromImmutable(immutableJavaNative, javaNative, resolvedOption);
+        return mapping.convertToJavaNativeValueFromImmutable(propertyNative, javaNative, resolvedOption);
     }
 
     // ===================================================================================

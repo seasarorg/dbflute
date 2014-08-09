@@ -45,6 +45,14 @@ import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.exception._;
 #end
 import org.seasar.dbflute.util.DfTypeUtil;
+#if ($database.isAvailableJodaTimeEntity())
+#if ($database.isAvailableJodaTimeLocalDateEntity())
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+#end
+import org.joda.time.ReadableInstant;
+import org.joda.time.ReadablePartial;
+#end
 import ${glPackageBaseCommon}._;
 import ${glPackageExtendedParameterBean}.${myExtendedParameterBeanClassName};
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
@@ -291,9 +299,29 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
         return DfTypeUtil.toBoolean(obj);
     }
 
+#if ($database.isAvailableJodaTimeEntity())
+    protected def toUtilDate(date: Object): Date = {
+        if (date != null && date.isInstanceOf[ReadablePartial]) {
+            return new Date(date.asInstanceOf[ReadablePartial].toDateTime(null).getMillis());
+        } else if (date != null && date.isInstanceOf[ReadableInstant]) {
+            return new Date(date.asInstanceOf[ReadableInstant].getMillis());
+        }
+#else
     protected def toUtilDate(date: Date): Date = {
+#end
         return DfTypeUtil.toDate(date); // if sub class, re-create as pure date
     }
+#if ($database.isAvailableJodaTimeLocalDateEntity())
+
+    protected def toLocalDate[DATE](date: Date, localType: Class[DATE]): DATE = {
+        if (classOf[LocalDate].isAssignableFrom(localType)) {
+            return LocalDate.fromDateFields(date).asInstanceOf[DATE];
+        } else if (classOf[LocalDateTime].isAssignableFrom(localType)) {
+            return LocalDateTime.fromDateFields(date).asInstanceOf[DATE];
+        }
+        return null.asInstanceOf[DATE]; // unreachable
+    }
+#end
 
     protected def formatUtilDate(date: Date): String = {
 #if ($database.isDatabaseOracle())
@@ -489,7 +517,11 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     def set${database.initCap($propertyName)}_FromDate(${argumentName}: ${propertyType}): Unit = {
+#if ($database.isAvailableJodaTimeLocalDateEntity())
+        ${variableName} = toLocalDate(new FromToOption().compareAsDate().filterFromDate(toUtilDate(${argumentName})), ${propertyType}.class);
+#else
         ${variableName} = new FromToOption().compareAsDate().filterFromDate(${argumentName});
+#end
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionFromDateOption($pmbClassName, $propertyName))
@@ -504,7 +536,11 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
      */
     def set${database.initCap($propertyName)}_FromDate(${argumentName}: ${propertyType}, ${argumentName}Option: FromToOption): Unit = {
         assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
+#if ($database.isAvailableJodaTimeLocalDateEntity())
+        ${variableName} = toLocalDate(${argumentName}Option.filterFromDate(toUtilDate(${argumentName})), ${propertyType}.class);
+#else
         ${variableName} = ${argumentName}Option.filterFromDate(${argumentName});
+#end
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
@@ -517,7 +553,11 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     def set${database.initCap($propertyName)}_ToDate(${argumentName}: ${propertyType}): Unit = {
+#if ($database.isAvailableJodaTimeLocalDateEntity())
+        ${variableName} = toLocalDate(new FromToOption().compareAsDate().filterToDate(toUtilDate(${argumentName})), ${propertyType}.class);
+#else
         ${variableName} = new FromToOption().compareAsDate().filterToDate(${argumentName});
+#end
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionToDateOption($pmbClassName, $propertyName))
@@ -532,7 +572,11 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
      */
     def set${database.initCap($propertyName)}_ToDate(${argumentName}: ${propertyType}, ${argumentName}Option: FromToOption): Unit = {
         assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
+#if ($database.isAvailableJodaTimeLocalDateEntity())
+        ${variableName} = toLocalDate(${argumentName}Option.filterToDate(toUtilDate(${argumentName})), ${propertyType}.class);
+#else
         ${variableName} = ${argumentName}Option.filterToDate(${argumentName});
+#end
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionClassificationSetter($pmbClassName, $propertyName))

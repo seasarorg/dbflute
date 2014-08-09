@@ -52,11 +52,11 @@ public interface DfLanguageImplStyle {
 
     boolean isImmutablePropertyOptional(Column column);
 
-    String adjustImmutablePropertyOptionalType(String immutableJavaNative);
+    String adjustImmutablePropertyOptionalType(String immutablePropertyNative);
 
     String adjustImmutablePropertyOptionalValue(String nativeExp);
 
-    String adjustImmutablePropertyOptionalOrElseNull(String immutableJavaNative, String variable);
+    String adjustImmutablePropertyOptionalOrElseNull(String immutablePropertyNative, String variable);
 
     boolean isCompatibleBeforeJava8();
 

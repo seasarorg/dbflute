@@ -1019,7 +1019,7 @@ public class ${glDBFluteConfig} {
             }
             return null;
         }
-    }    
+    }
 #if ($database.isAvailableJodaTimeLocalDateEntity())
 
     // ===================================================================================
