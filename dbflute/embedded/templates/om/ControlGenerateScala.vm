@@ -88,6 +88,8 @@ $database.checkProperties()
 #set ($glScrCBeanHelper = "${glProjectPrefix}ScrCBeanHelper")
 #set ($glScrCBeanOption = "${glProjectPrefix}ScrCBeanOption")
 #set ($glScrInternalDbGateway = "${glProjectPrefix}ScrInternalDbGateway")
+#set ($glScrOutsideSqlFreeStyleHelper = "${glProjectPrefix}ScrOutsideSqlFreeStyleHelper")
+#set ($glScrOutsideSqlTypedHelper = "${glProjectPrefix}ScrOutsideSqlTypedHelper")
 
 ## ===================================================================================
 ##                                                                            Variable
@@ -196,6 +198,14 @@ $generator.parse("om/${glResourceDirectory}/allcommon/ScrCBeanOption.${glTemplat
 $database.info("    parse('ScrInternalDbGateway');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glScrInternalDbGateway}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/ScrInternalDbGateway.${glTemplateFileExtension}",$path ,"" ,"")
+
+$database.info("    parse('ScrOutsideSqlFreeStyleHelper');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glScrOutsideSqlFreeStyleHelper}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/ScrOutsideSqlFreeStyleHelper.${glTemplateFileExtension}",$path ,"" ,"")
+
+$database.info("    parse('ScrOutsideSqlTypedHelper');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glScrOutsideSqlTypedHelper}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/ScrOutsideSqlTypedHelper.${glTemplateFileExtension}",$path ,"" ,"")
 
 $database.info("}")
 

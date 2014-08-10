@@ -1051,12 +1051,12 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * </pre>
      * @return The basic executor of outside-SQL. (NotNull)
      */
-    def outsideSql(): ScrOutsideSqlBasicExecutor[${myExtendedBhvClassName}] = {
-        return toImmutableOutsideSqlBasicExecutor(doOutsideSql());
+    def outsideSql(): ScrOutsideSqlTypedBasicExecutor[${myExtendedBhvClassName}] = {
+        return toImmutableOutsideSqlTypedBasicExecutor(doOutsideSql());
     }
 
-    protected def toImmutableOutsideSqlBasicExecutor(executor: OutsideSqlBasicExecutor[${myExtendedBhvClassName}]): ScrOutsideSqlBasicExecutor[${myExtendedBhvClassName}] =
-    { new ScrOutsideSqlBasicExecutor(executor) }
+    protected def toImmutableOutsideSqlTypedBasicExecutor(executor: OutsideSqlBasicExecutor[${myExtendedBhvClassName}]): ScrOutsideSqlTypedBasicExecutor[${myExtendedBhvClassName}] =
+    { new ScrOutsideSqlTypedBasicExecutor(executor) }
 #if ($table.hasBehaviorFilterBeforeColumn())
 
     // ===================================================================================
