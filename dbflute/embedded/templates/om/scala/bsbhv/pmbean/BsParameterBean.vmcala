@@ -16,6 +16,7 @@
 ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 #set ($myClassName = "${myBaseParameterBeanClassName}")
 
+import scala.collection.immutable;
 import scala.collection.JavaConverters._;
 
 import java.util._;
@@ -365,6 +366,14 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
     protected def createFromToOption(): ScrFromToOption = { new ScrFromToOption() }
 
 #end
+    protected def toBindingType[PROP](obj: Any): PROP = { // except from-to Date
+        return if (obj.isInstanceOf[immutable.List[_]]) {
+            obj.asInstanceOf[immutable.List[_]].asJava.asInstanceOf[PROP]
+        } else {
+            obj.asInstanceOf[PROP]
+        }
+    }
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
@@ -408,6 +417,12 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($argumentName = "$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#set ($entryPropertyType = "")
+#if ($propertyType.startsWith("List["))
+#set ($entryPropertyType = "immutable.${propertyType}")
+#else
+#set ($entryPropertyType = "${propertyType}")
+#end
     /**
      * [get] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
@@ -441,8 +456,8 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #end
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
-    def set${database.initCap($propertyName)}(${argumentName}: ${propertyType}): Unit = {
-        ${variableName} = ${argumentName};
+    def set${database.initCap($propertyName)}(${argumentName}: ${entryPropertyType}): Unit = {
+        ${variableName} = toBindingType(${argumentName});
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
@@ -455,10 +470,10 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      * @param optionCall The callback for option of likeSearch for ${propertyName} which is NOT split mode. (NotNull)
      */
-    def set${database.initCap($propertyName)}(${argumentName}: ${propertyType})(optionCall: (ScrLikeSearchOption) => Unit): Unit = {
+    def set${database.initCap($propertyName)}(${argumentName}: ${entryPropertyType})(optionCall: (ScrLikeSearchOption) => Unit): Unit = {
         val option = callbackLSOP(optionCall);
         assertLikeSearchOptionValid("option for ${argumentName}", option);
-        ${variableName} = ${argumentName};
+        ${variableName} = toBindingType(${argumentName});
         ${variableName}InternalLikeSearchOption = option;
     }
 #end
@@ -471,8 +486,8 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #end
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
-    def set${database.initCap($propertyName)}_PrefixSearch(${argumentName}: ${propertyType}): Unit = {
-        ${variableName} = ${argumentName};
+    def set${database.initCap($propertyName)}_PrefixSearch(${argumentName}: ${entryPropertyType}): Unit = {
+        ${variableName} = toBindingType(${argumentName});
         ${variableName}InternalLikeSearchOption = createLikeSearchOption().likePrefix();
     }
 #end
@@ -485,8 +500,8 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #end
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
-    def set${database.initCap($propertyName)}_ContainSearch(${argumentName}: ${propertyType}): Unit = {
-        ${variableName} = ${argumentName};
+    def set${database.initCap($propertyName)}_ContainSearch(${argumentName}: ${entryPropertyType}): Unit = {
+        ${variableName} = toBindingType(${argumentName});
         ${variableName}InternalLikeSearchOption = createLikeSearchOption().likeContain();
     }
 #end
@@ -499,8 +514,8 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #end
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
-    def set${database.initCap($propertyName)}_SuffixSearch(${argumentName}: ${propertyType}): Unit = {
-        ${variableName} = ${argumentName};
+    def set${database.initCap($propertyName)}_SuffixSearch(${argumentName}: ${entryPropertyType}): Unit = {
+        ${variableName} = toBindingType(${argumentName});
         ${variableName}InternalLikeSearchOption = createLikeSearchOption().likeSuffix();
     }
 #end
