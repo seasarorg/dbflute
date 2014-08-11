@@ -43,7 +43,6 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
     public static final String SCALA_NATIVE_LONG = "Long";
     public static final String SCALA_NATIVE_BIG_INTEGER = "scala.math.BigInt";
     public static final String SCALA_NATIVE_BIG_DECIMAL = "scala.math.BigDecimal";
-    public static final String SCALA_NATIVE_RICH_LOCAL_DATE = "com.github.nscala_time.time.RichLocalDate";
     public static final String SCALA_NATIVE_BOOLEAN = "Boolean";
     // DB-able entity same as Java 
     //protected static final List<String> _numberList;
@@ -111,6 +110,8 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
     }
 
     public String switchParameterBeanTestValueType(String plainTypeName) {
+        // Integer should be Int but it cannot resolve null problem so no conversion for now
+        // BigDecimal's package is resolved by other process (package resolver)
         if (Srl.equalsPlain(plainTypeName, "boolean")) {
             return "Boolean";
         } else {
@@ -124,6 +125,8 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
             converted = SCALA_NATIVE_INTEGER;
         } else if ("java.math.BigDecimal".equals(javaNative)) {
             converted = SCALA_NATIVE_BIG_DECIMAL;
+        } else if ("boolean".equals(javaNative)) {
+            converted = "Boolean";
         } else {
             converted = javaNative;
         }
@@ -153,10 +156,7 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
         //    return "long2Long(" + variable + ")";
         //}
         if (SCALA_NATIVE_BIG_DECIMAL.equals(immutableJavaNative)) {
-            return variable + ".asInstanceOf[" + javaNative + "]";
-        }
-        if (SCALA_NATIVE_RICH_LOCAL_DATE.equals(immutableJavaNative)) {
-            return variable + ".asInstanceOf[" + javaNative + "]";
+            return variable + ".underlying"; // to java.math.BigDecimal
         }
         return variable;
     }
