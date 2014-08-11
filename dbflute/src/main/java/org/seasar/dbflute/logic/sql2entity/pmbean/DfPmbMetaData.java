@@ -499,10 +499,8 @@ public class DfPmbMetaData {
         if (hasPropertyOptionAnyFromTo(propertyName)) {
             return true;
         }
-        if (isPropertyOptionClassification(propertyName, schemaData)) {
-            if (getLittleAdjustmentProperties().isForceClassificationSetting()) {
-                return true;
-            }
+        if (isPropertyOptionClassificationSetter(propertyName, schemaData)) {
+            return true;
         }
         if (isPropertyOptionClassificationFixedElement(propertyName)) {
             return true;
