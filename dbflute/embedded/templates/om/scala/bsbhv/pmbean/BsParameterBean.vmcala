@@ -417,12 +417,15 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($argumentName = "$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
-#set ($entryPropertyType = "")
-#if ($propertyType.startsWith("List["))
-#set ($entryPropertyType = "immutable.${propertyType}")
-#else
+## cannot handle different property type between getter and setter
+## DfBeanDesc cannot treat such definition as property
+###set ($entryPropertyType = "")
+###if ($propertyType.startsWith("List["))
+###set ($entryPropertyType = "immutable.${propertyType}")
+###else
+###set ($entryPropertyType = "${propertyType}")
+###end
 #set ($entryPropertyType = "${propertyType}")
-#end
     /**
      * [get] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
