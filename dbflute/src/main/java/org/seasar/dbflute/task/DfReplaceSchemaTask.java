@@ -331,8 +331,23 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         systemOutPrintLn("Database: " + getDatabaseProperties().getDatabaseUrl());
         systemOutPrintLn("Schema: " + getDatabaseProperties().getDatabaseSchema().getLoggingSchema());
         systemOutPrintLn("- - - - - - - - - -/");
+        systemOutPrintLn("ReplaceSchema will");
+        systemOutPrintLn("");
+        systemOutPrintLn("DDD   EEEEE L     EEEEE TTTTT EEEEE");
+        systemOutPrintLn("D  D  E     L     E       T   E");
+        systemOutPrintLn("D   D E     L     E       T   E");
+        systemOutPrintLn("D   D EEEEE L     EEEEE   T   EEEEE");
+        systemOutPrintLn("D   D E     L     E       T   E");
+        systemOutPrintLn("D  D  E     L     E       T   E");
+        systemOutPrintLn("DDD   EEEEE LLLLL EEEEE   T   EEEEE your all data!");
+        systemOutPrintLn("");
+        systemOutPrintLn("<Process Flow>");
+        systemOutPrintLn("1. initialize your schema (*droping all existing tables)");
+        systemOutPrintLn("2. create tables as your DDL");
+        systemOutPrintLn("3. load your test data, e.g. excel files");
+        systemOutPrintLn("");
         systemOutPrintLn("(input on your console)");
-        systemOutPrint("The schema will be initialized. Are you ready? (y or n): ");
+        systemOutPrint("Are you ready? (y or n): ");
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));

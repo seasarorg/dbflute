@@ -540,8 +540,7 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
             return;
         }
         _log.info("...Closing connections to change-users: " + _changeUserConnectionMap.keySet());
-        final Set<Entry<String, Connection>> entrySet = _changeUserConnectionMap.entrySet();
-        for (Entry<String, Connection> entry : entrySet) {
+        for (Entry<String, Connection> entry : _changeUserConnectionMap.entrySet()) {
             final String changeUser = entry.getKey();
             final Connection conn = entry.getValue();
             try {
