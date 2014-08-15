@@ -33,6 +33,7 @@ import org.seasar.dbflute.properties.DfFlexDtoProperties;
 import org.seasar.dbflute.properties.DfFreeGenProperties;
 import org.seasar.dbflute.properties.DfHibernateProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
+import org.seasar.dbflute.properties.DfInfraProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
@@ -266,6 +267,18 @@ public final class DfPropertiesHandler {
             _includeQueryProperties = new DfIncludeQueryProperties(prop);
         }
         return _includeQueryProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                                 Infra
+    //                                                 -----
+    protected DfInfraProperties _infraProperties;
+
+    public DfInfraProperties getInfraProperties(Properties prop) {
+        if (_infraProperties == null) {
+            _infraProperties = new DfInfraProperties(prop);
+        }
+        return _infraProperties;
     }
 
     // -----------------------------------------------------

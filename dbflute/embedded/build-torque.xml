@@ -71,10 +71,12 @@
     classname="org.seasar.dbflute.task.DfSql2EntityTask"/>
   <taskdef name="df-refresh" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.manage.DfRefreshTask"/>
-  <taskdef name="df-take-assert" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.manage.DfTakeAssertTask"/>
   <taskdef name="df-freegen" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.manage.DfFreeGenTask"/>
+  <taskdef name="df-intro" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.manage.DfIntroTask"/>
+  <taskdef name="df-upgrade" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.manage.DfUpgradeTask"/>
 
   <!--
     for Ant-Contrib
@@ -216,6 +218,7 @@
   	<antcall target="jdbc"/>
   	<antcall target="doc"/>
   	<antcall target="generate"/>
+  	<antcall target="outside-sql-test"/>
   	<antcall target="sql2entity"/>
   </target>
 
@@ -227,14 +230,6 @@
     </df-refresh>
   </target>
 
-  <target name="take-assert" description="TakeAssert task">
-    <df-take-assert
-        contextProperties="${torque.contextProperties}"
-        environmentType="${dfenv}"
-        sqlRootDir="${dfdir}">
-    </df-take-assert>
-  </target>
-
   <target name="freegen" description="FreeGen task">
     <df-freegen
         contextProperties="${torque.contextProperties}"
@@ -243,4 +238,25 @@
     </df-freegen>
   </target>
 
+  <target name="take-assert" description="TakeAssert task">
+    <df-take-assert
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}"
+        sqlRootDir="${dfdir}">
+    </df-take-assert>
+  </target>
+
+  <target name="intro" description="DBFlute Intro task">
+    <df-intro
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}">
+    </df-intro>
+  </target>
+
+  <target name="upgrade" description="DBFlute Upgrade task">
+    <df-upgrade
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}">
+    </df-upgrade>
+  </target>
 </project>

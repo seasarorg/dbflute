@@ -19,19 +19,24 @@ if "%PURE_FIRST_ARG%"=="""" (
 )
 
 if "%FIRST_ARG%"=="" (
+  echo      |\  |-\ |-- |      |      "
+  echo      | | |-\ |-  | | | -+- /_\ "
+  echo      |/  |-/ |   | |_|  |  \-  "
   echo:
-  echo  1 : renewal (ReplaceSchema, JDBC, Doc, Generate, OutsideSqlTest, Sql2Entity^)
-  echo  2 : regenerate (JDBC, Doc, Generate, Sql2Entity^)
+  echo  [DB Change] *delete database"
+  echo    0 : replace-schema  => drop tables and create schema"
+  echo    1 : renewal         => replace-schema + regenerate"
+  echo    7 : save-previous  8 : alter-check"
   echo:
-  echo  4 : load-data-reverse
-  echo  5 : schema-sync-check
+  echo  [Generate]"
+  echo    2 : regenerate  => call 21->22->23->25->24"
+  echo   21 : jdbc        22 : doc  23 : generate"
+  echo   24 : sql2entity  25 : outside-sql-test"
   echo:
-  echo  7 : save-previous
-  echo  8 : alter-check
-  echo  9 : take-assert
-  echo:
-  echo  11 : refresh
-  echo  12 : freegen
+  echo  [Utility]"
+  echo    4 : load-data-reverse  5 : schema-sync-check"
+  echo   11 : refresh  12 : freegen  13 : take-assert"
+  echo   88 : intro  94 : upgrade  97 : help"
   echo:
 
   echo (input on your console^)
@@ -40,7 +45,9 @@ if "%FIRST_ARG%"=="" (
   set /p FIRST_ARG=
 )
 
-if "%FIRST_ARG%"=="1" (
+if "%FIRST_ARG%"=="0" (
+  set FIRST_ARG=replace-schema
+) else if "%FIRST_ARG%"=="1" (
   set FIRST_ARG=renewal
 ) else if "%FIRST_ARG%"=="2" (
   set FIRST_ARG=regenerate
@@ -52,15 +59,37 @@ if "%FIRST_ARG%"=="1" (
   set FIRST_ARG=save-previous
 ) else if "%FIRST_ARG%"=="8" (
   set FIRST_ARG=alter-check
-) else if "%FIRST_ARG%"=="9" (
+) else if "%FIRST_ARG%"=="10" (
   set FIRST_ARG=take-assert
 ) else if "%FIRST_ARG%"=="11" (
   set FIRST_ARG=refresh
 ) else if "%FIRST_ARG%"=="12" (
   set FIRST_ARG=freegen
+) else if "%FIRST_ARG%"=="21" (
+  set FIRST_ARG=jdbc
+) else if "%FIRST_ARG%"=="22" (
+  set FIRST_ARG=doc
+) else if "%FIRST_ARG%"=="23" (
+  set FIRST_ARG=generate
+) else if "%FIRST_ARG%"=="24" (
+  set FIRST_ARG=sql2entity
+) else if "%FIRST_ARG%"=="25" (
+  set FIRST_ARG=outside-sql-test
+) else if "%FIRST_ARG%"=="88" (
+  set FIRST_ARG=intro
+) else if "%FIRST_ARG%"=="94" (
+  set FIRST_ARG=upgrade
+) else if "%FIRST_ARG%"=="97" (
+  set FIRST_ARG=help
 )
 
-if "%FIRST_ARG%"=="renewal" (
+if "%FIRST_ARG%"=="replace-schema" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the ReplaceSchema task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-replace-schema.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+
+) else if "%FIRST_ARG%"=="renewal" (
   echo /nnnnnnnnnnnnnnnnnnnnnnnnnn
   echo ...Calling the Renewal task
   echo nnnnnnnnnn/
@@ -71,30 +100,6 @@ if "%FIRST_ARG%"=="renewal" (
   echo ...Calling the Regenerate task
   echo nnnnnnnnnn/
   call %DBFLUTE_HOME%\etc\cmd\_df-regenerate.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
-
-) else if "%FIRST_ARG%"=="refresh" (
-
-  if "%PURE_FIRST_ARG%"=="" echo (input on your console^)
-  if "%PURE_FIRST_ARG%"=="" echo What is refresh project? (name^):
-  if "%PURE_FIRST_ARG%"=="" set /p SECOND_ARG=
-
-  echo /nnnnnnnnnnnnnnnnnnnnnnnnnn
-  echo ...Calling the Refresh task
-  echo nnnnnnnnnn/
-  setlocal enabledelayedexpansion
-  call %DBFLUTE_HOME%\etc\cmd\_df-refresh.cmd %NATIVE_PROPERTIES_PATH% !SECOND_ARG!
-  endlocal
-) else if "%FIRST_ARG%"=="take-assert" (
-  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnn
-  echo ...Calling the TakeAssert task
-  echo nnnnnnnnnn/
-  call %DBFLUTE_HOME%\etc\cmd\_df-take-assert.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
-
-) else if "%FIRST_ARG%"=="freegen" (
-  echo /nnnnnnnnnnnnnnnnnnnnnnnnnn
-  echo ...Calling the FreeGen task
-  echo nnnnnnnnnn/
-  call %DBFLUTE_HOME%\etc\cmd\_df-freegen.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
 
 ) else if "%FIRST_ARG%"=="load-data-reverse" (
   echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
@@ -119,5 +124,97 @@ if "%FIRST_ARG%"=="renewal" (
   echo ...Calling the SavePrevious task
   echo nnnnnnnnnn/
   call %DBFLUTE_HOME%\etc\cmd\_df-replace-schema.cmd %NATIVE_PROPERTIES_PATH% save-previous %SECOND_ARG%
+
+) else if "%FIRST_ARG%"=="refresh" (
+
+  if "%PURE_FIRST_ARG%"=="" echo (input on your console^)
+  if "%PURE_FIRST_ARG%"=="" echo What is refresh project? (name^):
+  if "%PURE_FIRST_ARG%"=="" set /p SECOND_ARG=
+
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the Refresh task
+  echo nnnnnnnnnn/
+  setlocal enabledelayedexpansion
+  call %DBFLUTE_HOME%\etc\cmd\_df-refresh.cmd %NATIVE_PROPERTIES_PATH% !SECOND_ARG!
+  endlocal
+) else if "%FIRST_ARG%"=="freegen" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the FreeGen task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-freegen.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+
+) else if "%FIRST_ARG%"=="take-assert" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the TakeAssert task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-take-assert.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+
+) else if "%FIRST_ARG%"=="jdbc" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the JDBC task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-jdbc.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+
+) else if "%FIRST_ARG%"=="doc" (
+  echo /nnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the Doc task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-doc.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+
+) else if "%FIRST_ARG%"=="generate" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the Generate task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-generate.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+
+) else if "%FIRST_ARG%"=="sql2entity" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the Sql2Entity task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-sql2entity.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+
+) else if "%FIRST_ARG%"=="outside-sql-test" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the OutsideSqlTest task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-outside-sql-test.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+
+) else if "%FIRST_ARG%"=="intro" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the DBFluteIntro task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-intro.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+
+) else if "%FIRST_ARG%"=="upgrade" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the DBFlute Upgrade task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-upgrade.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+
+) else if "%FIRST_ARG%"=="help" (
+  echo  [DB Change] => after changing database, with replacing your database
+  echo    0 : replace-schema => drop tables and re-create schema (needs settings^)
+  echo    1 : renewal        => replace-schema and generate all (replace-schema + regenerate^)
+  echo    7 : save-previous  => save previous DDLs for AlterCheck
+  echo    8 : alter-check    => check alter DDLs with previous and next DDLs
+  echo:
+  echo  [Generate] => generate class files and documents by schema meta data
+  echo    2 : regenerate       => generate all (execute 21->22->23->24->25^)
+  echo   21 : jdbc             => get meta data from schema (before doc and generate^)
+  echo   22 : doc              => generate documents e.g. SchemaHTML, HistoryHTML
+  echo   23 : generate         => generate class files for tables
+  echo   24 : sql2entity       => generate class files for OutsideSql
+  echo   25 : outside-sql-test => check OutsideSql (execute SQLs, expect no error^)
+  echo:
+  echo  [Utility] => various tasks
+  echo    4 : load-data-reverse => reverse data to excel for e.g. ReplaceSchema
+  echo    5 : schema-sync-check => check difference between two schemas
+  echo   11 : refresh           => request refresh (F5^) to IDE e.g. Eclipse
+  echo   12 : freegen           => generate something by free template
+  echo   13 : take-assert       => execute assertion SQL of TakeFinally
+  echo:
+  echo   88 : intro   => boot DBFluteIntro that provides GUI control
+  echo   94 : upgrade => upgrade DBFlute module to new version (except runtime^)
+  echo   97 : help    => show description of tasks
 
 )

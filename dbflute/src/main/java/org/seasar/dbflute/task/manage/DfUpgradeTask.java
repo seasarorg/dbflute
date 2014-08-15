@@ -15,17 +15,22 @@
  */
 package org.seasar.dbflute.task.manage;
 
-import org.seasar.dbflute.logic.manage.DfRefreshMan;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
- * @since 0.9.8.5 (2011/06/09 Thursday)
+ * @since 1.0.5K (2014/08/15 Friday)
  */
-public class DfRefreshTask extends DfAbstractTask {
+public class DfUpgradeTask extends DfAbstractTask {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Log _log = LogFactory.getLog(DfUpgradeTask.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -37,13 +42,12 @@ public class DfRefreshTask extends DfAbstractTask {
     //                                                                           =========
     @Override
     protected boolean begin() {
-        // Refresh task is for utility so it's to be quietly as it can
-        //_log.info("+------------------------------------------+");
-        //_log.info("|                                          |");
-        //_log.info("|                 Refresh                  |");
-        //_log.info("|                                          |");
-        //_log.info("+------------------------------------------+");
-        DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.Refresh);
+        _log.info("+------------------------------------------+");
+        _log.info("|                                          |");
+        _log.info("|               DBFluteIntro               |");
+        _log.info("|                                          |");
+        _log.info("+------------------------------------------+");
+        DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.Intro);
         return true;
     }
 
@@ -60,24 +64,5 @@ public class DfRefreshTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        final DfRefreshMan refreshMan = prepareRefreshMap();
-        refreshMan.refresh();
-    }
-
-    protected DfRefreshMan prepareRefreshMap() {
-        return new DfRefreshMan().specifyRefreshProject(_refreshProject);
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public void setRefreshProject(String refreshProject) {
-        if (Srl.is_Null_or_TrimmedEmpty(refreshProject)) {
-            return;
-        }
-        if (refreshProject.equals("${dfprj}")) {
-            return;
-        }
-        _refreshProject = refreshProject;
     }
 }
