@@ -431,7 +431,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
 #end
-     * @return The value of ${propertyName}. (Nullable, NotEmptyString(when String): if empty string, returns null)
+     * @return The value of ${propertyName}. (NotNull, NotEmptyString(when String): if empty string, returns null)
      */
     def get${database.initCap($propertyName)}(): ${propertyType} = {
 #if ($propertyType.endsWith("String"))

@@ -128,11 +128,15 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                                      Classification
     //                                                                      ==============
     public boolean isCheckSelectedClassification() {
-        return isProperty("isCheckSelectedClassification", false);
+        return isProperty("isCheckSelectedClassification", !isCompatibleBeforeJava8());
     }
 
     public boolean isForceClassificationSetting() {
-        return isProperty("isForceClassificationSetting", false);
+        return isProperty("isForceClassificationSetting", !isCompatibleBeforeJava8());
+    }
+
+    public boolean isCheckImplicitClassificationSetting() { // closet
+        return isProperty("isCheckImplicitClassificationSetting", !isCompatibleBeforeJava8());
     }
 
     public boolean isCDefToStringReturnsName() { // closet

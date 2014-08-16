@@ -330,31 +330,36 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     @SuppressWarnings("unchecked")
     protected boolean isClassificationCheckImplicitSet(Map<?, ?> elementMap) {
-        return isProperty(DfClassificationTop.KEY_CHECK_IMPLICIT_SET, false, (Map<String, ? extends Object>) elementMap);
+        final String key = DfClassificationTop.KEY_CHECK_IMPLICIT_SET;
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        final boolean defaultValue = prop.isCheckImplicitClassificationSetting();
+        return isProperty(key, defaultValue, (Map<String, ? extends Object>) elementMap);
     }
 
     @SuppressWarnings("unchecked")
     protected boolean isClassificationUseDocumentOnly(Map<?, ?> elementMap) {
-        return isProperty(DfClassificationTop.KEY_USE_DOCUMENT_ONLY, false, (Map<String, ? extends Object>) elementMap);
+        final String key = DfClassificationTop.KEY_USE_DOCUMENT_ONLY;
+        return isProperty(key, false, (Map<String, ? extends Object>) elementMap);
     }
 
     @SuppressWarnings("unchecked")
     protected boolean isClassificationSuppressAutoDeploy(Map<?, ?> elementMap) {
-        return isProperty(DfClassificationTop.KEY_SUPPRESS_AUTO_DEPLOY, false,
-                (Map<String, ? extends Object>) elementMap);
+        final String key = DfClassificationTop.KEY_SUPPRESS_AUTO_DEPLOY;
+        return isProperty(key, false, (Map<String, ? extends Object>) elementMap);
     }
 
     @SuppressWarnings("unchecked")
     protected boolean isClassificationSuppressDBAccessClass(Map<?, ?> elementMap) {
-        final DfLittleAdjustmentProperties littleAdjustmentProp = getLittleAdjustmentProperties();
-        final boolean defaultValue = littleAdjustmentProp.isSuppressTableClassificationDBAccessClass();
-        return isProperty(DfClassificationTop.KEY_SUPPRESS_DBACCESS_CLASS, defaultValue,
-                (Map<String, ? extends Object>) elementMap);
+        final String key = DfClassificationTop.KEY_SUPPRESS_DBACCESS_CLASS;
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        final boolean defaultValue = prop.isSuppressTableClassificationDBAccessClass();
+        return isProperty(key, defaultValue, (Map<String, ? extends Object>) elementMap);
     }
 
     @SuppressWarnings("unchecked")
     protected boolean isClassificationDeprecated(Map<?, ?> elementMap) {
-        return isProperty(DfClassificationTop.KEY_DEPRECATED, false, (Map<String, ? extends Object>) elementMap);
+        final String key = DfClassificationTop.KEY_DEPRECATED;
+        return isProperty(key, false, (Map<String, ? extends Object>) elementMap);
     }
 
     public boolean isCheckImplicitSet(String classificationName) {

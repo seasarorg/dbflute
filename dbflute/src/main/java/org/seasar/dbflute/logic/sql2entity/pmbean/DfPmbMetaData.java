@@ -500,7 +500,9 @@ public class DfPmbMetaData {
             return true;
         }
         if (isPropertyOptionClassificationSetter(propertyName, schemaData)) {
-            return true;
+            if (getLittleAdjustmentProperties().isForceClassificationSetting()) {
+                return true;
+            }
         }
         if (isPropertyOptionClassificationFixedElement(propertyName)) {
             return true;

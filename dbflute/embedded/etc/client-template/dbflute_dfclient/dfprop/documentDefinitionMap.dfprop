@@ -4,7 +4,7 @@
 # o documentOutputDirectory (NotRequired - Default './output/doc')
 # o aliasDelimiterInDbComment (NotRequired - Default '')
 # o isDbCommentOnAliasBasis (NotRequired - Default false)
-# o isEntityJavaDocDbCommentValid (NotRequired - Default false)
+# o isEntityJavaDocDbCommentValid (NotRequired - Default true)
 # o isEntityDBMetaDbCommentValid (NotRequired - Default false)
 # o schemaHtmlFileName (NotRequired - Default 'schema-[project-name].html')
 # o isSuppressSchemaHtmlOutsideSql (NotRequired - Default false)

@@ -428,7 +428,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
 #end
-     * @return The value of ${propertyName}. (Nullable, NotEmptyString(when String): if empty string, returns null)
+     * @return The value of ${propertyName}. (NullAllowed, NotEmptyString(when String): if empty string, returns null)
      */
     public ${propertyType} get${database.initCap($propertyName)}() {
 #if ($propertyType.endsWith("String"))

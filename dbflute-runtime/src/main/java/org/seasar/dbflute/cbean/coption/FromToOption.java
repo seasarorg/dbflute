@@ -978,7 +978,7 @@ public class FromToOption implements ConditionOption {
      * @param fromDate The date as From. (NullAllowed: If the value is null, it returns null)
      * @return The filtered date as From. (NullAllowed)
      */
-    public Date filterFromDate(Date fromDate) {
+    public <DATE extends Date> DATE filterFromDate(DATE fromDate) {
         if (fromDate == null) {
             return null;
         }
@@ -1011,7 +1011,8 @@ public class FromToOption implements ConditionOption {
             moveToCalendarHourJustFor(cal, _fromDateWithHour);
         }
 
-        final Date cloneDate = (Date) fromDate.clone();
+        @SuppressWarnings("unchecked")
+        final DATE cloneDate = (DATE) fromDate.clone();
         cloneDate.setTime(cal.getTimeInMillis());
         fromDate = cloneDate;
         return fromDate;
@@ -1022,7 +1023,7 @@ public class FromToOption implements ConditionOption {
      * @param toDate The date as To. (NullAllowed: If the value is null, it returns null)
      * @return The filtered date as To. (NullAllowed)
      */
-    public Date filterToDate(Date toDate) {
+    public <DATE extends Date> DATE filterToDate(DATE toDate) {
         if (toDate == null) {
             return null;
         }
@@ -1055,7 +1056,8 @@ public class FromToOption implements ConditionOption {
             moveToCalendarHourJustFor(cal, _toDateWithHour);
         }
 
-        final Date cloneDate = (Date) toDate.clone();
+        @SuppressWarnings("unchecked")
+        final DATE cloneDate = (DATE) toDate.clone();
         cloneDate.setTime(cal.getTimeInMillis());
         toDate = cloneDate;
         return toDate;
