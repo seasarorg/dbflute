@@ -16,6 +16,7 @@
 package org.seasar.dbflute.task.bs;
 
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -23,13 +24,16 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.Task;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.filesystem.FileURL;
 import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
+import org.seasar.dbflute.infra.dfprop.DfPropPublicMap;
 import org.seasar.dbflute.logic.DfDBFluteTaskUtil;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.DfInfraProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
@@ -37,6 +41,7 @@ import org.seasar.dbflute.task.bs.assistant.DfTaskBasicController;
 import org.seasar.dbflute.task.bs.assistant.DfTaskControlCallback;
 import org.seasar.dbflute.task.bs.assistant.DfTaskControlLogic;
 import org.seasar.dbflute.task.bs.assistant.DfTaskDatabaseResource;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The abstract task.
@@ -248,6 +253,42 @@ public abstract class DfAbstractTask extends Task {
 
     protected DfRefreshProperties getRefreshProperties() {
         return getProperties().getRefreshProperties();
+    }
+
+    // ===================================================================================
+    //                                                                  Environment Helper
+    //                                                                  ==================
+    protected String getDBFluteHome() {
+        final Map<String, String> envMap = new ProcessBuilder().environment();
+        return envMap != null ? envMap.get("DBFLUTE_HOME") : null; // null check just in case
+    }
+
+    protected String getMyDBFluteDir() {
+        final String dbfluteHome = getDBFluteHome(); // e.g. ../mydbflute/dbflute-1.0.5K
+        if (dbfluteHome == null) { // basically no way (just in case)
+            return null;
+        }
+        final String filtered = Srl.replace(dbfluteHome, "\\", "/");
+        if (!filtered.contains("/")) { // basically no way (just in case)
+            return null;
+        }
+        return Srl.substringLastFront(filtered, "/"); // e.g. ../mydbflute
+    }
+
+    protected DfPropPublicMap preparePublicMap() {
+        final DfInfraProperties prop = getInfraProperties();
+        final String publicMapUrl = prop.getPublicMapUrl();
+        final DfPropPublicMap dfprop = new DfPropPublicMap().specifyUrl(publicMapUrl);
+        dfprop.loadMap();
+        return dfprop;
+    }
+
+    protected void download(String downloadUrl, String locationPath) {
+        new FileURL(downloadUrl).download(locationPath);
+    }
+
+    protected DfInfraProperties getInfraProperties() {
+        return DfBuildProperties.getInstance().getInfraProperties();
     }
 
     // ===================================================================================

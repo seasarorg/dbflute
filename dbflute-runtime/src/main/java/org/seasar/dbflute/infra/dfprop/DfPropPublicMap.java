@@ -24,6 +24,13 @@ import org.seasar.dbflute.helper.mapstring.MapListFile;
 import org.seasar.dbflute.util.Srl;
 
 /**
+ * The handling class for publicMap.dfprop.
+ * <pre>
+ * e.g. use default URL
+ *  DfPropPublicMap publicMap = new DfPropPublicMap();
+ *  publicMap.loadMap();
+ *  String latestVersion = publicMap.getDBFluteLatestVersion();
+ * </pre>
  * @author jflute
  * @since 1.0.5K (2014/08/15 Friday)
  */
@@ -44,13 +51,13 @@ public class DfPropPublicMap {
     //                                                                           Attribute
     //                                                                           =========
     protected Map<String, Object> _map;
-    protected String _specifiedSiteUrl;
+    protected String _specifiedUrl;
 
     // ===================================================================================
     //                                                                           Load Meta
     //                                                                           =========
     public void loadMap() {
-        final String siteUrl = getPublicMapSiteUrl();
+        final String siteUrl = getPublicMapUrl();
         InputStream ins = null;
         try {
             final URL url = new URL(siteUrl);
@@ -111,15 +118,15 @@ public class DfPropPublicMap {
         return (String) _map.get(key);
     }
 
-    protected String getPublicMapSiteUrl() {
-        return _specifiedSiteUrl != null ? _specifiedSiteUrl : DEFAULT_DFPROP_URL;
+    protected String getPublicMapUrl() {
+        return _specifiedUrl != null ? _specifiedUrl : DEFAULT_DFPROP_URL;
     }
 
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public DfPropPublicMap specifySiteUrl(String siteUrl) {
-        _specifiedSiteUrl = siteUrl;
+    public DfPropPublicMap specifyUrl(String url) {
+        _specifiedUrl = url;
         return this;
     }
 }

@@ -106,24 +106,6 @@ public class FileMakingOption {
     }
 
     /**
-     * @return this. (NotNull)
-     * @deprecated use {@link #separateByCrLf()}
-     */
-    public FileMakingOption separateCrLf() {
-        _lineSeparator = "\r\n";
-        return this;
-    }
-
-    /**
-     * @return this. (NotNull)
-     * @deprecated use {@link #separateByLf()}
-     */
-    public FileMakingOption separateLf() {
-        _lineSeparator = "\n";
-        return this;
-    }
-
-    /**
      * Quote values minimally (if it needs).
      * @return this. (NotNull)
      */

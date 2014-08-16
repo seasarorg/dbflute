@@ -256,7 +256,8 @@
   <target name="upgrade" description="DBFlute Upgrade task">
     <df-upgrade
         contextProperties="${torque.contextProperties}"
-        environmentType="${dfenv}">
+        environmentType="${dfenv}"
+    	version="${dfver}">
     </df-upgrade>
   </target>
 </project>

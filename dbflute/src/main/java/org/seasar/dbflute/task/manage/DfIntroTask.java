@@ -19,8 +19,6 @@ import java.io.File;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.io.download.DfFileDownloadMan;
 import org.seasar.dbflute.infra.dfprop.DfPropPublicMap;
 import org.seasar.dbflute.properties.DfInfraProperties;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus;
@@ -74,29 +72,9 @@ public class DfIntroTask extends DfAbstractTask {
         }
         final String downloadUrl = findDownloadUrl();
         _log.info("...Downloading DBFlute Intro to " + locationPath);
+        _log.info("    from " + downloadUrl);
         download(downloadUrl, locationPath);
         refreshResources();
-    }
-
-    protected String findDownloadUrl() {
-        final DfInfraProperties prop = getInfraProperties();
-        final String specified = prop.getDBFluteIntroDownloadUrl();
-        if (specified != null) {
-            return specified;
-        }
-        final DfPropPublicMap dfprop = preparePublicMap(prop);
-        final String downloadUrl = dfprop.getIntroDownloadUrl();
-        if (downloadUrl == null) {
-            String msg = "Not found the download URL for DBFlute Intro.";
-            throw new IllegalStateException(msg);
-        }
-        return downloadUrl;
-    }
-
-    protected DfPropPublicMap preparePublicMap(final DfInfraProperties prop) {
-        final DfPropPublicMap dfprop = new DfPropPublicMap().specifySiteUrl(prop.getPublicMapUrl());
-        dfprop.loadMap();
-        return dfprop;
     }
 
     protected String findLocationPath() {
@@ -105,11 +83,18 @@ public class DfIntroTask extends DfAbstractTask {
         return specified != null ? specified : DEFAULT_LOCATION_PATH;
     }
 
-    protected DfInfraProperties getInfraProperties() {
-        return DfBuildProperties.getInstance().getInfraProperties();
-    }
-
-    protected void download(String downloadUrl, String locationPath) {
-        new DfFileDownloadMan().download(downloadUrl, locationPath);
+    protected String findDownloadUrl() {
+        final DfInfraProperties prop = getInfraProperties();
+        final String specified = prop.getDBFluteIntroDownloadUrl();
+        if (specified != null) {
+            return specified;
+        }
+        final DfPropPublicMap dfprop = preparePublicMap();
+        final String downloadUrl = dfprop.getIntroDownloadUrl();
+        if (downloadUrl == null) {
+            String msg = "Not found the download URL for DBFlute Intro in publicMap.";
+            throw new IllegalStateException(msg);
+        }
+        return downloadUrl;
     }
 }

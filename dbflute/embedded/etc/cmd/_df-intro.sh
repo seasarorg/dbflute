@@ -2,7 +2,6 @@
 
 ANT_HOME=$DBFLUTE_HOME/ant
 NATIVE_PROPERTIES_PATH=$1
-VARYING_ARG=$2
 
 if [ -e ../dbflute-intro.jar ]; then
   pushd ../
@@ -13,7 +12,7 @@ else
 
   sh $DBFLUTE_HOME/etc/cmd/_df-copy-extlib.sh
 
-  sh $DBFLUTE_HOME/ant/bin/ant -Ddfenv=$DBFLUTE_ENVIRONMENT_TYPE -Ddfvarg=$VARYING_ARG -f $DBFLUTE_HOME/build-torque.xml intro
+  sh $DBFLUTE_HOME/ant/bin/ant -Ddfenv=$DBFLUTE_ENVIRONMENT_TYPE -f $DBFLUTE_HOME/build-torque.xml intro
   antReturnCode=$?
 
   sh $DBFLUTE_HOME/etc/cmd/_df-delete-extlib.sh
