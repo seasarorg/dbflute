@@ -2234,8 +2234,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected Method xhelpGettingCQMethod(ConditionQuery cq, String methodName, Class<?>[] argTypes) {
-        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(cq.getClass());
-        return beanDesc.getMethodNoException(methodName, argTypes);
+        final Class<? extends ConditionQuery> cqType = cq.getClass();
+        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(cqType);
+        final Method found = beanDesc.getMethodNoException(methodName, argTypes);
+        if (found != null) {
+            return found;
+        }
+        return DfReflectionUtil.getWholeMethod(cqType, methodName, argTypes); // e.g. native method of classification
     }
 
     protected Object xhelpInvokingCQMethod(ConditionQuery cq, Method method, Object[] args) {
