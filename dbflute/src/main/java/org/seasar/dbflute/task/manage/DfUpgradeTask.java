@@ -152,7 +152,7 @@ public class DfUpgradeTask extends DfAbstractTask {
 
     protected void deleteDownloadedArchive(String archivePath) {
         _log.info("...Deleting zip archive to " + archivePath);
-        new File(archivePath).delete();
+        new File(archivePath).deleteOnExit();
     }
 
     // ===================================================================================

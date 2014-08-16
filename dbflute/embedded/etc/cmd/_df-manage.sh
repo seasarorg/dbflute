@@ -12,17 +12,17 @@ if [ "$FIRST_ARG" = "" ];then
   echo "     | | |-\ |-  | | | -+- /_\ "
   echo "     |/  |-/ |   | |_|  |  \-  "
   echo ""
-  echo " [DB Change] *delete database"
+  echo " <<< DB Change >>> *delete database"
   echo "   0 : replace-schema  => drop tables and create schema"
   echo "   1 : renewal         => replace-schema + regenerate"
   echo "   7 : save-previous  8 : alter-check"
   echo ""
-  echo " [Generate]"
+  echo " <<< Generate >>>"
   echo "   2 : regenerate  => call 21->22->23->25->24"
   echo "  21 : jdbc        22 : doc  23 : generate"
   echo "  24 : sql2entity  25 : outside-sql-test"
   echo ""
-  echo " [Utility]"
+  echo " <<< Utility >>>"
   echo "   4 : load-data-reverse  5 : schema-sync-check"
   echo "  11 : refresh  12 : freegen  13 : take-assert"
   echo "  88 : intro    94 : upgrade  97 : help"
@@ -47,12 +47,12 @@ elif [ "$FIRST_ARG" = "7" ];then
   FIRST_ARG=save-previous
 elif [ "$FIRST_ARG" = "8" ];then
   FIRST_ARG=alter-check
-elif [ "$FIRST_ARG" = "10" ];then
-  FIRST_ARG=take-assert
 elif [ "$FIRST_ARG" = "11" ];then
   FIRST_ARG=refresh
 elif [ "$FIRST_ARG" = "12" ];then
   FIRST_ARG=freegen
+elif [ "$FIRST_ARG" = "13" ];then
+  FIRST_ARG=take-assert
 elif [ "$FIRST_ARG" = "21" ];then
   FIRST_ARG=jdbc
 elif [ "$FIRST_ARG" = "22" ];then
@@ -215,7 +215,7 @@ elif [ "$FIRST_ARG" = "help" ];then
   echo " [Utility] => various tasks"
   echo "   4 : load-data-reverse => reverse data to excel for e.g. ReplaceSchema"
   echo "   5 : schema-sync-check => check difference between two schemas"
-  echo "  11 : refresh           => request refresh (F5) to IDE e.g. Eclipse"
+  echo "  11 : refresh           => request refresh (F5) to IDE e.g. Eclipse"
   echo "  12 : freegen           => generate something by free template"
   echo "  13 : take-assert       => execute assertion SQL of TakeFinally"
   echo ""

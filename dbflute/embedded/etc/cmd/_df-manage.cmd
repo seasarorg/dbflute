@@ -19,24 +19,24 @@ if "%PURE_FIRST_ARG%"=="""" (
 )
 
 if "%FIRST_ARG%"=="" (
-  echo      |\  |-\ |-- |      |      "
-  echo      | | |-\ |-  | | | -+- /_\ "
-  echo      |/  |-/ |   | |_|  |  \-  "
+  echo      ^|\  ^|-\ ^|-- ^|      ^|
+  echo      ^| ^| ^|-\ ^|-  ^| ^| ^| -+- /_\
+  echo      ^|/  ^|-/ ^|   ^| ^|_^|  ^|  \-
   echo:
-  echo  [DB Change] *delete database"
-  echo    0 : replace-schema  => drop tables and create schema"
-  echo    1 : renewal         => replace-schema + regenerate"
-  echo    7 : save-previous  8 : alter-check"
+  echo  ^<^<^< DB Change ^>^>^> *delete database
+  echo    0 : replace-schema  =^> drop tables and create schema
+  echo    1 : renewal         =^> replace-schema + regenerate
+  echo    7 : save-previous  8 : alter-check
   echo:
-  echo  [Generate]"
-  echo    2 : regenerate  => call 21->22->23->25->24"
-  echo   21 : jdbc        22 : doc  23 : generate"
-  echo   24 : sql2entity  25 : outside-sql-test"
+  echo  ^<^<^< Generate ^>^>^>
+  echo    2 : regenerate  =^> call 21-^>22-^>23-^>25-^>24
+  echo   21 : jdbc        22 : doc  23 : generate
+  echo   24 : sql2entity  25 : outside-sql-test
   echo:
-  echo  [Utility]"
-  echo    4 : load-data-reverse  5 : schema-sync-check"
-  echo   11 : refresh  12 : freegen  13 : take-assert"
-  echo   88 : intro  94 : upgrade  97 : help"
+  echo  ^<^<^< Utility ^>^>^>
+  echo    4 : load-data-reverse  5 : schema-sync-check
+  echo   11 : refresh  12 : freegen  13 : take-assert
+  echo   88 : intro    94 : upgrade  97 : help
   echo:
 
   echo (input on your console^)
@@ -59,12 +59,12 @@ if "%FIRST_ARG%"=="0" (
   set FIRST_ARG=save-previous
 ) else if "%FIRST_ARG%"=="8" (
   set FIRST_ARG=alter-check
-) else if "%FIRST_ARG%"=="10" (
-  set FIRST_ARG=take-assert
 ) else if "%FIRST_ARG%"=="11" (
   set FIRST_ARG=refresh
 ) else if "%FIRST_ARG%"=="12" (
   set FIRST_ARG=freegen
+) else if "%FIRST_ARG%"=="13" (
+  set FIRST_ARG=take-assert
 ) else if "%FIRST_ARG%"=="21" (
   set FIRST_ARG=jdbc
 ) else if "%FIRST_ARG%"=="22" (
@@ -192,29 +192,29 @@ if "%FIRST_ARG%"=="replace-schema" (
   call %DBFLUTE_HOME%\etc\cmd\_df-upgrade.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
 
 ) else if "%FIRST_ARG%"=="help" (
-  echo  [DB Change] => after changing database, with replacing your database
-  echo    0 : replace-schema => drop tables and re-create schema (needs settings^)
-  echo    1 : renewal        => replace-schema and generate all (replace-schema + regenerate^)
-  echo    7 : save-previous  => save previous DDLs for AlterCheck
-  echo    8 : alter-check    => check alter DDLs with previous and next DDLs
+  echo  [DB Change] =^> after changing database, with replacing your database
+  echo    0 : replace-schema =^> drop tables and re-create schema (needs settings^)
+  echo    1 : renewal        =^> replace-schema and generate all (replace-schema + regenerate^)
+  echo    7 : save-previous  =^> save previous DDLs for AlterCheck
+  echo    8 : alter-check    =^> check alter DDLs with previous and next DDLs
   echo:
-  echo  [Generate] => generate class files and documents by schema meta data
-  echo    2 : regenerate       => generate all (execute 21->22->23->24->25^)
-  echo   21 : jdbc             => get meta data from schema (before doc and generate^)
-  echo   22 : doc              => generate documents e.g. SchemaHTML, HistoryHTML
-  echo   23 : generate         => generate class files for tables
-  echo   24 : sql2entity       => generate class files for OutsideSql
-  echo   25 : outside-sql-test => check OutsideSql (execute SQLs, expect no error^)
+  echo  [Generate] =^> generate class files and documents by schema meta data
+  echo    2 : regenerate       =^> generate all (execute 21-^>22-^>23-^>24-^>25^)
+  echo   21 : jdbc             =^> get meta data from schema (before doc and generate^)
+  echo   22 : doc              =^> generate documents e.g. SchemaHTML, HistoryHTML
+  echo   23 : generate         =^> generate class files for tables
+  echo   24 : sql2entity       =^> generate class files for OutsideSql
+  echo   25 : outside-sql-test =^> check OutsideSql (execute SQLs, expect no error^)
   echo:
-  echo  [Utility] => various tasks
-  echo    4 : load-data-reverse => reverse data to excel for e.g. ReplaceSchema
-  echo    5 : schema-sync-check => check difference between two schemas
-  echo   11 : refresh           => request refresh (F5^) to IDE e.g. Eclipse
-  echo   12 : freegen           => generate something by free template
-  echo   13 : take-assert       => execute assertion SQL of TakeFinally
+  echo  [Utility] =^> various tasks
+  echo    4 : load-data-reverse =^> reverse data to excel for e.g. ReplaceSchema
+  echo    5 : schema-sync-check =^> check difference between two schemas
+  echo   11 : refresh           =^> request refresh (F5^) to IDE e.g. Eclipse
+  echo   12 : freegen           =^> generate something by free template
+  echo   13 : take-assert       =^> execute assertion SQL of TakeFinally
   echo:
-  echo   88 : intro   => boot DBFluteIntro that provides GUI control
-  echo   94 : upgrade => upgrade DBFlute module to new version (except runtime^)
-  echo   97 : help    => show description of tasks
+  echo   88 : intro   =^> boot DBFluteIntro that provides GUI control
+  echo   94 : upgrade =^> upgrade DBFlute module to new version (except runtime^)
+  echo   97 : help    =^> show description of tasks
 
 )

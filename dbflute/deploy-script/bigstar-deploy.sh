@@ -8,21 +8,21 @@ export answer=y
 
 cd ../../dbflute-example-container/dbflute-seasar-example/dbflute_exampledb
 rm ./log/*.log
-. replace-schema.sh
-. jdbc.sh
-. doc.sh
-. generate.sh
-. sql2entity.sh
-. outside-sql-test.sh
+. manage.sh 0
+. manage.sh 21
+. manage.sh 22
+. manage.sh 23
+. manage.sh 24
+. manage.sh 25
 
 cd ../../dbflute-spring-example/dbflute_exampledb
 rm ./log/*.log
-. replace-schema.sh
-. jdbc.sh
-. doc.sh
-. generate.sh
-. sql2entity.sh
-. outside-sql-test.sh
+. manage.sh replace-schema
+. manage.sh jdbc
+. manage.sh doc
+. manage.sh generate
+. manage.sh sql2entity
+. manage.sh outside-sql-test
 
 cd ../../dbflute-guice-example/dbflute_exampledb
 rm ./log/*.log

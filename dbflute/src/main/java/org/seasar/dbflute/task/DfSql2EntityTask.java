@@ -97,6 +97,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                           =========
     @Override
     protected boolean begin() {
+        if (getBasicProperties().isSuppressSql2EntityTask()) {
+            _log.info("...Suppressing Sql2Entity task as basicInfoMap.dfprop");
+            return false;
+        }
         _log.info("+------------------------------------------+");
         _log.info("|                                          |");
         _log.info("|                Sql2Entity                |");

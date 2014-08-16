@@ -83,6 +83,10 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     //                                                                           =========
     @Override
     protected boolean begin() {
+        if (getBasicProperties().isSuppressReplaceSchemaTask()) {
+            _log.info("...Suppressing ReplaceSchema task as basicInfoMap.dfprop");
+            return false;
+        }
         {
             _log.info("+------------------------------------------+");
             _log.info("|                                          |");

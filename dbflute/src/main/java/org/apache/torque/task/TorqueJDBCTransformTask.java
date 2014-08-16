@@ -97,6 +97,10 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                                                           =========
     @Override
     protected boolean begin() {
+        if (getBasicProperties().isSuppressJDBCTask()) {
+            _log.info("...Suppressing JDBC task as basicInfoMap.dfprop");
+            return false;
+        }
         _log.info("+------------------------------------------+");
         _log.info("|                                          |");
         _log.info("|                   JDBC                   |");

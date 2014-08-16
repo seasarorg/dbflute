@@ -102,6 +102,10 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
     //                                                                           =========
     @Override
     protected boolean begin() {
+        if (getBasicProperties().isSuppressGenerateTask()) {
+            _log.info("...Suppressing Generate task as basicInfoMap.dfprop");
+            return false;
+        }
         _log.info("+------------------------------------------+");
         _log.info("|                                          |");
         _log.info("|                 Generate                 |");

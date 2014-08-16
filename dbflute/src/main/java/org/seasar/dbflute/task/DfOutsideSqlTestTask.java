@@ -69,6 +69,10 @@ public class DfOutsideSqlTestTask extends DfAbstractTask {
     //                                                                           =========
     @Override
     protected boolean begin() {
+        if (getBasicProperties().isSuppressOutsideSqlTestTask()) {
+            _log.info("...Suppressing OutsideSqlTest task as basicInfoMap.dfprop");
+            return false;
+        }
         _log.info("+------------------------------------------+");
         _log.info("|                                          |");
         _log.info("|              OutsideSqlTest              |");

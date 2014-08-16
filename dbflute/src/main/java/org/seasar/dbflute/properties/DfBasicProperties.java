@@ -764,6 +764,33 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                       Suppress Task
+    //                                                                       =============
+    public boolean isSuppressJDBCTask() { // closet (very internal)
+        return isProperty("isSuppressJDBCTask", false);
+    }
+
+    public boolean isSuppressDocTask() { // closet (very internal)
+        return isProperty("isSuppressDocTask", false);
+    }
+
+    public boolean isSuppressGenerateTask() { // closet (very internal)
+        return isProperty("isSuppressGenerateTask", false);
+    }
+
+    public boolean isSuppressSql2EntityTask() { // closet (very internal)
+        return isProperty("isSuppressSql2EntityTask", false);
+    }
+
+    public boolean isSuppressOutsideSqlTestTask() { // closet (very internal)
+        return isProperty("isSuppressOutsideSqlTestTask", false);
+    }
+
+    public boolean isSuppressReplaceSchemaTask() { // closet (very internal)
+        return isProperty("isSuppressReplaceSchemaTask", false);
+    }
+
+    // ===================================================================================
     //                                                                             Friends
     //                                                                             =======
     public boolean isFriendsHibernate() {

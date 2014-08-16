@@ -167,6 +167,10 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     //                                                                           =========
     @Override
     protected boolean begin() {
+        if (getBasicProperties().isSuppressDocTask()) {
+            _log.info("...Suppressing Doc task as basicInfoMap.dfprop");
+            return false;
+        }
         {
             _log.info("+------------------------------------------+");
             _log.info("|                                          |");

@@ -4,11 +4,11 @@ set ANT_HOME=%DBFLUTE_HOME%\ant
 set NATIVE_PROPERTIES_PATH=%1
 if "%DBFLUTE_ENVIRONMENT_TYPE%"=="" set DBFLUTE_ENVIRONMENT_TYPE=""
 
-if [ -e ..\dbflute-intro.jar ]; then
+if exist ..\dbflute-intro.jar (
   pushd ..\
-  start /b cmd /c java -jar dbflute-intro.jar &
+  start /b cmd /c java -jar dbflute-intro.jar
   popd
-else
+) else (
   call %DBFLUTE_HOME%\etc\cmd\_df-copy-properties.cmd %NATIVE_PROPERTIES_PATH%
 
   call %DBFLUTE_HOME%\etc\cmd\_df-copy-extlib.cmd
@@ -20,4 +20,4 @@ else
   pushd ..\
   start /b cmd /c java -jar dbflute-intro.jar
   popd
-fi
+)
