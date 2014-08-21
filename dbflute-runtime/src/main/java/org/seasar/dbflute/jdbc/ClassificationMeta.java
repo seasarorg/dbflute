@@ -25,6 +25,12 @@ import java.util.List;
 public interface ClassificationMeta {
 
     /**
+     * Get classification name of this meta.
+     * @return The name of the classification.
+     */
+    String classificationName();
+
+    /**
      * Get classification by the code.
      * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns null)
      * @return The instance of the classification. (NullAllowed: when not found and code is null)
@@ -56,4 +62,10 @@ public interface ClassificationMeta {
      * @return The instance of the code type for the classification. (NotNull)
      */
     ClassificationCodeType codeType();
+
+    /**
+     * Get the handling type of undefined classification code.
+     * @return The enumeration of the handling type. (NotNull)
+     */
+    ClassificationUndefinedHandlingType undefinedHandlingType();
 }

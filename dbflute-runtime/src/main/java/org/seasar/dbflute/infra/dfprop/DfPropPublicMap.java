@@ -28,7 +28,7 @@ import org.seasar.dbflute.util.Srl;
  * <pre>
  * e.g. use default URL
  *  DfPropPublicMap publicMap = new DfPropPublicMap();
- *  publicMap.loadMap();
+ *  publicMap.loadMap(); // connecting to network
  *  String latestVersion = publicMap.getDBFluteLatestVersion();
  * </pre>
  * @author jflute
@@ -62,7 +62,7 @@ public class DfPropPublicMap {
         try {
             final URL url = new URL(siteUrl);
             ins = url.openStream();
-            MapListFile mapListFile = new MapListFile();
+            final MapListFile mapListFile = new MapListFile();
             _map = mapListFile.readMap(ins);
         } catch (IOException e) {
             throw new IllegalStateException("The url threw the IO exception: url=" + siteUrl, e);

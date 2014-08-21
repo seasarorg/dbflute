@@ -28,7 +28,10 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfLoadDataIllegalImplicitClassificationValueException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.jdbc.ClassificationMeta;
+import org.seasar.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.seasar.dbflute.properties.DfClassificationProperties;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
 
 /**
  * @author jflute
@@ -38,10 +41,24 @@ public class DfImplicitClassificationChecker {
 
     private static final Log _log = LogFactory.getLog(DfImplicitClassificationChecker.class);
 
+    /** The instance of logging object for classification meta. */
+    private static final Log _clsMetaLog = LogFactory.getLog(ClassificationMeta.class);
+
     public void check(File file, String tableDbName, String columnDbName, Connection conn) throws SQLException {
         final DfClassificationProperties prop = getClassificationProperties();
         final String classificationName = prop.getClassificationName(tableDbName, columnDbName);
         if (!prop.isCheckImplicitSet(classificationName)) {
+            return;
+        }
+        final DfClassificationTop classificationTop = prop.getClassificationTop(classificationName);
+        if (classificationTop == null) { // no way (just in case)
+            return;
+        }
+        final ClassificationUndefinedHandlingType undefinedHandlingType = classificationTop.getUndefinedHandlingType();
+        if (undefinedHandlingType == null) { // no way (just in case)
+            return;
+        }
+        if (!undefinedHandlingType.isChecked()) { // no way (just in case)
             return;
         }
         final boolean quote = prop.isCodeTypeNeedsQuoted(classificationName);
@@ -59,7 +76,7 @@ public class DfImplicitClassificationChecker {
             }
             if (!illegalCodeList.isEmpty()) {
                 throwLoadDataIllegalImplicitClassificationValueException(file, tableDbName, columnDbName,
-                        classificationName, codeList, illegalCodeList);
+                        classificationName, codeList, illegalCodeList, undefinedHandlingType);
             }
         } finally {
             if (rs != null) {
@@ -89,9 +106,10 @@ public class DfImplicitClassificationChecker {
     }
 
     protected void throwLoadDataIllegalImplicitClassificationValueException(File file, String tableDbName,
-            String columnDbName, String classificationName, List<String> codeList, List<String> illegalCodeList) {
+            String columnDbName, String classificationName, List<String> codeList, List<String> illegalCodeList,
+            ClassificationUndefinedHandlingType undefinedHandlingType) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The illegal code of the implicit classification was found.");
+        br.addNotice("Undefined classification code was found.");
         br.addItem("Data File");
         br.addElement(file.getPath());
         br.addItem("Table");
@@ -105,7 +123,11 @@ public class DfImplicitClassificationChecker {
         br.addItem("Illegal Value");
         br.addElement(illegalCodeList);
         final String msg = br.buildExceptionMessage();
-        throw new DfLoadDataIllegalImplicitClassificationValueException(msg);
+        if (ClassificationUndefinedHandlingType.EXCEPTION.equals(undefinedHandlingType)) {
+            throw new DfLoadDataIllegalImplicitClassificationValueException(msg);
+        } else if (ClassificationUndefinedHandlingType.LOGGING.equals(undefinedHandlingType)) {
+            _clsMetaLog.info(msg);
+        }
     }
 
     // ===================================================================================

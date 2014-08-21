@@ -14,7 +14,7 @@ if [ "$FIRST_ARG" = "" ];then
   echo ""
   echo " <<< DB Change >>> *delete database"
   echo "   0 : replace-schema  => drop tables and create schema"
-  echo "   1 : renewal         => replace-schema + regenerate"
+  echo "   1 : renewal         => call 0->21->22->23->25->24"
   echo "   7 : save-previous  8 : alter-check"
   echo ""
   echo " <<< Generate >>>"

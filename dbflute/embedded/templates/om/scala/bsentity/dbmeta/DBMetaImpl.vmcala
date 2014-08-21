@@ -78,8 +78,35 @@ object ${myClassName} extends AbstractDBMeta {
 #if ($col.isCheckSelectedClassification())
             dgccls(col, vl);
 #end
+#if ($col.isForceClassificationSetting())
+            val cls = dggcls(col, vl).asInstanceOf[${glCDef}.${col.classificationName}];
+            if (cls != null) {
+                et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}As${col.classificationName}(cls);
+            } else {
+#if ($col.isClassificationUndefinedHandlingTypeCheckedAbort())
+## undefined code does not come here so set null fixedly
+                et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}As${col.classificationName}(null);
+#else
+## undefined code or null here, use internal method for native mapping
+#if ($col.isJavaNativeNumberObject())
+                et.asInstanceOf[${myExtendedObjectClassName}].mynativeMapping${col.javaName}(dgctn(vl, classOf[${col.javaNative}]));
+#else
+                et.asInstanceOf[${myExtendedObjectClassName}].mynativeMapping${col.javaName}(vl.asInstanceOf[${col.javaNative}]);
+#end
+#end
+            }
+#else
+#if ($col.isJavaNativeNumberObject())
+            ((${myExtendedObjectClassName})et).set${col.javaName}(ctn(vl, ${col.javaNative}.class));
+#else
+            ((${myExtendedObjectClassName})et).set${col.javaName}((${col.javaNative})vl);
+#end
+#end
+        }
+
             et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}As${col.classificationName}(dggcls(col, vl).asInstanceOf[${glCDef}.${col.classificationName}]);
         }
+
 #else
 ## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## for different type between relation (Integer, Long and BigDecimal are prior)

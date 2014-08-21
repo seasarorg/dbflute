@@ -955,4 +955,20 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
         FunCustodial.checkImplicitSet(this, columnDbName, meta, value);
     }
 #end
+#foreach ($col in $table.columns)
+#if ($col.isPropertySettingModifierClosed() && $col.isClassificationUndefinedHandlingTypeContinued())
+
+    /**
+     * For framework so basically DON'T use this method.
+#if ($col.isNotNull())
+     * @param ${col.uncapitalisedJavaName} The value of the column '${col.name}'. (basically NotNull if update: for the constraint)
+#else
+     * @param ${col.uncapitalisedJavaName} The value of the column '${col.name}'. (NullAllowed: null update allowed for no constraint)
+#end
+     */
+    def mynativeMapping${col.javaName}(${col.uncapitalisedJavaName}: ${col.javaNative}): Unit = {
+        set${col.javaName}(${col.uncapitalisedJavaName});
+    }
+#end
+#end
 }

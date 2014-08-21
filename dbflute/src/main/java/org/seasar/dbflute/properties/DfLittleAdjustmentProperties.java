@@ -22,11 +22,13 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfTableColumnNameNonCompilableConnectorException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.framework.DfLanguageFramework;
 import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
@@ -127,18 +129,95 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                      Classification
     //                                                                      ==============
-    public boolean isCheckSelectedClassification() {
-        return isProperty("isCheckSelectedClassification", !isCompatibleBeforeJava8());
+    // -----------------------------------------------------
+    //                                    Undefined Handling
+    //                                    ------------------
+    // old style, but primitive control
+    protected static final String PROP_isCheckSelectedClassification = "isCheckSelectedClassification";
+
+    public boolean hasCheckSelectedClassificationProperty() {
+        return getProperty(PROP_isCheckSelectedClassification, null) != null;
     }
 
+    public boolean isCheckSelectedClassification() {
+        if (hasClassificationUndefinedHandlingTypeProperty()) {
+            return getClassificationUndefinedHandlingType().isChecked();
+        }
+        return isProperty(PROP_isCheckSelectedClassification, !isCompatibleBeforeJava8());
+    }
+
+    // user public since 1.1 (implemented when 1.0.5K)
+    public boolean hasClassificationUndefinedHandlingTypeProperty() {
+        return doGetClassificationUndefinedHandlingType(null) != null;
+    }
+
+    public ClassificationUndefinedHandlingType getClassificationUndefinedHandlingType() {
+        final String defaultValue;
+        if (isCompatibleBeforeJava8()) {
+            defaultValue = ClassificationUndefinedHandlingType.EXCEPTION.code();
+        } else {
+            defaultValue = ClassificationUndefinedHandlingType.LOGGING.code();
+        }
+        final String code = doGetClassificationUndefinedHandlingType(defaultValue);
+        final ClassificationUndefinedHandlingType handlingType = ClassificationUndefinedHandlingType.codeOf(code);
+        if (handlingType == null) {
+            throwUnknownClassificationUndefinedHandlingTypeException(code);
+        }
+        return handlingType;
+    }
+
+    protected String doGetClassificationUndefinedHandlingType(String defaultValue) {
+        return getProperty("classificationUndefinedHandlingType", defaultValue);
+    }
+
+    protected void throwUnknownClassificationUndefinedHandlingTypeException(String code) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Unknown handling type of classification undefined code.");
+        br.addItem("Advice");
+        br.addElement("You can specify following types:");
+        for (ClassificationUndefinedHandlingType handlingType : ClassificationUndefinedHandlingType.values()) {
+            br.addElement(" " + handlingType.code());
+        }
+        final String exampleCode = ClassificationUndefinedHandlingType.EXCEPTION.code();
+        br.addElement("");
+        br.addElement("For example: (littleAdjustmentMap.dfprop)");
+        br.addElement("map:{");
+        br.addElement("    ...");
+        br.addElement("    ");
+        br.addElement("    ; classificationUndefinedCodeHandlingType = " + exampleCode);
+        br.addElement("    ...");
+        br.addElement("}");
+        br.addItem("Specified Unknown Type");
+        br.addElement(code);
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                  Force Classification
+    //                                  --------------------
+    // old style, but primitive control
     public boolean isForceClassificationSetting() {
+        if (hasMakeClassificationNativeTypeSetterProperty()) {
+            return !isMakeClassificationNativeTypeSetter();
+        }
         return isProperty("isForceClassificationSetting", !isCompatibleBeforeJava8());
     }
 
-    public boolean isCheckImplicitClassificationSetting() { // closet
-        return isProperty("isCheckImplicitClassificationSetting", !isCompatibleBeforeJava8());
+    // user public since 1.1 (implemented when 1.0.5K)
+    protected static final String PROP_isMakeClassificationNativeTypeSetter = "isMakeClassificationNativeTypeSetter";
+
+    public boolean hasMakeClassificationNativeTypeSetterProperty() {
+        return getProperty(PROP_isMakeClassificationNativeTypeSetter, null) != null;
     }
 
+    public boolean isMakeClassificationNativeTypeSetter() {
+        return isProperty(PROP_isMakeClassificationNativeTypeSetter, false);
+    }
+
+    // -----------------------------------------------------
+    //                                          Small Option
+    //                                          ------------
     public boolean isCDefToStringReturnsName() { // closet
         return isProperty("isCDefToStringReturnsName", false);
     }

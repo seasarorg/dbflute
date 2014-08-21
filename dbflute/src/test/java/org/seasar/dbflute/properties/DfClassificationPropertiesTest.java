@@ -159,13 +159,13 @@ public class DfClassificationPropertiesTest {
         final Map<String, String> elementMap = new HashMap<String, String>();
 
         // ## Act & Assert ##
-        assertFalse(prop.isClassificationSuppressAutoDeploy(elementMap));
+        assertFalse(prop.isElementMapSuppressAutoDeploy(elementMap));
         elementMap.put("suppressAutoDeploy", "false");
-        assertFalse(prop.isClassificationSuppressAutoDeploy(elementMap));
+        assertFalse(prop.isElementMapSuppressAutoDeploy(elementMap));
         elementMap.put("suppressAutoDeploy", "true");
-        assertTrue(prop.isClassificationSuppressAutoDeploy(elementMap));
+        assertTrue(prop.isElementMapSuppressAutoDeploy(elementMap));
         elementMap.put("suppressAutoDeploy", "True");
-        assertTrue(prop.isClassificationSuppressAutoDeploy(elementMap));
+        assertTrue(prop.isElementMapSuppressAutoDeploy(elementMap));
     }
 
     protected DfClassificationProperties createClassificationProperties(Map<String, Map<String, String>> deploymentMap) {

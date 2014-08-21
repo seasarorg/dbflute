@@ -19,14 +19,19 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.exception.IllegalClassificationCodeException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerUnknownAliasNameException;
+import org.seasar.dbflute.exception.UndefinedClassificationCodeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
+import org.seasar.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.seasar.dbflute.jdbc.ParameterUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -380,6 +385,9 @@ public interface Entity {
     //                                                                      ==============
     public static final class FunCustodial {
 
+        /** The instance of logging object for classification meta. */
+        private static final Log _clsMetaLog = LogFactory.getLog(ClassificationMeta.class);
+
         @SuppressWarnings("unchecked")
         public static <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) {
             return (NUMBER) DfTypeUtil.toNumber(obj, type);
@@ -448,20 +456,53 @@ public interface Entity {
         }
 
         public static void checkImplicitSet(Entity entity, String columnDbName, ClassificationMeta meta, Object code) {
-            if (code != null && meta.codeOf(code) == null) {
-                final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-                br.addNotice("The set value was not found in the classification of the column.");
-                br.addItem("Table");
-                br.addElement(entity.getTableDbName());
-                br.addItem("Column");
-                br.addElement(columnDbName);
-                br.addItem("Classification");
-                br.addElement(meta);
-                br.addItem("Set Value");
-                br.addElement(code);
-                String msg = br.buildExceptionMessage();
-                throw new IllegalClassificationCodeException(msg);
+            if (code == null) {
+                return;
             }
+            if (meta.codeOf(code) != null) {
+                return;
+            }
+            final ClassificationUndefinedHandlingType undefinedHandlingType = meta.undefinedHandlingType();
+            if (ClassificationUndefinedHandlingType.EXCEPTION.equals(undefinedHandlingType)) {
+                throwUndefinedClassificationCodeException(entity, columnDbName, meta, code);
+            } else if (ClassificationUndefinedHandlingType.LOGGING.equals(undefinedHandlingType)) {
+                showUndefinedClassificationCodeMessage(entity, columnDbName, meta, code);
+            }
+            // else means ALLOWED
+        }
+
+        protected static void throwUndefinedClassificationCodeException(Entity entity, String columnDbName,
+                ClassificationMeta meta, Object code) {
+            // TODO jflute exception message
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Undefined classification code was set to the entity.");
+            br.addItem("Table");
+            br.addElement(entity.getTableDbName());
+            br.addItem("Column");
+            br.addElement(columnDbName);
+            br.addItem("Classification");
+            br.addElement(meta.classificationName());
+            final List<Classification> listAll = meta.listAll();
+            final StringBuilder sb = new StringBuilder();
+            for (Classification cls : listAll) {
+                if (sb.length() > 0) {
+                    sb.append(", ");
+                }
+                sb.append(cls.name()).append("(").append(cls.code()).append(")");
+            }
+            br.addElement(sb.toString());
+            br.addItem("Undefined Code");
+            br.addElement(code);
+            final String msg = br.buildExceptionMessage();
+            throw new UndefinedClassificationCodeException(msg);
+        }
+
+        protected static void showUndefinedClassificationCodeMessage(Entity entity, String columnDbName,
+                ClassificationMeta meta, Object code) {
+            final String tableDbName = entity.getTableDbName();
+            final String classificationName = meta.classificationName();
+            final String exp = tableDbName + "." + columnDbName + "->" + classificationName + "." + code;
+            _clsMetaLog.info("*Undefined classification code was set: " + exp);
         }
     }
 }

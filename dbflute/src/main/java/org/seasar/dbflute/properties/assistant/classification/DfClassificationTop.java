@@ -27,6 +27,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.Srl;
 
@@ -41,19 +42,29 @@ public class DfClassificationTop {
     //                                                                          Definition
     //                                                                          ==========
     public static final String KEY_TOP_COMMENT = "topComment";
+
+    // code type
     public static final String KEY_CODE_TYPE = "codeType";
     public static final String KEY_DATA_TYPE = "dataType"; // old style
-
     public static final String CODE_TYPE_STRING = "String";
     public static final String CODE_TYPE_NUMBER = "Number";
     public static final String CODE_TYPE_BOOLEAN = "Boolean";
     public static final String DEFAULT_CODE_TYPE = CODE_TYPE_STRING;
 
-    public static final String KEY_CHECK_IMPLICIT_SET = "isCheckImplicitSet";
+    // primitive control, closet
+    public static final String KEY_CHECK_IMPLICIT_SET = "isCheckImplicitSet"; // old style
+
+    // document default, basically true
+    public static final String KEY_UNDEFINED_CODE_HANDLING_TYPE = "undefinedCodeHandlingType";
+    public static final String KEY_MAKE_NATIVE_TYPE_SETTER = "isMakeNativeTypeSetter";
+
+    // small options
     public static final String KEY_USE_DOCUMENT_ONLY = "isUseDocumentOnly";
     public static final String KEY_SUPPRESS_AUTO_DEPLOY = "isSuppressAutoDeploy";
     public static final String KEY_SUPPRESS_DBACCESS_CLASS = "isSuppressDBAccessClass";
     public static final String KEY_DEPRECATED = "isDeprecated";
+
+    // mapping settings
     public static final String KEY_GROUPING_MAP = "groupingMap";
     public static final String KEY_DEPRECATED_MAP = "deprecatedMap";
 
@@ -63,10 +74,13 @@ public class DfClassificationTop {
     protected String _classificationName;
     protected String _topComment;
     protected String _codeType = DfClassificationTop.CODE_TYPE_STRING; // as default
+    protected ClassificationUndefinedHandlingType _undefinedHandlingType = ClassificationUndefinedHandlingType.LOGGING; // as default
     protected String _relatedColumnName;
     protected final List<DfClassificationElement> _elementList = new ArrayList<DfClassificationElement>();
     protected boolean _tableClassification;
     protected boolean _checkImplicitSet;
+    protected boolean _checkSelectedClassification;
+    protected boolean _forceClassificationSetting;
     protected boolean _useDocumentOnly;
     protected boolean _suppressAutoDeploy; // no automatic classification deployment
     protected boolean _suppressDBAccessClass; // no DB-access class (e.g. behavior) for table classification
@@ -100,7 +114,7 @@ public class DfClassificationTop {
             codeType = tmpType;
         }
         if (codeType != null) {
-            this._codeType = codeType;
+            _codeType = codeType;
         }
     }
 
@@ -361,6 +375,9 @@ public class DfClassificationTop {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                            Basic Item
+    //                                            ----------
     public String getClassificationName() {
         return _classificationName;
     }
@@ -418,6 +435,36 @@ public class DfClassificationTop {
         _codeType = codeType;
     }
 
+    // -----------------------------------------------------
+    //                                 UndefinedHandlingType
+    //                                 ---------------------
+    public ClassificationUndefinedHandlingType getUndefinedHandlingType() {
+        return _undefinedHandlingType;
+    }
+
+    public boolean isUndefinedHandlingTypeChecked() {
+        return _undefinedHandlingType != null && _undefinedHandlingType.isChecked();
+    }
+
+    public boolean isUndefinedHandlingTypeCheckedAbort() {
+        return _undefinedHandlingType != null && _undefinedHandlingType.isCheckedAbort();
+    }
+
+    public boolean isUndefinedHandlingTypeCheckedContinue() {
+        return _undefinedHandlingType != null && _undefinedHandlingType.isCheckedContinue();
+    }
+
+    public boolean isUndefinedHandlingTypeContinued() {
+        return _undefinedHandlingType != null && _undefinedHandlingType.isContinued();
+    }
+
+    public void setUndefinedHandlingType(ClassificationUndefinedHandlingType undefinedHandlingType) {
+        _undefinedHandlingType = undefinedHandlingType;
+    }
+
+    // -----------------------------------------------------
+    //                                     RelatedColumnName
+    //                                     -----------------
     public String getRelatedColumnName() {
         return _relatedColumnName;
     }
@@ -426,6 +473,9 @@ public class DfClassificationTop {
         _relatedColumnName = relatedColumnName;
     }
 
+    // -----------------------------------------------------
+    //                             ClassificationElementList
+    //                             -------------------------
     public List<DfClassificationElement> getClassificationElementList() {
         return _elementList;
     }
@@ -442,6 +492,9 @@ public class DfClassificationTop {
         _elementList.addAll(classificationElementList);
     }
 
+    // -----------------------------------------------------
+    //                                 Various Determination
+    //                                 ---------------------
     public boolean isTableClassification() {
         return _tableClassification;
     }
@@ -451,11 +504,27 @@ public class DfClassificationTop {
     }
 
     public boolean isCheckImplicitSet() {
-        return _checkImplicitSet;
+        return !_tableClassification && _checkImplicitSet;
     }
 
     public void setCheckImplicitSet(boolean checkImplicitSet) {
         _checkImplicitSet = checkImplicitSet;
+    }
+
+    public boolean isCheckSelectedClassification() {
+        return _checkSelectedClassification;
+    }
+
+    public void setCheckSelectedClassification(boolean checkSelectedClassification) {
+        _checkSelectedClassification = checkSelectedClassification;
+    }
+
+    public boolean isForceClassificationSetting() {
+        return _forceClassificationSetting;
+    }
+
+    public void setForceClassificationSetting(boolean forceClassificationSetting) {
+        _forceClassificationSetting = forceClassificationSetting;
     }
 
     public boolean isUseDocumentOnly() {
@@ -490,6 +559,9 @@ public class DfClassificationTop {
         _deprecated = deprecated;
     }
 
+    // -----------------------------------------------------
+    //                                        Mapping Option
+    //                                        --------------
     public Map<String, Map<String, Object>> getGroupingMap() {
         return _groupingMap;
     }

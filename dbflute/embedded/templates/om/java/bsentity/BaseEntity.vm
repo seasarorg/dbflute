@@ -907,4 +907,20 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         FunCustodial.checkImplicitSet(this, columnDbName, meta, value);
     }
 #end
+#foreach ($col in $table.columns)
+#if ($col.isPropertySettingModifierClosed() && $col.isClassificationUndefinedHandlingTypeContinued())
+
+    /**
+     * For framework so basically DON'T use this method.
+#if ($col.isNotNull())
+     * @param ${col.uncapitalisedJavaName} The value of the column '${col.name}'. (basically NotNull if update: for the constraint)
+#else
+     * @param ${col.uncapitalisedJavaName} The value of the column '${col.name}'. (NullAllowed: null update allowed for no constraint)
+#end
+     */
+    public void mynativeMapping${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
+        set${col.javaName}(${col.uncapitalisedJavaName});
+    }
+#end
+#end
 }

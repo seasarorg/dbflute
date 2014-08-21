@@ -2322,11 +2322,42 @@ public class Column {
         return getClassificationProperties().getClassificationTopMap();
     }
 
+    public DfClassificationTop getClassificationTop() {
+        final Map<String, DfClassificationTop> definitionMap = getClassificationTopMap();
+        final String classificationName = getClassificationName();
+        final DfClassificationTop classificationTop = definitionMap.get(classificationName);
+        if (classificationTop == null) {
+            throwClassificationDeploymentClassificationNotFoundException(classificationName);
+        }
+        return classificationTop;
+    }
+
+    protected void throwClassificationDeploymentClassificationNotFoundException(String classificationName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The classification of the column was not found in the DBFlute property.");
+        br.addItem("Advice");
+        br.addElement("Make sure classificationDefinitionMap.dfprop and");
+        br.addElement("classificationDeploymentMap.dfprop are correct each other.");
+        br.addElement("For example, a classification name is case sensitive.");
+        br.addElement("See the document for the DBFlute properties.");
+        br.addItem("Column");
+        br.addElement(getName());
+        br.addItem("Related Classification");
+        br.addElement(classificationName);
+        br.addItem("Defined Classification List");
+        br.addElement(getClassificationTopMap().keySet());
+        final String msg = br.buildExceptionMessage();
+        throw new DfClassificationDeploymentClassificationNotFoundException(msg);
+    }
+
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // If sql2EntityTableName exists(when sql2entity only), use it at first.
     // Then it would be not found, it uses formal table name of the column.
     // - - - - - - - - - -/
 
+    // -----------------------------------------------------
+    //                                            Basic Item
+    //                                            ----------
     public boolean hasClassification() {
         if (hasSql2EntityRelatedTableClassification()) {
             return true;
@@ -2384,14 +2415,35 @@ public class Column {
         return hasClassification() ? "As" + getClassificationName() : "";
     }
 
+    // -----------------------------------------------------
+    //                                 UndefinedHandlingType
+    //                                 ---------------------
     public boolean isCheckSelectedClassification() {
-        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        return prop.isCheckSelectedClassification() && canBeForcedClassification();
+        return hasClassification() && getClassificationTop().isCheckSelectedClassification();
     }
 
+    public boolean isClassificationUndefinedHandlingTypeChecked() {
+        return hasClassification() && getClassificationTop().isUndefinedHandlingTypeChecked();
+    }
+
+    public boolean isClassificationUndefinedHandlingTypeCheckedAbort() {
+        return hasClassification() && getClassificationTop().isUndefinedHandlingTypeCheckedAbort();
+    }
+
+    public boolean isClassificationUndefinedHandlingTypeCheckedContinue() {
+        return hasClassification() && getClassificationTop().isUndefinedHandlingTypeCheckedContinue();
+    }
+
+    public boolean isClassificationUndefinedHandlingTypeContinued() {
+        return hasClassification() && getClassificationTop().isUndefinedHandlingTypeContinued();
+    }
+
+    // -----------------------------------------------------
+    //                                         Native Method
+    //                                         -------------
     public boolean isForceClassificationSetting() {
-        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        return prop.isForceClassificationSetting() && canBeForcedClassification();
+        return hasClassification() && canBeForcedClassification()
+                && getClassificationTop().isForceClassificationSetting();
     }
 
     protected boolean canBeForcedClassification() {
@@ -2399,34 +2451,9 @@ public class Column {
         return hasClassification() && !isCommonColumn();
     }
 
-    public DfClassificationTop getClassificationTop() {
-        final Map<String, DfClassificationTop> definitionMap = getClassificationTopMap();
-        final String classificationName = getClassificationName();
-        final DfClassificationTop classificationTop = definitionMap.get(classificationName);
-        if (classificationTop == null) {
-            throwClassificationDeploymentClassificationNotFoundException(classificationName);
-        }
-        return classificationTop;
-    }
-
-    protected void throwClassificationDeploymentClassificationNotFoundException(String classificationName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The classification of the column was not found in the DBFlute property.");
-        br.addItem("Advice");
-        br.addElement("Make sure classificationDefinitionMap.dfprop and");
-        br.addElement("classificationDeploymentMap.dfprop are correct each other.");
-        br.addElement("For example, a classification name is case sensitive.");
-        br.addElement("See the document for the DBFlute properties.");
-        br.addItem("Column");
-        br.addElement(getName());
-        br.addItem("Related Classification");
-        br.addElement(classificationName);
-        br.addItem("Defined Classification List");
-        br.addElement(getClassificationTopMap().keySet());
-        final String msg = br.buildExceptionMessage();
-        throw new DfClassificationDeploymentClassificationNotFoundException(msg);
-    }
-
+    // -----------------------------------------------------
+    //                             Sql2Entity Classification
+    //                             -------------------------
     protected boolean hasSql2EntityRelatedTableClassification() {
         if (!hasSql2EntityRelatedTable()) {
             return false;

@@ -20,6 +20,7 @@ import java.util.*;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationCodeType;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
+import org.seasar.dbflute.jdbc.ClassificationUndefinedHandlingType;
 
 /**
  * The definition of classification.
@@ -209,6 +210,10 @@ public interface ${glCDef} extends Classification {
 #set ($count = $count + 1)
 #end
         ;
+        public String classificationName() {
+            return name(); // same as definition name
+        }
+
         public Classification codeOf(Object code) {
 #foreach ($classificationName in $database.classificationNameList)
             if ("${classificationName}".equals(name())) { return ${glCDef}.${classificationName}.codeOf(code); }
@@ -250,6 +255,14 @@ public interface ${glCDef} extends Classification {
 #end
 #end
             return ClassificationCodeType.String; // as default
+        }
+
+        public ClassificationUndefinedHandlingType undefinedHandlingType() {
+#foreach ($classificationName in $database.classificationNameList)
+#set ($classificationTop = $database.getClassificationTop($classificationName))
+            if ("${classificationName}".equals(name())) { return ClassificationUndefinedHandlingType.${classificationTop.undefinedHandlingType}; }
+#end
+            return ClassificationUndefinedHandlingType.LOGGING; // as default
         }
     }
 }

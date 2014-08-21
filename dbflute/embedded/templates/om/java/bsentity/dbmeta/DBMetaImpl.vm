@@ -75,7 +75,30 @@ public class ${myClassName} extends AbstractDBMeta {
 #if ($col.isCheckSelectedClassification())
             ccls(col, vl);
 #end
-            ((${myExtendedObjectClassName})et).set${col.javaName}As${col.classificationName}((${glCDef}.${col.classificationName})gcls(col, vl));
+#if ($col.isForceClassificationSetting())
+            ${glCDef}.${col.classificationName} cls = (${glCDef}.${col.classificationName})gcls(col, vl);
+            if (cls != null) {
+                ((${myExtendedObjectClassName})et).set${col.javaName}As${col.classificationName}(cls);
+            } else {
+#if ($col.isClassificationUndefinedHandlingTypeCheckedAbort())
+## undefined code does not come here so set null fixedly
+                ((${myExtendedObjectClassName})et).set${col.javaName}As${col.classificationName}(null);
+#else
+## undefined code or null here, use internal method for native mapping
+#if ($col.isJavaNativeNumberObject())
+                ((${myExtendedObjectClassName})et).mynativeMapping${col.javaName}(ctn(vl, ${col.javaNative}.class));
+#else
+                ((${myExtendedObjectClassName})et).mynativeMapping${col.javaName}((${col.javaNative})vl);
+#end
+#end
+            }
+#else
+#if ($col.isJavaNativeNumberObject())
+            ((${myExtendedObjectClassName})et).set${col.javaName}(ctn(vl, ${col.javaNative}.class));
+#else
+            ((${myExtendedObjectClassName})et).set${col.javaName}((${col.javaNative})vl);
+#end
+#end
         }
 #else
 ## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -83,6 +106,10 @@ public class ${myClassName} extends AbstractDBMeta {
 ## - - - - - - - - - -/
     public static class ${setupperClassName} implements PropertyGateway {
         public Object read(Entity et) { return ((${myExtendedObjectClassName})et).get${col.javaName}(); }
+## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## number handling might be enough to mapping but use simple name converter for small line
+## (and for compatible, keep just in case)
+## - - - - - - - - - -/
 #if ($col.isJavaNativeNumberObject())
 #if ($col.isJavaNativeInteger())
         public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}(cti(vl)); }

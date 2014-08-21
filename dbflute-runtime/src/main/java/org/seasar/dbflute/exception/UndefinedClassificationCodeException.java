@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the classification code is illegal.
+ * The exception of when the undefined classification code is found.
  * @author jflute
  */
-public class IllegalClassificationCodeException extends RuntimeException {
+public class UndefinedClassificationCodeException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class IllegalClassificationCodeException extends RuntimeException {
      * Constructor.
      * @param msg The message of the exception. (NotNull)
      */
-    public IllegalClassificationCodeException(String msg) {
+    public UndefinedClassificationCodeException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class IllegalClassificationCodeException extends RuntimeException {
      * @param msg The message of the exception. (NotNull)
      * @param cause The cause of the exception. (NotNull)
      */
-    public IllegalClassificationCodeException(String msg, Throwable cause) {
+    public UndefinedClassificationCodeException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

@@ -41,6 +41,7 @@ import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationAllInOneSqlExecutor;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationLiteralArranger;
@@ -316,52 +317,109 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // ===================================================================================
     //                                                                  Classification Top
     //                                                                  ==================
+    // -----------------------------------------------------
+    //                                        Process Method
+    //                                        --------------
     protected void processClassificationTopFromLiteralIfNeeds(DfClassificationTop classificationTop,
             Map<?, ?> elementMap) {
         classificationTop.acceptClassificationTopBasicItemMap(elementMap);
-        classificationTop.setCheckImplicitSet(isClassificationCheckImplicitSet(elementMap));
-        classificationTop.setUseDocumentOnly(isClassificationUseDocumentOnly(elementMap));
-        classificationTop.setSuppressAutoDeploy(isClassificationSuppressAutoDeploy(elementMap));
-        classificationTop.setSuppressDBAccessClass(isClassificationSuppressDBAccessClass(elementMap));
-        classificationTop.setDeprecated(isClassificationDeprecated(elementMap));
-        classificationTop.putGroupingAll(getGroupingMap(elementMap));
-        classificationTop.putDeprecatedAll(getDeprecatedMap(elementMap));
+        classificationTop.setUndefinedHandlingType(getElementMapUndefinedHandlingType(elementMap));
+        classificationTop.setCheckImplicitSet(isElementMapCheckImplicitSet(elementMap));
+        classificationTop.setCheckSelectedClassification(isElementMapCheckSelectedClassification(elementMap));
+        classificationTop.setForceClassificationSetting(isClassificationForceClassificationSetting(elementMap));
+        classificationTop.setUseDocumentOnly(isElementMapUseDocumentOnly(elementMap));
+        classificationTop.setSuppressAutoDeploy(isElementMapSuppressAutoDeploy(elementMap));
+        classificationTop.setSuppressDBAccessClass(isElementMapSuppressDBAccessClass(elementMap));
+        classificationTop.setDeprecated(isElementMapDeprecated(elementMap));
+        classificationTop.putGroupingAll(getElementMapGroupingMap(elementMap));
+        classificationTop.putDeprecatedAll(getElementMapDeprecatedMap(elementMap));
     }
 
+    // -----------------------------------------------------
+    //                                             Code Type
+    //                                             ---------
+    // classification interface
+    public boolean isCodeTypeNeedsQuoted(String classificationName) {
+        final DfClassificationTop classificationTop = getClassificationTop(classificationName);
+        if (classificationTop == null) {
+            return false;
+        }
+        final String codeType = classificationTop.getCodeType();
+        if (codeType == null) { // unknown
+            return true; // quoted
+        }
+        return codeType.equalsIgnoreCase(DfClassificationTop.CODE_TYPE_STRING);
+    }
+
+    // -----------------------------------------------------
+    //                                    Undefined Handling
+    //                                    ------------------
+    // user closet, primitive control
     @SuppressWarnings("unchecked")
-    protected boolean isClassificationCheckImplicitSet(Map<?, ?> elementMap) {
+    protected boolean isElementMapCheckImplicitSet(Map<?, ?> elementMap) { // has been existed since old
+        // table classification determination is set at DfClassificationTop
+        if (hasElementMapUndefinedHandlingTypeProperty(elementMap)) {
+            return !getElementMapUndefinedHandlingType(elementMap).isChecked();
+        }
         final String key = DfClassificationTop.KEY_CHECK_IMPLICIT_SET;
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        final boolean defaultValue = prop.isCheckImplicitClassificationSetting();
-        return isProperty(key, defaultValue, (Map<String, ? extends Object>) elementMap);
+        return isProperty(key, !prop.isCompatibleBeforeJava8(), (Map<String, ? extends Object>) elementMap);
+    }
+
+    protected boolean isElementMapCheckSelectedClassification(Map<?, ?> elementMap) { // has been existed since old
+        if (hasElementMapUndefinedHandlingTypeProperty(elementMap)) {
+            return !getElementMapUndefinedHandlingType(elementMap).isChecked();
+        }
+        return getLittleAdjustmentProperties().isCheckSelectedClassification();
+    }
+
+    // user public since 1.1 (implemented when 1.0.5K)
+    @SuppressWarnings("unchecked")
+    protected boolean hasElementMapUndefinedHandlingTypeProperty(Map<?, ?> elementMap) {
+        final String key = DfClassificationTop.KEY_UNDEFINED_CODE_HANDLING_TYPE;
+        return getProperty(key, null, (Map<String, ? extends Object>) elementMap) != null;
     }
 
     @SuppressWarnings("unchecked")
-    protected boolean isClassificationUseDocumentOnly(Map<?, ?> elementMap) {
-        final String key = DfClassificationTop.KEY_USE_DOCUMENT_ONLY;
-        return isProperty(key, false, (Map<String, ? extends Object>) elementMap);
-    }
-
-    @SuppressWarnings("unchecked")
-    protected boolean isClassificationSuppressAutoDeploy(Map<?, ?> elementMap) {
-        final String key = DfClassificationTop.KEY_SUPPRESS_AUTO_DEPLOY;
-        return isProperty(key, false, (Map<String, ? extends Object>) elementMap);
-    }
-
-    @SuppressWarnings("unchecked")
-    protected boolean isClassificationSuppressDBAccessClass(Map<?, ?> elementMap) {
-        final String key = DfClassificationTop.KEY_SUPPRESS_DBACCESS_CLASS;
+    protected ClassificationUndefinedHandlingType getElementMapUndefinedHandlingType(Map<?, ?> elementMap) {
+        final String key = DfClassificationTop.KEY_UNDEFINED_CODE_HANDLING_TYPE;
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        final boolean defaultValue = prop.isSuppressTableClassificationDBAccessClass();
-        return isProperty(key, defaultValue, (Map<String, ? extends Object>) elementMap);
+        final ClassificationUndefinedHandlingType defaultType = prop.getClassificationUndefinedHandlingType();
+        final String defaultValue = defaultType.code();
+        final String code = getProperty(key, defaultValue, (Map<String, ? extends Object>) elementMap);
+        final ClassificationUndefinedHandlingType handlingType = ClassificationUndefinedHandlingType.codeOf(code);
+        if (handlingType == null) {
+            throwUnknownClassificationUndefinedCodeHandlingTypeException(code);
+        }
+        return handlingType;
     }
 
-    @SuppressWarnings("unchecked")
-    protected boolean isClassificationDeprecated(Map<?, ?> elementMap) {
-        final String key = DfClassificationTop.KEY_DEPRECATED;
-        return isProperty(key, false, (Map<String, ? extends Object>) elementMap);
+    protected void throwUnknownClassificationUndefinedCodeHandlingTypeException(String code) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Unknown handling type of classification undefined code.");
+        br.addItem("Advice");
+        br.addElement("You can specify following types:");
+        for (ClassificationUndefinedHandlingType handlingType : ClassificationUndefinedHandlingType.values()) {
+            br.addElement(" " + handlingType.code());
+        }
+        final String exampleCode = ClassificationUndefinedHandlingType.EXCEPTION.code();
+        br.addElement("");
+        br.addElement("For example: (classificationDefinitionMap.dfprop)");
+        br.addElement("; [classification-name] = list:{");
+        br.addElement("    ; map:{");
+        br.addElement("        ; topComment=...");
+        br.addElement("        ; codeType=String");
+        br.addElement("        ; classificationUndefinedCodeHandlingType = " + exampleCode);
+        br.addElement("        ...");
+        br.addElement("    }");
+        br.addElement("}");
+        br.addItem("Specified Unknown Type");
+        br.addElement(code);
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
     }
 
+    // classification interface
     public boolean isCheckImplicitSet(String classificationName) {
         final DfClassificationTop classificationTop = getClassificationTop(classificationName);
         return classificationTop != null && classificationTop.isCheckImplicitSet();
@@ -382,19 +440,63 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return _hasImplicitSetCheck;
     }
 
-    public boolean isCodeTypeNeedsQuoted(String classificationName) {
-        final DfClassificationTop classificationTop = getClassificationTop(classificationName);
-        if (classificationTop == null) {
-            return false;
+    // -----------------------------------------------------
+    //                                  Force Classification
+    //                                  --------------------
+    // user closet, but primitive control
+    protected boolean isClassificationForceClassificationSetting(Map<?, ?> elementMap) {
+        if (hasClassificationMakeNativeTypeProperty(elementMap)) {
+            return !isClassificationMakeNativeTypeSetter(elementMap);
         }
-        final String codeType = classificationTop.getCodeType();
-        if (codeType == null) { // unknown
-            return true; // quoted
-        }
-        return codeType.equalsIgnoreCase(DfClassificationTop.CODE_TYPE_STRING);
+        return getLittleAdjustmentProperties().isForceClassificationSetting();
     }
 
-    protected Map<String, Map<String, Object>> getGroupingMap(Map<?, ?> elementMap) {
+    // user public since 1.1 (implemented when 1.0.5K)
+    @SuppressWarnings("unchecked")
+    protected boolean hasClassificationMakeNativeTypeProperty(Map<?, ?> elementMap) {
+        final String key = DfClassificationTop.KEY_MAKE_NATIVE_TYPE_SETTER;
+        return getProperty(key, null, (Map<String, ? extends Object>) elementMap) != null;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected boolean isClassificationMakeNativeTypeSetter(Map<?, ?> elementMap) {
+        final String key = DfClassificationTop.KEY_MAKE_NATIVE_TYPE_SETTER;
+        return isProperty(key, false, (Map<String, ? extends Object>) elementMap);
+    }
+
+    // -----------------------------------------------------
+    //                                          Small Option
+    //                                          ------------
+    @SuppressWarnings("unchecked")
+    protected boolean isElementMapUseDocumentOnly(Map<?, ?> elementMap) {
+        final String key = DfClassificationTop.KEY_USE_DOCUMENT_ONLY;
+        return isProperty(key, false, (Map<String, ? extends Object>) elementMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected boolean isElementMapSuppressAutoDeploy(Map<?, ?> elementMap) {
+        final String key = DfClassificationTop.KEY_SUPPRESS_AUTO_DEPLOY;
+        return isProperty(key, false, (Map<String, ? extends Object>) elementMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected boolean isElementMapSuppressDBAccessClass(Map<?, ?> elementMap) {
+        final String key = DfClassificationTop.KEY_SUPPRESS_DBACCESS_CLASS;
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        final boolean defaultValue = prop.isSuppressTableClassificationDBAccessClass();
+        return isProperty(key, defaultValue, (Map<String, ? extends Object>) elementMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected boolean isElementMapDeprecated(Map<?, ?> elementMap) {
+        final String key = DfClassificationTop.KEY_DEPRECATED;
+        return isProperty(key, false, (Map<String, ? extends Object>) elementMap);
+    }
+
+    // -----------------------------------------------------
+    //                                      Mapping Settings
+    //                                      ----------------
+    protected Map<String, Map<String, Object>> getElementMapGroupingMap(Map<?, ?> elementMap) {
         final Object obj = elementMap.get(DfClassificationTop.KEY_GROUPING_MAP);
         if (obj == null) {
             return DfCollectionUtil.emptyMap();
@@ -404,7 +506,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return groupingMap;
     }
 
-    protected Map<String, String> getDeprecatedMap(Map<?, ?> elementMap) {
+    protected Map<String, String> getElementMapDeprecatedMap(Map<?, ?> elementMap) {
         final Object obj = elementMap.get(DfClassificationTop.KEY_DEPRECATED_MAP);
         if (obj == null) {
             return DfCollectionUtil.emptyMap();
@@ -434,7 +536,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         metaElement.setClassificationName(classificationTop.getClassificationName());
         metaElement.setTable(table);
         metaElement.acceptBasicItemMap(elementMap);
-        if (isClassificationSuppressAutoDeploy(elementMap)) { // for compatible
+        if (isElementMapSuppressAutoDeploy(elementMap)) { // for compatible
             classificationTop.setSuppressAutoDeploy(true);
         }
         final String where = (String) elementMap.get("where");
