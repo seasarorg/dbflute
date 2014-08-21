@@ -473,7 +473,6 @@ public interface Entity {
 
         protected static void throwUndefinedClassificationCodeException(Entity entity, String columnDbName,
                 ClassificationMeta meta, Object code) {
-            // TODO jflute exception message
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Undefined classification code was set to the entity.");
             br.addItem("Table");
