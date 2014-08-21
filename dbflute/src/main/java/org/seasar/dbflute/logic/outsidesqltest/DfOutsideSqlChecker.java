@@ -69,6 +69,9 @@ public class DfOutsideSqlChecker {
         checkRequiredDescription(fileName, sql);
     }
 
+    // ===================================================================================
+    //                                                                     Sql2Entity Mark
+    //                                                                     ===============
     protected void checkSql2EntityMark(List<String> splitList, String fileName, String sql) {
         for (String line : splitList) {
             line = line.trim();
@@ -83,6 +86,9 @@ public class DfOutsideSqlChecker {
         }
     }
 
+    // ===================================================================================
+    //                                                                IfComment Expression
+    //                                                                ====================
     protected void checkIfCommentExpression(List<String> ifCommentList, String sql) {
         if (!_ifCommentExpressionCheck) {
             return;
@@ -137,6 +143,14 @@ public class DfOutsideSqlChecker {
         throw new DfParameterBeanMarkInvalidException(msg);
     }
 
+    // ===================================================================================
+    //                                                                Required SQL Comment
+    //                                                                ====================
+    public void checkRequiredSqlComment(String fileName, String sql) { // basically for Sql2Entity task
+        checkRequiredTitle(fileName, sql);
+        checkRequiredDescription(fileName, sql);
+    }
+
     protected void checkRequiredTitle(String fileName, String sql) {
         if (!_requiredTitleCheck) {
             return;
@@ -156,8 +170,9 @@ public class DfOutsideSqlChecker {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The outsideSql title was NOT found!");
         br.addItem("Advice");
-        br.addElement("A outsideSql title is required in this project.");
+        br.addElement("OutsideSql title is required in this project.");
         br.addElement("(The property 'isRequiredSqlTitle' of outsideSqlDefinition is true)");
+        br.addElement("");
         br.addElement("You should add title comment in your outside-SQL like this:");
         br.addElement("");
         br.addElement("  /*");
@@ -200,8 +215,9 @@ public class DfOutsideSqlChecker {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The outsideSql description was NOT found.");
         br.addItem("Advice");
-        br.addElement("A outsideSql description is required in this project.");
+        br.addElement("OutsideSql description is required in this project.");
         br.addElement("(The property 'isRequiredSqlDescription' of outsideSqlDefinition is true)");
+        br.addElement("");
         br.addElement("You should add description comment in your outside-SQL like this:");
         br.addElement("");
         br.addElement("  /*");

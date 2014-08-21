@@ -263,11 +263,19 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     //                                                                      OutsideSqlTest
     //                                                                      ==============
     public boolean isRequiredSqlTitle() {
-        return isProperty("isRequiredSqlTitle", false);
+        final boolean defaultValue = !getLittleAdjustmentProperties().isCompatibleBeforeJava8();
+        return isProperty("isRequiredSqlTitle", defaultValue);
     }
 
     public boolean isRequiredSqlDescription() {
-        return isProperty("isRequiredSqlDescription", false);
+        final boolean defaultValue = !getLittleAdjustmentProperties().isCompatibleBeforeJava8();
+        return isProperty("isRequiredSqlDescription", defaultValue);
+    }
+
+    public boolean isCheckRequiredSqlCommentAlsoSql2Entity() { // closet
+        final boolean defaultValue = !getLittleAdjustmentProperties().isCompatibleBeforeJava8();
+        // TODO jflute 
+        return isProperty("isCheckRequiredSqlCommentAlsoSql2Entity", defaultValue);
     }
 
     public boolean isSuppressParameterCommentCheck() { // It's closet!

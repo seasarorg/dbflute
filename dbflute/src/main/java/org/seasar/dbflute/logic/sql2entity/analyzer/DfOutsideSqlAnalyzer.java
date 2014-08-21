@@ -37,6 +37,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
 import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.seasar.dbflute.logic.outsidesqltest.DfOutsideSqlChecker;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtractor;
@@ -44,6 +45,7 @@ import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtract
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -68,6 +70,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     protected final DfSql2EntityMarkAnalyzer _outsideSqlMarkAnalyzer = new DfSql2EntityMarkAnalyzer();
     protected final DfOutsideSqlNameResolver _sqlFileNameResolver = new DfOutsideSqlNameResolver();
     protected final DfBehaviorQueryPathSetupper _bqpSetupper = new DfBehaviorQueryPathSetupper();
+    protected final DfOutsideSqlChecker _outsideSqlChecker = new DfOutsideSqlChecker();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -107,6 +110,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     //                                                                           =========
     @Override
     protected void execSQL(String sql) {
+        checkRequiredSqlComment(sql);
         ResultSet rs = null;
         try {
             DfCustomizeEntityInfo customizeEntityInfo = null;
@@ -151,6 +155,16 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
                     _log.warn("Ignored exception: " + ignored.getMessage());
                 }
             }
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                Required Comment Check
+    //                                ----------------------
+    protected void checkRequiredSqlComment(String sql) {
+        if (getOutsideSqlProperties().isCheckRequiredSqlCommentAlsoSql2Entity()) {
+            final String fileName = _sqlFile.getName();
+            _outsideSqlChecker.checkRequiredSqlComment(fileName, sql);
         }
     }
 
@@ -428,5 +442,9 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
 
     protected DfDatabaseProperties getDatabaseProperties() {
         return getProperties().getDatabaseProperties();
+    }
+
+    protected DfOutsideSqlProperties getOutsideSqlProperties() {
+        return getProperties().getOutsideSqlProperties();
     }
 }
