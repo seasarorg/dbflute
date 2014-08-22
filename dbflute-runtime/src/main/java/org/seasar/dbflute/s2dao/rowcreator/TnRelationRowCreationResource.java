@@ -383,6 +383,14 @@ public class TnRelationRowCreationResource {
         return _relSelector.isNonSelectedNextConnectingRelation(_relationNoSuffix);
     }
 
+    /**
+     * Can it use the relation cache for entity mapping?
+     * @return The determination, true or false.
+     */
+    public boolean canUseRelationCache() {
+        return _relSelector.canUseRelationCache(_relationNoSuffix);
+    }
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========

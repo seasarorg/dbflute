@@ -450,13 +450,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String fixedCondition = foreignInfo.getFixedCondition();
         final boolean fixedInline = foreignInfo.isFixedInline();
         final FixedConditionResolver resolver = createForeignFixedConditionResolver(foreignCQ);
+        final String relationPath = foreignCQ.xgetRelationPath();
         if (fixedInline) {
             xgetSqlClause().registerOuterJoinFixedInline(foreignAlias, foreignTable, localAlias, localTable // basic
-                    , joinOnMap, foreignInfo // join objects
+                    , joinOnMap, relationPath, foreignInfo // join objects
                     , fixedCondition, resolver); // fixed condition (to in-line view)
         } else { // normally here
             xgetSqlClause().registerOuterJoin(foreignAlias, foreignTable, localAlias, localTable // basic
-                    , joinOnMap, foreignInfo // join objects
+                    , joinOnMap, relationPath, foreignInfo // join objects
                     , fixedCondition, resolver); // fixed condition (to on-clause)
         }
         xprepareFixedConditionDynamicParameterLazyChecker(foreignPropertyName, foreignInfo);

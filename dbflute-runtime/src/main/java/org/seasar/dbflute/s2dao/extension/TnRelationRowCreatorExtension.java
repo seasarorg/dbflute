@@ -198,15 +198,18 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         final TnRelationPropertyType rpt = res.getRelationPropertyType();
         Object relationRow = null;
         if (relKey != null) {
-            final TnRelationRowCache relRowCache = res.getRelRowCache();
             final String relationNoSuffix = res.getRelationNoSuffix();
-            relationRow = relRowCache.getRelationRow(relationNoSuffix, relKey);
-            if (relationRow == null) {
+            final boolean canUseRelationCache = res.canUseRelationCache();
+            TnRelationRowCache relRowCache = null;
+            if (canUseRelationCache) {
+                relRowCache = res.getRelRowCache();
                 relationRow = relRowCache.getRelationRow(relationNoSuffix, relKey);
-                if (relationRow == null) { // when no cache
-                    relationRow = createRelationRow(res);
-                    if (relationRow != null) { // is new created relation row
-                        adjustCreatedRow(relationRow, rpt);
+            }
+            if (relationRow == null) { // when no cache
+                relationRow = createRelationRow(res);
+                if (relationRow != null) { // is new created relation row
+                    adjustCreatedRow(relationRow, rpt);
+                    if (canUseRelationCache) {
                         relRowCache.addRelationRow(relationNoSuffix, relKey, relationRow);
                     }
                 }

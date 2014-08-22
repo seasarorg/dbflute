@@ -185,6 +185,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      */
     protected Map<String, LeftOuterJoinInfo> _outerJoinMap;
 
+    /**
+     * The map of relationPath and foreignAliasName. (NullAllowed: lazy-load) <br />
+     * map:{relationPath : foreignAliasName}
+     */
+    protected Map<String, String> _relationPathForeignAliasMap;
+
     /** The list of lazy checker for fixed-condition e.g. dynamic parameters. (NullAllowed: lazy-load) */
     protected List<FixedConditionLazyChecker> _fixedConditionLazyChecker;
 
@@ -1440,20 +1446,21 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      * {@inheritDoc}
      */
     public void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
-            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
-            String fixedCondition, FixedConditionResolver fixedConditionResolver) {
-        doRegisterOuterJoin(foreignAliasName, foreignTableDbName, localAliasName, localTableDbName, joinOnMap,
-                foreignInfo, fixedCondition, fixedConditionResolver);
+            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath,
+            ForeignInfo foreignInfo, String fixedCondition, FixedConditionResolver fixedConditionResolver) {
+        doRegisterOuterJoin(foreignAliasName, foreignTableDbName, localAliasName, localTableDbName // basic
+                , joinOnMap, relationPath, foreignInfo // join object
+                , fixedCondition, fixedConditionResolver); // fixed condition
     }
 
     /**
      * {@inheritDoc}
      */
     public void registerOuterJoinFixedInline(String foreignAliasName, String foreignTableDbName, String localAliasName,
-            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
-            String fixedCondition, FixedConditionResolver fixedConditionResolver) {
+            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath,
+            ForeignInfo foreignInfo, String fixedCondition, FixedConditionResolver fixedConditionResolver) {
         doRegisterOuterJoin(foreignAliasName, foreignTableDbName, localAliasName, localTableDbName // same as normal
-                , joinOnMap, foreignInfo // normal until here
+                , joinOnMap, relationPath, foreignInfo // normal until here
                 , null, null); // null set to OnClause
         if (fixedCondition != null) { // uses it instead of null set
             if (fixedConditionResolver != null) {
@@ -1466,8 +1473,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected void doRegisterOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
-            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
-            String fixedCondition, FixedConditionResolver fixedConditionResolver) {
+            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath,
+            ForeignInfo foreignInfo, String fixedCondition, FixedConditionResolver fixedConditionResolver) {
         assertAlreadyOuterJoin(foreignAliasName);
         assertJoinOnMapNotEmpty(joinOnMap, foreignAliasName);
         final Map<String, LeftOuterJoinInfo> outerJoinMap = getOuterJoinMap();
@@ -1481,6 +1488,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (localJoinInfo != null) { // means local is also joined (not base point)
             joinInfo.setLocalJoinInfo(localJoinInfo);
         }
+        joinInfo.setRelationPath(relationPath);
         joinInfo.setPureFK(foreignInfo.isPureFK());
         joinInfo.setNotNullFKColumn(foreignInfo.isNotNullFKColumn());
         joinInfo.setFixedCondition(fixedCondition);
@@ -1491,6 +1499,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         joinInfo.resolveFixedCondition();
 
         outerJoinMap.put(foreignAliasName, joinInfo);
+        getRelationPathForeignAliasMap().put(relationPath, foreignAliasName);
     }
 
     /**
@@ -1516,8 +1525,50 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _outerJoinMap;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean hasOuterJoin() {
         return _outerJoinMap != null && !_outerJoinMap.isEmpty();
+    }
+
+    protected Map<String, String> getRelationPathForeignAliasMap() {
+        if (_relationPathForeignAliasMap == null) {
+            _relationPathForeignAliasMap = new LinkedHashMap<String, String>(4);
+        }
+        return _relationPathForeignAliasMap;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean canUseRelationCache(String relationPath) {
+        // if over-relation, possible following case:
+        //  sea (1) -> dock(21) -(over)-> {21, FOO}
+        //  land(2) -> dock(21) -(over)-> {21, BAR}
+        // 'dock' is the same record but should be different instance 
+        return !isUnderOverRelation(relationPath);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isUnderOverRelation(String relationPath) {
+        final Map<String, String> relationPathForeignAliasMap = getRelationPathForeignAliasMap();
+        final String foreignAliasName = relationPathForeignAliasMap.get(relationPath);
+        if (foreignAliasName == null) { // basically no way
+            String msg = "Not found the foreign alias name by the relation path:";
+            msg = msg + " " + relationPath + ", " + relationPathForeignAliasMap.keySet();
+            throw new IllegalStateException(msg);
+        }
+        final Map<String, LeftOuterJoinInfo> outerJoinMap = getOuterJoinMap();
+        final LeftOuterJoinInfo outerJoinInfo = outerJoinMap.get(foreignAliasName);
+        if (outerJoinInfo == null) { // basically no way
+            String msg = "Not found the outer join info by the foreign alias name:";
+            msg = msg + " " + relationPath + ", " + foreignAliasName + ", " + outerJoinMap.keySet();
+            throw new IllegalStateException(msg);
+        }
+        return outerJoinInfo.isUnderOverRelation();
     }
 
     // -----------------------------------------------------

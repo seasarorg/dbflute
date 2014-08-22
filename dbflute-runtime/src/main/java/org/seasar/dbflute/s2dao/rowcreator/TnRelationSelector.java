@@ -39,4 +39,11 @@ public interface TnRelationSelector {
      * @return The determination, true or false.
      */
     boolean isNonSelectedNextConnectingRelation(String relationNoSuffix);
+
+    /**
+     * Can it use the relation cache for entity mapping?
+     * @param relationNoSuffix The suffix of relation no. e.g. _1_3 (NotNull)
+     * @return The determination, true or false.
+     */
+    boolean canUseRelationCache(String relationNoSuffix); // sorry, emergency implementation
 }

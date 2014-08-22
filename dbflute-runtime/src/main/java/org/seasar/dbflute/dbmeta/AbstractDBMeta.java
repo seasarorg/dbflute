@@ -32,8 +32,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
@@ -41,7 +39,6 @@ import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.exception.DBMetaNotFoundException;
-import org.seasar.dbflute.exception.UndefinedClassificationCodeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.Classification;
@@ -63,9 +60,6 @@ public abstract class AbstractDBMeta implements DBMeta {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** The instance of logging object for classification meta. */
-    private static final Log _clsMetaLog = LogFactory.getLog(ClassificationMeta.class);
-
     /** The dummy value for internal map value. */
     protected static final Object DUMMY_VALUE = new Object();
 
@@ -160,76 +154,24 @@ public abstract class AbstractDBMeta implements DBMeta {
     // these are static to avoid the FindBugs headache
     // (implementations of PropertyGateway can be static class)
     protected static void ccls(ColumnInfo columnInfo, Object code) { // checkClassification
+        // old style, for compatibility, check only on entity after Java8
         if (code == null) {
             return; // no check null value which means no existence on DB
         }
-        final Classification classification = gcls(columnInfo, code);
-        if (classification == null) {
-            handleUndefinedClassificationCode(columnInfo, code);
-        }
-    }
-
-    protected static void handleUndefinedClassificationCode(ColumnInfo columnInfo, Object code) {
         final ClassificationMeta meta = columnInfo.getClassificationMeta();
         if (meta == null) { // no way (just in case)
             return;
         }
         final ClassificationUndefinedHandlingType undefinedHandlingType = meta.undefinedHandlingType();
-        if (ClassificationUndefinedHandlingType.EXCEPTION.equals(undefinedHandlingType)) {
-            throwUndefinedClassificationCodeException(columnInfo, code);
-        } else if (ClassificationUndefinedHandlingType.LOGGING.equals(undefinedHandlingType)) {
-            showUndefinedClassificationCodeMessage(columnInfo, code);
+        if (!undefinedHandlingType.isChecked()) { // basically no way (not called if no check)
+            return;
         }
-        // else means ALLOWED
-    }
-
-    protected static void throwUndefinedClassificationCodeException(ColumnInfo columnInfo, Object code) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Undefined classification code was selected.");
-        br.addItem("Advice");
-        br.addElement("Confirm the value of the classication column on your database.");
-        br.addElement("The code may NOT be one of classification code defined on DBFlute.");
-        br.addElement("Add the classification code to classification definition.");
-        br.addElement("");
-        br.addElement("Or if you (reluctantly) need to allow it, change the option like this:");
-        br.addElement("(classificationDefinitionMap.dfprop)");
-        br.addElement("    ; [classification-name] = list:{");
-        br.addElement("        ; map:{");
-        br.addElement("            ; topComment=...; codeType=...");
-        br.addElement("            ; undefinedCodeHandlingType=ALLOWED");
-        br.addElement("        }");
-        br.addElement("        map:{...}");
-        br.addElement("    }");
-        br.addElement("*for your information, the default of undefinedCodeHandlingType is LOGGING");
-        br.addItem("Table");
-        br.addElement(columnInfo.getDBMeta().getTableDbName());
-        br.addItem("Column");
-        br.addElement(columnInfo.getColumnDbName());
-        br.addItem("Classication");
-        final ClassificationMeta meta = columnInfo.getClassificationMeta();
-        br.addElement(meta.classificationName());
-        final List<Classification> listAll = meta.listAll();
-        final StringBuilder sb = new StringBuilder();
-        for (Classification cls : listAll) {
-            if (sb.length() > 0) {
-                sb.append(", ");
-            }
-            sb.append(cls.name()).append("(").append(cls.code()).append(")");
+        final Classification classification = gcls(columnInfo, code);
+        if (classification == null) {
+            final String tableDbName = columnInfo.getDBMeta().getTableDbName();
+            final String columnDbName = columnInfo.getColumnDbName();
+            Entity.FunCustodial.handleUndefinedClassificationCode(tableDbName, columnDbName, meta, code);
         }
-        br.addElement(sb.toString());
-        br.addItem("Undefined Code");
-        br.addElement(code);
-        final String msg = br.buildExceptionMessage();
-        throw new UndefinedClassificationCodeException(msg);
-    }
-
-    protected static void showUndefinedClassificationCodeMessage(ColumnInfo columnInfo, Object code) {
-        final String tableDbName = columnInfo.getDBMeta().getTableDbName();
-        final String columnDbName = columnInfo.getColumnDbName();
-        final ClassificationMeta meta = columnInfo.getClassificationMeta();
-        final String classificationName = meta.classificationName();
-        final String exp = tableDbName + "." + columnDbName + "->" + classificationName + "." + code;
-        _clsMetaLog.info("*Undefined classification code was selected: " + exp);
     }
 
     protected static Classification gcls(ColumnInfo columnInfo, Object code) { // getClassification

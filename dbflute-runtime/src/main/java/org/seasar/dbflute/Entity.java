@@ -455,28 +455,59 @@ public interface Entity {
             return "byte[" + (bytes != null ? String.valueOf(bytes.length) : "null") + "]";
         }
 
-        public static void checkImplicitSet(Entity entity, String columnDbName, ClassificationMeta meta, Object code) {
+        public static void checkClassificationCode(Entity entity, String columnDbName, ClassificationMeta meta,
+                Object code) {
             if (code == null) {
+                return;
+            }
+            final ClassificationUndefinedHandlingType undefinedHandlingType = meta.undefinedHandlingType();
+            if (!undefinedHandlingType.isChecked()) { // basically no way (not called if no check)
                 return;
             }
             if (meta.codeOf(code) != null) {
                 return;
             }
+            handleUndefinedClassificationCode(entity.getTableDbName(), columnDbName, meta, code);
+        }
+
+        public static void handleUndefinedClassificationCode(String tableDbName, String columnDbName,
+                ClassificationMeta meta, Object code) {
             final ClassificationUndefinedHandlingType undefinedHandlingType = meta.undefinedHandlingType();
             if (ClassificationUndefinedHandlingType.EXCEPTION.equals(undefinedHandlingType)) {
-                throwUndefinedClassificationCodeException(entity, columnDbName, meta, code);
+                throwUndefinedClassificationCodeException(tableDbName, columnDbName, meta, code);
             } else if (ClassificationUndefinedHandlingType.LOGGING.equals(undefinedHandlingType)) {
-                showUndefinedClassificationCodeMessage(entity, columnDbName, meta, code);
+                showUndefinedClassificationCodeMessage(tableDbName, columnDbName, meta, code);
             }
             // else means ALLOWED
         }
 
-        protected static void throwUndefinedClassificationCodeException(Entity entity, String columnDbName,
+        public static void throwUndefinedClassificationCodeException(String tableDbName, String columnDbName,
                 ClassificationMeta meta, Object code) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Undefined classification code was set to the entity.");
+            br.addItem("Advice");
+            br.addElement("Confirm the value of the classication column on your database,");
+            br.addElement("or setting value to your entity.");
+            br.addElement("The code is NOT one of classification code defined on DBFlute.");
+            br.addElement("");
+            br.addElement("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
+            br.addElement(" Use correct code!");
+            br.addElement("  Or add the code to classification definition.");
+            br.addElement("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
+            br.addElement("");
+            br.addElement("Or if you (reluctantly) need to allow it, change the option like this:");
+            br.addElement("but *Deprecated");
+            br.addElement("(classificationDefinitionMap.dfprop)");
+            br.addElement("    ; [classification-name] = list:{");
+            br.addElement("        ; map:{");
+            br.addElement("            ; topComment=...; codeType=...");
+            br.addElement("            ; undefinedCodeHandlingType=ALLOWED");
+            br.addElement("        }");
+            br.addElement("        map:{...}");
+            br.addElement("    }");
+            br.addElement("*for your information, the default of undefinedCodeHandlingType is LOGGING");
             br.addItem("Table");
-            br.addElement(entity.getTableDbName());
+            br.addElement(tableDbName);
             br.addItem("Column");
             br.addElement(columnDbName);
             br.addItem("Classification");
@@ -496,9 +527,9 @@ public interface Entity {
             throw new UndefinedClassificationCodeException(msg);
         }
 
-        protected static void showUndefinedClassificationCodeMessage(Entity entity, String columnDbName,
+        public static void showUndefinedClassificationCodeMessage(String tableDbName, String columnDbName,
                 ClassificationMeta meta, Object code) {
-            final String tableDbName = entity.getTableDbName();
+            // TODO jflute line? big?
             final String classificationName = meta.classificationName();
             final String exp = tableDbName + "." + columnDbName + "->" + classificationName + "." + code;
             _clsMetaLog.info("*Undefined classification code was set: " + exp);

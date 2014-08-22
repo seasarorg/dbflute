@@ -153,6 +153,10 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
             public boolean isNonSelectedNextConnectingRelation(String relationNoSuffix) {
                 return cb != null && !cb.getSqlClause().isSelectedNextConnectingRelation(relationNoSuffix);
             }
+
+            public boolean canUseRelationCache(String relationNoSuffix) {
+                return cb != null && cb.getSqlClause().canUseRelationCache(relationNoSuffix);
+            }
         };
     }
 
@@ -209,14 +213,19 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                 , relationNoSuffix); // indicates relation location
         Object relationRow = null;
         if (relKey != null) {
-            relationRow = relRowCache.getRelationRow(relationNoSuffix, relKey);
+            final boolean canUseRelationCache = relSelector.canUseRelationCache(relationNoSuffix);
+            if (canUseRelationCache) {
+                relationRow = relRowCache.getRelationRow(relationNoSuffix, relKey);
+            }
             if (relationRow == null) { // when no cache
                 relationRow = createRelationRow(rs, rpt // basic resource
                         , selectColumnMap, selectIndexMap // select resource
                         , relKey, relPropCache, relRowCache, relSelector); // relation resource
                 if (relationRow != null) { // is new created relation row
                     adjustCreatedRow(relationRow, rpt.getYourBeanMetaData());
-                    relRowCache.addRelationRow(relationNoSuffix, relKey, relationRow);
+                    if (canUseRelationCache) {
+                        relRowCache.addRelationRow(relationNoSuffix, relKey, relationRow);
+                    }
                 }
             }
         }

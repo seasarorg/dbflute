@@ -45,6 +45,7 @@ public class LeftOuterJoinInfo implements Serializable {
     // join condition and info
     protected Map<ColumnRealName, ColumnRealName> _joinOnMap;
     protected LeftOuterJoinInfo _localJoinInfo; // to be able to trace back toward base point
+    protected String _relationPath; // also unique
 
     // foreign key info
     protected boolean _pureFK; // has foreign key constraint (not additional, not referrer)
@@ -63,6 +64,7 @@ public class LeftOuterJoinInfo implements Serializable {
     protected boolean _innerJoin; // option (true if inner-join forced or auto-detected)
     protected boolean _underInnerJoin; // option (true if the join has foreign's inner-join)
     protected boolean _whereUsedJoin; // option (true if used on where clause or foreign's use)
+    protected boolean _underOverRelation;
 
     // ===================================================================================
     //                                                                       Determination
@@ -86,6 +88,7 @@ public class LeftOuterJoinInfo implements Serializable {
             // over-relation should be determined before resolving
             _fixedConditionOverRelation = _fixedConditionResolver.hasOverRelation(_fixedCondition);
             _fixedCondition = _fixedConditionResolver.resolveVariable(_fixedCondition, false);
+            determineUnderOverRelation();
         }
     }
 
@@ -98,6 +101,20 @@ public class LeftOuterJoinInfo implements Serializable {
             return _fixedConditionResolver.resolveFixedInlineView(foreignTableSqlName, canBeInnerJoin);
         }
         return foreignTableSqlName.toString();
+    }
+
+    protected void determineUnderOverRelation() {
+        if (hasFixedConditionOverRelation()) {
+            LeftOuterJoinInfo current = _localJoinInfo;
+            while (true) {
+                if (current == null) { // means first level (not nested) join
+                    break;
+                }
+                // means nested join here
+                current.setUnderOverRelation(true); // tell her about it
+                current = current.getLocalJoinInfo();
+            }
+        }
     }
 
     // -----------------------------------------------------
@@ -192,12 +209,20 @@ public class LeftOuterJoinInfo implements Serializable {
         _localJoinInfo = localJoinInfo;
     }
 
+    public String getRelationPath() {
+        return _relationPath;
+    }
+
+    public void setRelationPath(String relationPath) {
+        _relationPath = relationPath;
+    }
+
     public boolean getPureFK() {
         return _pureFK;
     }
 
     public void setPureFK(boolean pureFK) {
-        this._pureFK = pureFK;
+        _pureFK = pureFK;
     }
 
     public boolean getNotNullFKColumn() {
@@ -205,7 +230,7 @@ public class LeftOuterJoinInfo implements Serializable {
     }
 
     public void setNotNullFKColumn(boolean notNullFKColumn) {
-        this._notNullFKColumn = notNullFKColumn;
+        _notNullFKColumn = notNullFKColumn;
     }
 
     public List<QueryClause> getInlineWhereClauseList() {
@@ -262,5 +287,13 @@ public class LeftOuterJoinInfo implements Serializable {
 
     public void setWhereUsedJoin(boolean whereUsedJoin) {
         _whereUsedJoin = whereUsedJoin;
+    }
+
+    public boolean isUnderOverRelation() {
+        return _underOverRelation;
+    }
+
+    public void setUnderOverRelation(boolean underOverRelation) {
+        _underOverRelation = underOverRelation;
     }
 }

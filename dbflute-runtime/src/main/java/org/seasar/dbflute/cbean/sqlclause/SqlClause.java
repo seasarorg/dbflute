@@ -272,13 +272,14 @@ public interface SqlClause {
      * @param localAliasName The alias name of local table. {[localTableDbName] [localAliasName] left outer join} (NotNull)
      * @param localTableDbName The DB name of local table. {[localTableDbName] [localAliasName] left outer join} (NotNull)
      * @param joinOnMap The map of join condition on on-clause. (NotNull)
+     * @param relationPath The path of relation. e.g. _1_3 (NotNull)
      * @param foreignInfo The information of foreign relation corresponding to this join. (NotNull)
      * @param fixedCondition The fixed condition on on-clause. (NullAllowed: if null, means no fixed condition)
      * @param fixedConditionResolver The resolver for variables on fixed-condition. (NullAllowed) 
      */
     void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
-            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
-            String fixedCondition, FixedConditionResolver fixedConditionResolver);
+            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath,
+            ForeignInfo foreignInfo, String fixedCondition, FixedConditionResolver fixedConditionResolver);
 
     /**
      * Register outer-join using in-line view for fixed-conditions. <br />
@@ -288,13 +289,14 @@ public interface SqlClause {
      * @param localAliasName The alias name of local table. {[localTableDbName] [localAliasName] left outer join} (NotNull)
      * @param localTableDbName The DB name of local table. {[localTableDbName] [localAliasName] left outer join} (NotNull)
      * @param joinOnMap The map of join condition on on-clause. (NotNull)
+     * @param relationPath The path of relation. e.g. _1_3 (NotNull)
      * @param foreignInfo The information of foreign relation corresponding to this join. (NotNull)
      * @param fixedCondition The fixed condition on in-line view. (NullAllowed: if null, means no fixed condition)
      * @param fixedConditionResolver The resolver for variables on fixed-condition. (NullAllowed) 
      */
     void registerOuterJoinFixedInline(String foreignAliasName, String foreignTableDbName, String localAliasName,
-            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
-            String fixedCondition, FixedConditionResolver fixedConditionResolver);
+            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath,
+            ForeignInfo foreignInfo, String fixedCondition, FixedConditionResolver fixedConditionResolver);
 
     /**
      * Register the lazy checker for the fixed condition. <br />
@@ -318,6 +320,20 @@ public interface SqlClause {
      * @return The determination, true or false.
      */
     boolean hasOuterJoin();
+
+    /**
+     * Can it use the relation cache for entity mapping?
+     * @param relationPath The path of relation. e.g. _1_3 (NotNull)
+     * @return The determination, true or false.
+     */
+    boolean canUseRelationCache(String relationPath);
+
+    /**
+     * Is the relation under over-relation?
+     * @param relationPath The path of relation. e.g. _1_3 (NotNull)
+     * @return The determination, true or false.
+     */
+    boolean isUnderOverRelation(String relationPath);
 
     // -----------------------------------------------------
     //                                    InnerJoin Handling
@@ -740,7 +756,7 @@ public interface SqlClause {
 
     /**
      * Resolve alias name for join table.
-     * @param relationPath Relation path. (NotNull)
+     * @param relationPath The path of relation. e.g. _1_3 (NotNull)
      * @param nestLevel The nest level of condition query.
      * @return The resolved name. (NotNull)
      */
