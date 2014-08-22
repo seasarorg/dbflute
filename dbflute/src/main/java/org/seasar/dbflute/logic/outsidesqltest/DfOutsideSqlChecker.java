@@ -191,6 +191,11 @@ public class DfOutsideSqlChecker {
         br.addElement("    from ...");
         br.addElement("   where ...");
         br.addElement("  = = = = = = = = = = /");
+        br.addElement("");
+        br.addElement("If you need to remove the check,");
+        br.addElement("change the property in your outsideSqlDefinitionMap.dfprop.");
+        br.addElement("Fro example:");
+        br.addElement("    ; isRequiredSqlTitle = false");
         br.addItem("Title");
         br.addElement(title);
         br.addItem("SQL File");
@@ -240,6 +245,11 @@ public class DfOutsideSqlChecker {
         br.addElement("    from ...");
         br.addElement("   where ...");
         br.addElement("  = = = = = = = = = = /");
+        br.addElement("");
+        br.addElement("If you need to remove the check,");
+        br.addElement("change the property in your outsideSqlDefinitionMap.dfprop.");
+        br.addElement("Fro example:");
+        br.addElement("    ; isRequiredSqlDescription = false");
         br.addItem("SQL File");
         br.addElement(fileName);
         br.addItem("Description");

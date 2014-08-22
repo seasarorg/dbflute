@@ -323,10 +323,11 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     protected void processClassificationTopFromLiteralIfNeeds(DfClassificationTop classificationTop,
             Map<?, ?> elementMap) {
         classificationTop.acceptClassificationTopBasicItemMap(elementMap);
+        classificationTop.setCheckClassificationCode(isElementMapCheckClassificationCode(elementMap));
         classificationTop.setUndefinedHandlingType(getElementMapUndefinedHandlingType(elementMap));
         classificationTop.setCheckImplicitSet(isElementMapCheckImplicitSet(elementMap));
         classificationTop.setCheckSelectedClassification(isElementMapCheckSelectedClassification(elementMap));
-        classificationTop.setForceClassificationSetting(isClassificationForceClassificationSetting(elementMap));
+        classificationTop.setForceClassificationSetting(isElementMapForceClassificationSetting(elementMap));
         classificationTop.setUseDocumentOnly(isElementMapUseDocumentOnly(elementMap));
         classificationTop.setSuppressAutoDeploy(isElementMapSuppressAutoDeploy(elementMap));
         classificationTop.setSuppressDBAccessClass(isElementMapSuppressDBAccessClass(elementMap));
@@ -354,35 +355,40 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // -----------------------------------------------------
     //                                    Undefined Handling
     //                                    ------------------
-    // user closet, primitive control
-    @SuppressWarnings("unchecked")
-    protected boolean isElementMapCheckImplicitSet(Map<?, ?> elementMap) { // has been existed since old
-        // table classification determination is set at DfClassificationTop
-        if (hasElementMapUndefinedHandlingTypeProperty(elementMap)) {
-            return !getElementMapUndefinedHandlingType(elementMap).isChecked();
-        }
-        final String key = DfClassificationTop.KEY_CHECK_IMPLICIT_SET;
-        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        return isProperty(key, !prop.isCompatibleBeforeJava8(), (Map<String, ? extends Object>) elementMap);
-    }
-
-    protected boolean isElementMapCheckSelectedClassification(Map<?, ?> elementMap) { // has been existed since old
-        if (hasElementMapUndefinedHandlingTypeProperty(elementMap)) {
-            return !getElementMapUndefinedHandlingType(elementMap).isChecked();
-        }
-        return getLittleAdjustmentProperties().isCheckSelectedClassification();
-    }
-
     // user public since 1.1 (implemented when 1.0.5K)
+    protected boolean isElementMapCheckClassificationCode(Map<?, ?> elementMap) {
+        final boolean checked = getElementMapUndefinedHandlingType(elementMap).isChecked();
+        if (hasElementMapUndefinedHandlingTypeProperty(elementMap)) {
+            return checked;
+        }
+        if (hasElementMapCheckImplicitSetProperty(elementMap) && !isElementMapCheckImplicitSet(elementMap)) {
+            return false;
+        }
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        if (prop.isSuppressDefaultCheckClassificationCode()) {
+            return false;
+        }
+        return checked;
+    }
+
     @SuppressWarnings("unchecked")
     protected boolean hasElementMapUndefinedHandlingTypeProperty(Map<?, ?> elementMap) {
-        final String key = DfClassificationTop.KEY_UNDEFINED_CODE_HANDLING_TYPE;
-        return getProperty(key, null, (Map<String, ? extends Object>) elementMap) != null;
+        final String key = DfClassificationTop.KEY_UNDEFINED_HANDLING_TYPE;
+        if (getProperty(key, null, (Map<String, ? extends Object>) elementMap) != null) {
+            return true;
+        }
+        if (getLittleAdjustmentProperties().hasClassificationUndefinedHandlingTypeProperty()) {
+            return true;
+        }
+        return false;
     }
 
     @SuppressWarnings("unchecked")
     protected ClassificationUndefinedHandlingType getElementMapUndefinedHandlingType(Map<?, ?> elementMap) {
-        final String key = DfClassificationTop.KEY_UNDEFINED_CODE_HANDLING_TYPE;
+        if (isElementMapCheckImplicitSet(elementMap)) {
+            return ClassificationUndefinedHandlingType.EXCEPTION;
+        }
+        final String key = DfClassificationTop.KEY_UNDEFINED_HANDLING_TYPE;
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         final ClassificationUndefinedHandlingType defaultType = prop.getClassificationUndefinedHandlingType();
         final String defaultValue = defaultType.code();
@@ -419,38 +425,44 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    // classification interface
-    public boolean isCheckImplicitSet(String classificationName) {
-        final DfClassificationTop classificationTop = getClassificationTop(classificationName);
-        return classificationTop != null && classificationTop.isCheckImplicitSet();
+    // user closet, old style
+    @SuppressWarnings("unchecked")
+    protected boolean hasElementMapCheckImplicitSetProperty(Map<?, ?> elementMap) { // has been existed since old
+        final String key = DfClassificationTop.KEY_CHECK_IMPLICIT_SET;
+        return getProperty(key, null, (Map<String, ? extends Object>) elementMap) != null;
     }
 
-    protected Boolean _hasImplicitSetCheck; // cached for performance
+    @SuppressWarnings("unchecked")
+    protected boolean isElementMapCheckImplicitSet(Map<?, ?> elementMap) { // has been existed since old
+        // table classification determination is set at DfClassificationTop
+        final String key = DfClassificationTop.KEY_CHECK_IMPLICIT_SET;
+        return isProperty(key, false, (Map<String, ? extends Object>) elementMap);
+    }
 
-    public boolean hasImplicitSetCheck() {
-        if (_hasImplicitSetCheck != null) {
-            return _hasImplicitSetCheck;
+    protected boolean isElementMapCheckSelectedClassification(Map<?, ?> elementMap) { // has been existed since old
+        return getLittleAdjustmentProperties().isCheckSelectedClassification();
+    }
+
+    // ReplaceSchema check
+    protected Boolean _isCheckReplaceSchemaImplicitClassificationCode; // cached for performance
+
+    public boolean isCheckReplaceSchemaImplicitClassificationCode() {
+        if (_isCheckReplaceSchemaImplicitClassificationCode != null) {
+            return _isCheckReplaceSchemaImplicitClassificationCode;
         }
-        _hasImplicitSetCheck = false;
+        _isCheckReplaceSchemaImplicitClassificationCode = false;
         for (Entry<String, DfClassificationTop> entry : getClassificationTopMap().entrySet()) {
-            if (entry.getValue().isCheckImplicitSet()) {
-                _hasImplicitSetCheck = true;
+            final DfClassificationTop classificationTop = entry.getValue();
+            if (classificationTop.isCheckImplicitSet() || classificationTop.isCheckClassificationCode()) {
+                _isCheckReplaceSchemaImplicitClassificationCode = true;
             }
         }
-        return _hasImplicitSetCheck;
+        return _isCheckReplaceSchemaImplicitClassificationCode;
     }
 
     // -----------------------------------------------------
     //                                  Force Classification
     //                                  --------------------
-    // user closet, but primitive control
-    protected boolean isClassificationForceClassificationSetting(Map<?, ?> elementMap) {
-        if (hasClassificationMakeNativeTypeProperty(elementMap)) {
-            return !isClassificationMakeNativeTypeSetter(elementMap);
-        }
-        return getLittleAdjustmentProperties().isForceClassificationSetting();
-    }
-
     // user public since 1.1 (implemented when 1.0.5K)
     @SuppressWarnings("unchecked")
     protected boolean hasClassificationMakeNativeTypeProperty(Map<?, ?> elementMap) {
@@ -462,6 +474,14 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     protected boolean isClassificationMakeNativeTypeSetter(Map<?, ?> elementMap) {
         final String key = DfClassificationTop.KEY_MAKE_NATIVE_TYPE_SETTER;
         return isProperty(key, false, (Map<String, ? extends Object>) elementMap);
+    }
+
+    // user closet, but primitive control
+    protected boolean isElementMapForceClassificationSetting(Map<?, ?> elementMap) {
+        if (hasClassificationMakeNativeTypeProperty(elementMap)) {
+            return !isClassificationMakeNativeTypeSetter(elementMap);
+        }
+        return getLittleAdjustmentProperties().isForceClassificationSetting();
     }
 
     // -----------------------------------------------------
@@ -774,8 +794,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             {
                 DfClassificationTop tmpTop = _classificationTopMap.get(classificationName);
                 if (tmpTop == null) {
-                    tmpTop = new DfClassificationTop();
-                    tmpTop.setClassificationName(classificationName);
+                    tmpTop = createAllInOneTableClassificationTop(classificationName);
                     _classificationTopMap.put(classificationName, tmpTop);
                 }
                 classificationTop = tmpTop;
@@ -805,6 +824,18 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             element.acceptBasicItemMap(map);
             classificationTop.addClassificationElement(element);
         }
+    }
+
+    protected DfClassificationTop createAllInOneTableClassificationTop(final String classificationName) {
+        final DfClassificationTop tmpTop = new DfClassificationTop();
+        tmpTop.setClassificationName(classificationName);
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        tmpTop.setCheckClassificationCode(prop.isPlainCheckClassificationCode());
+        tmpTop.setUndefinedHandlingType(prop.getClassificationUndefinedHandlingType());
+        tmpTop.setCheckImplicitSet(false); // unsupported
+        tmpTop.setCheckSelectedClassification(prop.isCheckSelectedClassification());
+        tmpTop.setForceClassificationSetting(prop.isForceClassificationSetting());
+        return tmpTop;
     }
 
     // ===================================================================================

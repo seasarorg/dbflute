@@ -1072,7 +1072,7 @@ public abstract class DfAbsractDataWriter {
         _implicitClassificationLazyCheckerList.add(new DfLoadedClassificationLazyChecker() {
             public void check(Connection conn) throws SQLException {
                 final DfClassificationProperties prop = getClassificationProperties();
-                if (!prop.hasImplicitSetCheck()) {
+                if (!prop.isCheckReplaceSchemaImplicitClassificationCode()) {
                     return;
                 }
                 final DfImplicitClassificationChecker checker = new DfImplicitClassificationChecker();

@@ -80,16 +80,11 @@ public class ${myClassName} extends AbstractDBMeta {
             if (cls != null) {
                 ((${myExtendedObjectClassName})et).set${col.javaName}As${col.classificationName}(cls);
             } else {
-#if ($col.isClassificationUndefinedHandlingTypeCheckedAbort())
-## undefined code does not come here so set null fixedly
-                ((${myExtendedObjectClassName})et).set${col.javaName}As${col.classificationName}(null);
-#else
 ## undefined code or null here, use internal method for native mapping
 #if ($col.isJavaNativeNumberObject())
                 ((${myExtendedObjectClassName})et).mynativeMapping${col.javaName}(ctn(vl, ${col.javaNative}.class));
 #else
                 ((${myExtendedObjectClassName})et).mynativeMapping${col.javaName}((${col.javaNative})vl);
-#end
 #end
             }
 #else

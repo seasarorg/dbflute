@@ -93,6 +93,7 @@ public class DfAdditionalForeignKeyInitializer {
         final String comment = getComment(foreignKeyName);
         final String suppressJoin = getSuppressJoin(foreignKeyName);
         final String suppressSubQuery = getSuppressSubQuery(foreignKeyName);
+        final String deprecated = getDeprecated(foreignKeyName);
 
         // for check about same-column self reference
         final Table foreignTable = getTable(foreignTableName);
@@ -121,14 +122,14 @@ public class DfAdditionalForeignKeyInitializer {
             if (existingFK != null) {
                 _log.info("The foreign key has already set up: " + foreignKeyName + "(" + fixedSuffix + ")");
                 reflectOptionToExistingFKIfNeeds(foreignKeyName, fixedSuffix, existingFK, suppressJoin,
-                        suppressSubQuery);
+                        suppressSubQuery, deprecated);
                 continue;
             }
 
             final String currentForeignKeyName = foreignKeyName + "_" + toConstraintPart(localTableName);
             setupForeignKeyToTable(currentForeignKeyName, foreignTableName, foreignColumnNameList, fixedCondition,
                     table, localColumnNameList, fixedSuffix, fixedInline, fixedReferrer, comment, suppressJoin,
-                    suppressSubQuery);
+                    suppressSubQuery, deprecated);
             showResult(foreignTableName, foreignColumnNameList, fixedCondition, table, localColumnNameList);
         }
     }
@@ -147,6 +148,7 @@ public class DfAdditionalForeignKeyInitializer {
         final String comment = getComment(foreignKeyName);
         final String suppressJoin = getSuppressJoin(foreignKeyName);
         final String suppressSubQuery = getSuppressSubQuery(foreignKeyName);
+        final String deprecated = getDeprecated(foreignKeyName);
         final Table table = getTable(localTableName);
         final List<String> localColumnNameList = getLocalColumnNameList(table, foreignKeyName, foreignTableName,
                 foreignColumnNameList, localTableName, fixedSuffix, false, true);
@@ -157,23 +159,25 @@ public class DfAdditionalForeignKeyInitializer {
                 foreignColumnNameList, fixedSuffix);
         if (existingFK != null) {
             _log.info("The foreign key has already set up: " + foreignKeyName + "(" + fixedSuffix + ")");
-            reflectOptionToExistingFKIfNeeds(foreignKeyName, fixedSuffix, existingFK, suppressJoin, suppressSubQuery);
+            reflectOptionToExistingFKIfNeeds(foreignKeyName, fixedSuffix, existingFK, suppressJoin, suppressSubQuery,
+                    deprecated);
             return;
         }
 
         setupForeignKeyToTable(foreignKeyName, foreignTableName, foreignColumnNameList, fixedCondition, table,
-                localColumnNameList, fixedSuffix, fixedInline, fixedReferrer, comment, suppressJoin, suppressSubQuery);
+                localColumnNameList, fixedSuffix, fixedInline, fixedReferrer, comment, suppressJoin, suppressSubQuery,
+                deprecated);
         showResult(foreignTableName, foreignColumnNameList, fixedCondition, table, localColumnNameList);
     }
 
     protected void setupForeignKeyToTable(String foreignKeyName, String foreignTableName,
             List<String> foreignColumnNameList, String fixedCondition, Table table, List<String> localColumnNameList,
             String fixedSuffix, String fixedInline, String fixedReferrer, String comment, String suppressJoin,
-            String suppressSubQuery) {
+            String suppressSubQuery, String deprecated) {
         // set up foreign key instance
         final ForeignKey fk = createAdditionalForeignKey(foreignKeyName, foreignTableName, localColumnNameList,
                 foreignColumnNameList, fixedCondition, fixedSuffix, fixedInline, fixedReferrer, comment);
-        reflectOptionToExistingFKIfNeeds(foreignKeyName, fixedSuffix, fk, suppressJoin, suppressSubQuery);
+        reflectOptionToExistingFKIfNeeds(foreignKeyName, fixedSuffix, fk, suppressJoin, suppressSubQuery, deprecated);
         table.addForeignKey(fk);
 
         // set up referrer instance
@@ -200,7 +204,7 @@ public class DfAdditionalForeignKeyInitializer {
     }
 
     protected void reflectOptionToExistingFKIfNeeds(String foreignKeyName, final String fixedSuffix,
-            final ForeignKey existingFK, String suppressJoin, String suppressSubQuery) {
+            final ForeignKey existingFK, String suppressJoin, String suppressSubQuery, String deprecated) {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(suppressJoin)) {
             _log.info("...Refecting suppress join to the FK: " + foreignKeyName + "(" + fixedSuffix + ")");
             existingFK.setSuppressJoin(suppressJoin.equalsIgnoreCase("true"));
@@ -208,6 +212,10 @@ public class DfAdditionalForeignKeyInitializer {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(suppressSubQuery)) {
             _log.info("...Refecting suppress sub-query to the FK: " + foreignKeyName + "(" + fixedSuffix + ")");
             existingFK.setSuppressSubQuery(suppressSubQuery.equalsIgnoreCase("true"));
+        }
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(deprecated)) {
+            _log.info("...Refecting deprecated to the FK: " + foreignKeyName + "(" + fixedSuffix + ")");
+            existingFK.setDeprecated(deprecated);
         }
     }
 
@@ -490,6 +498,10 @@ public class DfAdditionalForeignKeyInitializer {
 
     protected String getSuppressSubQuery(String foreignKeyName) {
         return getProperties().findSuppressSubQuery(foreignKeyName);
+    }
+
+    protected String getDeprecated(String foreignKeyName) {
+        return getProperties().findDeprecated(foreignKeyName);
     }
 
     protected boolean isSuppressImplicitReverseFK(String foreignKeyName) {

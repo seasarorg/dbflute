@@ -186,6 +186,7 @@ public class ForeignKey implements Constraint {
     protected String _comment;
     protected boolean _suppressJoin;
     protected boolean _suppressSubQuery;
+    protected String _deprecated;
     protected String _foreignPropertyNamePrefix;
     protected boolean _implicitReverseForeignKey;
 
@@ -1988,6 +1989,18 @@ public class ForeignKey implements Constraint {
 
     public void setSuppressSubQuery(boolean suppressSubQuery) {
         _suppressSubQuery = suppressSubQuery;
+    }
+
+    public boolean isDeprecatedRelation() {
+        return Srl.is_NotNull_and_NotTrimmedEmpty(_deprecated);
+    }
+
+    public String getDeprecated() {
+        return _deprecated;
+    }
+
+    public void setDeprecated(String deprecated) {
+        _deprecated = deprecated;
     }
 
     public void setForeignPropertyNamePrefix(String propertyNamePrefix) {

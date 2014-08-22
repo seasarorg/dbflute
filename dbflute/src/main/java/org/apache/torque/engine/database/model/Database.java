@@ -1851,10 +1851,6 @@ public class Database {
         return getClassificationProperties().buildClassificationCodeNameAliasVariables(classificationElement);
     }
 
-    public boolean isCheckImplicitSetClassification(String classificationName) {
-        return getClassificationProperties().isCheckImplicitSet(classificationName);
-    }
-
     public boolean isTableClassification(String classificationName) {
         return getClassificationProperties().isTableClassification(classificationName);
     }

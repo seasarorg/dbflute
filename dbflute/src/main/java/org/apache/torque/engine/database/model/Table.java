@@ -2802,18 +2802,21 @@ public class Table {
         return false;
     }
 
-    public boolean hasCheckImplicitSetClassification() {
-        final Column[] columns = getColumns();
-        for (Column column : columns) {
-            if (column.hasCheckImplicitSetClassification()) {
+    protected boolean isSuppressDBAccessClass() {
+        return getClassificationProperties().isSuppressDBAccessClassTable(getTableDbName());
+    }
+
+    public boolean hasCheckClassificationCodeOnEntity() {
+        if (!hasClassification()) {
+            return false;
+        }
+        final List<Column> columnList = getColumnList();
+        for (Column column : columnList) {
+            if (column.hasCheckClassificationCodeOnEntity()) {
                 return true;
             }
         }
         return false;
-    }
-
-    protected boolean isSuppressDBAccessClass() {
-        return getClassificationProperties().isSuppressDBAccessClassTable(getTableDbName());
     }
 
     // ===================================================================================

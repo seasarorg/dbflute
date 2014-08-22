@@ -116,12 +116,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public boolean isAvailableSelectEntityPlainReturn() { // closet
-        final boolean defaultValue = isCompatibleBeforeJava8();
-        return isProperty("isAvailableSelectEntityPlainReturn", defaultValue);
+        return isProperty("isAvailableSelectEntityPlainReturn", isCompatibleBeforeJava8());
     }
 
     public boolean isAvailableSelectEntityWithDeletedCheck() { // closet
-        // selectEntityWithDeletedCheck() coexists with optional entity
+        // selectEntityWithDeletedCheck() can coexist with optional entity
         //final boolean defaultValue = isCompatibleUnderJava8();
         return isProperty("isAvailableSelectEntityWithDeletedCheck", true);
     }
@@ -132,20 +131,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                    Undefined Handling
     //                                    ------------------
-    // old style, but primitive control
-    protected static final String PROP_isCheckSelectedClassification = "isCheckSelectedClassification";
-
-    public boolean hasCheckSelectedClassificationProperty() {
-        return getProperty(PROP_isCheckSelectedClassification, null) != null;
-    }
-
-    public boolean isCheckSelectedClassification() {
-        if (hasClassificationUndefinedHandlingTypeProperty()) {
-            return getClassificationUndefinedHandlingType().isChecked();
-        }
-        return isProperty(PROP_isCheckSelectedClassification, !isCompatibleBeforeJava8());
-    }
-
     // user public since 1.1 (implemented when 1.0.5K)
     public boolean hasClassificationUndefinedHandlingTypeProperty() {
         return doGetClassificationUndefinedHandlingType(null) != null;
@@ -156,7 +141,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         if (isCompatibleBeforeJava8()) {
             defaultValue = ClassificationUndefinedHandlingType.EXCEPTION.code();
         } else {
-            defaultValue = ClassificationUndefinedHandlingType.LOGGING.code();
+            if (hasCheckSelectedClassificationProperty() && isCheckSelectedClassification()) {
+                defaultValue = ClassificationUndefinedHandlingType.EXCEPTION.code();
+            } else { // default after Java8
+                defaultValue = ClassificationUndefinedHandlingType.LOGGING.code();
+            }
         }
         final String code = doGetClassificationUndefinedHandlingType(defaultValue);
         final ClassificationUndefinedHandlingType handlingType = ClassificationUndefinedHandlingType.codeOf(code);
@@ -193,17 +182,36 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         throw new DfIllegalPropertySettingException(msg);
     }
 
+    public boolean isPlainCheckClassificationCode() { // for e.g. classificationResource
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        final ClassificationUndefinedHandlingType undefinedHandlingType = prop.getClassificationUndefinedHandlingType();
+        if (prop.hasClassificationUndefinedHandlingTypeProperty() && undefinedHandlingType.isChecked()) {
+            return true;
+        }
+        if (prop.isSuppressDefaultCheckClassificationCode()) {
+            return false;
+        }
+        return undefinedHandlingType.isChecked();
+    }
+
+    public boolean isSuppressDefaultCheckClassificationCode() { // closet
+        return isProperty("isSuppressDefaultCheckClassificationCode", isCompatibleBeforeJava8());
+    }
+
+    // old style
+    protected static final String KEY_isCheckSelectedClassification = "isCheckSelectedClassification";
+
+    public boolean hasCheckSelectedClassificationProperty() {
+        return getProperty(KEY_isCheckSelectedClassification, null) != null;
+    }
+
+    public boolean isCheckSelectedClassification() {
+        return isProperty(KEY_isCheckSelectedClassification, false);
+    }
+
     // -----------------------------------------------------
     //                                  Force Classification
     //                                  --------------------
-    // old style, but primitive control
-    public boolean isForceClassificationSetting() {
-        if (hasMakeClassificationNativeTypeSetterProperty()) {
-            return !isMakeClassificationNativeTypeSetter();
-        }
-        return isProperty("isForceClassificationSetting", !isCompatibleBeforeJava8());
-    }
-
     // user public since 1.1 (implemented when 1.0.5K)
     protected static final String PROP_isMakeClassificationNativeTypeSetter = "isMakeClassificationNativeTypeSetter";
 
@@ -213,6 +221,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public boolean isMakeClassificationNativeTypeSetter() {
         return isProperty(PROP_isMakeClassificationNativeTypeSetter, false);
+    }
+
+    // old style, but primitive control
+    public boolean isForceClassificationSetting() {
+        if (hasMakeClassificationNativeTypeSetterProperty()) {
+            return !isMakeClassificationNativeTypeSetter();
+        }
+        return isProperty("isForceClassificationSetting", !isCompatibleBeforeJava8());
     }
 
     // -----------------------------------------------------

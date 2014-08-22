@@ -92,7 +92,7 @@ public class DfLanguageImplStyleJava implements DfLanguageImplStyle {
     }
 
     public boolean isEntityDerivedMappable() {
-        return false;
+        return !isCompatibleBeforeJava8();
     }
 
     public boolean isOutsideSqlCursorGenericVoidable() {

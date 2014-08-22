@@ -55,7 +55,7 @@ public class DfClassificationTop {
     public static final String KEY_CHECK_IMPLICIT_SET = "isCheckImplicitSet"; // old style
 
     // document default, basically true
-    public static final String KEY_UNDEFINED_CODE_HANDLING_TYPE = "undefinedCodeHandlingType";
+    public static final String KEY_UNDEFINED_HANDLING_TYPE = "undefinedHandlingType";
     public static final String KEY_MAKE_NATIVE_TYPE_SETTER = "isMakeNativeTypeSetter";
 
     // small options
@@ -74,12 +74,13 @@ public class DfClassificationTop {
     protected String _classificationName;
     protected String _topComment;
     protected String _codeType = DfClassificationTop.CODE_TYPE_STRING; // as default
+    protected boolean _checkClassificationCode;
     protected ClassificationUndefinedHandlingType _undefinedHandlingType = ClassificationUndefinedHandlingType.LOGGING; // as default
     protected String _relatedColumnName;
     protected final List<DfClassificationElement> _elementList = new ArrayList<DfClassificationElement>();
     protected boolean _tableClassification;
-    protected boolean _checkImplicitSet;
-    protected boolean _checkSelectedClassification;
+    protected boolean _checkImplicitSet; // old style
+    protected boolean _checkSelectedClassification; // old style
     protected boolean _forceClassificationSetting;
     protected boolean _useDocumentOnly;
     protected boolean _suppressAutoDeploy; // no automatic classification deployment
@@ -438,6 +439,14 @@ public class DfClassificationTop {
     // -----------------------------------------------------
     //                                 UndefinedHandlingType
     //                                 ---------------------
+    public boolean isCheckClassificationCode() {
+        return _checkClassificationCode;
+    }
+
+    public void setCheckClassificationCode(boolean checkClassificationCode) {
+        _checkClassificationCode = checkClassificationCode;
+    }
+
     public ClassificationUndefinedHandlingType getUndefinedHandlingType() {
         return _undefinedHandlingType;
     }

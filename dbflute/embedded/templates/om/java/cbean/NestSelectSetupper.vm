@@ -58,6 +58,9 @@ public class ${myClassName} {
      * @return The set-upper of more nested relation. {...with[nested-relation].with[more-nested-relation]} (NotNull)
 #set ($setupSelectReturnType = "${fk.foreignTableNestSelectSetupperClassName}")
 #end
+#if ($fk.isDeprecatedRelation())
+     * @deprecated ${fk.deprecated}
+#end
      */
     public ${setupSelectReturnType} with${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
         _query.doNss(new ${myConditionQueryClassName}.NssCall() { public ConditionQuery qf() { return _query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
@@ -77,6 +80,9 @@ public class ${myClassName} {
 #if ($hasNestSelectSetupper)
      * @return The set-upper of more nested relation. {...with[nested-relation].with[more-nested-relation]} (NotNull)
 #set ($setupSelectReturnType = "${referrer.referrerTableNestSelectSetupperClassName}")
+#end
+#if ($referrer.isDeprecatedRelation())
+     * @deprecated ${referrer.deprecated}
 #end
      */
     public ${setupSelectReturnType} with${tmpPropertyNameInitCap}() {

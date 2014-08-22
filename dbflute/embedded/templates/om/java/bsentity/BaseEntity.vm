@@ -862,8 +862,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
      */
     ${col.propertySettingModifier} void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
-#if ($col.hasCheckImplicitSetClassification())
-        checkImplicitSet("${col.name}", ${glCDef}.DefMeta.${col.classificationName}, ${col.uncapitalisedJavaName});
+#if ($col.hasCheckClassificationCodeOnEntity())
+        checkClassificationCode("${col.name}", ${glCDef}.DefMeta.${col.classificationName}, ${col.uncapitalisedJavaName});
 #end
         __modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
         _${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
@@ -895,20 +895,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 #end
 #end
-#if ($table.hasEntityConvertEmptyStringToNull())
-
-    protected String convertEmptyToNull(String value) {
-        return FunCustodial.convertEmptyToNull(value);
-    }
-#end
-#if ($table.hasCheckImplicitSetClassification())
-
-    protected void checkImplicitSet(String columnDbName, ${glCDef}.DefMeta meta, Object value) {
-        FunCustodial.checkImplicitSet(this, columnDbName, meta, value);
-    }
-#end
 #foreach ($col in $table.columns)
-#if ($col.isPropertySettingModifierClosed() && $col.isClassificationUndefinedHandlingTypeContinued())
+#if ($col.isPropertySettingModifierClosed())
 
     /**
      * For framework so basically DON'T use this method.
@@ -922,5 +910,17 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         set${col.javaName}(${col.uncapitalisedJavaName});
     }
 #end
+#end
+#if ($table.hasEntityConvertEmptyStringToNull())
+
+    protected String convertEmptyToNull(String value) {
+        return FunCustodial.convertEmptyToNull(value);
+    }
+#end
+#if ($table.hasCheckClassificationCodeOnEntity())
+
+    protected void checkClassificationCode(String columnDbName, ${glCDef}.DefMeta meta, Object value) {
+        FunCustodial.checkClassificationCode(this, columnDbName, meta, value);
+    }
 #end
 }

@@ -41,9 +41,10 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
     public static final String KEY_FIXED_SUFFIX = "fixedSuffix";
     public static final String KEY_FIXED_INLINE = "fixedInline";
     public static final String KEY_FIXED_REFERRER = "fixedReferrer";
-    public static final String KEY_COMMENT = "comment";
     public static final String KEY_SUPPRESS_JOIN = "suppressJoin";
     public static final String KEY_SUPPRESS_SUBQUERY = "suppressSubQuery";
+    public static final String KEY_COMMENT = "comment";
+    public static final String KEY_DEPRECATED = "deprecated";
 
     // ===================================================================================
     //                                                                         Constructor
@@ -204,6 +205,10 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
     public String findFixedReferrer(String foreignKeyName) {
         return doFindAttributeValue(foreignKeyName, KEY_FIXED_REFERRER);
     }
+    
+    public String findComment(String foreignKeyName) {
+        return doFindAttributeValue(foreignKeyName, KEY_COMMENT);
+    }
 
     public String findSuppressJoin(String foreignKeyName) {
         return doFindAttributeValue(foreignKeyName, KEY_SUPPRESS_JOIN);
@@ -213,8 +218,8 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         return doFindAttributeValue(foreignKeyName, KEY_SUPPRESS_SUBQUERY);
     }
 
-    public String findComment(String foreignKeyName) {
-        return doFindAttributeValue(foreignKeyName, KEY_COMMENT);
+    public String findDeprecated(String foreignKeyName) {
+        return doFindAttributeValue(foreignKeyName, KEY_DEPRECATED);
     }
 
     protected String doFindAttributeValue(String foreignKeyName, String optionKey) {

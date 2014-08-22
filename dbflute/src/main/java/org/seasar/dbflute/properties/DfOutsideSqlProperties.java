@@ -274,7 +274,6 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
 
     public boolean isCheckRequiredSqlCommentAlsoSql2Entity() { // closet
         final boolean defaultValue = !getLittleAdjustmentProperties().isCompatibleBeforeJava8();
-        // TODO jflute 
         return isProperty("isCheckRequiredSqlCommentAlsoSql2Entity", defaultValue);
     }
 

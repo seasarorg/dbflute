@@ -406,6 +406,9 @@ public class ${myClassName} extends AbstractConditionBean {
      * @return The set-upper of nested relation. {setupSelect...().with[nested-relation]} (NotNull)
 #set ($setupSelectReturnType = "${nestSelectSetuppperClassName}")
 #end
+#if ($fk.isDeprecatedRelation())
+     * @deprecated ${fk.deprecated}
+#end
      */
     public ${setupSelectReturnType} setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
         assertSetupSelectPurpose("${tmpPropertyName}");
@@ -453,6 +456,9 @@ public class ${myClassName} extends AbstractConditionBean {
 #if ($hasNestSelectSetupper)
      * @return The set-upper of nested relation. {setupSelect...().with[nested-relation]} (NotNull)
 #set ($setupSelectReturnType = "${nestSelectSetuppperClassName}")
+#end
+#if ($referrer.isDeprecatedRelation())
+     * @deprecated ${referrer.deprecated}
 #end
      */
     public ${setupSelectReturnType} setupSelect_${tmpPropertyNameInitCap}() {
@@ -569,6 +575,9 @@ public class ${myClassName} extends AbstractConditionBean {
          * ${fk.foreignDispForJavaDocNest}
          * ${fk.dynamicFixedConditionArgsJavaDocStringNest}
          * @return The instance for specification for relation table to specify. (NotNull)
+#if ($fk.isDeprecatedRelation())
+         * @deprecated ${fk.deprecated}
+#end
          */
         public ${tmpCBClassName}.HpSpecification specify${tmpPropertyNameInitCap}(${fk.dynamicFixedConditionFinalArgs}) {
             assertRelation("${tmpPropertyName}");
@@ -591,6 +600,9 @@ public class ${myClassName} extends AbstractConditionBean {
          * Prepare to specify functions about relation table. <br />
          * ${fk.foreignDispForJavaDocNest}
          * @return The instance for specification for relation table to specify. (NotNull)
+#if ($referrer.isDeprecatedRelation())
+         * @deprecated ${referrer.deprecated}
+#end
          */
         public ${tmpCBClassName}.HpSpecification specify${tmpPropertyNameInitCap}() {
             assertRelation("${tmpPropertyName}");

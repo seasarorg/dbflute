@@ -28,7 +28,6 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfLoadDataIllegalImplicitClassificationValueException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
@@ -41,24 +40,24 @@ public class DfImplicitClassificationChecker {
 
     private static final Log _log = LogFactory.getLog(DfImplicitClassificationChecker.class);
 
-    /** The instance of logging object for classification meta. */
-    private static final Log _clsMetaLog = LogFactory.getLog(ClassificationMeta.class);
-
     public void check(File file, String tableDbName, String columnDbName, Connection conn) throws SQLException {
         final DfClassificationProperties prop = getClassificationProperties();
         final String classificationName = prop.getClassificationName(tableDbName, columnDbName);
-        if (!prop.isCheckImplicitSet(classificationName)) {
-            return;
-        }
         final DfClassificationTop classificationTop = prop.getClassificationTop(classificationName);
         if (classificationTop == null) { // no way (just in case)
+            return;
+        }
+        if (classificationTop.isTableClassification()) { // basically checked by FK constraint
+            return;
+        }
+        if (!classificationTop.isCheckClassificationCode() && !classificationTop.isCheckImplicitSet()) { // no option
             return;
         }
         final ClassificationUndefinedHandlingType undefinedHandlingType = classificationTop.getUndefinedHandlingType();
         if (undefinedHandlingType == null) { // no way (just in case)
             return;
         }
-        if (!undefinedHandlingType.isChecked()) { // no way (just in case)
+        if (!undefinedHandlingType.isChecked()) { // no handling option
             return;
         }
         final boolean quote = prop.isCodeTypeNeedsQuoted(classificationName);
@@ -75,7 +74,7 @@ public class DfImplicitClassificationChecker {
                 illegalCodeList.add(rs.getString(1));
             }
             if (!illegalCodeList.isEmpty()) {
-                throwLoadDataIllegalImplicitClassificationValueException(file, tableDbName, columnDbName,
+                handleLoadDataIllegalImplicitClassificationValueException(file, tableDbName, columnDbName,
                         classificationName, codeList, illegalCodeList, undefinedHandlingType);
             }
         } finally {
@@ -105,11 +104,30 @@ public class DfImplicitClassificationChecker {
         return sb.toString();
     }
 
-    protected void throwLoadDataIllegalImplicitClassificationValueException(File file, String tableDbName,
+    protected void handleLoadDataIllegalImplicitClassificationValueException(File file, String tableDbName,
             String columnDbName, String classificationName, List<String> codeList, List<String> illegalCodeList,
             ClassificationUndefinedHandlingType undefinedHandlingType) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Undefined classification code was found.");
+        br.addElement("Confirm the value of the classication column on your data file,");
+        br.addElement("The code is NOT one of classification code defined on DBFlute.");
+        br.addElement("");
+        br.addElement("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
+        br.addElement(" Use formal code!");
+        br.addElement("  Or add the code to classification definition.");
+        br.addElement("_/_/_/_/_/_/_/_/_/_/");
+        br.addElement("");
+        br.addElement("Or if you (reluctantly) need to allow it, change the option like this:");
+        br.addElement("but *Deprecated");
+        br.addElement("(classificationDefinitionMap.dfprop)");
+        br.addElement("    ; [classification-name] = list:{");
+        br.addElement("        ; map:{");
+        br.addElement("            ; topComment=...; codeType=...");
+        br.addElement("            ; undefinedHandlingType=ALLOWED");
+        br.addElement("        }");
+        br.addElement("        map:{...}");
+        br.addElement("    }");
+        br.addElement("*for your information, the default of undefinedHandlingType is LOGGING");
         br.addItem("Data File");
         br.addElement(file.getPath());
         br.addItem("Table");
@@ -123,11 +141,15 @@ public class DfImplicitClassificationChecker {
         br.addItem("Illegal Value");
         br.addElement(illegalCodeList);
         final String msg = br.buildExceptionMessage();
-        if (ClassificationUndefinedHandlingType.EXCEPTION.equals(undefinedHandlingType)) {
-            throw new DfLoadDataIllegalImplicitClassificationValueException(msg);
-        } else if (ClassificationUndefinedHandlingType.LOGGING.equals(undefinedHandlingType)) {
-            _clsMetaLog.info(msg);
-        }
+        // in spite of undefined handling type, forcedly exception on ReplaceSchema
+        // because ReplaceSchema's logging is hardly seen by developers
+        // and strict cost is none here so strict
+        //if (ClassificationUndefinedHandlingType.EXCEPTION.equals(undefinedHandlingType)) {
+        //    throw new DfLoadDataIllegalImplicitClassificationValueException(msg);
+        //} else if (ClassificationUndefinedHandlingType.LOGGING.equals(undefinedHandlingType)) {
+        //    _clsMetaLog.info(msg);
+        //}
+        throw new DfLoadDataIllegalImplicitClassificationValueException(msg);
     }
 
     // ===================================================================================

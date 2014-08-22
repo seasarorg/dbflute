@@ -27,8 +27,10 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.Srl;
@@ -121,7 +123,10 @@ public class DfClassificationResourceAnalyzer {
             final List<DfClassificationTop> classificationTopList = analyze(lineList);
             if (!classificationTopList.isEmpty()) {
                 for (DfClassificationTop top : classificationTopList) {
-                    _log.info("    " + top.getClassificationName() + ", " + top.getTopCommentDisp());
+                    _log.info("    " + top.getClassificationName() + ", " + top.getTopCommentDisp() + ", "
+                            + top.isCheckClassificationCode() + ", " + top.getUndefinedHandlingType() + ", "
+                            + top.isCheckImplicitSet() + ", " + top.isCheckSelectedClassification() + ", "
+                            + top.isForceClassificationSetting());
                 }
             } else {
                 _log.info(" -> no classification in resource file");
@@ -402,7 +407,18 @@ public class DfClassificationResourceAnalyzer {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(topComment)) {
             classificationTop.setTopComment(topComment);
         }
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        classificationTop.setCheckClassificationCode(prop.isPlainCheckClassificationCode());
+        classificationTop.setUndefinedHandlingType(prop.getClassificationUndefinedHandlingType());
+        // analyzed after
+        //classificationTop.setCheckImplicitSet(false);
+        classificationTop.setCheckSelectedClassification(prop.isCheckSelectedClassification());
+        classificationTop.setForceClassificationSetting(prop.isForceClassificationSetting());
         return classificationTop;
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return DfBuildProperties.getInstance().getLittleAdjustmentProperties();
     }
 
     protected DfClassificationElement extractClassificationElement(String line) {

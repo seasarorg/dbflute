@@ -500,8 +500,9 @@ public class DfPmbMetaData {
             return true;
         }
         if (isPropertyOptionClassificationSetter(propertyName, schemaData)) {
-            if (getLittleAdjustmentProperties().isForceClassificationSetting()) {
-                return true;
+            final DfClassificationTop classificationTop = getPropertyOptionClassificationTop(propertyName, schemaData);
+            if (classificationTop != null) { // basically no way (just in case)
+                return classificationTop.isForceClassificationSetting();
             }
         }
         if (isPropertyOptionClassificationFixedElement(propertyName)) {

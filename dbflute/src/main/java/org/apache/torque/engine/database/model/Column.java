@@ -2418,8 +2418,8 @@ public class Column {
     // -----------------------------------------------------
     //                                 UndefinedHandlingType
     //                                 ---------------------
-    public boolean isCheckSelectedClassification() {
-        return hasClassification() && getClassificationTop().isCheckSelectedClassification();
+    public boolean isCheckClassificationCode() { // true if undefined handling type is specified
+        return hasClassification() && getClassificationTop().isCheckClassificationCode();
     }
 
     public boolean isClassificationUndefinedHandlingTypeChecked() {
@@ -2436,6 +2436,27 @@ public class Column {
 
     public boolean isClassificationUndefinedHandlingTypeContinued() {
         return hasClassification() && getClassificationTop().isUndefinedHandlingTypeContinued();
+    }
+
+    public boolean isCheckSelectedClassification() { // old style, on DBMeta
+        return hasClassification() && getClassificationTop().isCheckSelectedClassification();
+    }
+
+    public boolean hasCheckClassificationCodeOnEntity() { // check only on entity after Java8
+        return isCheckClassificationCode() || hasCheckImplicitSetClassification();
+    }
+
+    protected boolean hasCheckImplicitSetClassification() { // old style
+        if (!hasClassification()) {
+            return false;
+        }
+        final String classificationName = getClassificationName();
+        if (classificationName == null) {
+            return false;
+        }
+        final DfClassificationProperties prop = getClassificationProperties();
+        final DfClassificationTop classificationTop = prop.getClassificationTop(classificationName);
+        return classificationTop != null && classificationTop.isCheckImplicitSet();
     }
 
     // -----------------------------------------------------
@@ -2484,17 +2505,6 @@ public class Column {
         }
         final String tableName = getSql2EntityRelatedTable().getTableDbName();
         return getClassificationProperties().getClassificationName(tableName, getName());
-    }
-
-    public boolean hasCheckImplicitSetClassification() {
-        if (!hasClassification()) {
-            return false;
-        }
-        final String classificationName = getClassificationName();
-        if (classificationName == null) {
-            return false;
-        }
-        return getClassificationProperties().isCheckImplicitSet(classificationName);
     }
 
     // ===================================================================================

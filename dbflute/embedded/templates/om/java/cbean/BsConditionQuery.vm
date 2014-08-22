@@ -402,6 +402,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * ${fk.dynamicFixedConditionArgsJavaDocString}
 #end
      * @return The instance of condition-query. (NotNull)
+#if ($fk.isDeprecatedRelation())
+     * @deprecated ${fk.deprecated}
+#end
      */
     public ${foreignCQClassName} query${fk.foreignPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
 #if ($fk.hasDynamicFixedCondition())
@@ -438,6 +441,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * Get the condition-query for relation table. <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * @return The instance of condition-query. (NotNull)
+#if ($referrer.isDeprecatedRelation())
+     * @deprecated ${referrer.deprecated}
+#end
      */
     public ${relatedCQClassName} query${referrer.referrerPropertyNameInitCapAsOne}() { return getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}(); }
     public ${relatedCQClassName} getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}() {

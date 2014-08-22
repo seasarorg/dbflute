@@ -910,8 +910,8 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
 #end
      */
     ${col.propertySettingModifierAsPrefix}def set${col.javaName}(${col.uncapitalisedJavaName}: ${col.javaNative}): Unit = {
-#if ($col.hasCheckImplicitSetClassification())
-        checkImplicitSet("${col.name}", ${glCDef}.DefMeta.${col.classificationName}, ${col.uncapitalisedJavaName});
+#if ($col.hasCheckClassificationCodeOnEntity())
+        checkClassificationCode("${col.name}", ${glCDef}.DefMeta.${col.classificationName}, ${col.uncapitalisedJavaName});
 #end
         __modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
         _${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
@@ -943,20 +943,8 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
     }
 #end
 #end
-#if ($table.hasEntityConvertEmptyStringToNull())
-
-    protected def convertEmptyToNull(value: String): String = {
-        return FunCustodial.convertEmptyToNull(value);
-    }
-#end
-#if ($table.hasCheckImplicitSetClassification())
-
-    protected def checkImplicitSet(columnDbName: String, meta: ${glCDef}.DefMeta, value: Object): Unit = {
-        FunCustodial.checkImplicitSet(this, columnDbName, meta, value);
-    }
-#end
 #foreach ($col in $table.columns)
-#if ($col.isPropertySettingModifierClosed() && $col.isClassificationUndefinedHandlingTypeContinued())
+#if ($col.isPropertySettingModifierClosed())
 
     /**
      * For framework so basically DON'T use this method.
@@ -970,5 +958,17 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
         set${col.javaName}(${col.uncapitalisedJavaName});
     }
 #end
+#end
+#if ($table.hasEntityConvertEmptyStringToNull())
+
+    protected def convertEmptyToNull(value: String): String = {
+        return FunCustodial.convertEmptyToNull(value);
+    }
+#end
+#if ($table.hasCheckClassificationCodeOnEntity())
+
+    protected def checkClassificationCode(columnDbName: String, meta: ${glCDef}.DefMeta, value: Object): Unit = {
+        FunCustodial.checkClassificationCode(this, columnDbName, meta, value);
+    }
 #end
 }

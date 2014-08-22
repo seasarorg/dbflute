@@ -490,10 +490,10 @@ public interface Entity {
             br.addElement("or setting value to your entity.");
             br.addElement("The code is NOT one of classification code defined on DBFlute.");
             br.addElement("");
-            br.addElement("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
-            br.addElement(" Use correct code!");
+            br.addElement("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
+            br.addElement(" Use formal code!");
             br.addElement("  Or add the code to classification definition.");
-            br.addElement("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
+            br.addElement("_/_/_/_/_/_/_/_/_/_/");
             br.addElement("");
             br.addElement("Or if you (reluctantly) need to allow it, change the option like this:");
             br.addElement("but *Deprecated");
@@ -501,11 +501,11 @@ public interface Entity {
             br.addElement("    ; [classification-name] = list:{");
             br.addElement("        ; map:{");
             br.addElement("            ; topComment=...; codeType=...");
-            br.addElement("            ; undefinedCodeHandlingType=ALLOWED");
+            br.addElement("            ; undefinedHandlingType=ALLOWED");
             br.addElement("        }");
             br.addElement("        map:{...}");
             br.addElement("    }");
-            br.addElement("*for your information, the default of undefinedCodeHandlingType is LOGGING");
+            br.addElement("*for your information, the default of undefinedHandlingType is LOGGING");
             br.addItem("Table");
             br.addElement(tableDbName);
             br.addItem("Column");
@@ -529,10 +529,11 @@ public interface Entity {
 
         public static void showUndefinedClassificationCodeMessage(String tableDbName, String columnDbName,
                 ClassificationMeta meta, Object code) {
-            // TODO jflute line? big?
-            final String classificationName = meta.classificationName();
-            final String exp = tableDbName + "." + columnDbName + "->" + classificationName + "." + code;
-            _clsMetaLog.info("*Undefined classification code was set: " + exp);
+            if (_clsMetaLog.isInfoEnabled()) {
+                final String classificationName = meta.classificationName();
+                final String exp = tableDbName + "." + columnDbName + "->" + classificationName + "." + code;
+                _clsMetaLog.info("*Undefined classification code was set: " + exp); // one line because of many called
+            }
         }
     }
 }
