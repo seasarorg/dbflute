@@ -3445,7 +3445,13 @@ public class Table {
         return !isSuppressDBAccessClass();
     }
 
-    public boolean hasLoadReferrer() {
+    public boolean hasReferrerLoader() { // the loader class of referrer
+        // no relation is rare case so simplify
+        //return hasBehavior() && hasRelation();
+        return hasBehavior();
+    }
+
+    public boolean hasLoadReferrer() { // the function for one-to-many
         return hasPrimaryKey() && hasReferrerAsMany();
     }
 
@@ -3461,12 +3467,6 @@ public class Table {
             type = ReferrerConditionSetupper.class;
         }
         return type.getSimpleName();
-    }
-
-    public boolean hasReferrerLoader() {
-        // no relation is rare case so simplify
-        //return hasBehavior() && hasRelation();
-        return hasBehavior();
     }
 
     // ===================================================================================

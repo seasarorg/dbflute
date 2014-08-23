@@ -15,10 +15,12 @@
  */
 package org.seasar.dbflute.task.manage;
 
+import org.seasar.dbflute.logic.DfDBFluteTaskUtil;
 import org.seasar.dbflute.logic.manage.DfRefreshMan;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
+import org.seasar.dbflute.util.DfTraceViewUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -66,6 +68,23 @@ public class DfRefreshTask extends DfAbstractTask {
 
     protected DfRefreshMan prepareRefreshMap() {
         return new DfRefreshMan().specifyRefreshProject(_refreshProject);
+    }
+
+    // ===================================================================================
+    //                                                                       Final Message
+    //                                                                       =============
+    @Override
+    protected void showFinalMessage(long before, long after, boolean abort) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("[Final Message]: ").append(getPerformanceView(after - before));
+        if (abort) {
+            sb.append(" *Abort");
+        }
+        DfDBFluteTaskUtil.logFinalMessage(sb.toString());
+    }
+
+    protected String getPerformanceView(long mil) {
+        return DfTraceViewUtil.convertToPerformanceView(mil);
     }
 
     // ===================================================================================

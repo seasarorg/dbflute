@@ -132,6 +132,9 @@ public class DfOldClassHandler {
     public void deleteOldTableClass_for_ReferrerLoader() {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
+                if (!table.hasReferrerLoader()) {
+                    return null; // delete the class though existing table
+                }
                 return table.getReferrerLoaderClassName();
             }
         };

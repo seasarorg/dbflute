@@ -2468,8 +2468,25 @@ public class Column {
     }
 
     protected boolean canBeForcedClassification() {
-        // common column has interface so cannot be forced e.g. DEL_FLG in all tables
-        return hasClassification() && !isCommonColumn();
+        if (!hasClassification()) {
+            return false;
+        }
+        if (isCommonColumn()) {
+            // common column has interface so cannot be forced e.g. DEL_FLG in all tables
+            return false;
+        }
+        // no, no, no, if master table is inserted, also reference table will be inserted
+        // so non-sense, expect manual setting 'isMake...' in development
+        //final DfClassificationTop top = getClassificationTop();
+        //if (top.isTableClassification() && isPrimaryKey()
+        //        && (!top.isCheckClassificationCode() || !top.isUndefinedHandlingTypeCheckedAbort())) {
+        //    // when table classification PK and non-checked as exception,
+        //    // new record might be inserted in production so cannot be forced
+        //    return false;
+        //}
+        // though it might be allowed to suppress insert method when table classification and exception,
+        // suppressing setter is enough to be strict as default for now
+        return true;
     }
 
     // -----------------------------------------------------
