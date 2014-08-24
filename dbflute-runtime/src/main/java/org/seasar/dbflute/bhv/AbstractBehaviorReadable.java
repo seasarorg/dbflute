@@ -679,7 +679,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
                 return (REFERRER_CB) referrerBhv.newConditionBean();
             }
 
-            public void qyFKIn(REFERRER_CB cb, List<KEY> pkList) {
+            public void qyFKIn(REFERRER_CB cb, Collection<KEY> pkList) {
                 final String conditionKey = ConditionKey.CK_IN_SCOPE.getConditionKey();
                 cb.localCQ().invokeQuery(fkCol.getColumnDbName(), conditionKey, pkList);
             }
@@ -741,7 +741,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
                 return (REFERRER_CB) referrerBhv.newConditionBean();
             }
 
-            public void qyFKIn(REFERRER_CB cb, final List<KEY> pkList) {
+            public void qyFKIn(REFERRER_CB cb, final Collection<KEY> pkList) {
                 // compound key doesn't use InScope so OrScopeQuery 
                 cb.invokeOrScopeQuery(new OrQuery<ConditionBean>() {
                     public void query(ConditionBean orCB) {
@@ -900,7 +900,6 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
             pkSet.add(primaryKeyValue);
             pkLocalEntityMap.put(toLoadReferrerMappingKey(primaryKeyValue), localEntity);
         }
-        final List<KEY> pkList = new ArrayList<KEY>(pkSet);
 
         // - - - - - - - - - - - - - - - -
         // Prepare referrer condition bean
@@ -915,7 +914,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         // - - - - - - - - - - - - - -
         // Select the list of referrer
         // - - - - - - - - - - - - - -
-        callback.qyFKIn(cb, pkList);
+        callback.qyFKIn(cb, pkSet);
         final String referrerPropertyName = callback.getRfPrNm();
         final String fixedCondition = xbuildReferrerCorrelatedFixedCondition(cb, referrerPropertyName);
         final String basePointAliasName = cb.getSqlClause().getBasePointAliasName();
@@ -928,13 +927,13 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
                 @SuppressWarnings("unchecked")
                 REFERRER_CB referrerUnionCB = (REFERRER_CB) unionCB;
                 // for when application uses union query in condition-bean set-upper.
-                callback.qyFKIn(referrerUnionCB, pkList);
+                callback.qyFKIn(referrerUnionCB, pkSet);
                 if (hasFixedCondition) {
                     referrerUnionCB.getSqlClause().registerWhereClause(fixedCondition, basePointAliasName);
                 }
             }
         });
-        if (pkList.size() > 1) {
+        if (pkSet.size() > 1) {
             callback.qyOdFKAsc(cb);
             cb.getOrderByComponent().exchangeFirstOrderByElementForLastOne();
         }
@@ -1070,7 +1069,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         // for Referrer
         REFERRER_CB newMyCB(); // newMyConditionBean()
 
-        void qyFKIn(REFERRER_CB cb, List<PK> pkList); // queryForeignKeyInScope()
+        void qyFKIn(REFERRER_CB cb, Collection<PK> pkList); // queryForeignKeyInScope()
 
         void qyOdFKAsc(REFERRER_CB cb); // queryAddOrderByForeignKeyAsc() 
 
