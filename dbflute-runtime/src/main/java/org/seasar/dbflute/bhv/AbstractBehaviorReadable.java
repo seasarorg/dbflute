@@ -890,16 +890,17 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         // Prepare temporary container
         // - - - - - - - - - - - - - -
         final Map<KEY, LOCAL_ENTITY> pkLocalEntityMap = new LinkedHashMap<KEY, LOCAL_ENTITY>();
-        final List<KEY> pkList = new ArrayList<KEY>();
+        final Set<KEY> pkSet = new LinkedHashSet<KEY>(); // might be same PK e.g. when entity of pull-out
         for (LOCAL_ENTITY localEntity : localEntityList) {
             final KEY primaryKeyValue = callback.getPKVal(localEntity);
             if (primaryKeyValue == null) {
                 String msg = "PK value of local entity should not be null: " + localEntity;
                 throw new IllegalArgumentException(msg);
             }
-            pkList.add(primaryKeyValue);
+            pkSet.add(primaryKeyValue);
             pkLocalEntityMap.put(toLoadReferrerMappingKey(primaryKeyValue), localEntity);
         }
+        final List<KEY> pkList = new ArrayList<KEY>(pkSet);
 
         // - - - - - - - - - - - - - - - -
         // Prepare referrer condition bean
@@ -1165,7 +1166,8 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         final RelationInfo reverseInfo = foreignInfo.getReverseRelation();
         final boolean existsReferrer = reverseInfo != null;
         final RelationOptionalFactory optionalFactory = xgetROpFactory();
-        final Set<FOREIGN_ENTITY> foreignSet = new LinkedHashSet<FOREIGN_ENTITY>();
+        final Map<Integer, FOREIGN_ENTITY> foreignBasicMap = new LinkedHashMap<Integer, FOREIGN_ENTITY>();
+        Map<Integer, List<FOREIGN_ENTITY>> foreignCollisionMap = null; // lazy-loaded
         final Map<FOREIGN_ENTITY, List<LOCAL_ENTITY>> foreignReferrerMap = new LinkedHashMap<FOREIGN_ENTITY, List<LOCAL_ENTITY>>();
         for (LOCAL_ENTITY localEntity : localEntityList) {
             final FOREIGN_ENTITY foreignEntity = xextractPulloutForeignEntity(foreignInfo, reverseInfo,
@@ -1173,9 +1175,26 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
             if (foreignEntity == null) {
                 continue;
             }
-            if (!foreignSet.contains(foreignEntity)) {
-                foreignSet.add(foreignEntity);
-            }
+            // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+            // basically mapped foreign entities are unique instances
+            // but according to circumstances, same PK different instance (rare case)
+            //
+            // e.g. normal pattern (no problem)
+            //  A - M - X
+            //  B - M - X
+            //  C - N - X
+            //  D - O - Y
+            //
+            // e.g. when OverRelation, might be following pattern
+            //  A - M - X
+            //  B - M - Y *same relation but different nested relation
+            //  C - N - X
+            //  D - O - Y
+            //
+            // when the latter pattern, the instance of A's M is different from the one of B's M
+            // so it need to handle the unique as instance (don't use overridden equals() of entity)
+            // _/_/_/_/_/_/_/_/_/_/
+            foreignCollisionMap = xsavePulloutForeignEntity(foreignBasicMap, foreignCollisionMap, foreignEntity);
             if (existsReferrer) {
                 if (!foreignReferrerMap.containsKey(foreignEntity)) {
                     foreignReferrerMap.put(foreignEntity, new ArrayList<LOCAL_ENTITY>());
@@ -1192,7 +1211,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
                 reverseInfo.write(foreignEntity, writtenObj);
             }
         }
-        return new ArrayList<FOREIGN_ENTITY>(foreignSet);
+        return xpreparePulloutResultList(foreignBasicMap, foreignCollisionMap);
     }
 
     @SuppressWarnings("unchecked")
@@ -1209,7 +1228,53 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return foreignEntity;
     }
 
-    protected <LOCAL_ENTITY> Object xextractPulloutReverseWrittenObject(ForeignInfo foreignInfo,
+    protected <FOREIGN_ENTITY extends Entity> Map<Integer, List<FOREIGN_ENTITY>> xsavePulloutForeignEntity(
+            Map<Integer, FOREIGN_ENTITY> foreignBasicMap, Map<Integer, List<FOREIGN_ENTITY>> foreignCollisionMap,
+            FOREIGN_ENTITY foreignEntity) {
+        final int instanceHash = foreignEntity.instanceHash();
+        if (!foreignBasicMap.containsKey(instanceHash)) { // first hash
+            foreignBasicMap.put(instanceHash, foreignEntity);
+        } else { // already exists, might be identical entity or collision
+            final FOREIGN_ENTITY firstEntity = foreignBasicMap.get(instanceHash); // might be null if second collision
+            if (firstEntity != null) { // means first collision in the hash
+                if (foreignEntity == firstEntity) { // identical (not collision)
+                    return foreignCollisionMap; // no need to save it
+                }
+            }
+            // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+            // means hash collision, so use collision map
+            // instance hash does not always provide unique value
+            // so it need to handle collision
+            // e.g. normal pattern
+            //  foreignBasicMap     : {A - M, B - N, C - O, D - P}
+            //  foreignCollisionMap : null
+            // 
+            // e.g. collision, B comes again
+            //  foreignBasicMap     : {A - M, B - N}
+            //  foreignCollisionMap : null
+            //   ...{B - O} comes here
+            //  foreignBasicMap     : {A - M, B - null}
+            //  foreignCollisionMap : {B - [N,O]}
+            // _/_/_/_/_/_/_/_/_/_/
+            if (foreignCollisionMap == null) { // means first collision of all entities
+                foreignCollisionMap = new LinkedHashMap<Integer, List<FOREIGN_ENTITY>>(2); // lazy-loaded
+            }
+            if (firstEntity != null) { // means first collision in the hash
+                foreignBasicMap.put(instanceHash, null); // existence mark only
+            }
+            if (!foreignCollisionMap.containsKey(instanceHash)) { // means first collision in the hash 
+                foreignCollisionMap.put(instanceHash, new ArrayList<FOREIGN_ENTITY>(2));
+            }
+            final List<FOREIGN_ENTITY> collisionList = foreignCollisionMap.get(instanceHash);
+            if (firstEntity != null) { // means first collision in the hash
+                collisionList.add(firstEntity);
+            }
+            collisionList.add(foreignEntity);
+        }
+        return foreignCollisionMap;
+    }
+
+    protected <LOCAL_ENTITY extends Entity> Object xextractPulloutReverseWrittenObject(ForeignInfo foreignInfo,
             RelationInfo reverseInfo, RelationOptionalFactory optionalFactory, List<LOCAL_ENTITY> mappedLocalList) {
         final Object writtenObj;
         if (foreignInfo.isOneToOne()) {
@@ -1227,6 +1292,38 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
             writtenObj = mappedLocalList;
         }
         return writtenObj;
+    }
+
+    protected <FOREIGN_ENTITY extends Entity> List<FOREIGN_ENTITY> xpreparePulloutResultList(
+            Map<Integer, FOREIGN_ENTITY> foreignBasicMap, Map<Integer, List<FOREIGN_ENTITY>> foreignCollisionMap) {
+        final List<FOREIGN_ENTITY> resultList = new ArrayList<FOREIGN_ENTITY>(foreignBasicMap.size() + 1); // + collision
+        for (Entry<Integer, FOREIGN_ENTITY> entry : foreignBasicMap.entrySet()) {
+            final FOREIGN_ENTITY foreignEntity = entry.getValue();
+            if (foreignEntity != null) { // basically here
+                resultList.add(foreignEntity);
+            } else { // means hash collision, so use collision map
+                // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+                // e.g. collision {B - O} comes
+                //  foreignBasicMap     : {A - M, B - null}
+                //  foreignCollisionMap : {B - [N,O]}
+                // _/_/_/_/_/_/_/_/_/_/
+                if (foreignCollisionMap == null) { // no way just in case
+                    String msg = "Not lazy-loaded the collision map: basicMap=" + foreignBasicMap;
+                    throw new IllegalStateException(msg);
+                }
+                final Integer instanceHash = entry.getKey();
+                final List<FOREIGN_ENTITY> savedList = foreignCollisionMap.get(instanceHash); // already exists
+                if (savedList == null) { // no way just in case
+                    String msg = "Not found the saved entity list in the collision map:";
+                    msg = msg + " key=" + instanceHash + ", collisionMap=" + foreignCollisionMap;
+                    throw new IllegalStateException(msg);
+                }
+                for (FOREIGN_ENTITY savedEntity : savedList) { // also contains first entity of collision
+                    resultList.add(savedEntity);
+                }
+            }
+        }
+        return resultList;
     }
 
     // ===================================================================================
