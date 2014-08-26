@@ -120,7 +120,7 @@ public class ${glDBFluteModule} implements Extension {
      * @param beanManager The manager of CDI beans. (NotNull)
      * @param typeList The list of behavior types to be registered. (NotNull)
      */
-    protected void doSetupBehaviors(final AfterBeanDiscovery event, final BeanManager beanManager, final List<Class<? extends AbstractBehaviorReadable>> typeList) {
+    protected void doSetupBehaviors(final AfterBeanDiscovery event, final BeanManager beanManager, final List<Class<? extends AbstractBehaviorReadable<?, ?>>> typeList) {
         for (Class<? extends AbstractBehaviorReadable<?, ?>> clazz : typeList) {
             event.addBean(newBehaviorBean(beanManager, clazz));
         }
