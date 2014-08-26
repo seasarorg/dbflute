@@ -1247,7 +1247,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
             // e.g. normal pattern
             //  foreignBasicMap     : {A - M, B - N, C - O, D - P}
             //  foreignCollisionMap : null
-            // 
+            //
             // e.g. collision, B comes again
             //  foreignBasicMap     : {A - M, B - N}
             //  foreignCollisionMap : null
@@ -1265,6 +1265,11 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
                 foreignCollisionMap.put(instanceHash, new ArrayList<FOREIGN_ENTITY>(2));
             }
             final List<FOREIGN_ENTITY> collisionList = foreignCollisionMap.get(instanceHash);
+            for (FOREIGN_ENTITY collision : collisionList) {
+                if (collision == foreignEntity) { // already exists
+                    return foreignCollisionMap; // no need to save it
+                }
+            }
             if (firstEntity != null) { // means first collision in the hash
                 collisionList.add(firstEntity);
             }

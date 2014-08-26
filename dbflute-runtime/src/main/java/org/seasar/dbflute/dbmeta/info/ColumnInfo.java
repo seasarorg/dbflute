@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -258,9 +259,9 @@ public class ColumnInfo {
     @SuppressWarnings("unchecked")
     public <VALUE> VALUE convertToObjectNativeType(Object value) {
         final VALUE result;
-        if (value instanceof List<?>) {
-            final List<?> valueList = (List<?>) value;
-            final List<Object> resultList = new ArrayList<Object>();
+        if (value instanceof Collection<?>) {
+            final Collection<?> valueList = (Collection<?>) value;
+            final List<Object> resultList = new ArrayList<Object>(valueList.size());
             for (Object obj : valueList) {
                 resultList.add(doConvertToObjectNativeType(obj));
             }
