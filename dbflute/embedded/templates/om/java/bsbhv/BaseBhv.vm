@@ -329,7 +329,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #if ($table.isEntityDerivedMappable())
 
     @Override
-    protected boolean isSuppressSpecifyDerivedReferrerEntityPropertyCheck() { return true; }
+    protected boolean isEntityDerivedMappable() { return true; }
 #end
 
     // ===================================================================================

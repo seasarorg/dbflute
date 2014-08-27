@@ -44,6 +44,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.rowcreator.impl.TnRowCreatorImpl;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -58,6 +59,9 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
 
     /** The key of DBMeta cache. */
     protected static final String DBMETA_CACHE_KEY = "df:DBMetaCache";
+
+    /** The prefix mark for derived mapping alias. */
+    protected static final String DERIVED_MAPPABLE_ALIAS_PREFIX = DerivedMappable.MAPPING_ALIAS_PREFIX;
 
     // ===================================================================================
     //                                                                           Attribute
@@ -205,6 +209,9 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             if (propertyCache.containsKey(derivingAlias)) { // already handled
                 continue;
             }
+            if (!derivingAlias.startsWith(DERIVED_MAPPABLE_ALIAS_PREFIX)) { // basically no way (just in case)
+                continue; // might be exception but no need to be strict here
+            }
             if (typeHandler == null) {
                 typeHandler = cb.xgetDerivedTypeHandler(); // basically fixed instance returned
                 if (typeHandler == null) { // no way, just in case
@@ -214,7 +221,8 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             }
             final HpDerivingSubQueryInfo derivingInfo = sqlClause.getSpecifiedDerivingInfo(derivingAlias);
             final ValueType valueType = TnValueTypes.getValueType(typeHandler.findMappingType(derivingInfo));
-            Object selectedValue = getValue(rs, derivingAlias, valueType, selectIndexMap);
+            final String onQueryAlias = Srl.substringFirstRear(derivingAlias, DERIVED_MAPPABLE_ALIAS_PREFIX);
+            Object selectedValue = getValue(rs, onQueryAlias, valueType, selectIndexMap);
             selectedValue = typeHandler.convertToMapValue(derivingInfo, selectedValue);
             mappable.registerDerivedValue(derivingAlias, selectedValue);
         }

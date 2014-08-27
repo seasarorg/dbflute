@@ -18,16 +18,24 @@ package org.seasar.dbflute.cbean.sqlclause.subquery;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.DerivedMappable;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  * @since 0.9.7.2 (2010/06/20 Sunday)
  */
 public class SpecifyDerivedReferrer extends DerivedReferrer {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** The prefix mark for derived mapping alias. */
+    protected static final String DERIVED_MAPPABLE_ALIAS_PREFIX = DerivedMappable.MAPPING_ALIAS_PREFIX;
 
     // ===================================================================================
     //                                                                           Attribute
@@ -65,7 +73,18 @@ public class SpecifyDerivedReferrer extends DerivedReferrer {
     }
 
     protected String buildCompleteClause(String subQueryClause, String beginMark, String endMark, String endIndent) {
-        final String aliasExp = _aliasName != null ? " as " + _aliasName : "";
+        final String aliasExp;
+        if (_aliasName != null) {
+            final String realAlias;
+            if (_aliasName.startsWith(DERIVED_MAPPABLE_ALIAS_PREFIX)) {
+                realAlias = Srl.substringFirstRear(_aliasName, DERIVED_MAPPABLE_ALIAS_PREFIX);
+            } else {
+                realAlias = _aliasName;
+            }
+            aliasExp = " as " + realAlias;
+        } else {
+            aliasExp = "";
+        }
         return "(" + beginMark + subQueryClause + ln() + endIndent + ")" + aliasExp + endMark;
     }
 

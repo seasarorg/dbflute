@@ -22,6 +22,9 @@ package org.seasar.dbflute.dbmeta;
  */
 public interface DerivedMappable {
 
+    /** The prefix mark for derived mapping alias. */
+    String MAPPING_ALIAS_PREFIX = "$";
+
     /**
      * Register value derived by (Specify)DerivedReferrer.
      * @param aliasName The alias name of derived-referrer. (NotNull)

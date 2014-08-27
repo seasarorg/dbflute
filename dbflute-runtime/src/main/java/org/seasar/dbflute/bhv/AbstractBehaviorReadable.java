@@ -60,6 +60,7 @@ import org.seasar.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.DerivedMappable;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
@@ -97,6 +98,9 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    /** The prefix mark for derived mapping alias. */
+    protected static final String DERIVED_MAPPABLE_ALIAS_PREFIX = DerivedMappable.MAPPING_ALIAS_PREFIX;
+
     /** The empty instance for provider of list handling for nested referrer. (wild-card generic for downcast) */
     protected static final NestedReferrerListGateway<?> EMPTY_NREF_LGWAY = new NestedReferrerListGateway<Entity>() {
         public void withNestedReferrer(ReferrerListHandler<Entity> handler) {
@@ -354,8 +358,8 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     // -----------------------------------------------------
     //                                       Option Handling
     //                                       ---------------
-    protected boolean isSuppressSpecifyDerivedReferrerEntityPropertyCheck() {
-        return false;
+    protected boolean isEntityDerivedMappable() {
+        return false; // depends on generator
     }
 
     protected void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String alias, Class<?> entityType) {
@@ -1825,15 +1829,15 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
 
     protected <RESULT extends ENTITY> void assertSpecifyDerivedReferrerEntityProperty(ConditionBean cb,
             Class<RESULT> entityType) {
-        if (isSuppressSpecifyDerivedReferrerEntityPropertyCheck()) {
-            return;
-        }
         final List<String> aliasList = cb.getSqlClause().getSpecifiedDerivingAliasList();
         if (aliasList.isEmpty()) {
             return;
         }
         final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(entityType);
         for (String alias : aliasList) {
+            if (isEntityDerivedMappable() && alias.startsWith(DERIVED_MAPPABLE_ALIAS_PREFIX)) {
+                continue;
+            }
             DfPropertyDesc pd = null;
             if (beanDesc.hasPropertyDesc(alias)) { // case insensitive
                 pd = beanDesc.getPropertyDesc(alias);

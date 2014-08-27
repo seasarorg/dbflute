@@ -258,7 +258,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public boolean isEntityDerivedMappable() { // closet
-        final boolean defaultValue = getLanguageDependency().getLanguageImplStyle().isEntityDerivedMappable();
+        boolean defaultValue = getLanguageDependency().getLanguageImplStyle().isEntityDerivedMappable();
+        if (!defaultValue) {
+            defaultValue = !isCompatibleBeforeJava8();
+        }
         return isProperty("isEntityDerivedMappable", defaultValue);
     }
 

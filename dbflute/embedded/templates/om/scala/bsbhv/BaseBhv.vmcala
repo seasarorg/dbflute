@@ -300,7 +300,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
     override protected def doReadList(cb: ConditionBean): ListResultBean[_ <: Entity] = { facadeSelectList(downcast(cb))() }
 #if ($table.isEntityDerivedMappable())
 
-    override protected def isSuppressSpecifyDerivedReferrerEntityPropertyCheck(): Boolean = { true }
+    override protected def isEntityDerivedMappable(): Boolean = { true }
 #end
 
     // ===================================================================================
