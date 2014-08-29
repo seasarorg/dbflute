@@ -220,7 +220,7 @@ namespace ${glPackageExtendedBhv} {
             AssertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName}); AssertObjectNotNull("loadReferrerOption", loadReferrerOption);
             if (${myEntityListVariableName}.Count == 0) { return; }
             ${referrerBhvClassName} referrerBhv = xgetBSFLR().Select<${referrerBhvClassName}>();
-            HelpLoadReferrerInternally<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}>
+            HelpLoadReferrerInternally<${myExtendedObjectClassName}, ${referrer.localColumnAsOne.javaNative}, ${referrerCBClassName}, ${referrerEntityClassName}>
                     (${myEntityListVariableName}, loadReferrerOption, new MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback(referrerBhv));
         }
 #if ($referrer.isSimpleKeyFK())
