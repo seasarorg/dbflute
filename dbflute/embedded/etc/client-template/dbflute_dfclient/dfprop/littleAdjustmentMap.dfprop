@@ -34,6 +34,39 @@
 # *The line that starts with '#' means comment-out.
 #
 map:{
+    # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    # for future DBFlute
+    # http://d.hatena.ne.jp/jflute/20140530/java8
+    # _/_/_/_/_/_/_/_/_/
+    # compile compatible (true if compatible)
+    ; isCompatibleSelectByPKOldStyle = false
+    ; isCompatibleSelectByPKPlainReturn = false
+    ; isCompatibleSelectByPKWithDeletedCheck = false
+    ; isMakeConditionQueryExistsReferrerToOne = false
+    ; isMakeConditionQueryInScopeRelationToOne = false
+    ; isMakeConditionQueryPlainListManualOrder = false
+    ; isAvailableSelectEntityPlainReturn = true
+    ; isAvailableRelationPlainEntity = true
+    ; isCompatibleNewMyEntityConditionBean = false
+    ; isCompatibleDeleteNonstrictIgnoreDeleted = false
+    ; isCompatibleLoadReferrerOldOption = false
+    ; isCompatibleConditionBeanAcceptPKOldStyle = false
+    ; isCompatibleConditionBeanOldNamingCheckInvalid = false
+    ; isCompatibleConditionBeanOldNamingOption = false
+
+    # compile compatible (false if compatible)
+    ; isEntityDerivedMappable = true
+
+    # runtime compatible (true if compatible)
+    ; isNullOrEmptyQueryAllowed = true
+    ; isOverridingQueryAllowed = true
+    ; isCompatibleConditionBeanFromToOneSideAllowed = true
+    ; isCompatibleOrScopeQueryPurposeNoCheck = false
+    ; isSuppressDefaultCheckClassificationCode = false
+
+    # runtime compatible (false if compatible)
+    ; isThatsBadTimingDetect = true
+
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isAvailableAddingSchemaToTableSqlName: (NotRequired - Default false)
     #   [true]
