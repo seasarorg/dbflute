@@ -765,6 +765,9 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             return name;
         }
         name = Srl.replaceBy(name, _nameFromToMap);
+        if (Character.isDigit(name.charAt(0))) {
+            name = "N" + name;
+        }
         return Srl.camelize(name, " ", "_", "-"); // for method name
     }
 
