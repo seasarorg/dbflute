@@ -92,7 +92,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
     //                                                                              DBMeta
     //                                                                              ======
     /** {@inheritDoc} */
-    def getDBMeta(): ${myDBMetaClassName} = { return ${myDBMetaClassName}; }
+    def getDBMeta(): DBMeta = { return ${myDBMetaClassName}; }
 
     // ===================================================================================
     //                                                                        New Instance
