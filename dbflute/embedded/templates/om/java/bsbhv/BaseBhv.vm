@@ -86,7 +86,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     //                                                                              DBMeta
     //                                                                              ======
     /** {@inheritDoc} */
-    public DBMeta getDBMeta() { return ${myDBMetaClassName}.getInstance(); }
+    public ${myDBMetaClassName} getDBMeta() { return ${myDBMetaClassName}.getInstance(); }
 #if ($table.isCompatibleNewMyEntityConditionBean())
 
     /** @return The instance of DBMeta as my table type. (NotNull) */
