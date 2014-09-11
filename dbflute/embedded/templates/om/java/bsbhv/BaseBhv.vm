@@ -22,7 +22,6 @@ import org.seasar.dbflute.*;
 import org.seasar.dbflute.bhv.*;
 import org.seasar.dbflute.cbean.*;
 import org.seasar.dbflute.cbean.chelper.HpSLSFunction;
-import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.*;
 #if ($table.needsBasicOptionalEntityImport())
 import ${database.basicOptionalEntityClassName};
