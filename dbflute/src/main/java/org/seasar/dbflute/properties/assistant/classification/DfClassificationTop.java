@@ -18,6 +18,7 @@ package org.seasar.dbflute.properties.assistant.classification;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -298,8 +299,58 @@ public class DfClassificationTop {
             group.setElementNameList(elementList);
             groupList.add(group);
         }
+        resolveGroupVariable(groupList);
         _cachedGroupList = groupList;
         return _cachedGroupList;
+    }
+
+    protected void resolveGroupVariable(List<DfClassificationGroup> groupList) {
+        final Map<String, DfClassificationGroup> groupMap = new LinkedHashMap<String, DfClassificationGroup>();
+        for (DfClassificationGroup group : groupList) {
+            groupMap.put(group.getGroupName(), group);
+        }
+        // e.g.
+        // ; servicePlus = map:{
+        //     ; elementList = list:{ $$ref$$.serviceAvailable ; Withdrawal }
+        // }
+        final String refPrefix = "$$ref$$.";
+        for (DfClassificationGroup group : groupList) {
+            final List<String> elementNameList = group.getElementNameList();
+            final Set<String> resolvedNameSet = new LinkedHashSet<String>();
+            for (String elementName : elementNameList) {
+                if (Srl.startsWith(elementName, refPrefix)) {
+                    final String refName = Srl.substringFirstRear(elementName, refPrefix).trim();
+                    final DfClassificationGroup refGroup = groupMap.get(refName);
+                    if (refGroup == null) {
+                        throwClassificationGroupingMapReferenceNotFoundException(groupList, group, refName);
+                    }
+                    resolvedNameSet.addAll(refGroup.getElementNameList());
+                } else {
+                    resolvedNameSet.add(elementName);
+                }
+            }
+            if (elementNameList.size() < resolvedNameSet.size()) {
+                group.setElementNameList(new ArrayList<String>(resolvedNameSet));
+            }
+        }
+    }
+
+    protected void throwClassificationGroupingMapReferenceNotFoundException(List<DfClassificationGroup> groupList,
+            DfClassificationGroup group, String refName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the refenrece in the grouping map.");
+        br.addItem("Classification Name");
+        br.addElement(group.getClassificationName());
+        br.addItem("Group Name");
+        br.addElement(group.getGroupName());
+        br.addItem("NotFound Name");
+        br.addElement(refName);
+        br.addItem("Defined Group");
+        for (DfClassificationGroup defined : groupList) {
+            br.addElement(defined);
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
     }
 
     public boolean hasGroup() {

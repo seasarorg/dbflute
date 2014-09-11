@@ -127,6 +127,14 @@ public class DfClassificationGroup {
     }
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + _groupName + ": " + _elementNameList + "}";
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public String getClassificationName() {
