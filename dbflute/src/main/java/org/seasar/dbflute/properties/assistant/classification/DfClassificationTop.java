@@ -30,6 +30,7 @@ import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.task.DfDBFluteTaskStatus;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -294,13 +295,15 @@ public class DfClassificationTop {
                 String msg = "The elementList in grouping map is required: " + getClassificationName();
                 throw new DfClassificationRequiredAttributeNotFoundException(msg);
             }
+            final String docOnly = (String) attrMap.get("isUseDocumentOnly");
             final DfClassificationGroup group = new DfClassificationGroup(_classificationName, groupName);
             group.setGroupComment(groupComment);
             group.setElementNameList(elementList);
+            group.setUseDocumentOnly(docOnly != null && docOnly.trim().equalsIgnoreCase("true"));
             groupList.add(group);
         }
         resolveGroupVariable(groupList);
-        _cachedGroupList = groupList;
+        _cachedGroupList = prepareGroupRealList(groupList);
         return _cachedGroupList;
     }
 
@@ -351,6 +354,18 @@ public class DfClassificationTop {
         }
         final String msg = br.buildExceptionMessage();
         throw new DfIllegalPropertySettingException(msg);
+    }
+
+    protected List<DfClassificationGroup> prepareGroupRealList(final List<DfClassificationGroup> groupList) {
+        final List<DfClassificationGroup> realList = new ArrayList<DfClassificationGroup>();
+        final boolean docOnly = isDocOnlyTask();
+        for (DfClassificationGroup group : groupList) {
+            if (!docOnly && group.isUseDocumentOnly()) {
+                continue;
+            }
+            realList.add(group);
+        }
+        return realList;
     }
 
     public boolean hasGroup() {
@@ -413,6 +428,14 @@ public class DfClassificationTop {
     protected String resolveTextForSchemaHtml(String comment) {
         final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
         return prop.resolveTextForSchemaHtml(comment);
+    }
+
+    // ===============================================================================
+    //                                                                     Task Status
+    //                                                                     ===========
+    protected boolean isDocOnlyTask() {
+        final DfDBFluteTaskStatus instance = DfDBFluteTaskStatus.getInstance();
+        return instance.isDocTask() || instance.isReplaceSchema();
     }
 
     // ===================================================================================
@@ -622,7 +645,7 @@ public class DfClassificationTop {
     // -----------------------------------------------------
     //                                        Mapping Option
     //                                        --------------
-    public Map<String, Map<String, Object>> getGroupingMap() {
+    protected Map<String, Map<String, Object>> getGroupingMap() { // not public to use resolved group list
         return _groupingMap;
     }
 

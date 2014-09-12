@@ -33,6 +33,7 @@ public class DfClassificationGroup {
     protected final String _groupName;
     protected String _groupComment;
     protected List<String> _elementNameList;
+    protected boolean _useDocumentOnly;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -173,7 +174,7 @@ public class DfClassificationGroup {
     }
 
     public void setGroupComment(String groupComment) {
-        this._groupComment = groupComment;
+        _groupComment = groupComment;
     }
 
     public List<String> getElementNameList() {
@@ -181,6 +182,14 @@ public class DfClassificationGroup {
     }
 
     public void setElementNameList(List<String> elementNameList) {
-        this._elementNameList = elementNameList;
+        _elementNameList = elementNameList;
+    }
+
+    public boolean isUseDocumentOnly() {
+        return _useDocumentOnly;
+    }
+
+    public void setUseDocumentOnly(boolean useDocumentOnly) {
+        _useDocumentOnly = useDocumentOnly;
     }
 }
