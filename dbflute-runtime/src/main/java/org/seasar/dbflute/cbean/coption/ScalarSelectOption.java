@@ -60,6 +60,9 @@ public class ScalarSelectOption extends FunctionFilterOption {
     // ===================================================================================
     //                                                                      Purpose Option
     //                                                                      ==============
+    // -----------------------------------------------------
+    //                                         Truncate Date
+    //                                         -------------
     /**
      * Truncate the month and day and time part of the date or the date-time value.
      * <pre>
@@ -96,6 +99,11 @@ public class ScalarSelectOption extends FunctionFilterOption {
         return this;
     }
 
+    // -----------------------------------------------------
+    //                                              Add Date
+    //                                              --------
+    // no DreamCruise ticket when ScalarSelect
+    // cannot use not grouping column
     /**
      * Add years to the date or date-time value.
      * @param addedYear The count of added years. (NullAllowed: if null, no dateAdd)

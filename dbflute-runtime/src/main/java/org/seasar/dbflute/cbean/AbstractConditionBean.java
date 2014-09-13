@@ -47,6 +47,7 @@ import org.seasar.dbflute.dbmeta.DerivedTypeHandler;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
+import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.exception.ColumnQueryCalculationUnsupportedColumnTypeException;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
@@ -116,14 +117,17 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** Is this condition-bean departure port for dream cruise? */
     protected boolean _departurePortForDreamCruise;
 
-    /** The departure port (base point condition-bean) of dream cruise. (used when dream cruise) */
+    /** The departure port (base point condition-bean) of dream cruise. (used when dream cruise) (NullAllowed) */
     protected ConditionBean _dreamCruiseDeparturePort;
 
-    /** The ticket (specified column) of dream cruise. (used when dream cruise) */
+    /** The ticket (specified column) of dream cruise. (used when dream cruise) (NullAllowed) */
     protected HpSpecifiedColumn _dreamCruiseTicket;
 
-    /** The journey log book (relation path) of dream cruise. (used when dream cruise) */
+    /** The journey log book (relation path) of dream cruise. (used when dream cruise) (NullAllowed) */
     protected List<String> _dreamCruiseJourneyLogBook;
+
+    /** The binding value or dream cruise ticket for mystic binding. (NullAllowed) */
+    protected Object _mysticBinding;
 
     // -----------------------------------------------------
     //                                        Various Option
@@ -297,6 +301,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return rightCalcSp;
     }
 
+    // -----------------------------------------------------
+    //                                     Build ColQyColumn
+    //                                     -----------------
     protected <CB extends ConditionBean> String xbuildColQyLeftColumn(CB leftCB, HpCalcSpecification<CB> leftCalcSp) {
         final ColumnRealName realName = xextractColQyColumnRealName(leftCB, leftCalcSp);
         return xbuildColQyColumn(leftCB, realName.toString(), "left");
@@ -308,6 +315,21 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected <CB extends ConditionBean> ColumnRealName xextractColQyColumnRealName(CB cb,
+            HpCalcSpecification<CB> calcSp) {
+        final Object mysticBinding = cb.xgetMysticBinding();
+        if (mysticBinding != null) {
+            return xdoExtractColQyColumnMysticBinding(cb, mysticBinding);
+        }
+        return xdoExtractColQyColumnSpecifiedColumn(calcSp);
+    }
+
+    protected <CB extends ConditionBean> ColumnRealName xdoExtractColQyColumnMysticBinding(CB cb,
+            final Object mysticBinding) {
+        final String exp = cb.getSqlClause().registerFreeParameterToThemeList("mystic", mysticBinding);
+        return ColumnRealName.create(null, new ColumnSqlName(exp));
+    }
+
+    protected <CB extends ConditionBean> ColumnRealName xdoExtractColQyColumnSpecifiedColumn(
             HpCalcSpecification<CB> calcSp) {
         final ColumnRealName realName = calcSp.getResolvedSpecifiedColumnRealName();
         if (realName == null) {
@@ -325,6 +347,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return new HpCalcSpecification<CB>(calcSp, this);
     }
 
+    // -----------------------------------------------------
+    //                                    Create ColQyClause
+    //                                    ------------------
     protected <CB extends ConditionBean> QueryClause xcreateColQyClause(final String leftColumn, final String operand,
             final String rightColumn, final HpCalcSpecification<CB> rightCalcSp) {
         return new QueryClause() {
@@ -595,6 +620,32 @@ public abstract class AbstractConditionBean implements ConditionBean {
             String msg = "The operation is only allowed at Dream Cruise.";
             throw new IllegalConditionBeanOperationException(msg);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void mysticRhythms(Object mysticBinding) {
+        if (mysticBinding == null) {
+            String msg = "The argument 'mysticBinding' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (_mysticBinding != null) {
+            String msg = "The other mystic binding already exists: " + mysticBinding;
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+        if (mysticBinding instanceof HpSpecifiedColumn) {
+            String msg = "The mystic binding should be bound value: " + mysticBinding;
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+        _mysticBinding = mysticBinding;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Object xgetMysticBinding() {
+        return _mysticBinding;
     }
 
     // [DBFlute-0.9.6.3]

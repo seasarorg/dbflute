@@ -59,15 +59,22 @@ public class FunctionFilterOption implements ParameterOption {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                           Bound Value
+    //                                           -----------
     protected Object _coalesce;
     protected Object _round;
     protected Object _trunc;
-    protected Integer _addYear;
-    protected Integer _addMonth;
-    protected Integer _addDay;
-    protected Integer _addHour;
-    protected Integer _addMinute;
-    protected Integer _addSecond;
+    protected Object _addYear;
+    protected Object _addMonth;
+    protected Object _addDay;
+    protected Object _addHour;
+    protected Object _addMinute;
+    protected Object _addSecond;
+
+    // -----------------------------------------------------
+    //                                   Parameter Direction
+    //                                   -------------------
     protected LinkedHashMap<String, ProcessCallback> _callbackMap; // order should be guaranteed
     protected String _parameterKey;
     protected String _parameterMapPath;
@@ -87,6 +94,9 @@ public class FunctionFilterOption implements ParameterOption {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
+    // -----------------------------------------------------
+    //                                              Coalesce
+    //                                              --------
     protected void doCoalesce(Object coalesce) {
         _coalesce = coalesce;
         addProcessCallback("coalesce", new ProcessCallback() {
@@ -96,6 +106,9 @@ public class FunctionFilterOption implements ParameterOption {
         });
     }
 
+    // -----------------------------------------------------
+    //                                                 Round
+    //                                                 -----
     protected void doRound(Object round) {
         _round = round;
         addProcessCallback("round", new ProcessCallback() {
@@ -105,6 +118,9 @@ public class FunctionFilterOption implements ParameterOption {
         });
     }
 
+    // -----------------------------------------------------
+    //                                         Truncate Date
+    //                                         -------------
     protected void doTrunc(Object trunc) {
         _trunc = trunc;
         addProcessCallback("trunc", new ProcessCallback() {
@@ -126,56 +142,89 @@ public class FunctionFilterOption implements ParameterOption {
         doTrunc(DATE_TRUNC_TIME);
     }
 
-    protected void doAddYear(Integer addedYear) {
+    // -----------------------------------------------------
+    //                                              Add Date
+    //                                              --------
+    protected void doAddYear(Object addedYear) {
+        doAddYear(addedYear, false);
+    }
+
+    protected void doAddYear(Object addedYear, final boolean minus) {
+        assertAddedValueNotNull("year", addedYear);
         _addYear = addedYear;
         addProcessCallback("addYear", new ProcessCallback() {
             public String callback(String functionExp) {
-                return processAddYear(functionExp);
+                return processAddYear(functionExp, minus);
             }
         });
     }
 
-    protected void doAddMonth(Integer addedMonth) {
+    protected void doAddMonth(Object addedMonth) {
+        doAddMonth(addedMonth, false);
+    }
+
+    protected void doAddMonth(Object addedMonth, final boolean minus) {
+        assertAddedValueNotNull("month", addedMonth);
         _addMonth = addedMonth;
         addProcessCallback("addMonth", new ProcessCallback() {
             public String callback(String functionExp) {
-                return processAddMonth(functionExp);
+                return processAddMonth(functionExp, minus);
             }
         });
     }
 
-    protected void doAddDay(Integer addedDay) {
+    protected void doAddDay(Object addedDay) {
+        doAddDay(addedDay, false);
+    }
+
+    protected void doAddDay(Object addedDay, final boolean minus) {
+        assertAddedValueNotNull("day", addedDay);
         _addDay = addedDay;
         addProcessCallback("addDay", new ProcessCallback() {
             public String callback(String functionExp) {
-                return processAddDay(functionExp);
+                return processAddDay(functionExp, minus);
             }
         });
     }
 
-    protected void doAddHour(Integer addedHour) {
+    protected void doAddHour(Object addedHour) {
+        doAddHour(addedHour, false);
+    }
+
+    protected void doAddHour(Object addedHour, final boolean minus) {
+        assertAddedValueNotNull("hour", addedHour);
         _addHour = addedHour;
         addProcessCallback("addHour", new ProcessCallback() {
             public String callback(String functionExp) {
-                return processAddHour(functionExp);
+                return processAddHour(functionExp, minus);
             }
         });
     }
 
-    protected void doAddMinute(Integer addedMinute) {
+    protected void doAddMinute(Object addedMinute) {
+        doAddMinute(addedMinute, false);
+    }
+
+    protected void doAddMinute(Object addedMinute, final boolean minus) {
+        assertAddedValueNotNull("minute", addedMinute);
         _addMinute = addedMinute;
         addProcessCallback("addMinute", new ProcessCallback() {
             public String callback(String functionExp) {
-                return processAddMinute(functionExp);
+                return processAddMinute(functionExp, minus);
             }
         });
     }
 
-    protected void doAddSecond(Integer addedSecond) {
+    protected void doAddSecond(Object addedSecond) {
+        doAddSecond(addedSecond, false);
+    }
+
+    protected void doAddSecond(Object addedSecond, final boolean minus) {
+        assertAddedValueNotNull("second", addedSecond);
         _addSecond = addedSecond;
         addProcessCallback("addSecond", new ProcessCallback() {
             public String callback(String functionExp) {
-                return processAddSecond(functionExp);
+                return processAddSecond(functionExp, minus);
             }
         });
     }
@@ -403,91 +452,106 @@ public class FunctionFilterOption implements ParameterOption {
     // -----------------------------------------------------
     //                                               DateAdd
     //                                               -------
-    protected String processAddYear(String functionExp) {
-        return doProcessDateAdd(functionExp, _addYear, "addYear");
+    protected String processAddYear(String functionExp, boolean minus) {
+        return doProcessDateAdd(functionExp, _addYear, "addYear", minus);
     }
 
-    protected String processAddMonth(String functionExp) {
-        return doProcessDateAdd(functionExp, _addMonth, "addMonth");
+    protected String processAddMonth(String functionExp, boolean minus) {
+        return doProcessDateAdd(functionExp, _addMonth, "addMonth", minus);
     }
 
-    protected String processAddDay(String functionExp) {
-        return doProcessDateAdd(functionExp, _addDay, "addDay");
+    protected String processAddDay(String functionExp, boolean minus) {
+        return doProcessDateAdd(functionExp, _addDay, "addDay", minus);
     }
 
-    protected String processAddHour(String functionExp) {
-        return doProcessDateAdd(functionExp, _addHour, "addHour");
+    protected String processAddHour(String functionExp, boolean minus) {
+        return doProcessDateAdd(functionExp, _addHour, "addHour", minus);
     }
 
-    protected String processAddMinute(String functionExp) {
-        return doProcessDateAdd(functionExp, _addMinute, "addMinute");
+    protected String processAddMinute(String functionExp, boolean minus) {
+        return doProcessDateAdd(functionExp, _addMinute, "addMinute", minus);
     }
 
-    protected String processAddSecond(String functionExp) {
-        return doProcessDateAdd(functionExp, _addSecond, "addSecond");
+    protected String processAddSecond(String functionExp, boolean minus) {
+        return doProcessDateAdd(functionExp, _addSecond, "addSecond", minus);
     }
 
-    protected String doProcessDateAdd(String functionExp, Integer addedValue, String propertyName) {
+    protected String doProcessDateAdd(String functionExp, Object addedValue, String propertyName, boolean minus) {
         if (addedValue == null) {
             return functionExp;
         }
-        if (!isDateTypeColumn()) { // basically no way
-            String msg = "The column should be Date type for the function addXxx():";
+        if (hasTargetColumnInfo() && !isDateTypeColumn()) { // if info is null, means e.g. mystic
+            String msg = "The column should be Date type for the function e.g. addDay():";
             msg = msg + " column=" + _targetColumnInfo;
-            throw new IllegalStateException(msg);
+            throw new IllegalConditionBeanOperationException(msg);
         }
         if (isDatabaseMySQL()) {
-            return doProcessDateAddMySQL(functionExp, addedValue, propertyName);
+            return doProcessDateAddMySQL(functionExp, addedValue, propertyName, minus);
         } else if (isDatabasePostgreSQL()) {
-            return doProcessDateAddPostgreSQL(functionExp, addedValue, propertyName);
+            return doProcessDateAddPostgreSQL(functionExp, addedValue, propertyName, minus);
         } else if (isDatabaseOracle()) {
-            return doProcessDateAddOracle(functionExp, addedValue, propertyName);
+            return doProcessDateAddOracle(functionExp, addedValue, propertyName, minus);
         } else if (isDatabaseDB2()) {
-            return doProcessDateAddDB2(functionExp, addedValue, propertyName);
+            return doProcessDateAddDB2(functionExp, addedValue, propertyName, minus);
         } else if (isDatabaseSQLServer()) {
-            return doProcessDateAddSQLServer(functionExp, addedValue, propertyName);
+            return doProcessDateAddSQLServer(functionExp, addedValue, propertyName, minus);
         } else if (isDatabaseH2()) { // same as SQLServer
-            return doProcessDateAddSQLServer(functionExp, addedValue, propertyName);
+            return doProcessDateAddSQLServer(functionExp, addedValue, propertyName, minus);
         } else {
             String msg = "Unsupported database to the function addXxx(): " + propertyName;
-            throw new IllegalStateException(msg);
+            throw new IllegalConditionBeanOperationException(msg);
         }
     }
 
-    protected String doProcessDateAddMySQL(String functionExp, Integer addedValue, String propertyName) {
+    protected String doProcessDateAddMySQL(String functionExp, Object addedValue, String propertyName, boolean minus) {
+        final String bindParameter = buildAddedBindParameter(addedValue, propertyName);
         final String type = buildDateAddExpType(propertyName, null, false);
-        final String bindParameter = buildBindParameter(propertyName);
-        return "date_add(" + functionExp + ", interval " + bindParameter + " " + type + ")";
+        final String prefixSign = minus ? "-" : "";
+        return "date_add(" + functionExp + ", interval " + prefixSign + bindParameter + " " + type + ")";
         // e.g. date_add(FOO_DATE, interval 1 month)
     }
 
-    protected String doProcessDateAddPostgreSQL(String functionExp, Integer addedValue, String propertyName) {
+    protected String doProcessDateAddPostgreSQL(String functionExp, Object addedValue, String propertyName,
+            boolean minus) {
         // no binding because it does not allowed
         final String type = buildDateAddExpType(propertyName, null, true);
-        if (isJustDateTypeColumn()) {
-            return "cast(" + functionExp + " as timestamp) + '" + addedValue + " " + type + "'";
+        final String valueExp;
+        {
+            final String baseValueExp = buildAddedEmbeddedValueExp(addedValue);
+            if (addedValue instanceof HpSpecifiedColumn) {
+                valueExp = "(" + baseValueExp + " || '" + type + "')::interval";
+            } else {
+                valueExp = "'" + baseValueExp + " " + type + "'";
+            }
+        }
+        final String calcSign = minus ? "-" : "+";
+        if (!hasTargetColumnInfo() || isJustDateTypeColumn()) { // if null, might be mystic binding
+            return "cast(" + functionExp + " as timestamp) " + calcSign + " " + valueExp;
         } else {
-            return functionExp + " + '" + addedValue + " " + type + "'";
+            return functionExp + " " + calcSign + " " + valueExp;
         }
         // e.g.
         //  o cast(FOO_DATE as timestamp) + '1 months'
         //  o FOO_DATE + '1 months'
+        //  o FOO_DATE + (FOO_DAYS || 'months')::interval
     }
 
-    protected String doProcessDateAddOracle(String functionExp, Integer addedValue, String propertyName) {
-        final String bindParameter = buildBindParameter(propertyName);
+    protected String doProcessDateAddOracle(String functionExp, Object addedValue, String propertyName, boolean minus) {
+        final String bindParameter = buildAddedBindParameter(addedValue, propertyName);
+        final String prefixSign = minus ? "-" : "";
+        final String calcSign = minus ? "-" : "+";
         if (isPropertyAddYear(propertyName)) {
-            return "add_months(" + functionExp + ", 12 * " + bindParameter + ")";
+            return "add_months(" + functionExp + ", 12 * " + prefixSign + bindParameter + ")";
         } else if (isPropertyAddMonth(propertyName)) {
-            return "add_months(" + functionExp + ", " + bindParameter + ")";
+            return "add_months(" + functionExp + ", " + prefixSign + bindParameter + ")";
         } else if (isPropertyAddDay(propertyName)) {
-            return functionExp + " + " + bindParameter;
+            return functionExp + " " + calcSign + " " + bindParameter;
         } else if (isPropertyAddHour(propertyName)) {
-            return functionExp + " + " + bindParameter + " / 24";
+            return functionExp + " " + calcSign + " " + bindParameter + " / 24";
         } else if (isPropertyAddMinute(propertyName)) {
-            return functionExp + " + " + bindParameter + " / 1440";
+            return functionExp + " " + calcSign + " " + bindParameter + " / 1440";
         } else if (isPropertyAddSecond(propertyName)) {
-            return functionExp + " + " + bindParameter + " / 86400";
+            return functionExp + " " + calcSign + " " + bindParameter + " / 86400";
         } else {
             String msg = "Unknown property for date-add: " + propertyName;
             throw new IllegalStateException(msg);
@@ -498,18 +562,19 @@ public class FunctionFilterOption implements ParameterOption {
         //  o FOO_DATE + 1 / 24
     }
 
-    protected String doProcessDateAddDB2(String functionExp, Integer addedValue, String propertyName) {
-        final String bindParameter = buildBindParameter(propertyName);
+    protected String doProcessDateAddDB2(String functionExp, Object addedValue, String propertyName, boolean minus) {
+        final String bindParameter = buildAddedBindParameter(addedValue, propertyName);
         final String type = buildDateAddExpType(propertyName, null, false);
-        return functionExp + " + " + bindParameter + " " + type;
+        final String calcSign = minus ? "-" : "+";
+        return functionExp + " " + calcSign + " " + bindParameter + " " + type;
         // e.g. FOO_DATE + 1 month
     }
 
-    protected String doProcessDateAddSQLServer(String functionExp, Integer addedValue, String propertyName) {
-        // no binding for correct formatting (related to leftArg binding problem)
-        // it does not need to bind here in the first place because of specified as Integer
+    protected String doProcessDateAddSQLServer(String functionExp, Object addedValue, String propertyName, boolean minus) {
+        final String valueExp = buildAddedEmbeddedValueExp(addedValue);
         final String type = buildDateAddExpType(propertyName, null, false);
-        return "dateadd(" + type + ", " + addedValue + ", " + functionExp + ")";
+        final String prefixSign = minus ? "-" : "";
+        return "dateadd(" + type + ", " + prefixSign + valueExp + ", " + functionExp + ")";
         // e.g. dateadd(month, 1, FOO_DATE)
     }
 
@@ -558,6 +623,26 @@ public class FunctionFilterOption implements ParameterOption {
 
     protected boolean isPropertyAddSecond(String propertyName) {
         return "addSecond".equals(propertyName);
+    }
+
+    protected String buildAddedBindParameter(Object addedValue, String propertyName) {
+        final String bindExp;
+        if (addedValue instanceof HpSpecifiedColumn) {
+            bindExp = ((HpSpecifiedColumn) addedValue).toColumnRealName().toString();
+        } else {
+            bindExp = buildBindParameter(propertyName);
+        }
+        return bindExp;
+    }
+
+    protected String buildAddedEmbeddedValueExp(Object addedValue) {
+        final String valueExp;
+        if (addedValue instanceof HpSpecifiedColumn) {
+            valueExp = ((HpSpecifiedColumn) addedValue).toColumnRealName().toString();
+        } else {
+            valueExp = addedValue.toString();
+        }
+        return valueExp;
     }
 
     // -----------------------------------------------------
@@ -619,6 +704,10 @@ public class FunctionFilterOption implements ParameterOption {
 
     protected String buildBindParameter(String propertyName) {
         return "/*pmb." + _parameterMapPath + "." + _parameterKey + "." + propertyName + "*/null";
+    }
+
+    protected boolean hasTargetColumnInfo() {
+        return _targetColumnInfo != null;
     }
 
     protected boolean isDateTypeColumn() {
@@ -712,6 +801,20 @@ public class FunctionFilterOption implements ParameterOption {
             final String msg = "The specified column was not dream cruise ticket: " + column;
             throw new IllegalConditionBeanOperationException(msg);
         }
+    }
+
+    protected void assertAddedValueNotNull(String keyword, Object addedValue) {
+        if (isAddedValueNullIgnored()) {
+            return;
+        }
+        if (addedValue == null) {
+            String msg = "The added value for " + keyword + " should not be null.";
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+    }
+
+    protected boolean isAddedValueNullIgnored() {
+        return true; // #later false since java8 (and fix javadoc comment)
     }
 
     // ===================================================================================

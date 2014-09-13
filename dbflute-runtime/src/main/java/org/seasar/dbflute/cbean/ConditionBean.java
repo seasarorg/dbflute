@@ -222,6 +222,32 @@ public interface ConditionBean extends PagingBean {
      */
     void xsetupSelectDreamCruiseJourneyLogBookIfUnionExists();
 
+    /**
+     * DBFlute Dreams.
+     * <pre>
+     * e.g. ColumnQuery: ... > '2015/04/05' + (PURCHASE_COUNT days)
+     *  PurchaseCB cb = new PurchaseCB();
+     *  cb.columnQuery(new SpecifyQuery() {
+     *      public void specify(Purchase cb) {
+     *          cb.column...();
+     *      }
+     *  }).greaterThan(new SpecifyQuery() {
+     *      public void specify(Purchase cb) {
+     *          cb.<span style="color: #DD4747">mysticRhythms</span>(toDate("2015/04/05"));
+     *      }
+     *  }).convert(new ColumnConversionOption()
+     *          .<span style="color: #DD4747">addDay</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     * </pre>
+     * @param mysticBinding
+     */
+    void mysticRhythms(Object mysticBinding);
+
+    /**
+     * Get the value of mystic binding.
+     * @return The object value for mystic binding. (NullAllowed: if null, no mystic)  
+     */
+    Object xgetMysticBinding();
+
     // ===================================================================================
     //                                                                       Invalid Query
     //                                                                       =============

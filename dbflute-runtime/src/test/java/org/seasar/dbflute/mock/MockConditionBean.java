@@ -349,6 +349,13 @@ public class MockConditionBean implements ConditionBean {
     public void xsetupSelectDreamCruiseJourneyLogBookIfUnionExists() {
     }
 
+    public void mysticRhythms(Object mysticBinding) {
+    }
+
+    public Object xgetMysticBinding() {
+        return null;
+    }
+
     public CursorSelectOption getCursorSelectOption() {
         return null;
     }

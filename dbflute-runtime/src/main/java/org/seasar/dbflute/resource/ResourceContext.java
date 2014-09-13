@@ -134,7 +134,7 @@ public class ResourceContext {
 
     /**
      * @param tableFlexibleName The flexible name of table. (NotNull)
-     * @return The instance of DB meta. (NullAllowed)
+     * @return The instance of DB meta. (NullAllowed: if null, means not found)
      */
     public static DBMeta provideDBMeta(String tableFlexibleName) {
         if (!isExistResourceContextOnThread()) {
