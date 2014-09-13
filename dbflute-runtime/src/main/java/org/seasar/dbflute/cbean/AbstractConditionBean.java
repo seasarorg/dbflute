@@ -318,6 +318,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
             HpCalcSpecification<CB> calcSp) {
         final Object mysticBinding = cb.xgetMysticBinding();
         if (mysticBinding != null) {
+            calcSp.setMysticBindingSnapshot(mysticBinding);
             return xdoExtractColQyColumnMysticBinding(cb, mysticBinding);
         }
         return xdoExtractColQyColumnSpecifiedColumn(calcSp);

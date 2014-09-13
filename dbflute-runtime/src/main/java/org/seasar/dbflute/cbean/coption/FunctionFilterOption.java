@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.cbean.coption;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -83,6 +84,7 @@ public class FunctionFilterOption implements ParameterOption {
     //                                    called by internal
     //                                    ------------------
     protected ColumnInfo _targetColumnInfo; // not required
+    protected Object _mysticBindingSnapshot; // e.g. to determine binding type
     protected boolean _databaseMySQL;
     protected boolean _databasePostgreSQL;
     protected boolean _databaseOracle;
@@ -267,11 +269,8 @@ public class FunctionFilterOption implements ParameterOption {
     }
 
     // ===================================================================================
-    //                                                                             Process
-    //                                                                             =======
-    // -----------------------------------------------------
-    //                                              Coalesce
-    //                                              --------
+    //                                                                            Coalesce
+    //                                                                            ========
     protected String processCoalesce(String functionExp) {
         if (_coalesce == null) {
             return functionExp;
@@ -284,9 +283,9 @@ public class FunctionFilterOption implements ParameterOption {
         return processSimpleFunction(functionExp, functionName, propertyName, null, false);
     }
 
-    // -----------------------------------------------------
-    //                                                 Round
-    //                                                 -----
+    // ===================================================================================
+    //                                                                               Round
+    //                                                                               =====
     protected String processRound(String functionExp) {
         if (_round == null) {
             return functionExp;
@@ -296,9 +295,9 @@ public class FunctionFilterOption implements ParameterOption {
         return processSimpleFunction(functionExp, functionName, propertyName, null, false);
     }
 
-    // -----------------------------------------------------
-    //                                                 Trunc
-    //                                                 -----
+    // ===================================================================================
+    //                                                                            Truncate
+    //                                                                            ========
     protected String processTrunc(String functionExp) {
         if (_trunc == null) {
             return functionExp;
@@ -449,9 +448,9 @@ public class FunctionFilterOption implements ParameterOption {
         return isDatabaseMySQL() || isDatabaseH2();
     }
 
-    // -----------------------------------------------------
-    //                                               DateAdd
-    //                                               -------
+    // ===================================================================================
+    //                                                                             DateAdd
+    //                                                                             =======
     protected String processAddYear(String functionExp, boolean minus) {
         return doProcessDateAdd(functionExp, _addYear, "addYear", minus);
     }
@@ -480,7 +479,7 @@ public class FunctionFilterOption implements ParameterOption {
         if (addedValue == null) {
             return functionExp;
         }
-        if (hasTargetColumnInfo() && !isDateTypeColumn()) { // if info is null, means e.g. mystic
+        if (!isDateTypeColumn()) { // if info is null, means e.g. mystic
             String msg = "The column should be Date type for the function e.g. addDay():";
             msg = msg + " column=" + _targetColumnInfo;
             throw new IllegalConditionBeanOperationException(msg);
@@ -518,14 +517,14 @@ public class FunctionFilterOption implements ParameterOption {
         final String valueExp;
         {
             final String baseValueExp = buildAddedEmbeddedValueExp(addedValue);
-            if (addedValue instanceof HpSpecifiedColumn) {
+            if (isDreamCruiseTicket(addedValue)) {
                 valueExp = "(" + baseValueExp + " || '" + type + "')::interval";
             } else {
                 valueExp = "'" + baseValueExp + " " + type + "'";
             }
         }
         final String calcSign = minus ? "-" : "+";
-        if (!hasTargetColumnInfo() || isJustDateTypeColumn()) { // if null, might be mystic binding
+        if (hasMysticBinding() || isJustDateTypeColumn()) { // mystic binding needs to cast (not sure why)
             return "cast(" + functionExp + " as timestamp) " + calcSign + " " + valueExp;
         } else {
             return functionExp + " " + calcSign + " " + valueExp;
@@ -566,7 +565,26 @@ public class FunctionFilterOption implements ParameterOption {
         final String bindParameter = buildAddedBindParameter(addedValue, propertyName);
         final String type = buildDateAddExpType(propertyName, null, false);
         final String calcSign = minus ? "-" : "+";
-        return functionExp + " " + calcSign + " " + bindParameter + " " + type;
+        final String baseFuncExp;
+        final String closingSuffix;
+        if (hasTargetColumnInfo()) {
+            baseFuncExp = functionExp; // no problem, so no cast
+            closingSuffix = "";
+        } else { // e.g. mystic binding
+            // needs time-stamp to calculate (not sure why)
+            final String castType;
+            if (isJustDateTypeColumn()) {
+                // and needs to revert to original type so twice cast
+                castType = "date";
+                baseFuncExp = "cast(cast(" + functionExp + " as timestamp)";
+                closingSuffix = " as " + castType + ")";
+            } else {
+                castType = "timestamp";
+                baseFuncExp = "cast(" + functionExp + " as timestamp)";
+                closingSuffix = "";
+            }
+        }
+        return baseFuncExp + " " + calcSign + " " + bindParameter + " " + type + closingSuffix;
         // e.g. FOO_DATE + 1 month
     }
 
@@ -627,7 +645,7 @@ public class FunctionFilterOption implements ParameterOption {
 
     protected String buildAddedBindParameter(Object addedValue, String propertyName) {
         final String bindExp;
-        if (addedValue instanceof HpSpecifiedColumn) {
+        if (isDreamCruiseTicket(addedValue)) {
             bindExp = ((HpSpecifiedColumn) addedValue).toColumnRealName().toString();
         } else {
             bindExp = buildBindParameter(propertyName);
@@ -637,7 +655,7 @@ public class FunctionFilterOption implements ParameterOption {
 
     protected String buildAddedEmbeddedValueExp(Object addedValue) {
         final String valueExp;
-        if (addedValue instanceof HpSpecifiedColumn) {
+        if (isDreamCruiseTicket(addedValue)) {
             valueExp = ((HpSpecifiedColumn) addedValue).toColumnRealName().toString();
         } else {
             valueExp = addedValue.toString();
@@ -645,9 +663,9 @@ public class FunctionFilterOption implements ParameterOption {
         return valueExp;
     }
 
-    // -----------------------------------------------------
-    //                                               Various
-    //                                               -------
+    // ===================================================================================
+    //                                                                 Various Calculation
+    //                                                                 ===================
     /**
      * Process calculation filters defined by sub-class. (for extension)
      * @param functionExp The expression of derived function. (NotNull)
@@ -666,9 +684,46 @@ public class FunctionFilterOption implements ParameterOption {
         return functionExp;
     }
 
-    // -----------------------------------------------------
-    //                                         Assist Helper
-    //                                         -------------
+    // ===================================================================================
+    //                                                                    Parameter Option
+    //                                                                    ================
+    public void acceptParameterKey(String parameterKey, String parameterMapPath) {
+        _parameterKey = parameterKey;
+        _parameterMapPath = parameterMapPath;
+    }
+
+    // ===================================================================================
+    //                                                                    Create Processor
+    //                                                                    ================
+    public SpecifyDerivedReferrer createSpecifyDerivedReferrer(SubQueryPath subQueryPath,
+            ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
+            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
+            GearedCipherManager cipherManager, String mainSubQueryIdentity, String aliasName) {
+        return new SpecifyDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel,
+                subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, aliasName);
+    }
+
+    public QueryDerivedReferrer createQueryDerivedReferrer(SubQueryPath subQueryPath,
+            ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
+            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
+            GearedCipherManager cipherManager, String mainSubQueryIdentity, String operand, Object value,
+            String parameterPath) {
+        return new QueryDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel,
+                subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, operand, value,
+                parameterPath);
+    }
+
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean mayNullRevived() { // basically for auto-detect of inner-join
+        // coalesce can change a null value to an existing value
+        return _coalesce != null;
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     protected String processSimpleFunction(String functionExp, String functionName, String propertyName,
             String thirdArg, boolean leftArg) {
         final String bindParameter = buildBindParameter(propertyName);
@@ -711,55 +766,31 @@ public class FunctionFilterOption implements ParameterOption {
     }
 
     protected boolean isDateTypeColumn() {
-        return _targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeDate();
+        if (_targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeDate()) {
+            return true;
+        }
+        if (_mysticBindingSnapshot != null && _mysticBindingSnapshot instanceof Date) {
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean hasMysticBinding() {
+        return _mysticBindingSnapshot != null;
     }
 
     protected boolean isJustDateTypeColumn() {
-        return _targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeJustDate();
+        if (_targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeJustDate()) {
+            return true;
+        }
+        if (_mysticBindingSnapshot != null && _mysticBindingSnapshot.getClass().equals(Date.class)) {
+            return true;
+        }
+        return false; // unknown, basically no way
     }
 
-    // ===================================================================================
-    //                                                                    Parameter Option
-    //                                                                    ================
-    public void acceptParameterKey(String parameterKey, String parameterMapPath) {
-        _parameterKey = parameterKey;
-        _parameterMapPath = parameterMapPath;
-    }
-
-    // ===================================================================================
-    //                                                                    Create Processor
-    //                                                                    ================
-    public SpecifyDerivedReferrer createSpecifyDerivedReferrer(SubQueryPath subQueryPath,
-            ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
-            GearedCipherManager cipherManager, String mainSubQueryIdentity, String aliasName) {
-        return new SpecifyDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel,
-                subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, aliasName);
-    }
-
-    public QueryDerivedReferrer createQueryDerivedReferrer(SubQueryPath subQueryPath,
-            ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
-            GearedCipherManager cipherManager, String mainSubQueryIdentity, String operand, Object value,
-            String parameterPath) {
-        return new QueryDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel,
-                subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, operand, value,
-                parameterPath);
-    }
-
-    // ===================================================================================
-    //                                                                       Determination
-    //                                                                       =============
-    public boolean mayNullRevived() { // basically for auto-detect of inner-join
-        // coalesce can change a null value to an existing value
-        return _coalesce != null;
-    }
-
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected final String ln() {
-        return DBFluteSystem.getBasicLn();
+    protected boolean isDreamCruiseTicket(Object value) {
+        return value instanceof HpSpecifiedColumn;
     }
 
     // ===================================================================================
@@ -818,6 +849,13 @@ public class FunctionFilterOption implements ParameterOption {
     }
 
     // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected final String ln() {
+        return DBFluteSystem.getBasicLn();
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
@@ -829,6 +867,9 @@ public class FunctionFilterOption implements ParameterOption {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    // -----------------------------------------------------
+    //                            called by ParameterComment 
+    //                            --------------------------
     public Object getCoalesce() {
         return _coalesce;
     }
@@ -874,6 +915,14 @@ public class FunctionFilterOption implements ParameterOption {
 
     public void xsetTargetColumnInfo(ColumnInfo targetColumnInfo) {
         _targetColumnInfo = targetColumnInfo;
+    }
+
+    public Object xgetMysticBindingSnapshot() {
+        return _mysticBindingSnapshot;
+    }
+
+    public void xsetMysticBindingSnapshot(Object mysticBindingSnapshot) {
+        _mysticBindingSnapshot = mysticBindingSnapshot;
     }
 
     public void xjudgeDatabase(SqlClause sqlClause) {

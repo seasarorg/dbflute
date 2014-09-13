@@ -55,6 +55,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     protected HpCalcSpecification<CB> _leftCalcSp;
     protected boolean _convert;
     protected boolean _synchronizeSetupSelectByJourneyLogBook;
+    protected Object _mysticBindingSnapshot; // e.g. to determine binding type
 
     // ===================================================================================
     //                                                                         Constructor
@@ -400,6 +401,9 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
             final ColumnInfo columnInfo = getResolvedSpecifiedColumnInfo();
             option.xsetTargetColumnInfo(columnInfo); // can be set if specified once
         }
+        if (_mysticBindingSnapshot != null && option.xgetMysticBindingSnapshot() == null) {
+            option.xsetMysticBindingSnapshot(_mysticBindingSnapshot); // can be set if specified once
+        }
         _baseCB.localCQ().xregisterParameterOption(option);
     }
 
@@ -731,5 +735,13 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
 
     public void setLeftCalcSp(HpCalcSpecification<CB> leftCalcSp) {
         _leftCalcSp = leftCalcSp;
+    }
+
+    public Object getMysticBindingSnapshot() {
+        return _mysticBindingSnapshot;
+    }
+
+    public void setMysticBindingSnapshot(Object mysticBindingSnapshot) {
+        _mysticBindingSnapshot = mysticBindingSnapshot;
     }
 }
