@@ -475,6 +475,9 @@ public class BehaviorCommandInvoker {
     protected <RESULT> BehaviorInvokeNameResult extractBehaviorInvoke(BehaviorCommand<RESULT> behaviorCommand,
             StackTraceElement[] stackTrace) {
         final DBMeta dbmeta = ResourceContext.provideDBMeta(behaviorCommand.getTableDbName());
+        if (dbmeta == null) { // basically no way, only direct invoking
+            return createUnknownInvokeNameResult();
+        }
         Class<?> outsideSqlResultType = null;
         boolean outsideSqlAutoPaging = false;
         if (behaviorCommand.isOutsideSql()) {
@@ -485,6 +488,18 @@ public class BehaviorCommandInvoker {
         final BehaviorInvokeNameExtractor extractor = createBehaviorInvokeNameExtractor(dbmeta, outsideSqlResultType,
                 outsideSqlAutoPaging);
         return extractor.extractBehaviorInvoke(stackTrace);
+    }
+
+    protected BehaviorInvokeNameResult createUnknownInvokeNameResult() { // basically no way
+        final String unknownKeyword;
+        if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) { // e.g. OutsideSql engine use
+            final OutsideSqlContext context = OutsideSqlContext.getOutsideSqlContextOnThread();
+            unknownKeyword = context.getTableDbName();
+        } else {
+            unknownKeyword = "Unknown";
+        }
+        final String expNoMethodSuffix = unknownKeyword + ".invoke";
+        return new BehaviorInvokeNameResult(expNoMethodSuffix + "()", expNoMethodSuffix, null, null);
     }
 
     protected BehaviorInvokeNameExtractor createBehaviorInvokeNameExtractor(final DBMeta dbmeta,
