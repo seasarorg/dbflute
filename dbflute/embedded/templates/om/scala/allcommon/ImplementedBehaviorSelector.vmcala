@@ -220,7 +220,7 @@ class ${glImplementedBehaviorSelector} extends BehaviorSelector {
 		}
 #end
 #if ($database.isTargetContainerSpring())
-		return _container.getBean(initUncap(toClassTitle(componentType))).asInstanceOf[COMPONENT];
+		return _container.getBean(replace(initUncap(toClassTitle(componentType)), "${database.dollar}", "")).asInstanceOf[COMPONENT];
 #end
 #if ($database.isTargetContainerLucy())
 		return _container.get(initUncap(toClassTitle(componentType))).asInstanceOf[COMPONENT];
@@ -247,6 +247,10 @@ class ${glImplementedBehaviorSelector} extends BehaviorSelector {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
+    protected def replace(str: String, fromStr: String, toStr: String): String = {
+        return Srl.replace(str, fromStr, toStr);
+    }
+
     protected def initUncap(str: String): String = {
         return str.substring(0, 1).toLowerCase() + str.substring(1);
     }

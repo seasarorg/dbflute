@@ -27,6 +27,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
 import org.seasar.dbflute.util.DfTraceViewUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 #if ($database.isTargetContainerSeasar())
 import org.seasar.framework.container.S2Container;
@@ -214,7 +215,7 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 		}
 #end
 #if ($database.isTargetContainerSpring())
-		return (COMPONENT)_container.getBean(initUncap(toClassTitle(componentType)));
+		return (COMPONENT)_container.getBean(replace(initUncap(toClassTitle(componentType)), "${database.dollar}", ""));
 #end
 #if ($database.isTargetContainerLucy())
 		return (COMPONENT)_container.get(initUncap(toClassTitle(componentType)));
@@ -241,6 +242,10 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
+    protected String replace(String str, String fromStr, String toStr) {
+        return Srl.replace(str, fromStr, toStr);
+    }
+
     protected String initUncap(String str) {
         return str.substring(0, 1).toLowerCase() + str.substring(1);
     }
