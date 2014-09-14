@@ -228,6 +228,23 @@ public class DfStringUtilTest extends PlainTestCase {
         }
     }
 
+    public void test_frontstring_basic() {
+        assertEquals("123", frontstring("123456", 3));
+        assertEquals("1", frontstring("123456", 1));
+        assertEquals("123456", frontstring("123456", 6));
+        assertEquals("", frontstring("123456", 0));
+    }
+
+    public void test_frontstring_illegal() {
+        try {
+            frontstring("123456", 7);
+            fail();
+        } catch (StringIndexOutOfBoundsException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
     public void test_rearstring_basic() {
         assertEquals("456", rearstring("123456", 3));
         assertEquals("6", rearstring("123456", 1));

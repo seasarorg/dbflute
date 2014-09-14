@@ -533,6 +533,26 @@ public class Srl {
     }
 
     /**
+     * Extract front sub-string by index.
+     * <pre>
+     * rearstring("flute", 2)
+     * returns "fl"
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param index The index from rear. 
+     * @return The rear string. (NotNull)
+     */
+    public static String frontstring(final String str, final int index) {
+        assertStringNotNull(str);
+        if (str.length() < index) {
+            String msg = "The length of the string was smaller than the index:";
+            msg = msg + " str=" + str + " index=" + index;
+            throw new StringIndexOutOfBoundsException(msg);
+        }
+        return str.substring(0, index);
+    }
+
+    /**
      * Extract rear sub-string by reverse index.
      * <pre>
      * rearstring("flute", 2)

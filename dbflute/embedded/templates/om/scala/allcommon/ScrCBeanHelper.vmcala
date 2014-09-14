@@ -156,6 +156,15 @@ class ScrHpColQyOperand[CB <: ConditionBean](handler: HpColQyHandler[CB]) {
      * @return The calculator for right column. (NotNull)
      */
     def lessEqual(rightSpecifyQuery: (CB) => Unit): ScrHpCalculator = { doHandle(rightSpecifyQuery, ConditionKey.CK_LESS_EQUAL) }
+#set ($isColQyMySqlExtension = ($database.isAvailableDatabaseDependency() && $database.isDatabaseMySQL()))
+#if ($isColQyMySqlExtension)
+
+    def bitAnd(rightSpecifyQuery: (CB) => Unit): ScrHpCalculator = { doHandle(rightSpecifyQuery, "&") }
+    def bitOr(rightSpecifyQuery: (CB) => Unit): ScrHpCalculator = { doHandle(rightSpecifyQuery, "|") }
+
+    protected def doHandle(rightSpecifyQuery: (CB) => Unit, operand: String): ScrHpCalculator =
+    { new ScrHpCalculator(handler.handle(toNativeSpecifyQuery(rightSpecifyQuery), operand)) }
+#end
 
     protected def doHandle(rightSpecifyQuery: (CB) => Unit, ckey: ConditionKey): ScrHpCalculator =
     { new ScrHpCalculator(handler.handle(toNativeSpecifyQuery(rightSpecifyQuery), ckey.getOperand())) }

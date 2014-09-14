@@ -165,4 +165,32 @@ public class HpColQyOperand<CB extends ConditionBean> {
     public HpCalculator lessEqual(SpecifyQuery<CB> rightSpecifyQuery) {
         return _handler.handle(rightSpecifyQuery, ConditionKey.CK_LESS_EQUAL.getOperand());
     }
+
+    // ===================================================================================
+    //                                                                     DBMS Dependency
+    //                                                                     ===============
+    public static class HpExtendedColQyOperandMySql<CB extends ConditionBean> extends HpColQyOperand<CB> {
+
+        public HpExtendedColQyOperandMySql(HpColQyHandler<CB> handler) {
+            super(handler);
+        }
+
+        /**
+         * BitAnd(&).
+         * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+         * @return The calculator for right column. (NotNull)
+         */
+        public HpCalculator bitAnd(SpecifyQuery<CB> rightSpecifyQuery) {
+            return _handler.handle(rightSpecifyQuery, "&");
+        }
+
+        /**
+         * BitOr(|).
+         * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+         * @return The calculator for right column. (NotNull)
+         */
+        public HpCalculator bitOr(SpecifyQuery<CB> rightSpecifyQuery) {
+            return _handler.handle(rightSpecifyQuery, "|");
+        }
+    }
 }

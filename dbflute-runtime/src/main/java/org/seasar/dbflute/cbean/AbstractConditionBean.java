@@ -27,6 +27,8 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
+import org.seasar.dbflute.cbean.chelper.HpColQyHandler;
+import org.seasar.dbflute.cbean.chelper.HpColQyOperand;
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
@@ -302,6 +304,18 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     // -----------------------------------------------------
+    //                                   Create ColQyOperand
+    //                                   -------------------
+    protected <CB extends ConditionBean> HpColQyOperand<CB> xcreateColQyOperand(HpColQyHandler<CB> handler) {
+        return new HpColQyOperand<CB>(handler);
+    }
+
+    protected <CB extends ConditionBean> HpColQyOperand.HpExtendedColQyOperandMySql<CB> xcreateColQyOperandMySql(
+            HpColQyHandler<CB> handler) {
+        return new HpColQyOperand.HpExtendedColQyOperandMySql<CB>(handler);
+    }
+
+    // -----------------------------------------------------
     //                                     Build ColQyColumn
     //                                     -----------------
     protected <CB extends ConditionBean> String xbuildColQyLeftColumn(CB leftCB, HpCalcSpecification<CB> leftCalcSp) {
@@ -395,24 +409,24 @@ public abstract class AbstractConditionBean implements ConditionBean {
                     }
                 }
             }
-
-            protected String xbuildColQyClause(String leftExp, String operand, String rightExp) {
-                final StringBuilder sb = new StringBuilder();
-                if (hasSubQueryEndOnLastLine(leftExp)) {
-                    if (hasSubQueryEndOnLastLine(rightExp)) { // (sub-query = sub-query)
-                        // add line separator before right expression
-                        // because of independent format for right query
-                        sb.append(reflectToSubQueryEndOnLastLine(leftExp, " " + operand + " "));
-                        sb.append(ln()).append("       ").append(rightExp);
-                    } else { // (sub-query = column)
-                        sb.append(reflectToSubQueryEndOnLastLine(leftExp, " " + operand + " " + rightExp));
-                    }
-                } else { // (column = sub-query) or (column = column) 
-                    sb.append(leftExp).append(" ").append(operand).append(" ").append(rightExp);
-                }
-                return sb.toString();
-            }
         };
+    }
+
+    protected String xbuildColQyClause(String leftExp, String operand, String rightExp) { // can be overridden just in case
+        final StringBuilder sb = new StringBuilder();
+        if (hasSubQueryEndOnLastLine(leftExp)) {
+            if (hasSubQueryEndOnLastLine(rightExp)) { // (sub-query = sub-query)
+                // add line separator before right expression
+                // because of independent format for right query
+                sb.append(reflectToSubQueryEndOnLastLine(leftExp, " " + operand + " "));
+                sb.append(ln()).append("       ").append(rightExp);
+            } else { // (sub-query = column)
+                sb.append(reflectToSubQueryEndOnLastLine(leftExp, " " + operand + " " + rightExp));
+            }
+        } else { // (column = sub-query) or (column = column) 
+            sb.append(leftExp).append(" ").append(operand).append(" ").append(rightExp);
+        }
+        return sb.toString();
     }
 
     protected boolean hasSubQueryEndOnLastLine(String columnExp) {
