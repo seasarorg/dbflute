@@ -31,12 +31,12 @@ public class DerivedReferrerOptionTest extends PlainTestCase {
         option.acceptParameterKey("key", "path");
 
         // ## Act ##
-        String actual = option.processSimpleFunction("max(foo.COL)", "func", "bar", null, false);
+        String actual = option.processSimpleFunction("max(foo.COL)", "func", null, false, "param0");
 
         // ## Assert ##
         log(actual);
         assertTrue(Srl.startsWith(actual, "func(max(foo.COL), "));
-        assertTrue(Srl.endsWith(actual, "/*pmb.path.key.bar*/null)"));
+        assertTrue(Srl.endsWith(actual, "/*pmb.path.key.bindMap.param0*/null)"));
     }
 
     public void test_processSimpleFunction_thirdArg() throws Exception {
@@ -45,12 +45,12 @@ public class DerivedReferrerOptionTest extends PlainTestCase {
         option.acceptParameterKey("key", "path");
 
         // ## Act ##
-        String actual = option.processSimpleFunction("max(foo.COL)", "func", "bar", "third", false);
+        String actual = option.processSimpleFunction("max(foo.COL)", "func", "third", false, "param0");
 
         // ## Assert ##
         log(actual);
         assertTrue(Srl.startsWith(actual, "func(max(foo.COL), "));
-        assertTrue(Srl.endsWith(actual, "/*pmb.path.key.bar*/null, third)"));
+        assertTrue(Srl.endsWith(actual, "/*pmb.path.key.bindMap.param0*/null, third)"));
     }
 
     public void test_processSimpleFunction_leftArg() throws Exception {
@@ -59,11 +59,11 @@ public class DerivedReferrerOptionTest extends PlainTestCase {
         option.acceptParameterKey("key", "path");
 
         // ## Act ##
-        String actual = option.processSimpleFunction("max(foo.COL)", "func", "bar", "third", true);
+        String actual = option.processSimpleFunction("max(foo.COL)", "func", "third", true, "param0");
 
         // ## Assert ##
         log(actual);
-        assertTrue(Srl.contains(actual, "func(/*pmb.path.key.bar*/null, max(foo.COL), third)"));
+        assertTrue(Srl.contains(actual, "func(/*pmb.path.key.bindMap.param0*/null, max(foo.COL), third)"));
     }
 
     public void test_processSimpleFunction_nested_basic() throws Exception {
@@ -80,14 +80,14 @@ public class DerivedReferrerOptionTest extends PlainTestCase {
         sb.append(ln()).append(")").append(sqend).append(identity);
 
         // ## Act ##
-        String actual = option.processSimpleFunction(sb.toString(), "func", "bar", null, false);
+        String actual = option.processSimpleFunction(sb.toString(), "func", null, false, "param0");
 
         // ## Assert ##
         log(ln() + actual);
         assertTrue(Srl.startsWith(actual, "func(max(" + sqbegin + identity));
         assertTrue(Srl.contains(actual, "select max(foo.COL)"));
         assertTrue(Srl.contains(actual, "  from FOO foo"));
-        assertTrue(Srl.endsWith(actual, ", /*pmb.path.key.bar*/null)" + sqend + identity));
+        assertTrue(Srl.endsWith(actual, ", /*pmb.path.key.bindMap.param0*/null)" + sqend + identity));
     }
 
     public void test_processSimpleFunction_nested_third() throws Exception {
@@ -104,14 +104,14 @@ public class DerivedReferrerOptionTest extends PlainTestCase {
         sb.append(ln()).append(")").append(sqend).append(identity);
 
         // ## Act ##
-        String actual = option.processSimpleFunction(sb.toString(), "func", "bar", "third", false);
+        String actual = option.processSimpleFunction(sb.toString(), "func", "third", false, "param0");
 
         // ## Assert ##
         log(ln() + actual);
         assertTrue(Srl.startsWith(actual, "func(max(" + sqbegin + identity));
         assertTrue(Srl.contains(actual, "select max(foo.COL)"));
         assertTrue(Srl.contains(actual, "  from FOO foo"));
-        assertTrue(Srl.endsWith(actual, ", /*pmb.path.key.bar*/null, third)" + sqend + identity));
+        assertTrue(Srl.endsWith(actual, ", /*pmb.path.key.bindMap.param0*/null, third)" + sqend + identity));
     }
 
     public void test_processSimpleFunction_nested_leftArg() throws Exception {
@@ -128,11 +128,11 @@ public class DerivedReferrerOptionTest extends PlainTestCase {
         sb.append(ln()).append(")").append(sqend).append(identity);
 
         // ## Act ##
-        String actual = option.processSimpleFunction(sb.toString(), "func", "bar", "third", true);
+        String actual = option.processSimpleFunction(sb.toString(), "func", "third", true, "param0");
 
         // ## Assert ##
         log(ln() + actual);
-        assertTrue(actual.contains("func(/*pmb.path.key.bar*/null" + ln()));
+        assertTrue(actual.contains("func(/*pmb.path.key.bindMap.param0*/null" + ln()));
         assertTrue(actual.contains(" , max(" + sqbegin + identity));
         assertTrue(Srl.contains(actual, "select max(foo.COL)"));
         assertTrue(Srl.contains(actual, "  from FOO foo"));
@@ -156,7 +156,7 @@ public class DerivedReferrerOptionTest extends PlainTestCase {
         sb.append(ln()).append(")").append(sqend).append(identity);
 
         // ## Act ##
-        String actual = option.processSimpleFunction(sb.toString(), "func", "bar", null, false);
+        String actual = option.processSimpleFunction(sb.toString(), "func", null, false, "param0");
 
         // ## Assert ##
         log(ln() + actual);
@@ -167,9 +167,8 @@ public class DerivedReferrerOptionTest extends PlainTestCase {
         assertEquals(2, Srl.count(actual, "max(" + sqbegin + identity));
         assertEquals(1, Srl.count(actual, "func(max(" + sqbegin + identity));
         assertEquals(2, Srl.count(actual, ")" + sqend + identity));
-        assertEquals(1, Srl.count(actual, "/*pmb.path.key.bar*/null)" + sqend + identity));
-
-        assertTrue(Srl.endsWith(actual, ", /*pmb.path.key.bar*/null)" + sqend + identity));
+        assertEquals(1, Srl.count(actual, "/*pmb.path.key.bindMap.param0*/null)" + sqend + identity));
+        assertTrue(Srl.endsWith(actual, ", /*pmb.path.key.bindMap.param0*/null)" + sqend + identity));
     }
 
     public void test_needsHandleSubQueryEnd_basic() throws Exception {
