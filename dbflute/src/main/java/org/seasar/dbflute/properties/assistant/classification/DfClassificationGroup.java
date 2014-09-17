@@ -15,9 +15,12 @@
  */
 package org.seasar.dbflute.properties.assistant.classification;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.Srl;
 
@@ -29,7 +32,7 @@ public class DfClassificationGroup {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _classificationName;
+    protected final DfClassificationTop _classificationTop;
     protected final String _groupName;
     protected String _groupComment;
     protected List<String> _elementNameList;
@@ -38,8 +41,8 @@ public class DfClassificationGroup {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfClassificationGroup(String classificationName, String groupName) {
-        _classificationName = classificationName;
+    public DfClassificationGroup(DfClassificationTop classificationTop, String groupName) {
+        _classificationTop = classificationTop;
         _groupName = groupName;
     }
 
@@ -84,7 +87,7 @@ public class DfClassificationGroup {
             }
             if (cdefClassName != null) {
                 sb.append(cdefClassName).append(".");
-                sb.append(_classificationName).append(".");
+                sb.append(_classificationTop.getClassificationName()).append(".");
             }
             sb.append(elementName);
             ++index;
@@ -108,6 +111,40 @@ public class DfClassificationGroup {
 
     public String buildElementDisp() {
         return "The group elements:" + _elementNameList;
+    }
+
+    public List<DfClassificationElement> getElementList() {
+        if (_elementNameList == null) {
+            return new ArrayList<DfClassificationElement>();
+        }
+        final int size = _elementNameList.size();
+        final List<DfClassificationElement> elementList = new ArrayList<DfClassificationElement>(size);
+        for (String elementName : _elementNameList) {
+            final DfClassificationElement element = _classificationTop.findClassificationElementByName(elementName);
+            if (element == null) {
+                throwClassificationGroupingMapElementNotFoundException(elementName);
+            }
+            elementList.add(element);
+        }
+        return elementList;
+    }
+
+    protected void throwClassificationGroupingMapElementNotFoundException(String elementName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the classification element in the grouping map.");
+        br.addItem("Classification Name");
+        br.addElement(_classificationTop.getClassificationName());
+        br.addItem("Group Name");
+        br.addElement(_groupName);
+        br.addItem("NotFound Name");
+        br.addElement(elementName);
+        br.addItem("Defined Element");
+        final List<DfClassificationElement> elementList = _classificationTop.getClassificationElementList();
+        for (DfClassificationElement element : elementList) {
+            br.addElement(element);
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
     }
 
     // ===================================================================================
@@ -138,8 +175,12 @@ public class DfClassificationGroup {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public DfClassificationTop getClassificationTop() {
+        return _classificationTop;
+    }
+
     public String getClassificationName() {
-        return _classificationName;
+        return _classificationTop.getClassificationName();
     }
 
     public String getGroupName() {

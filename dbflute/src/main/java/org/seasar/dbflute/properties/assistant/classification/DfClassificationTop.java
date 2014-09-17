@@ -296,7 +296,7 @@ public class DfClassificationTop {
                 throw new DfClassificationRequiredAttributeNotFoundException(msg);
             }
             final String docOnly = (String) attrMap.get("isUseDocumentOnly");
-            final DfClassificationGroup group = new DfClassificationGroup(_classificationName, groupName);
+            final DfClassificationGroup group = new DfClassificationGroup(this, groupName);
             group.setGroupComment(groupComment);
             group.setElementNameList(elementList);
             group.setUseDocumentOnly(docOnly != null && docOnly.trim().equalsIgnoreCase("true"));
@@ -573,6 +573,15 @@ public class DfClassificationTop {
             element.setClassificationTop(this);
         }
         _elementList.addAll(classificationElementList);
+    }
+
+    public DfClassificationElement findClassificationElementByName(String name) {
+        for (DfClassificationElement element : _elementList) {
+            if (element.getName().equals(name)) {
+                return element;
+            }
+        }
+        return null;
     }
 
     // -----------------------------------------------------

@@ -68,6 +68,7 @@ public class JavaPropertiesReader {
     //                                                ------
     protected final Map<String, JavaPropertiesStreamProvider> _extendsProviderMap = newLinkedHashMapSized(4);
     protected boolean _checkImplicitOverride;
+    protected String _streamEncoding; // used if set
 
     // -----------------------------------------------------
     //                                            Reflection
@@ -99,6 +100,16 @@ public class JavaPropertiesReader {
 
     public JavaPropertiesReader checkImplicitOverride() {
         _checkImplicitOverride = true;
+        return this;
+    }
+
+    public JavaPropertiesReader encodeAsUTF8() {
+        _streamEncoding = "UTF-8";
+        return this;
+    }
+
+    public JavaPropertiesReader encodeAs(String encoding) {
+        _streamEncoding = encoding;
         return this;
     }
 
@@ -399,7 +410,7 @@ public class JavaPropertiesReader {
         InputStream ins = null;
         try {
             ins = preparePropFileStream();
-            prop.load(ins);
+            loadProperties(prop, ins);
         } catch (IOException e) {
             throwJavaPropertiesReadFailureException(e);
         } finally {
@@ -419,6 +430,25 @@ public class JavaPropertiesReader {
             throwJavaPropertiesStreamNotFoundException();
         }
         return stream;
+    }
+
+    protected void loadProperties(Properties prop, InputStream ins) throws IOException {
+        if (_streamEncoding != null) {
+            BufferedReader br = null;
+            try {
+                br = new BufferedReader(new InputStreamReader(ins, _streamEncoding));
+                prop.load(br);
+            } finally {
+                if (br != null) {
+                    try {
+                        br.close();
+                    } catch (IOException ignored) {
+                    }
+                }
+            }
+        } else {
+            prop.load(ins);
+        }
     }
 
     protected void throwJavaPropertiesStreamNotFoundException() {

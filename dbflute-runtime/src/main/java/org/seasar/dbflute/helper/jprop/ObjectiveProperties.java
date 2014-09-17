@@ -50,6 +50,9 @@ public class ObjectiveProperties {
     /** Does it check the implicit override property? */
     protected boolean _checkImplicitOverride;
 
+    /** The encoding for stream to the properties file. (NullAllowed: if nul, use default encoding) */
+    protected String _streamEncoding; // used if set
+
     // -----------------------------------------------------
     //                                              Contents
     //                                              --------
@@ -101,6 +104,16 @@ public class ObjectiveProperties {
         return this;
     }
 
+    /**
+     * Encode the stream to the properties file as UTF-8. <br />
+     * If not use this, encoded as default encoding.
+     * @return this. (NotNull)
+     */
+    public ObjectiveProperties encodeAsUTF8() {
+        _streamEncoding = "UTF-8";
+        return this;
+    }
+
     // ===================================================================================
     //                                                                     Load Properties
     //                                                                     ===============
@@ -111,17 +124,28 @@ public class ObjectiveProperties {
      */
     public ObjectiveProperties load() {
         final String title = toTitle(_resourcePath);
-        final JavaPropertiesReader reader = new JavaPropertiesReader(title, new JavaPropertiesStreamProvider() {
-            public InputStream provideStream() throws IOException {
-                return toStream(_resourcePath);
-            }
-        });
+        final JavaPropertiesReader reader = createJavaPropertiesReader(title);
         prepareExtendsProperties(reader);
         if (_checkImplicitOverride) {
             reader.checkImplicitOverride();
         }
+        if (_streamEncoding != null) {
+            reader.encodeAs(_streamEncoding);
+        }
         _javaPropertiesResult = reader.read();
         return this;
+    }
+
+    protected JavaPropertiesReader createJavaPropertiesReader(final String title) {
+        return new JavaPropertiesReader(title, createJavaPropertiesStreamProvider());
+    }
+
+    protected JavaPropertiesStreamProvider createJavaPropertiesStreamProvider() {
+        return new JavaPropertiesStreamProvider() {
+            public InputStream provideStream() throws IOException {
+                return toStream(_resourcePath);
+            }
+        };
     }
 
     protected void prepareExtendsProperties(final JavaPropertiesReader reader) {
