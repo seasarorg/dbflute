@@ -200,7 +200,8 @@ public class DfAdditionalForeignKeyInitializer {
         // ...
         // Sorry, I forgot the detail of the reason...
         if (fk.hasFixedCondition() && !isSuppressImplicitReverseFK(foreignKeyName)) {
-            // if fixedReferrer, basically means BizOneToOne so unnecessary
+            // to suppress biz-many-to-one-like biz-one-to-one
+            // at any rate, if fixedReferrer, basically means BizOneToOne so unnecessary
             // but compatible just in case
             final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
             if (!fk.isFixedReferrer() || prop.isCompatibleFixedReferrerReverseFKAllowed()) {
