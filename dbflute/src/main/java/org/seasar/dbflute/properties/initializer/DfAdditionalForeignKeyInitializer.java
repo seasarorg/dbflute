@@ -33,6 +33,7 @@ import org.seasar.dbflute.exception.DfPropertySettingTableNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -199,7 +200,12 @@ public class DfAdditionalForeignKeyInitializer {
         // ...
         // Sorry, I forgot the detail of the reason...
         if (fk.hasFixedCondition() && !isSuppressImplicitReverseFK(foreignKeyName)) {
-            processImplicitReverseForeignKey(table, foreignTable, localColumnNameList, foreignColumnNameList);
+            // if fixedReferrer, basically means BizOneToOne so unnecessary
+            // but compatible just in case
+            final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+            if (!fk.isFixedReferrer() || prop.isCompatibleFixedReferrerReverseFKAllowed()) {
+                processImplicitReverseForeignKey(table, foreignTable, localColumnNameList, foreignColumnNameList);
+            }
         }
     }
 
@@ -339,10 +345,6 @@ public class DfAdditionalForeignKeyInitializer {
             foreignColumnNameList.add(column.getName());
         }
         return foreignColumnNameList;
-    }
-
-    protected DfAdditionalForeignKeyProperties getProperties() {
-        return DfBuildProperties.getInstance().getAdditionalForeignKeyProperties();
     }
 
     protected List<String> getLocalColumnNameList(Table table, String foreignKeyName, String foreignTableName,
@@ -518,6 +520,17 @@ public class DfAdditionalForeignKeyInitializer {
 
     protected List<Table> getTableList() {
         return getDatabase().getTableList();
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfAdditionalForeignKeyProperties getProperties() {
+        return DfBuildProperties.getInstance().getAdditionalForeignKeyProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return DfBuildProperties.getInstance().getLittleAdjustmentProperties();
     }
 
     // ===================================================================================

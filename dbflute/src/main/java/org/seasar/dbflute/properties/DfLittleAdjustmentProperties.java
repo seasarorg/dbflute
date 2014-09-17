@@ -1156,6 +1156,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isCompatibleNestSelectSetupperAlwaysGenerate", false);
     }
 
+    public boolean isCompatibleFixedReferrerReverseFKAllowed() { // closet
+        return isProperty("isCompatibleFixedReferrerReverseFKAllowed", false);
+    }
+
     // -----------------------------------------------------
     //                                      Java8 Compatible
     //                                      ----------------
