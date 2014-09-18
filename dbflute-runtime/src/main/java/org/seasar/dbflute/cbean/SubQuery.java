@@ -18,9 +18,9 @@ package org.seasar.dbflute.cbean;
 /**
  * The interface of sub-query.
  * <pre>
- * cb.query.existsBarList(new SubQuery&lt;BarCB&gt;() {
- *     public void query(BarCB subCB) {
- *         subCB.query().setBar...
+ * cb.query.existsSeaList(new SubQuery&lt;SeaCB&gt;() {
+ *     public void query(SeaCB subCB) {
+ *         subCB.query().setSea...
  *     }
  * }
  * </pre>

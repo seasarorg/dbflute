@@ -18,13 +18,13 @@ package org.seasar.dbflute.cbean;
 /**
  * The interface of specify-query.
  * <pre>
- * cb.columnQuery(new SpecifyQuery&lt;FooCB&gt;() {
- *     public void query(FooCB cb) {
- *         cb.specify().columnFoo...();
+ * cb.columnQuery(new SpecifyQuery&lt;LandCB&gt;() {
+ *     public void query(LandCB spCB) {
+ *         spCB.specify().columnLand...();
  *     }
- * }).lessThan(new SpecifyQuery&lt;FooCB&gt;() {
- *     public void query(FooCB cb) {
- *         cb.specify().columnBar...();
+ * }).lessThan(new SpecifyQuery&lt;SeaCB&gt;() {
+ *     public void query(SeaCB spCB) {
+ *         spCB.specify().columnSea...();
  *     }
  * });
  * </pre>
@@ -37,7 +37,7 @@ public interface SpecifyQuery<CB extends ConditionBean> {
      * Specify your column for query. <br />
      * Don't call the method 'setupSelect_Xxx()' and 'query()' and 'addOrderBy_Xxx...()'
      * and they are ignored if you call.
-     * @param cb The condition-bean for specification. (NotNull)
+     * @param spCB The condition-bean for specification. (NotNull)
      */
-    void specify(CB cb);
+    void specify(CB spCB);
 }

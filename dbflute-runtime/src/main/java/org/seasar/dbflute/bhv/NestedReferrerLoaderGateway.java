@@ -24,14 +24,14 @@ package org.seasar.dbflute.bhv;
  * memberBhv.load(memberList, new ReferrerLoaderHandler&lt;LoaderOfMember&gt;() {
  *     public void handle(LoaderOfMember loader) {
  *         memberBhv.load(memberList, new ReferrerConditionSetupper&lt;PurchaseCB&gt;() {
- *             public void setup(PurchaseCB cb) {
+ *             public void setup(PurchaseCB refCB) {
  *                 cb.query().addOrderBy_PurchaseDatetime_Asc();
  *             }
  *         }).<span style="color: #DD4747">withNestedReferrer</span>(new ReferrerLoaderHandler&lt;LoaderOfPurchase&gt;() {
  *             public void <span style="color: #DD4747">handle</span>(List&lt;LoaderOfPurchase&gt; loader) {
  *                 <span style="color: #3F7E5E">// you can call LoadReferrer here for nested referrer as you like it</span>
  *                 loader.loadPurchasePaymentList(new ReferrerConditionSetupper&lt;PurchasePaymentCB&gt;() {
- *                     public void setup(PurchaseDetailCB cb) {
+ *                     public void setup(PurchaseDetailCB refCB) {
  *                         ...
  *                     }
  *                 });

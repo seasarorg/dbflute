@@ -63,7 +63,7 @@ public interface ReferrerConditionSetupper<CB extends ConditionBean> {
      *     }
      * }
      * </pre>
-     * @param referrerCB The prepared instance of condition-bean. (NotNull)
+     * @param refCB The prepared instance of condition-bean for referrer table. (NotNull)
      */
-    void setup(CB referrerCB);
+    void setup(CB refCB);
 }
