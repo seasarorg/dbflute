@@ -27,11 +27,14 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -581,6 +584,124 @@ public abstract class DfAbstractHelperProperties {
         public void setDefaultValue(String defaultValue) {
             this._defaultValue = defaultValue;
         }
+    }
+
+    // ===================================================================================
+    //                                                                        Split DfProp
+    //                                                                        ============
+    protected Map<String, Object> resolveSplit(String mapName, Map<String, Object> plainDefinitionMap) {
+        Map<String, Object> splitDefinitionMap = null;
+        for (Entry<String, Object> entry : plainDefinitionMap.entrySet()) {
+            final String classificationName = entry.getKey();
+            if (isSplitMark(classificationName)) {
+                @SuppressWarnings("unchecked")
+                final Map<String, Object> splitMap = (Map<String, Object>) entry.getValue();
+                splitDefinitionMap = handleSplitDefinition(mapName, classificationName, splitMap);
+            }
+        }
+        if (splitDefinitionMap == null) {
+            return plainDefinitionMap;
+        }
+        final Map<String, Object> resolvedMap = new LinkedHashMap<String, Object>();
+        for (Entry<String, Object> entry : plainDefinitionMap.entrySet()) {
+            final String classificationName = entry.getKey();
+            if (isSplitMark(classificationName)) {
+                continue;
+            }
+            resolvedMap.put(classificationName, entry.getValue());
+        }
+        if (splitDefinitionMap != null) {
+            for (Entry<String, Object> entry : splitDefinitionMap.entrySet()) {
+                final String elementName = entry.getKey();
+                if (resolvedMap.containsKey(elementName)) {
+                    throwDfPropDefinitionDuplicateDefinitionException(mapName, elementName, null);
+                }
+                resolvedMap.put(elementName, entry.getValue());
+            }
+        }
+        return resolvedMap;
+    }
+
+    protected boolean isSplitMark(String classificationName) {
+        return classificationName.equalsIgnoreCase("$$split$$");
+    }
+
+    protected Map<String, Object> handleSplitDefinition(String mapName, String classificationName, Map<?, ?> splitMap) {
+        final Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
+        @SuppressWarnings("unchecked")
+        final Set<String> keywordSet = (Set<String>) splitMap.keySet();
+        for (String keyword : keywordSet) {
+            final Map<String, Object> splitProp = getOutsideMapProp(mapName + "_" + keyword);
+            if (splitProp.isEmpty()) {
+                throwClassificationSplitDefinitionNotFoundException(mapName, keyword);
+            }
+            for (Entry<String, Object> entry : splitProp.entrySet()) {
+                final String elementName = entry.getKey();
+                if (resultMap.containsKey(elementName)) {
+                    throwDfPropDefinitionDuplicateDefinitionException(mapName, classificationName, keyword);
+                }
+                resultMap.put(elementName, entry.getValue());
+            }
+        }
+        return resultMap;
+    }
+
+    protected void throwClassificationSplitDefinitionNotFoundException(String mapName, String keyword) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the split definition of DBFlute property.");
+        br.addItem("Advice");
+        br.addElement("Make sure the file name of your split dfprop");
+        br.addElement("or define at least one definition in the split file.");
+        br.addElement("");
+        br.addElement("For example:");
+        br.addElement("    $$split$$ = map:{");
+        br.addElement("        ; land = dummy");
+        br.addElement("        ; sea  = dummy");
+        br.addElement("    }");
+        br.addElement("");
+        br.addElement("The following files should exist:");
+        br.addElement("    dfprop/" + mapName + "_land.dfprop");
+        br.addElement("    dfprop/" + mapName + "_sea.dfprop");
+        br.addItem("DBFlute Property");
+        br.addElement(mapName);
+        br.addItem("NotFound Keyword");
+        br.addElement(keyword);
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
+    }
+
+    protected void throwDfPropDefinitionDuplicateDefinitionException(String mapName, String elementName,
+            String splitKeyword) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Found the duplicate definition.");
+        br.addItem("Advice");
+        br.addElement("The element names are unique.");
+        br.addElement("(in all split files)");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    Sea = map:{");
+        br.addElement("        ; ...");
+        br.addElement("    }");
+        br.addElement("    Sea = map:{");
+        br.addElement("        ; ...");
+        br.addElement("    }");
+        br.addElement("  (o):");
+        br.addElement("    Land = map:{");
+        br.addElement("        ; ...");
+        br.addElement("    }");
+        br.addElement("    Sea = map:{");
+        br.addElement("        ; ...");
+        br.addElement("    }");
+        br.addItem("DBFlute Property");
+        br.addElement(mapName);
+        br.addItem("Duplicate Name");
+        br.addElement(elementName);
+        if (splitKeyword != null) {
+            br.addItem("Second Definition Location");
+            br.addElement(splitKeyword);
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
     }
 
     // ===============================================================================

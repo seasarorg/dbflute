@@ -131,8 +131,12 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         }
         _classificationTopMap = newLinkedHashMap();
 
-        final String key = "torque." + KEY_classificationDefinitionMap;
-        final Map<String, Object> plainDefinitionMap = mapProp(key, DEFAULT_EMPTY_MAP);
+        final Map<String, Object> plainDefinitionMap;
+        {
+            final String mapName = KEY_classificationDefinitionMap;
+            final String propKey = "torque." + mapName;
+            plainDefinitionMap = resolveSplit(mapName, mapProp(propKey, DEFAULT_EMPTY_MAP));
+        }
         final DfClassificationLiteralArranger literalArranger = new DfClassificationLiteralArranger();
         String allInOneSql = null;
         Connection conn = null;

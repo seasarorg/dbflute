@@ -18,6 +18,7 @@ package org.seasar.dbflute.properties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -68,22 +69,31 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
             return _additionalForeignKeyMap;
         }
         _additionalForeignKeyMap = newLinkedHashMap();
-        final Map<String, Object> generatedMap = mapProp("torque." + KEY_additionalForeignKeyMap, DEFAULT_EMPTY_MAP);
-        final Set<String> fisrtKeySet = generatedMap.keySet();
-        for (Object foreignName : fisrtKeySet) { // FK Loop!
-            final Object firstValue = generatedMap.get(foreignName);
-            if (!(firstValue instanceof Map<?, ?>)) {
-                String msg = "The value type should be Map:";
-                msg = msg + " tableName=" + foreignName + " property=" + KEY_additionalForeignKeyMap;
-                msg = msg + " actualType=" + firstValue.getClass() + " actualValue=" + firstValue;
-                throw new IllegalStateException(msg);
-            }
-            final Map<?, ?> fkDefMap = (Map<?, ?>) firstValue;
-            final Set<?> secondKeySet = fkDefMap.keySet();
-            final Map<String, String> genericMap = prepareFKDefGenericMap(foreignName, fkDefMap, secondKeySet);
-            _additionalForeignKeyMap.put((String) foreignName, genericMap);
+        final String mapName = KEY_additionalForeignKeyMap;
+        final String propKey = "torque." + mapName;
+        final Map<String, Object> generatedMap = resolveSplit(mapName, mapProp(propKey, DEFAULT_EMPTY_MAP));
+        for (Entry<String, Object> entry : generatedMap.entrySet()) { // FK Loop!
+            final String foreignName = entry.getKey();
+            final Object foreignDefObj = entry.getValue();
+            checkForeignDefMap(foreignName, foreignDefObj);
+            final Map<?, ?> fkDefMap = (Map<?, ?>) foreignDefObj;
+            registerForeignKeyElement(foreignName, fkDefMap, null);
         }
         return _additionalForeignKeyMap;
+    }
+
+    protected void checkForeignDefMap(final String foreignName, final Object foreignDefObj) {
+        if (!(foreignDefObj instanceof Map<?, ?>)) {
+            String msg = "The value type should be Map:";
+            msg = msg + " tableName=" + foreignName + " property=" + KEY_additionalForeignKeyMap;
+            msg = msg + " actualType=" + foreignDefObj.getClass() + " actualValue=" + foreignDefObj;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected void registerForeignKeyElement(String foreignName, Map<?, ?> fkDefMap, String splitKeyword) {
+        final Map<String, String> genericMap = prepareFKDefGenericMap(foreignName, fkDefMap, fkDefMap.keySet());
+        _additionalForeignKeyMap.put(foreignName, genericMap);
     }
 
     protected Map<String, String> prepareFKDefGenericMap(Object foreignName, Map<?, ?> fkDefMap, Set<?> secondKeySet) {
@@ -205,7 +215,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
     public String findFixedReferrer(String foreignKeyName) {
         return doFindAttributeValue(foreignKeyName, KEY_FIXED_REFERRER);
     }
-    
+
     public String findComment(String foreignKeyName) {
         return doFindAttributeValue(foreignKeyName, KEY_COMMENT);
     }

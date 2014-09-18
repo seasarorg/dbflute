@@ -199,13 +199,21 @@ public class DfAdditionalForeignKeyInitializer {
         // ...
         // ...
         // Sorry, I forgot the detail of the reason...
-        if (fk.hasFixedCondition() && !isSuppressImplicitReverseFK(foreignKeyName)) {
-            // to suppress biz-many-to-one-like biz-one-to-one
-            // at any rate, if fixedReferrer, basically means BizOneToOne so unnecessary
-            // but compatible just in case
-            final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-            if (!fk.isFixedReferrer() || prop.isCompatibleFixedReferrerReverseFKAllowed()) {
-                processImplicitReverseForeignKey(table, foreignTable, localColumnNameList, foreignColumnNameList);
+        // ...
+        // ...
+        // (2014/09/18)
+        // actually, no problem for generation if suppressed
+        // so suppressed (deprecated) as default since 1.1
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        if (prop.isCompatibleBizOneToOneImplicitReverseFkAllowed()) { // basically false since 1.1
+            if (fk.hasFixedCondition() && !isSuppressImplicitReverseFK(foreignKeyName)) {
+                // to suppress biz-many-to-one-like biz-one-to-one
+                // at any rate, if fixedReferrer, basically means BizOneToOne so unnecessary
+                // but compatible just in case
+                if (!fk.isFixedReferrer()) {
+                    processImplicitReverseForeignKey(fk, table, foreignTable, localColumnNameList,
+                            foreignColumnNameList);
+                }
             }
         }
     }
@@ -226,13 +234,13 @@ public class DfAdditionalForeignKeyInitializer {
         }
     }
 
-    protected void processImplicitReverseForeignKey(Table table, Table foreignTable, List<String> localColumnNameList,
-            List<String> foreignColumnNameList) { // called only when a fixed condition exists
+    protected void processImplicitReverseForeignKey(ForeignKey correspondingFk, Table table, Table foreignTable,
+            List<String> localColumnNameList, List<String> foreignColumnNameList) { // called only when a fixed condition exists
         // name is "FK_ + foreign + local" because it's reversed
         final String localTableName = table.getTableDbName();
         final String foreignTableName = foreignTable.getTableDbName();
         final String reverseName = buildReverseFKName(localTableName, foreignTableName);
-        final String comment = "This relation is auto-detected as implicit reverse FK.";
+        final String comment = "Implicit Reverse FK to " + correspondingFk.getName();
         final List<Column> primaryKey = table.getPrimaryKey();
         if (localColumnNameList.size() != primaryKey.size()) {
             return; // may be biz-many-to-one (not biz-one-to-one)
