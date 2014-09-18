@@ -638,7 +638,7 @@ public abstract class DfAbstractHelperProperties {
             for (Entry<String, Object> entry : splitProp.entrySet()) {
                 final String elementName = entry.getKey();
                 if (resultMap.containsKey(elementName)) {
-                    throwDfPropDefinitionDuplicateDefinitionException(mapName, classificationName, keyword);
+                    throwDfPropDefinitionDuplicateDefinitionException(mapName, elementName, keyword);
                 }
                 resultMap.put(elementName, entry.getValue());
             }
@@ -664,19 +664,18 @@ public abstract class DfAbstractHelperProperties {
         br.addElement("    dfprop/" + mapName + "_sea.dfprop");
         br.addItem("DBFlute Property");
         br.addElement(mapName);
-        br.addItem("NotFound Keyword");
+        br.addItem("Split Keyword");
         br.addElement(keyword);
         final String msg = br.buildExceptionMessage();
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    protected void throwDfPropDefinitionDuplicateDefinitionException(String mapName, String elementName,
-            String splitKeyword) {
+    protected void throwDfPropDefinitionDuplicateDefinitionException(String mapName, String elementName, String keyword) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Found the duplicate definition.");
         br.addItem("Advice");
-        br.addElement("The element names are unique.");
-        br.addElement("(in all split files)");
+        br.addElement("The element names should be unique.");
+        br.addElement("(in all split files if split)");
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    Sea = map:{");
@@ -694,12 +693,12 @@ public abstract class DfAbstractHelperProperties {
         br.addElement("    }");
         br.addItem("DBFlute Property");
         br.addElement(mapName);
+        if (keyword != null) {
+            br.addItem("Duplicate Found Location");
+            br.addElement(keyword);
+        }
         br.addItem("Duplicate Name");
         br.addElement(elementName);
-        if (splitKeyword != null) {
-            br.addItem("Second Definition Location");
-            br.addElement(splitKeyword);
-        }
         final String msg = br.buildExceptionMessage();
         throw new DfIllegalPropertySettingException(msg);
     }
