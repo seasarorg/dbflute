@@ -1211,6 +1211,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isCompatibleBizOneToOneImplicitReverseFkAllowed", isCompatibleBeforeJava8());
     }
 
+    public boolean isCompatibleDfPropDuplicateEntryIgnored() { // closet
+        return isProperty("isCompatibleDfPropDuplicateEntryIgnored", isCompatibleBeforeJava8());
+    }
+
     public boolean isCompatibleBeforeJava8() { // closet
         final boolean defaultValue = getLanguageDependency().getLanguageImplStyle().isCompatibleBeforeJava8();
         return isProperty("isCompatibleBeforeJava8", defaultValue);

@@ -28,12 +28,48 @@ public class DfOutsideListPropReader {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfPropFile _dfpropFile = new DfPropFile();
+    protected final DfPropFile _dfpropFile = createDfPropFile();
+    protected boolean _returnsNullIfNotFound;
+    protected boolean _skipLineSeparator;
 
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
     public List<Object> readList(String path, String environmentType) {
         return _dfpropFile.readList(path, environmentType);
+    }
+
+    // ===================================================================================
+    //                                                                         DfProp File
+    //                                                                         ===========
+    protected DfPropFile createDfPropFile() {
+        final DfPropFile file = newDfPropFile();
+        if (_returnsNullIfNotFound) {
+            file.returnsNullIfNotFound();
+
+        }
+        if (_skipLineSeparator) {
+            file.skipLineSeparator();
+        }
+        // #later fixedly true since java8
+        //file.checkDuplicateEntry();
+        return file;
+    }
+
+    protected DfPropFile newDfPropFile() {
+        return new DfPropFile();
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public DfOutsideListPropReader returnsNullIfNotFound() {
+        _returnsNullIfNotFound = true;
+        return this;
+    }
+
+    public DfOutsideListPropReader skipLineSeparator() {
+        _skipLineSeparator = true;
+        return this;
     }
 }

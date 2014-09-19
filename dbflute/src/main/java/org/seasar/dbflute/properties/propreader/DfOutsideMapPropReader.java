@@ -28,13 +28,9 @@ public class DfOutsideMapPropReader {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final DfPropFile _dfpropFile = createDfPropFile();
     protected boolean _returnsNullIfNotFound;
     protected boolean _skipLineSeparator;
-
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected final DfPropFile _dfpropFile = createDfPropFile();
 
     // ===================================================================================
     //                                                                                Read
@@ -82,6 +78,8 @@ public class DfOutsideMapPropReader {
         if (_skipLineSeparator) {
             file.skipLineSeparator();
         }
+        // #later fixedly true since java8
+        file.checkDuplicateEntry();
         return file;
     }
 
