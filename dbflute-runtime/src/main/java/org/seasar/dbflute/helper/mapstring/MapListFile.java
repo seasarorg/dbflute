@@ -49,6 +49,7 @@ public class MapListFile {
     protected final String _fileEncoding;
     protected final String _lineCommentMark;
     protected boolean _skipLineSeparator;
+    protected boolean _checkDuplicateEntry;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -319,11 +320,20 @@ public class MapListFile {
         return this;
     }
 
+    public MapListFile checkDuplicateEntry() {
+        _checkDuplicateEntry = true;
+        return this;
+    }
+
     // ===================================================================================
     //                                                                     Map List String
     //                                                                     ===============
     protected MapListString createMapListString() {
-        return new MapListString();
+        final MapListString mapListString = new MapListString();
+        if (_checkDuplicateEntry) {
+            mapListString.checkDuplicateEntry();
+        }
+        return mapListString;
     }
 
     // ===================================================================================

@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.exception.MapListStringDuplicateEntryException;
 import org.seasar.dbflute.exception.MapListStringParseFailureException;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
@@ -176,6 +177,97 @@ public class MapListStringTest extends PlainTestCase {
 
         // ## Assert ##
         showGeneratedMap(generatedMap);
+    }
+
+    // -----------------------------------------------------
+    //                                             Duplicate
+    //                                             ---------
+    public void test_generateMap_duplicate_basic() throws Exception {
+        // ## Arrange ##
+        final MapListString maplist = new MapListString();
+        final String mapString = "map:{key1=value1;key2=value2;key1=value3}";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = maplist.generateMap(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals("value3", resultMap.get("key1"));
+        assertEquals("value2", resultMap.get("key2"));
+    }
+
+    public void test_generateMap_duplicate_nested() throws Exception {
+        // ## Arrange ##
+        final MapListString maplist = new MapListString();
+        final String mapString = "map:{key1=value1;key1=map:{key1=value2;key2=value3;key2=value4};key3=value3}";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = maplist.generateMap(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals(newHashMap("key1", "value2", "key2", "value4"), resultMap.get("key1"));
+        assertEquals("value3", resultMap.get("key3"));
+    }
+
+    public void test_generateMap_duplicate_checked_basic() throws Exception {
+        // ## Arrange ##
+        final MapListString maplist = new MapListString().checkDuplicateEntry();
+        final String mapString = "map:{key1=value1;key2=map:{key1=value2;key2=value3;key2=value4};key1=value3}";
+
+        // ## Act ##
+        try {
+            maplist.generateMap(mapString);
+            // ## Assert ##
+            fail();
+        } catch (MapListStringDuplicateEntryException e) {
+            log(e.getMessage());
+        }
+    }
+
+    public void test_generateMap_duplicate_checked_list() throws Exception {
+        // ## Arrange ##
+        final MapListString maplist = new MapListString().checkDuplicateEntry();
+        final String mapString = "map:{key1=value1;key1=list:{a;b;c};key3=value3}";
+
+        // ## Act ##
+        try {
+            maplist.generateMap(mapString);
+            // ## Assert ##
+            fail();
+        } catch (MapListStringDuplicateEntryException e) {
+            log(e.getMessage());
+        }
+    }
+
+    public void test_generateMap_duplicate_checked_map() throws Exception {
+        // ## Arrange ##
+        final MapListString maplist = new MapListString().checkDuplicateEntry();
+        final String mapString = "map:{key1=value1;key1=map:{key1=value2;key2=value3;key2=value4};key3=value3}";
+
+        // ## Act ##
+        try {
+            maplist.generateMap(mapString);
+            // ## Assert ##
+            fail();
+        } catch (MapListStringDuplicateEntryException e) {
+            log(e.getMessage());
+        }
+    }
+
+    public void test_generateMap_duplicate_checked_nested() throws Exception {
+        // ## Arrange ##
+        final MapListString maplist = new MapListString().checkDuplicateEntry();
+        final String mapString = "map:{key1=value1;key2=map:{key1=value2;key2=value3;key2=value4};key3=value3}";
+
+        // ## Act ##
+        try {
+            maplist.generateMap(mapString);
+            // ## Assert ##
+            fail();
+        } catch (MapListStringDuplicateEntryException e) {
+            log(e.getMessage());
+        }
     }
 
     // -----------------------------------------------------

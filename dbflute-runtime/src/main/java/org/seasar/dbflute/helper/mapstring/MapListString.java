@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.seasar.dbflute.exception.MapListStringDuplicateEntryException;
 import org.seasar.dbflute.exception.MapListStringParseFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 
@@ -71,6 +72,9 @@ public class MapListString {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                             Component
+    //                                             ---------
     /** The mark of map. (NotNull: but changeable) */
     protected String _mapMark;
 
@@ -92,11 +96,20 @@ public class MapListString {
     /** The escape character for control marks. (NotNull) */
     protected final String _escapeChar;
 
+    // -----------------------------------------------------
+    //                                             Temporary
+    //                                             ---------
     /** The string of top (full) string as temporary variable for generation. (NullAllowed: depends on process) */
     protected String _topString;
 
     /** The string of remainder as temporary variable for generation. (NullAllowed: depends on process) */
     protected String _remainderString;
+
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
+    /** Does it check duplicate entry of map? */
+    protected boolean _checkDuplicateEntry;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -319,7 +332,7 @@ public class MapListString {
             if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex) { // delimiter exists
                 // e.g. value1 ; key2=value2}
                 final String mapValue = _remainderString.substring(0, delimiterIndex);
-                currentMap.put(filterMapListKey(mapKey), filterMapListValue(mapValue));
+                registerToMap(currentMap, filterMapListKey(mapKey), filterMapListValue(mapValue));
 
                 // because the map element continues since the delimiter,
                 // skip the delimiter and continue the loop
@@ -329,7 +342,7 @@ public class MapListString {
 
             // e.g. value1} ; key2=value2}
             final String mapValue = _remainderString.substring(0, endBraceIndex);
-            currentMap.put(filterMapListKey(mapKey), filterMapListValue(mapValue));
+            registerToMap(currentMap, filterMapListKey(mapKey), filterMapListValue(mapValue));
 
             // analyzing map is over, so close and return.
             closeByEndBraceIndex(endBraceIndex);
@@ -702,7 +715,7 @@ public class MapListString {
      */
     protected Map<String, Object> setupNestMap(Map<String, Object> currentMap, String mapKey) {
         final Map<String, Object> nestMap = newStringObjectMap();
-        currentMap.put(filterMapListKey(mapKey), nestMap);
+        registerToMap(currentMap, filterMapListKey(mapKey), nestMap);
         return nestMap;
     }
 
@@ -725,7 +738,7 @@ public class MapListString {
      */
     protected List<Object> setupNestList(Map<String, Object> currentMap, String mapKey) {
         final List<Object> nestList = newObjectList();
-        currentMap.put(filterMapListKey(mapKey), nestList);
+        registerToMap(currentMap, filterMapListKey(mapKey), nestList);
         return nestList;
     }
 
@@ -754,6 +767,46 @@ public class MapListString {
      */
     protected List<Object> newObjectList() {
         return new ArrayList<Object>();
+    }
+
+    // ===================================================================================
+    //                                                                    Map Registration
+    //                                                                    ================
+    protected void registerToMap(Map<String, Object> currentMap, String key, Object element) {
+        doCheckDuplicateEntryIfNeeds(currentMap, key, element);
+        currentMap.put(key, element);
+    }
+
+    protected void doCheckDuplicateEntryIfNeeds(Map<String, Object> currentMap, String key, Object element) {
+        if (isCheckDuplicateEntry()) {
+            if (currentMap.containsKey(key)) {
+                throwMapStringDuplicateEntryFoundException(currentMap, key, element);
+            }
+        }
+    }
+
+    protected void throwMapStringDuplicateEntryFoundException(Map<String, Object> currentMap, String key, Object element) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Duplicate entry in the map string.");
+        br.addItem("MapList String");
+        br.addElement(_topString);
+        br.addItem("Already Registered Entry");
+        br.addElement(key);
+        br.addElement(currentMap.get(key));
+        br.addItem("New Duplicate Entry");
+        br.addElement(key);
+        if (element instanceof Map<?, ?>) {
+            // might be lazy registered so might be empty (then not show)
+            final Map<?, ?> map = (Map<?, ?>) element;
+            if (!map.isEmpty()) {
+                br.addElement(map);
+            }
+        } else {
+            br.addElement(element);
+        }
+        prepareControlMarkMessage(br);
+        final String msg = br.buildExceptionMessage();
+        throw new MapListStringDuplicateEntryException(msg);
     }
 
     // ===================================================================================
@@ -1126,5 +1179,21 @@ public class MapListString {
 
     public void setEqual(String equal) {
         _equal = equal;
+    }
+
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
+    /**
+     * Check duplicate entry of map. (throws exception if found)
+     * @return this;
+     */
+    public MapListString checkDuplicateEntry() {
+        _checkDuplicateEntry = true;
+        return this;
+    }
+
+    public boolean isCheckDuplicateEntry() {
+        return _checkDuplicateEntry;
     }
 }

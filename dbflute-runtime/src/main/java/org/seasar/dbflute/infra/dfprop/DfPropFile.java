@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.exception.DfPropFileReadFailureException;
+import org.seasar.dbflute.exception.MapListStringDuplicateEntryException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.mapstring.MapListFile;
 import org.seasar.dbflute.util.Srl;
@@ -41,6 +42,7 @@ public class DfPropFile {
     //                                                                           =========
     protected boolean _returnsNullIfNotFound;
     protected boolean _skipLineSeparator;
+    protected boolean _checkDuplicateEntry;
 
     // ===================================================================================
     //                                                                                 Map
@@ -112,7 +114,38 @@ public class DfPropFile {
     }
 
     protected Map<String, Object> actuallyReadMap(String path) throws FileNotFoundException, IOException {
-        return createMapListFileStructural().readMap(createInputStream(path));
+        try {
+            return createMapListFileStructural().readMap(createInputStream(path));
+        } catch (MapListStringDuplicateEntryException e) {
+            throwDfPropDuplicateEntryException(path, e);
+            return null; // unreachable
+        }
+    }
+
+    protected void throwDfPropDuplicateEntryException(String path, MapListStringDuplicateEntryException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Duplicate entry in the map file.");
+        br.addItem("Advice");
+        br.addElement("The entry keys in the map string should be unique.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    Sea = map:{");
+        br.addElement("        ; ...");
+        br.addElement("    }");
+        br.addElement("    Sea = map:{");
+        br.addElement("        ; ...");
+        br.addElement("    }");
+        br.addElement("  (o):");
+        br.addElement("    Land = map:{");
+        br.addElement("        ; ...");
+        br.addElement("    }");
+        br.addElement("    Sea = map:{");
+        br.addElement("        ; ...");
+        br.addElement("    }");
+        br.addItem("DfProp Path");
+        br.addElement(path);
+        final String msg = br.buildExceptionMessage();
+        throw new DfPropFileReadFailureException(msg, e);
     }
 
     /**
@@ -145,7 +178,12 @@ public class DfPropFile {
     }
 
     protected Map<String, String> actuallyReadMapAsStringValue(String path) throws FileNotFoundException, IOException {
-        return createMapListFileStructural().readMapAsStringValue(createInputStream(path));
+        try {
+            return createMapListFileStructural().readMapAsStringValue(createInputStream(path));
+        } catch (MapListStringDuplicateEntryException e) {
+            throwDfPropDuplicateEntryException(path, e);
+            return null; // unreachable
+        }
     }
 
     /**
@@ -179,7 +217,12 @@ public class DfPropFile {
 
     protected Map<String, List<String>> actuallyReadMapAsStringListValue(String path) throws FileNotFoundException,
             IOException {
-        return createMapListFileStructural().readMapAsStringListValue(createInputStream(path));
+        try {
+            return createMapListFileStructural().readMapAsStringListValue(createInputStream(path));
+        } catch (MapListStringDuplicateEntryException e) {
+            throwDfPropDuplicateEntryException(path, e);
+            return null; // unreachable
+        }
     }
 
     /**
@@ -213,7 +256,12 @@ public class DfPropFile {
 
     protected Map<String, Map<String, String>> actuallyReadMapAsStringMapValue(String path)
             throws FileNotFoundException, IOException {
-        return createMapListFileStructural().readMapAsStringMapValue(createInputStream(path));
+        try {
+            return createMapListFileStructural().readMapAsStringMapValue(createInputStream(path));
+        } catch (MapListStringDuplicateEntryException e) {
+            throwDfPropDuplicateEntryException(path, e);
+            return null; // unreachable
+        }
     }
 
     // ===================================================================================
@@ -248,7 +296,12 @@ public class DfPropFile {
     }
 
     protected List<Object> actuallyReadList(String path) throws FileNotFoundException, IOException {
-        return createMapListFileStructural().readList(createInputStream(path));
+        try {
+            return createMapListFileStructural().readList(createInputStream(path));
+        } catch (MapListStringDuplicateEntryException e) {
+            throwDfPropDuplicateEntryException(path, e);
+            return null; // unreachable
+        }
     }
 
     // ===================================================================================
@@ -455,7 +508,7 @@ public class DfPropFile {
         return new FileInputStream(path);
     }
 
-    protected void throwDfPropFileReadFailureException(String path, Exception e) {
+    protected void throwDfPropFileReadFailureException(String path, IOException e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to read the DBFlute property file.");
         br.addItem("Advice");
@@ -471,11 +524,15 @@ public class DfPropFile {
     //                                                                       Map List File
     //                                                                       =============
     protected MapListFile createMapListFilePlain() {
-        return newMapListFile();
+        final MapListFile mapListFile = newMapListFile();
+        if (_checkDuplicateEntry) {
+            mapListFile.checkDuplicateEntry();
+        }
+        return mapListFile;
     }
 
     protected MapListFile createMapListFileStructural() {
-        final MapListFile file = newMapListFile();
+        final MapListFile file = createMapListFilePlain();
         if (_skipLineSeparator) {
             file.skipLineSeparator();
         }
@@ -506,6 +563,11 @@ public class DfPropFile {
 
     public DfPropFile skipLineSeparator() {
         _skipLineSeparator = true;
+        return this;
+    }
+
+    public DfPropFile checkDuplicateEntry() {
+        _checkDuplicateEntry = true;
         return this;
     }
 }
