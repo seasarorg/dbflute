@@ -78,7 +78,6 @@ public class DfOutsideMapPropReader {
         if (_skipLineSeparator) {
             file.skipLineSeparator();
         }
-        // #later fixedly true since java8
         file.checkDuplicateEntry();
         return file;
     }

@@ -46,13 +46,11 @@ public class DfOutsideListPropReader {
         final DfPropFile file = newDfPropFile();
         if (_returnsNullIfNotFound) {
             file.returnsNullIfNotFound();
-
         }
         if (_skipLineSeparator) {
             file.skipLineSeparator();
         }
-        // #later fixedly true since java8
-        //file.checkDuplicateEntry();
+        file.checkDuplicateEntry();
         return file;
     }
 
