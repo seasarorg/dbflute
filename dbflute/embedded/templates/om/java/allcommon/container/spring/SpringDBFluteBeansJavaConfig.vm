@@ -15,6 +15,7 @@
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public class ${glDBFluteBeansJavaConfig} {
     @Autowired
     protected ApplicationContext _container;
 
-    @Autowired
+    @Resource(name="${database.DBFluteBeansDataSourceName}")
     protected DataSource dataSource;
 
     @Autowired
@@ -66,44 +67,65 @@ public class ${glDBFluteBeansJavaConfig} {
 
     @Bean(name="${database.invokerAssistantComponentName}")
     public InvokerAssistant createImplementedInvokerAssistant() {
-        ${glImplementedInvokerAssistant} assistant = new ${database.implementedInvokerAssistantClass}();
+        ${glImplementedInvokerAssistant} assistant = newImplementedInvokerAssistant();
         assistant.setDataSource(dataSource);
         return assistant;
     }
 
+    protected ${glImplementedInvokerAssistant} newImplementedInvokerAssistant() {
+        return new ${database.implementedInvokerAssistantClass}();
+    }
+
     @Bean(name="${database.behaviorCommandInvokerComponentName}")
     public BehaviorCommandInvoker createBehaviorCommandInvoker() {
-        BehaviorCommandInvoker invoker = new BehaviorCommandInvoker();
+        BehaviorCommandInvoker invoker = newBehaviorCommandInvoker();
         invoker.setInvokerAssistant(invokerAssistant);
         return invoker;
     }
 
+    protected BehaviorCommandInvoker newBehaviorCommandInvoker() {
+        return new BehaviorCommandInvoker();
+    }
+
     @Bean(name="${database.behaviorSelectorComponentName}")
     public ${glImplementedBehaviorSelector} createImplementedBehaviorSelector() {
-        ${glImplementedBehaviorSelector} selector = new ${glImplementedBehaviorSelector}();
+        ${glImplementedBehaviorSelector} selector = newImplementedBehaviorSelector();
         selector.setContainer(_container);
         return selector;
     }
 
-    @Bean(name="${database.commonColumnAutoSetupperComponentName}")
-    public ${glImplementedCommonColumnAutoSetupper} createImplementedCommonColumnAutoSetupper() {
-        return new ${database.implementedCommonColumnAutoSetupperClass}();
+    protected ${glImplementedBehaviorSelector} newImplementedBehaviorSelector() {
+        return new ${glImplementedBehaviorSelector}();
     }
 
+    @Bean(name="${database.commonColumnAutoSetupperComponentName}")
+    public ${glImplementedCommonColumnAutoSetupper} createImplementedCommonColumnAutoSetupper() {
+        return newImplementedCommonColumnAutoSetupper();
+    }
+
+    protected ${glImplementedCommonColumnAutoSetupper} newImplementedCommonColumnAutoSetupper() {
+        return new ${glImplementedCommonColumnAutoSetupper}();
+    }
+
+#set ($behaviorLoopIndex = 0)
+#foreach ($table in $database.behaviorTableList)
+#if ($behaviorLoopIndex == 0)
     // ===================================================================================
     //                                                                            Behavior
     //                                                                            ========
-#foreach ($table in $database.behaviorTableList)
+#else
 
+#end
     @Bean(name={"${table.behaviorComponentName}"})
     public ${table.extendedBehaviorClassName} create${table.extendedBehaviorClassName}() {
-        ${table.extendedBehaviorClassName} bhv = new ${table.extendedBehaviorClassName}();
-#if ($table.isWritable())
-        bhv.setBehaviorCommandInvoker(behaviorCommandInvoker); bhv.setBehaviorSelector(behaviorSelector); bhv.setCommonColumnAutoSetupper(commonColumnAutoSetupper);
-#else
+        ${table.extendedBehaviorClassName} bhv = new${table.extendedBehaviorClassName}();
         bhv.setBehaviorCommandInvoker(behaviorCommandInvoker); bhv.setBehaviorSelector(behaviorSelector);
+#if ($table.isWritable())
+        bhv.setCommonColumnAutoSetupper(commonColumnAutoSetupper);
 #end
         return bhv;
     }
+    protected ${table.extendedBehaviorClassName} new${table.extendedBehaviorClassName}() { return new ${table.extendedBehaviorClassName}(); }
+#set ($behaviorLoopIndex = $behaviorLoopIndex + 1)
 #end
 }
