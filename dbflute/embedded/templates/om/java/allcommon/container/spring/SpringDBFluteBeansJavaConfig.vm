@@ -1,0 +1,109 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Bean;
+import org.seasar.dbflute.BehaviorSelector;
+import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
+import org.seasar.dbflute.bhv.core.InvokerAssistant;
+import ${database.DBFluteInitializerClass};
+import ${glPackageExtendedBhv}.*;
+
+/**
+ * @author ${database.classAuthor}
+ */
+@Configuration
+public class ${glDBFluteBeansJavaConfig} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    // *according to dependency order
+    @Autowired
+    protected ApplicationContext _container;
+
+    @Autowired
+    protected DataSource dataSource;
+
+    @Autowired
+    protected InvokerAssistant invokerAssistant;
+
+    @Autowired
+    protected BehaviorCommandInvoker behaviorCommandInvoker;
+
+    @Autowired
+    protected BehaviorSelector behaviorSelector;
+
+    @Autowired
+    protected CommonColumnAutoSetupper commonColumnAutoSetupper;
+
+    // ===================================================================================
+    //                                                                   Runtime Component
+    //                                                                   =================
+    @Bean(name="${database.DBFluteInitializerComponentName}")
+    public ${glDBFluteInitializer} createDBFluteInitializer() {
+        return new ${glDBFluteInitializer}(dataSource);
+    }
+
+    @Bean(name="${database.invokerAssistantComponentName}")
+    public InvokerAssistant createImplementedInvokerAssistant() {
+        ${glImplementedInvokerAssistant} assistant = new ${database.implementedInvokerAssistantClass}();
+        assistant.setDataSource(dataSource);
+        return assistant;
+    }
+
+    @Bean(name="${database.behaviorCommandInvokerComponentName}")
+    public BehaviorCommandInvoker createBehaviorCommandInvoker() {
+        BehaviorCommandInvoker invoker = new BehaviorCommandInvoker();
+        invoker.setInvokerAssistant(invokerAssistant);
+        return invoker;
+    }
+
+    @Bean(name="${database.behaviorSelectorComponentName}")
+    public ${glImplementedBehaviorSelector} createImplementedBehaviorSelector() {
+        ${glImplementedBehaviorSelector} selector = new ${glImplementedBehaviorSelector}();
+        selector.setContainer(_container);
+        return selector;
+    }
+
+    @Bean(name="${database.commonColumnAutoSetupperComponentName}")
+    public ${glImplementedCommonColumnAutoSetupper} createImplementedCommonColumnAutoSetupper() {
+        return new ${database.implementedCommonColumnAutoSetupperClass}();
+    }
+
+    // ===================================================================================
+    //                                                                            Behavior
+    //                                                                            ========
+#foreach ($table in $database.behaviorTableList)
+
+    @Bean(name={"${table.behaviorComponentName}"})
+    public ${table.extendedBehaviorClassName} create${table.extendedBehaviorClassName}() {
+        ${table.extendedBehaviorClassName} bhv = new ${table.extendedBehaviorClassName}();
+#if ($table.isWritable())
+        bhv.setBehaviorCommandInvoker(behaviorCommandInvoker); bhv.setBehaviorSelector(behaviorSelector); bhv.setCommonColumnAutoSetupper(commonColumnAutoSetupper);
+#else
+        bhv.setBehaviorCommandInvoker(behaviorCommandInvoker); bhv.setBehaviorSelector(behaviorSelector);
+#end
+        return bhv;
+    }
+#end
+}

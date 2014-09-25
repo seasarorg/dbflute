@@ -223,6 +223,11 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
         return prop != null ? prop : "";
     }
 
+    public boolean isDBFluteBeansGeneratedAsJavaConfig() { // Java Only
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return isProperty("isDBFluteBeansGeneratedAsJavaConfig", !prop.isCompatibleBeforeJava8());
+    }
+
     // ===================================================================================
     //                                                             Quill DataSource(Quill)
     //                                                             =======================

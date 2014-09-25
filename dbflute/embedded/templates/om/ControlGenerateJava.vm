@@ -62,6 +62,7 @@ $database.checkProperties()
 #set ($glCustomizerDiconFileName = "${database.DBFluteCustomizerDiconFileName}")
 #set ($glJ2eeDiconResourceName = "${database.j2eeDiconResourceName}")
 #set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
+#set ($glDBFluteBeansJavaConfig = "${glProjectPrefix}DBFluteBeansJavaConfig")
 #set ($glDBFluteModule = "${glProjectPrefix}DBFluteModule")
 
 ## ===================================================================================
@@ -184,6 +185,11 @@ $database.info("public void parseContainerConfig() {")
 #end
 #end
 #if ($database.isTargetContainerSpring())
+#if ($database.isDBFluteBeansGeneratedAsJavaConfig())
+  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteBeansJavaConfig}.${glClassFileExtension}" )
+  $database.info("    parse('${path}')")
+  $generator.parse("om/${glResourceDirectory}/allcommon/container/spring/SpringDBFluteBeansJavaConfig.${glTemplateFileExtension}", $path, "", "")
+#else
   #foreach ($dbfluteBeansPackageName in $database.DBFluteBeansPackageNameList)
   #set ($path = "${dbfluteBeansPackageName}" )
   $database.makeDirectory($path)
@@ -192,6 +198,7 @@ $database.info("public void parseContainerConfig() {")
   $database.info("    parse('${path}')")
   $generator.parse("om/${glResourceDirectory}/allcommon/container/spring/SpringDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
   #end
+#end
 #end
 #if ($database.isTargetContainerLucy())
   #foreach ($dbfluteBeansPackageName in $database.DBFluteBeansPackageNameList)

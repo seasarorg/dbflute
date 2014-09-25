@@ -1683,6 +1683,10 @@ public class Database {
         return filePath;
     }
 
+    public boolean isDBFluteBeansGeneratedAsJavaConfig() {
+        return getProperties().getDependencyInjectionProperties().isDBFluteBeansGeneratedAsJavaConfig();
+    }
+
     // -----------------------------------------------------
     //                                                 Guice
     //                                                 -----
