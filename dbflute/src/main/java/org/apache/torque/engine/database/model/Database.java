@@ -2055,7 +2055,7 @@ public class Database {
     }
 
     public boolean isCompatibleInsertColumnNotNullOnly() {
-        return getLittleAdjustmentProperties().isCompatibleBatchUpdateDefaultEveryColumn();
+        return getLittleAdjustmentProperties().isCompatibleInsertColumnNotNullOnly();
     }
 
     public boolean isCompatibleBatchInsertDefaultEveryColumn() {
