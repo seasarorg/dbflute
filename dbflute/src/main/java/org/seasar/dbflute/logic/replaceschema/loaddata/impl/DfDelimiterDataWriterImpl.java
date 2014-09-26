@@ -114,6 +114,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         final List<String> columnNameList = new ArrayList<String>();
         final List<String> additionalColumnList = new ArrayList<String>();
         final List<String> valueList = new ArrayList<String>();
+        final boolean canBatchUpdate = !isMergedSuppressBatchUpdate(dataDirectory);
 
         final File dataFile = new File(_fileName);
         Connection conn = null;
@@ -217,8 +218,9 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     conn = _dataSource.getConnection();
                 }
                 if (ps == null) {
+                    beginTransaction(conn); // for performance (suppress implicit transaction per SQL)
                     executedSql = sqlBuilder.buildSql();
-                    ps = conn.prepareStatement(executedSql);
+                    ps = prepareStatement(conn, executedSql);
                 }
                 final Map<String, Object> columnValueMap = sqlBuilder.setupParameter();
                 final Set<String> sysdateColumnSet = sqlBuilder.getSysdateColumnSet();
@@ -260,18 +262,22 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                             columnMetaMap, rowNumber);
                     bindCount++;
                 }
-                if (isMergedSuppressBatchUpdate(dataDirectory)) {
-                    ps.execute();
-                } else {
+                if (canBatchUpdate) { // mainly here
                     ps.addBatch();
-                    ++addedBatchSize;
-                    if (addedBatchSize == 100000) {
+                } else {
+                    ps.execute();
+                }
+                ++addedBatchSize;
+                if (isBatchSizeLimit(addedBatchSize)) { // transaction scope
+                    if (canBatchUpdate) { // mainly here
                         // this is supported in only delimiter data writer
                         // because delimiter data can treat large data
                         ps.executeBatch(); // to avoid OutOfMemory
-                        ps.clearBatch(); // for next batch
-                        addedBatchSize = 0;
                     }
+                    commitTransaction(conn);
+                    addedBatchSize = 0;
+                    close(ps);
+                    ps = null;
                 }
                 // *one record is finished here
 
@@ -282,7 +288,10 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 preContinueString = null;
             }
             if (ps != null && addedBatchSize > 0) {
-                ps.executeBatch();
+                if (canBatchUpdate) { // mainly here
+                    ps.executeBatch();
+                }
+                commitTransaction(conn);
             }
             noticeLoadedRowSize(tableDbName, rowNumber);
             checkImplicitClassification(dataFile, tableDbName, columnNameList);
@@ -314,25 +323,72 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 if (br != null) {
                     br.close();
                 }
-            } catch (java.io.IOException ignored) {
-                _log.warn("File-close threw the exception: ", ignored);
+            } catch (IOException continued) {
+                _log.warn("File-close threw the exception: ", continued);
             }
-            if (ps != null) {
-                try {
-                    ps.close();
-                } catch (SQLException ignored) {
-                    _log.info("Statement.close() threw the exception!", ignored);
-                }
-            }
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignored) {
-                    _log.info("Connection.close() threw the exception!", ignored);
-                }
-            }
+            commitJustInCase(conn);
+            close(ps);
+            close(conn);
             // process after (finally) handling table
             finallyHandlingTable(tableDbName, columnMetaMap);
+        }
+    }
+
+    protected void beginTransaction(Connection conn) throws SQLException {
+        conn.setAutoCommit(false);
+    }
+
+    protected PreparedStatement prepareStatement(Connection conn, String executedSql) throws SQLException {
+        return conn.prepareStatement(executedSql);
+    }
+
+    protected boolean isBatchSizeLimit(int addedBatchSize) {
+        return addedBatchSize == 100000;
+    }
+
+    protected void commitTransaction(Connection conn) throws SQLException {
+        conn.commit();
+    }
+
+    protected void commitJustInCase(Connection conn) {
+        final Boolean autoCommit = getAutoCommit(conn);
+        if (autoCommit != null && !autoCommit) { // basically no way, just in case
+            try {
+                commitTransaction(conn);
+            } catch (SQLException continued) {
+                _log.warn("Failed to commit the transaction.", continued);
+            }
+        }
+    }
+
+    protected Boolean getAutoCommit(Connection conn) {
+        Boolean autoCommit = null;
+        try {
+            autoCommit = conn != null ? conn.getAutoCommit() : null;
+        } catch (SQLException continued) {
+            // because it is possible that the connection would have already closed
+            _log.warn("Connection#getAutoCommit() said: " + continued.getMessage());
+        }
+        return autoCommit;
+    }
+
+    protected void close(PreparedStatement ps) {
+        if (ps != null) {
+            try {
+                ps.close();
+            } catch (SQLException ignored) {
+                _log.info("Statement.close() threw the exception!", ignored);
+            }
+        }
+    }
+
+    protected void close(Connection conn) {
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException ignored) {
+                _log.info("Connection.close() threw the exception!", ignored);
+            }
         }
     }
 

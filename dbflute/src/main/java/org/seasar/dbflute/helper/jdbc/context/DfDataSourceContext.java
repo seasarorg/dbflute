@@ -23,7 +23,7 @@ import javax.sql.DataSource;
 public class DfDataSourceContext {
 
     /** The thread-local for this. */
-    private static ThreadLocal<DataSource> _threadLocal = new ThreadLocal<DataSource>();
+    private static final ThreadLocal<DataSource> _threadLocal = new ThreadLocal<DataSource>();
 
     /**
      * Get DataSource on thread.
