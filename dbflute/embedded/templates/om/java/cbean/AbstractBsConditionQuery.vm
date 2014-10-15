@@ -365,11 +365,13 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${referrer.isOneToOne()})
 #set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($relationMethodIdentityName = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #else
 #set ($relationPropertyName = "${referrer.referrerPropertyName}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
@@ -379,7 +381,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #DD4747">exists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
+     * cb.query().<span style="color: #DD4747">exists${relationMethodIdentityName}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
      *     public void query(${relatedCBClassName} subCB) {
      *         subCB.query().setXxx...
      *     }
@@ -387,7 +389,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
      */
-    public void exists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    public void exists${relationMethodIdentityName}(SubQuery<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
@@ -402,11 +404,13 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${referrer.isOneToOne()})
 #set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($relationMethodIdentityName = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #else
 #set ($relationPropertyName = "${referrer.referrerPropertyName}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
@@ -416,7 +420,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #DD4747">notExists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
+     * cb.query().<span style="color: #DD4747">notExists${relationMethodIdentityName}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
      *     public void query(${relatedCBClassName} subCB) {
      *         subCB.query().setXxx...
      *     }
@@ -424,7 +428,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
      */
-    public void notExists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    public void notExists${relationMethodIdentityName}(SubQuery<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
@@ -553,6 +557,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #foreach ($referrer in $col.derivedReferrerReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 
@@ -561,7 +566,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {FOO &lt;= (select max(BAR) from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #DD4747">derived${referrer.referrerPropertyNameInitCap}()</span>.<span style="color: #DD4747">max</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
+     * cb.query().<span style="color: #DD4747">derived${relationMethodIdentityName}()</span>.<span style="color: #DD4747">max</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
      *     public void query(${relatedCBClassName} subCB) {
      *         subCB.specify().<span style="color: #DD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
@@ -570,7 +575,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @return The object to set up a function for referrer table. (NotNull)
      */
-    public HpQDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
+    public HpQDRFunction<${relatedCBClassName}> derived${relationMethodIdentityName}() {
         return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
     }
     protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
@@ -830,11 +835,13 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${referrer.isOneToOne()})
 #set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($relationMethodIdentityName = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #else
 #set ($relationPropertyName = "${referrer.referrerPropertyName}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
@@ -844,7 +851,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #DD4747">exists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
+     * cb.query().<span style="color: #DD4747">exists${relationMethodIdentityName}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
      *     public void query(${relatedCBClassName} subCB) {
      *         subCB.query().setXxx...
      *     }
@@ -852,7 +859,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
      */
-    public void exists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    public void exists${relationMethodIdentityName}(SubQuery<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
@@ -867,11 +874,13 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${referrer.isOneToOne()})
 #set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($relationMethodIdentityName = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #else
 #set ($relationPropertyName = "${referrer.referrerPropertyName}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
@@ -881,7 +890,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #DD4747">notExists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
+     * cb.query().<span style="color: #DD4747">notExists${relationMethodIdentityName}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
      *     public void query(${relatedCBClassName} subCB) {
      *         subCB.query().setXxx...
      *     }
@@ -889,7 +898,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
      */
-    public void notExists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    public void notExists${relationMethodIdentityName}(SubQuery<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
@@ -1018,6 +1027,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #foreach ($referrer in $col.derivedReferrerReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 
@@ -1026,7 +1036,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {FOO &lt;= (select max(BAR) from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #DD4747">derived${referrer.referrerPropertyNameInitCap}()</span>.<span style="color: #DD4747">max</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
+     * cb.query().<span style="color: #DD4747">derived${relationMethodIdentityName}()</span>.<span style="color: #DD4747">max</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
      *     public void query(${relatedCBClassName} subCB) {
      *         subCB.specify().<span style="color: #DD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
@@ -1035,7 +1045,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * @return The object to set up a function for referrer table. (NotNull)
      */
-    public HpQDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
+    public HpQDRFunction<${relatedCBClassName}> derived${relationMethodIdentityName}() {
         return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
     }
     protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {

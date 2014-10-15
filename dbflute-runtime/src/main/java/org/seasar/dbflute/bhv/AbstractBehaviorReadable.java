@@ -79,6 +79,7 @@ import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.optional.OptionalEntity;
 import org.seasar.dbflute.optional.OptionalObjectExceptionThrower;
 import org.seasar.dbflute.optional.RelationOptionalFactory;
+import org.seasar.dbflute.outsidesql.executor.OutsideSqlAllFacadeExecutor;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -583,19 +584,22 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public <BEHAVIOR extends BehaviorReadable> OutsideSqlBasicExecutor<BEHAVIOR> readyOutsideSql() {
-        return doOutsideSql();
+        return (OutsideSqlBasicExecutor<BEHAVIOR>) doOutsideSql().xbasicExecutor();
     }
 
     /**
      * Prepare an outside-SQL execution by returning an instance of the executor for outside-SQL. <br />
      * It's an extension point for your adding original customization to outside-SQL executions.
      * @param <BEHAVIOR> The type of behavior.
-     * @return The basic executor for outside-SQL. (NotNull) 
+     * @return The facade for outside-SQL. (NotNull)
      */
-    protected <BEHAVIOR extends BehaviorReadable> OutsideSqlBasicExecutor<BEHAVIOR> doOutsideSql() {
+    protected <BEHAVIOR extends BehaviorReadable> OutsideSqlAllFacadeExecutor<BEHAVIOR> doOutsideSql() {
         assertBehaviorCommandInvoker("outsideSql");
-        return _behaviorCommandInvoker.createOutsideSqlBasicExecutor(getTableDbName());
+        final OutsideSqlBasicExecutor<BEHAVIOR> basicExecutor = _behaviorCommandInvoker
+                .createOutsideSqlBasicExecutor(getTableDbName());
+        return new OutsideSqlAllFacadeExecutor<BEHAVIOR>(basicExecutor);
     }
 
     // ===================================================================================

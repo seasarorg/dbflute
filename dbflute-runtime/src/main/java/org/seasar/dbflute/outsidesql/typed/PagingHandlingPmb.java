@@ -19,10 +19,10 @@ import org.seasar.dbflute.cbean.PagingBean;
 
 /**
  * The parameter-bean for auto-paging handling.
- * @author jflute
  * @param <BEHAVIOR> The type of a corresponding behavior.
  * @param <ENTITY> The type of an entity (may be scalar) for result.
+ * @author jflute
+ * @since 1.1.0 (2014/10/13 Monday)
  */
-public interface AutoPagingHandlingPmb<BEHAVIOR, ENTITY> extends PagingHandlingPmb<BEHAVIOR, ENTITY>,
-        TypedSelectPmb<BEHAVIOR, ENTITY>, PagingBean {
+public interface PagingHandlingPmb<BEHAVIOR, ENTITY> extends TypedSelectPmb<BEHAVIOR, ENTITY>, PagingBean {
 }

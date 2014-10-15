@@ -3537,6 +3537,11 @@ public class Table {
         return prop.isCompatibleSelectByPKWithDeletedCheck();
     }
 
+    public boolean isCompatibleOutsideSqlFacadeChainOldStyle() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isCompatibleOutsideSqlFacadeChainOldStyle();
+    }
+
     // -----------------------------------------------------
     //                                   Optional Properties
     //                                   -------------------

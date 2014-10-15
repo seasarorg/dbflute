@@ -507,7 +507,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     // ===================================================================================
     //                                                                    Exception Helper
     //                                                                    ================
-    protected BehaviorExceptionThrower createBhvExThrower() {
+    public BehaviorExceptionThrower createBhvExThrower() { // public for facade
         return _behaviorCommandInvoker.createBehaviorExceptionThrower();
     }
 }
