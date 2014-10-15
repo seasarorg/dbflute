@@ -18,11 +18,11 @@ package org.seasar.dbflute.optional;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 
 /**
- * @param <OBJ> The type of object.
+ * @param <THING> The type of thing.
  * @author jflute
  * @since 1.0.5F (2014/05/05 Monday)
  */
-public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
+public class OptionalObject<THING> extends BaseOptional<THING> {
 
     // ===================================================================================
     //                                                                          Definition
@@ -49,7 +49,7 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
      * @param object The wrapped instance of object. (NullAllowed)
      * @param thrower The exception thrower when illegal access. (NotNull)
      */
-    public OptionalObject(OBJ object, OptionalObjectExceptionThrower thrower) { // basically called by DBFlute
+    public OptionalObject(THING object, OptionalObjectExceptionThrower thrower) { // basically called by DBFlute
         super(object, thrower);
     }
 
@@ -87,14 +87,14 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
     }
 
     // ===================================================================================
-    //                                                                     Object Handling
-    //                                                                     ===============
+    //                                                                   Standard Handling
+    //                                                                   =================
     /**
      * Get the object or exception if null.
      * @return The object instance wrapped in this optional object. (NotNull)
      * @exception EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
      */
-    public OBJ get() {
+    public THING get() {
         return directlyGet();
     }
 
@@ -104,7 +104,7 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
      * If exception is preferred when null object, use required().
      * @param consumer The callback interface to consume the optional value. (NotNull)
      */
-    public void ifPresent(OptionalObjectConsumer<OBJ> consumer) {
+    public void ifPresent(OptionalObjectConsumer<THING> consumer) {
         callbackIfPresent(consumer);
     }
 
@@ -121,8 +121,8 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
      * @param predicate The callback to predicate whether the object is remained. (NotNull)
      * @return The filtered optional object, might be empty. (NotNull)
      */
-    public OptionalObject<OBJ> filter(OptionalObjectPredicate<OBJ> predicate) {
-        return (OptionalObject<OBJ>) callbackFilter(predicate);
+    public OptionalObject<THING> filter(OptionalObjectPredicate<THING> predicate) {
+        return (OptionalObject<THING>) callbackFilter(predicate);
     }
 
     /**
@@ -138,7 +138,7 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
      * @param mapper The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    public <RESULT> OptionalObject<RESULT> map(OptionalObjectFunction<? super OBJ, ? extends RESULT> mapper) {
+    public <RESULT> OptionalObject<RESULT> map(OptionalObjectFunction<? super THING, ? extends RESULT> mapper) {
         return (OptionalObject<RESULT>) callbackMapping(mapper); // downcast allowed because factory is overridden
     }
 
@@ -155,7 +155,7 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
      * @param mapper The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    public <RESULT> OptionalObject<RESULT> flatMap(OptionalObjectFunction<? super OBJ, OptionalObject<RESULT>> mapper) {
+    public <RESULT> OptionalObject<RESULT> flatMap(OptionalObjectFunction<? super THING, OptionalObject<RESULT>> mapper) {
         return callbackFlatMapping(mapper);
     }
 
@@ -163,15 +163,28 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
      * @param other The object instance to be returned when the optional is empty. (NullAllowed)
      * @return The wrapped instance or specified other object. (NullAllowed:)
      */
-    public OBJ orElse(OBJ other) {
+    public THING orElse(THING other) {
         return directlyGetOrElse(other);
+    }
+
+    // ===================================================================================
+    //                                                                   DBFlute Extension
+    //                                                                   =================
+    /**
+     * Handle the object in the optional thing or exception if not present.
+     * @param oneArgLambda The callback interface to consume the optional object. (NotNull)
+     * @exception EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
+     */
+    public void alwaysPresent(OptionalObjectConsumer<THING> oneArgLambda) {
+        assertOneArgLambdaNotNull(oneArgLambda);
+        callbackAlwaysPresent(oneArgLambda);
     }
 
     /**
      * Get the object instance or null if not present.
      * @return The object instance wrapped in this optional object or null. (NullAllowed: if not present)
      */
-    public OBJ orElseNull() {
+    public THING orElseNull() {
         return directlyGetOrElse(null);
     }
 
@@ -180,7 +193,16 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
      * @param consumer The callback interface to consume the optional value. (NotNull)
      * @exception EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
      */
-    public void required(OptionalObjectConsumer<OBJ> consumer) {
+    public void required(OptionalObjectConsumer<THING> consumer) {
         callbackRequired(consumer);
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertOneArgLambdaNotNull(Object oneArgLambda) {
+        if (oneArgLambda == null) {
+            throw new IllegalArgumentException("The argument 'oneArgLambda' should not be null.");
+        }
     }
 }

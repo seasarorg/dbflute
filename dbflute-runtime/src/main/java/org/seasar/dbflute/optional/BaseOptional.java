@@ -147,6 +147,20 @@ public abstract class BaseOptional<OBJ> {
     }
 
     /**
+     * @param objLambda The callback interface to consume the wrapped value. (NotNull)
+     */
+    protected void callbackAlwaysPresent(OptionalObjectConsumer<OBJ> objLambda) {
+        if (objLambda == null) {
+            String msg = "The argument 'objLambda' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (_obj == null) {
+            _thrower.throwNotFoundException();
+        }
+        objLambda.accept(_obj);
+    }
+
+    /**
      * @param consumer The callback interface to consume the wrapped value. (NotNull)
      */
     protected void callbackRequired(OptionalObjectConsumer<OBJ> consumer) {

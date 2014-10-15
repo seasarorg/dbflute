@@ -167,8 +167,8 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     }
 
     // ===================================================================================
-    //                                                                     Object Handling
-    //                                                                     ===============
+    //                                                                   Standard Handling
+    //                                                                   =================
     /**
      * Get the entity or exception if null.
      * <pre>
@@ -310,6 +310,28 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     //    return directlyGetOrElse(other);
     //}
 
+    // ===================================================================================
+    //                                                                   DBFlute Extension
+    //                                                                   =================
+    /**
+     * Handle the entity in the optional object or exception if not present.
+     * <pre>
+     * memberBhv.selectEntity(cb -&gt; {
+     *     cb.setupSelect_MemberStatus();
+     *     cb.query().setMemberId_Equal(1);
+     * }).<span style="color: #DD4747">alwaysPresent</span>(member -&gt; {
+     *     <span style="color: #3F7E5E">// called if value exists, or exception if not present</span>
+     *     ... = member.getMemberName();
+     * });
+     * </pre>
+     * @param entityLambda The callback interface to consume the optional value. (NotNull)
+     * @exception EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
+     */
+    public void alwaysPresent(OptionalObjectConsumer<ENTITY> entityLambda) {
+        assertEntityLambdaNotNull(entityLambda);
+        callbackAlwaysPresent(entityLambda);
+    }
+
     /**
      * Get the entity instance or null if not present.
      * <pre>
@@ -340,5 +362,14 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      */
     public void required(OptionalObjectConsumer<ENTITY> consumer) {
         callbackRequired(consumer);
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertEntityLambdaNotNull(Object entityLambda) {
+        if (entityLambda == null) {
+            throw new IllegalArgumentException("The argument 'entityLambda' should not be null.");
+        }
     }
 }
