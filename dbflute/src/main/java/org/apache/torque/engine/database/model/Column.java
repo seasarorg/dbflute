@@ -213,6 +213,7 @@ public class Column {
     protected Table _sql2EntityRelatedTable;
     protected Column _sql2EntityRelatedColumn;
     protected String _sql2EntityForcedJavaNative;
+    protected String _sql2EntityHintedClassification;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -1868,6 +1869,15 @@ public class Column {
         _sql2EntityForcedJavaNative = sql2EntityForcedJavaNative;
     }
 
+    /**
+     * Set the hinted classification name for Sql2Entity. <br />
+     * This is used at getting classification as high priority.
+     * @param sql2EntityHintedClassification The hinted classification for Sql2Entity. (NullAllowed)
+     */
+    public void setSql2EntityHintedClassification(String sql2EntityHintedClassification) {
+        _sql2EntityHintedClassification = sql2EntityHintedClassification;
+    }
+
     // ===================================================================================
     //                                                                           Immutable
     //                                                                           =========
@@ -2517,6 +2527,9 @@ public class Column {
     }
 
     protected String getSql2EntityRelatedTableClassificationName() {
+        if (_sql2EntityHintedClassification != null) {
+            return _sql2EntityHintedClassification;
+        }
         if (!hasSql2EntityRelatedTable()) {
             return null;
         }

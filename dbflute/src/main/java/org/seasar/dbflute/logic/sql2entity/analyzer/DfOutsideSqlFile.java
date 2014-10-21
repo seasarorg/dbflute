@@ -60,7 +60,7 @@ public class DfOutsideSqlFile {
 
     @Override
     public String toString() {
-        return _physicalFile.toString();
+        return "{" + _physicalFile.getName() + " of " + _outsideSqlLocation.getSqlDirectory() + "}";
     }
 
     // ===================================================================================

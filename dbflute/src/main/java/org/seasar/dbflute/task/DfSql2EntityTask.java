@@ -65,6 +65,7 @@ import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 import org.seasar.dbflute.task.bs.assistant.DfSpecifiedSqlFile;
 import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.Srl.IndexOfInfo;
+import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
@@ -355,7 +356,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 setupNotNull(metaMap, columnName, column);
                 setupColumnSizeContainsDigit(metaMap, columnName, column);
                 setupColumnComment(metaMap, columnName, column);
-                setupSql2EntityElement(entityName, metaMap, columnName, column, pkRelatedTableName, logSb);
+                setupSql2EntityElement(entityName, entityInfo, metaMap, columnName, column, pkRelatedTableName, logSb);
                 tbl.addColumn(column);
             }
             if (!pkMap.isEmpty()) { // if not-removed columns exist
@@ -591,18 +592,22 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return getDocumentProperties().isDbCommentOnAliasBasis();
     }
 
-    protected void setupSql2EntityElement(String entityName, Map<String, DfColumnMeta> metaMap, String columnName,
-            Column column, String pkRelatedTableName, StringBuilder logSb) {
-        final Table relatedTable = setupSql2EntityRelatedTable(entityName, metaMap, columnName, column,
+    protected void setupSql2EntityElement(String entityName, DfCustomizeEntityInfo entityInfo,
+            Map<String, DfColumnMeta> metaMap, String columnName, Column column, String pkRelatedTableName,
+            StringBuilder logSb) {
+        final Table relatedTable = setupSql2EntityRelatedTable(entityName, entityInfo, metaMap, columnName, column,
                 pkRelatedTableName);
-        final Column relatedColumn = setupSql2EntityRelatedColumn(relatedTable, metaMap, columnName, column);
-        final String forcedJavaNative = setupSql2EntityForcedJavaNative(metaMap, columnName, column);
+        final Column relatedColumn = setupSql2EntityRelatedColumn(entityName, entityInfo, relatedTable, metaMap,
+                columnName, column);
+        final String forcedJavaNative = setupSql2EntityForcedJavaNative(entityName, entityInfo, metaMap, columnName,
+                column);
+        setupSql2EntitySpecifiedClassification(entityName, entityInfo, metaMap, columnName, column);
 
         buildCustomizeEntityColumnInfo(logSb, columnName, column, relatedTable, relatedColumn, forcedJavaNative);
     }
 
-    protected Table setupSql2EntityRelatedTable(String entityName, Map<String, DfColumnMeta> metaMap,
-            String columnName, Column column, String pkRelatedTableName) {
+    protected Table setupSql2EntityRelatedTable(String entityName, DfCustomizeEntityInfo entityInfo,
+            Map<String, DfColumnMeta> metaMap, String columnName, Column column, String pkRelatedTableName) {
         final DfColumnMeta columnMeta = metaMap.get(columnName);
         final String sql2EntityRelatedTableName = columnMeta.getSql2EntityRelatedTableName();
         Table relatedTable = getRelatedTable(sql2EntityRelatedTableName); // first attack
@@ -610,7 +615,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             if (pkRelatedTableName != null) { // second attack using PK-related
                 relatedTable = getRelatedTable(pkRelatedTableName);
                 if (relatedTable == null) {
-                    throwTableRelatedPrimaryKeyNotFoundException(entityName, pkRelatedTableName, columnName);
+                    throwTableRelatedPrimaryKeyNotFoundException(entityName, entityInfo, pkRelatedTableName, columnName);
                 }
             } else {
                 return null;
@@ -618,7 +623,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         } else {
             if (pkRelatedTableName != null) {
                 if (!Srl.equalsFlexible(sql2EntityRelatedTableName, pkRelatedTableName)) {
-                    throwTableRelatedPrimaryKeyDifferentException(entityName, sql2EntityRelatedTableName,
+                    throwTableRelatedPrimaryKeyDifferentException(entityName, entityInfo, sql2EntityRelatedTableName,
                             pkRelatedTableName, columnName);
                 }
             }
@@ -627,9 +632,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return relatedTable;
     }
 
-    protected void throwTableRelatedPrimaryKeyNotFoundException(String entityName, String tableName, String columnName) {
+    protected void throwTableRelatedPrimaryKeyNotFoundException(String entityName, DfCustomizeEntityInfo entityInfo,
+            String tableName, String columnName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The table name related to the primary key is not found.");
+        br.addItem("OutsideSql");
+        br.addElement(entityInfo.getOutsideSqlFile());
         br.addItem("Entity");
         br.addElement(entityName);
         br.addItem("Table Name");
@@ -640,10 +648,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         throw new IllegalOutsideSqlOperationException(msg);
     }
 
-    protected void throwTableRelatedPrimaryKeyDifferentException(String entityName, String realTable,
-            String differentTable, String columnName) {
+    protected void throwTableRelatedPrimaryKeyDifferentException(String entityName, DfCustomizeEntityInfo entityInfo,
+            String realTable, String differentTable, String columnName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The table name related to the primary key is different.");
+        br.addItem("OutsideSql");
+        br.addElement(entityInfo.getOutsideSqlFile());
         br.addItem("Entity");
         br.addElement(entityName);
         br.addItem("Real Table");
@@ -656,8 +666,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         throw new IllegalOutsideSqlOperationException(msg);
     }
 
-    protected Column setupSql2EntityRelatedColumn(Table relatedTable, Map<String, DfColumnMeta> metaMap,
-            String columnName, Column column) {
+    protected Column setupSql2EntityRelatedColumn(String entityName, DfCustomizeEntityInfo entityInfo,
+            Table relatedTable, Map<String, DfColumnMeta> metaMap, String columnName, Column column) {
         if (relatedTable == null) {
             return null;
         }
@@ -679,12 +689,53 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return relatedTable;
     }
 
-    protected String setupSql2EntityForcedJavaNative(final Map<String, DfColumnMeta> metaMap, String columnName,
-            final Column column) {
+    protected String setupSql2EntityForcedJavaNative(String entityName, DfCustomizeEntityInfo entityInfo,
+            final Map<String, DfColumnMeta> metaMap, String columnName, final Column column) {
         final DfColumnMeta metaInfo = metaMap.get(columnName);
         final String sql2EntityForcedJavaNative = metaInfo.getSql2EntityForcedJavaNative();
         column.setSql2EntityForcedJavaNative(sql2EntityForcedJavaNative);
         return sql2EntityForcedJavaNative;
+    }
+
+    protected String setupSql2EntitySpecifiedClassification(String entityName, DfCustomizeEntityInfo entityInfo,
+            final Map<String, DfColumnMeta> metaMap, String columnName, final Column column) {
+        final String classification = extractSql2EntityHintedClassification(entityName, entityInfo, column);
+        if (classification != null) {
+            column.setSql2EntityHintedClassification(classification);
+        }
+        return classification;
+    }
+
+    protected String extractSql2EntityHintedClassification(String entityName, DfCustomizeEntityInfo entityInfo,
+            Column column) {
+        final String comment = column.getComment();
+        final ScopeInfo scopeInfo = Srl.extractScopeFirst(comment, "cls(", ")");
+        if (scopeInfo != null) {
+            final String classification = scopeInfo.getContent().trim();
+            if (!getProperties().getClassificationProperties().hasClassificationTop(classification)) {
+                throwUnknownClassificationSpecifiedInHintException(entityName, entityInfo, column, classification);
+            }
+            return classification;
+        }
+        return null;
+    }
+
+    protected void throwUnknownClassificationSpecifiedInHintException(String entityName,
+            DfCustomizeEntityInfo entityInfo, Column column, String classification) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Unknown classification specified in the hint.");
+        br.addItem("OutsideSql");
+        br.addElement(entityInfo.getOutsideSqlFile());
+        br.addItem("Entity");
+        br.addElement(entityName);
+        br.addItem("Column");
+        br.addElement(column.getName());
+        br.addItem("Comment");
+        br.addElement(column.getComment());
+        br.addItem("Unknown Classification");
+        br.addElement(classification);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalOutsideSqlOperationException(msg);
     }
 
     // -----------------------------------------------------
