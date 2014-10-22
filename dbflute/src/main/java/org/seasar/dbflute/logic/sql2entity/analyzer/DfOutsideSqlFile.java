@@ -60,7 +60,9 @@ public class DfOutsideSqlFile {
 
     @Override
     public String toString() {
-        return "{" + _physicalFile.getName() + " of " + _outsideSqlLocation.getSqlDirectory() + "}";
+        final String projectName = _outsideSqlLocation.getProjectName();
+        final String sqlDirectory = _outsideSqlLocation.getSqlDirectory();
+        return "{" + projectName + ", " + sqlDirectory + ", " + _physicalFile.getName() + "}";
     }
 
     // ===================================================================================

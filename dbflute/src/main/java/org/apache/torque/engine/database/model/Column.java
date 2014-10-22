@@ -2503,27 +2503,17 @@ public class Column {
     //                             Sql2Entity Classification
     //                             -------------------------
     protected boolean hasSql2EntityRelatedTableClassification() {
-        if (!hasSql2EntityRelatedTable()) {
-            return false;
-        }
-        final String tableName = getSql2EntityRelatedTable().getTableDbName();
-        return getClassificationProperties().hasClassification(tableName, getName());
+        return getSql2EntityRelatedTableClassificationName() != null;
     }
 
     protected boolean hasSql2EntityRelatedTableClassificationName() {
-        if (!hasSql2EntityRelatedTable()) {
-            return false;
-        }
-        final String tableName = getSql2EntityRelatedTable().getTableDbName();
-        return getClassificationProperties().hasClassificationName(tableName, getName());
+        final String classificationName = getSql2EntityRelatedTableClassificationName();
+        return classificationName != null && getClassificationProperties().hasClassificationName(classificationName);
     }
 
     protected boolean hasSql2EntityRelatedTableClassificationAlias() {
-        if (!hasSql2EntityRelatedTable()) {
-            return false;
-        }
-        final String tableName = getSql2EntityRelatedTable().getTableDbName();
-        return getClassificationProperties().hasClassificationAlias(tableName, getName());
+        final String classificationName = getSql2EntityRelatedTableClassificationName();
+        return classificationName != null && getClassificationProperties().hasClassificationAlias(classificationName);
     }
 
     protected String getSql2EntityRelatedTableClassificationName() {

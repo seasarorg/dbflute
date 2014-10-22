@@ -1213,6 +1213,10 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         if (classificationName == null) {
             return false;
         }
+        return hasClassificationName(classificationName);
+    }
+
+    public boolean hasClassificationName(String classificationName) {
         return getClassificationValidNameOnlyList().contains(classificationName);
     }
 
