@@ -23,26 +23,22 @@ import scala.collection.JavaConverters._;
 import java.lang.Long;
 import java.lang.Boolean;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
-#if ($table.hasUtilDateColumn())
-import java.util.Date;
-#end
 
-#if (!$table.hasAllCommonColumn() || $table.hasRelation())
+#if ($table.hasOptionalRelation())
 import org.seasar.dbflute.Entity;
 #end
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.AbstractEntity;
 #if ($table.needsMappingValueType())
-import org.seasar.dbflute.dbmeta.MappingValueType;
+import org.seasar.dbflute.dbmeta.accessory.MappingValueType;
 #end
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
 #end
-import org.seasar.dbflute.Entity.FunCustodial;
+import org.seasar.dbflute.FunCustodial;
 import org.seasar.dbflute.helper.beans.DfCoupleProperties;
 import org.seasar.dbflute.immutable.DBableEntity;
 #if ($table.hasAllCommonColumn())
@@ -113,7 +109,7 @@ import ${table.relationalNullObjectProviderPackage}._;
  * </pre>
  * @author ${database.classAuthor}
  */
-abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef} with DBableEntity[${myImmutableExtendedObjectClassName}] with Serializable with Cloneable${table.derivedMappableDefinition} {
+abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef} with DBableEntity[${myImmutableExtendedObjectClassName}] with Serializable with Cloneable {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -148,7 +144,7 @@ abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef} with D
         __uniqueDrivenProperties.clear();
         immu.getMyUniqueDrivenProperties().foreach(__uniqueDrivenProperties.addPropertyName(_))
         __modifiedProperties.clear();
-        immu.getModifiedProperties().foreach(__modifiedProperties.addPropertyName(_))
+        immu.getMyModifiedProperties().foreach(__modifiedProperties.addPropertyName(_))
         return this.asInstanceOf[${myExtendedObjectClassName}];
     }
 
@@ -463,7 +459,7 @@ abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef} with D
      * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: even if no loading, returns empty list)
      */
     def get${referrer.referrerJavaBeansRulePropertyNameInitCap}(): List[${referrerEntityClassName}] = {
-        if (${referrerVariableName} == null) { ${referrerVariableName} = newReferrerList(); }
+        if (${referrerVariableName} == null) { ${referrerVariableName} = newReferrerScalaList(); }
         return ${referrerVariableName};
     }
 
@@ -531,7 +527,7 @@ abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef} with D
 
 #end
 #end
-    protected def newReferrerList[ELEMENT](): List[ELEMENT] = {
+    protected def newReferrerScalaList[ELEMENT](): List[ELEMENT] = {
         return new ArrayList[ELEMENT]();
     }
 
@@ -579,6 +575,7 @@ abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef} with D
 
     override protected def doBuildStringWithRelation(li: String): String = {
 #if ($table.hasRelation())
+        val sb: StringBuilder = new StringBuilder();
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
 #if ($fk.isForeignPropertyOptionalEntity())
@@ -601,8 +598,10 @@ abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef} with D
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
         toScalaList(${referrerVariableName}).foreach(et => { if (et != null) { sb.append(li).append(xbRDS(et, "${referrer.referrerPropertyName}")) } });
 #end
-#end
         return sb.toString();
+#else
+        return "";
+#end
     }
 #if ($table.hasOptionalRelation())
     protected def xbRDS[ET <: Entity](et: ${database.relationOptionalEntityClassName}[ET], name: String): String = {

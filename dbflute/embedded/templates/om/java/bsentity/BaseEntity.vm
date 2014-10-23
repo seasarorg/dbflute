@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 #if ($table.hasOptionalRelation())
-import org.dbflute.Entity;
+import org.seasar.dbflute.Entity;
 #end
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.AbstractEntity;

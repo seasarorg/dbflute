@@ -136,19 +136,11 @@ class ${glImplementedCommonColumnAutoSetupper} extends CommonColumnAutoSetupper 
         if (!hasCommonColumn(targetEntity)) {
             return null;
         }
-        val entity: ${glEntityDefinedCommonColumn} = downcastEntity(targetEntity);
-        if (!canCommonColumnAutoSetup(entity)) {
-            return null;
-        }
-        return entity;
+        return downcastEntity(targetEntity);
     }
 
     protected def hasCommonColumn(targetEntity: Entity): Boolean = {
         return targetEntity.isInstanceOf[${glEntityDefinedCommonColumn}];
-    }
-
-    protected def canCommonColumnAutoSetup(entity: ${glEntityDefinedCommonColumn}): Boolean = {
-        return entity.canCommonColumnAutoSetup();
     }
 
     protected def downcastEntity(targetEntity: Entity): ${glEntityDefinedCommonColumn} = {

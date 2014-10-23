@@ -26,7 +26,7 @@ import java.util.Date;
 #end
 
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.Entity.FunCustodial;
+import org.seasar.dbflute.FunCustodial;
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
 #end
@@ -106,7 +106,7 @@ abstract class $myClassName(dble: ${myExtendedObjectClassName}) extends Serializ
     ): ${myImmutableExtendedObjectClassName} = {
         val newDble = new ${myExtendedObjectClassName}
         newDble.myuniqueDrivenProperties.addAll(dble.myuniqueDrivenProperties) // inherit
-        newDble.modifiedProperties.addAll(dble.modifiedProperties) // inherit
+        newDble.mymodifiedProperties.addAll(dble.mymodifiedProperties) // inherit
 #foreach ($col in $table.columns)
         if (!${col.uncapitalisedJavaName}.equals(this.${col.uncapitalisedJavaName})) { newDble.set${col.javaName}${col.classificationMethodSuffix}(${col.convertToMutablePropertyValue("${col.uncapitalisedJavaName}")}) }
 #end
@@ -119,7 +119,7 @@ abstract class $myClassName(dble: ${myExtendedObjectClassName}) extends Serializ
     def getTableDbName(): String = { dble.getTableDbName }
     def getDBMeta(): DBMeta = { dble.getDBMeta }
     def getMyUniqueDrivenProperties(): Set[String] = { toScalaStringSet(dble.myuniqueDrivenProperties) }
-    def getModifiedProperties(): Set[String] = { toScalaStringSet(dble.modifiedProperties) }
+    def getMyModifiedProperties(): Set[String] = { toScalaStringSet(dble.mymodifiedProperties) }
 
     protected def toScalaStringSet(javaList: java.util.Collection[String]): Set[String] =
     { Set(javaList.toArray).asInstanceOf[Set[String]] }

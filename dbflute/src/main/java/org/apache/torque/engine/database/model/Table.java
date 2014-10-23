@@ -145,7 +145,7 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.bhv.ConditionBeanSetupper;
 import org.seasar.dbflute.bhv.ReferrerConditionSetupper;
-import org.seasar.dbflute.dbmeta.DerivedMappable;
+import org.seasar.dbflute.dbmeta.accessory.DerivedMappable;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
