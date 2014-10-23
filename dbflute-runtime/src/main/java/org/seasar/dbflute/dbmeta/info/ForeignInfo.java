@@ -24,8 +24,8 @@ import java.util.Map.Entry;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.dbmeta.PropertyGateway;
-import org.seasar.dbflute.dbmeta.PropertyMethodFinder;
+import org.seasar.dbflute.dbmeta.property.PropertyGateway;
+import org.seasar.dbflute.dbmeta.property.PropertyMethodFinder;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.Srl;
 

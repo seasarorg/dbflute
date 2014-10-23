@@ -22,13 +22,13 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.AbstractDBMeta;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.dbmeta.PropertyGateway;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.dbmeta.name.TableSqlName;
+import org.seasar.dbflute.dbmeta.property.PropertyGateway;
 
 /**
  * @author jflute

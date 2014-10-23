@@ -60,7 +60,7 @@ import org.seasar.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.dbmeta.DerivedMappable;
+import org.seasar.dbflute.dbmeta.accessory.DerivedMappable;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;

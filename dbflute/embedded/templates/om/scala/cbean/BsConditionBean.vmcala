@@ -67,6 +67,9 @@ class ${myClassName} extends AbstractConditionBean {
         if (${glDBFluteConfig}.isPagingCountLeastJoin()) {
             enablePagingCountLeastJoin();
         }
+        if (${glDBFluteConfig}.isNonSpecifiedColumnAccessAllowed()) {
+            enableNonSpecifiedColumnAccess();
+        }
         if (${glDBFluteConfig}.isQueryUpdateCountPreCheck()) {
             enableQueryUpdateCountPreCheck();
         }

@@ -250,7 +250,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
             @SuppressWarnings("unchecked")
             public Set<String> getModifiedPropertyNames(Object bean) {
                 if (bean instanceof Entity) { // all entities of DBFlute are here
-                    return ((Entity) bean).modifiedProperties();
+                    return ((Entity) bean).mymodifiedProperties();
                 } else { // basically no way on DBFlute (S2Dao's route)
                     final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(bean.getClass());
                     final String propertyName = MODIFIED_PROPERTY_PROPERTY_NAME;

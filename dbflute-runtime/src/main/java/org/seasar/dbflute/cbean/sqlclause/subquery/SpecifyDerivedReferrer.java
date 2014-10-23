@@ -18,7 +18,7 @@ package org.seasar.dbflute.cbean.sqlclause.subquery;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.dbmeta.DerivedMappable;
+import org.seasar.dbflute.dbmeta.accessory.DerivedMappable;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;

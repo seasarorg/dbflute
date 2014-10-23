@@ -33,11 +33,14 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.FunCustodial;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
+import org.seasar.dbflute.dbmeta.property.PropertyGateway;
+import org.seasar.dbflute.dbmeta.property.PropertyMethodFinder;
 import org.seasar.dbflute.exception.DBMetaNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -170,7 +173,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         if (classification == null) {
             final String tableDbName = columnInfo.getDBMeta().getTableDbName();
             final String columnDbName = columnInfo.getColumnDbName();
-            Entity.FunCustodial.handleUndefinedClassificationCode(tableDbName, columnDbName, meta, code);
+            FunCustodial.handleUndefinedClassificationCode(tableDbName, columnDbName, meta, code);
         }
     }
 

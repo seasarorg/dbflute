@@ -31,18 +31,5 @@ package org.seasar.dbflute.optional;
  * @author jflute
  * @since 1.0.5F (2014/05/10 Saturday)
  */
-public interface OptionalObjectConsumer<OBJ> {
-
-    /**
-     * Accept the value in the optional object.
-     * <pre>
-     * when caller is <span style="color: #DD4747">ifPresent()</span>:
-     *   called if value exists, not called if not present
-     *
-     * when caller is <span style="color: #DD4747">required()</span>:
-     *   called if value exists, or exception if not present
-     * </pre>
-     * @param obj The wrapped object in the optional object. (NotNull)
-     */
-    void accept(OBJ obj);
+public interface OptionalObjectConsumer<OBJ> extends OptionalThingConsumer<OBJ> {
 }

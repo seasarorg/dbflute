@@ -33,7 +33,7 @@ import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.dbmeta.DerivedTypeHandler;
+import org.seasar.dbflute.dbmeta.accessory.DerivedTypeHandler;
 import org.seasar.dbflute.jdbc.StatementConfig;
 
 /**
@@ -292,6 +292,16 @@ public class MockConditionBean implements ConditionBean {
     }
 
     public boolean canRelationMappingCache() {
+        return false;
+    }
+
+    public void enableNonSpecifiedColumnAccess() {
+    }
+
+    public void disableNonSpecifiedColumnAccess() {
+    }
+
+    public boolean isNonSpecifiedColumnAccessAllowed() {
         return false;
     }
 

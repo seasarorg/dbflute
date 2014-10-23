@@ -24,7 +24,7 @@ import org.seasar.dbflute.cbean.coption.CursorSelectOption;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.dbmeta.DerivedTypeHandler;
+import org.seasar.dbflute.dbmeta.accessory.DerivedTypeHandler;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.jdbc.StatementConfig;
 
@@ -432,6 +432,48 @@ public interface ConditionBean extends PagingBean {
      * @return The determination, true or false.
      */
     boolean canRelationMappingCache();
+
+    /**
+     * Enable access to non-specified column. (default is disabled) <br />
+     * You can get columns of base-point or setup-select using SpecifyColumn but non-specified column.
+     * <pre>
+     * <span style="color: #0000C0">memberBhv</span>.selectEntity(<span style="color: #553000">cb</span> -&gt; {
+     *     <span style="color: #553000">cb</span>.setupSelect_MemberStatus();
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnMemberStatusName()</span>;
+     *     <span style="color: #553000">cb</span>.query().set...
+     * }).alwaysPresent(<span style="color: #553000">member</span> -&gt; {
+     *     <span style="color: #553000">member</span>.getMemberStatus().alwaysPresent(<span style="color: #553000">status</span> -&gt; {
+     *         ... = <span style="color: #553000">status</span>.getMemberStatusName(); <span style="color: #3F7E5E">// OK</span>
+     *         ... = <span style="color: #553000">status</span>.<span style="color: #CC4747">getDisplayOrder()</span>; <span style="color: #3F7E5E">// OK: allowed</span>
+     *     });
+     * });
+     * </pre>
+     */
+    void enableNonSpecifiedColumnAccess();
+
+    /**
+     * Disable the check of access to non-specified column. (back to default) <br />
+     * You cannot get columns of base-point or setup-select using SpecifyColumn but non-specified column.
+     * <pre>
+     * <span style="color: #0000C0">memberBhv</span>.selectEntity(<span style="color: #553000">cb</span> -&gt; {
+     *     <span style="color: #553000">cb</span>.setupSelect_MemberStatus();
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnMemberStatusName()</span>;
+     *     <span style="color: #553000">cb</span>.query().set...
+     * }).alwaysPresent(<span style="color: #553000">member</span> -&gt; {
+     *     <span style="color: #553000">member</span>.getMemberStatus().alwaysPresent(<span style="color: #553000">status</span> -&gt; {
+     *         ... = <span style="color: #553000">status</span>.getMemberStatusName(); <span style="color: #3F7E5E">// OK</span>
+     *         ... = <span style="color: #553000">status</span>.<span style="color: #CC4747">getDisplayOrder()</span>; <span style="color: #3F7E5E">// *NG: exception</span>
+     *     });
+     * });
+     * </pre>
+     */
+    void disableNonSpecifiedColumnAccess();
+
+    /**
+     * Is the access to non-specified column allowed?
+     * @return The determination, true or false.
+     */
+    boolean isNonSpecifiedColumnAccessAllowed();
 
     // ===================================================================================
     //                                                                         Display SQL

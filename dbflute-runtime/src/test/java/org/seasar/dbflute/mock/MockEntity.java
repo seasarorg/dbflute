@@ -56,7 +56,7 @@ public class MockEntity implements Entity {
         return Collections.emptySet();
     }
 
-    public Set<String> modifiedProperties() {
+    public Set<String> mymodifiedProperties() {
         return Collections.emptySet();
     }
 
@@ -65,6 +65,16 @@ public class MockEntity implements Entity {
 
     public boolean hasModification() {
         return false;
+    }
+
+    public void modifiedToSpecified() {
+    }
+
+    public Set<String> myspecifiedProperties() {
+        return null;
+    }
+
+    public void clearSpecifiedInfo() {
     }
 
     public void markAsSelect() {

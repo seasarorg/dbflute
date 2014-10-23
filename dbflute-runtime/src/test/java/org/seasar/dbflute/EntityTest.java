@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute;
 
-import org.seasar.dbflute.Entity.FunCustodial;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**

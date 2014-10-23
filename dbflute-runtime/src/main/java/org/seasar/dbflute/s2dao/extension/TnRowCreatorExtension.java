@@ -30,8 +30,8 @@ import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.dbmeta.DerivedMappable;
-import org.seasar.dbflute.dbmeta.DerivedTypeHandler;
+import org.seasar.dbflute.dbmeta.accessory.DerivedMappable;
+import org.seasar.dbflute.dbmeta.accessory.DerivedTypeHandler;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.MappingClassCastException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -121,8 +121,8 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     /**
      * {@inheritDoc}
      */
-    public Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap,
-            Map<String, TnPropertyMapping> propertyCache, Class<?> beanClass) throws SQLException {
+    public Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap, Map<String, TnPropertyMapping> propertyCache,
+            Class<?> beanClass) throws SQLException {
         if (propertyCache.isEmpty()) {
             String msg = "The propertyCache should not be empty: bean=" + beanClass.getName();
             throw new IllegalStateException(msg);
@@ -228,8 +228,8 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         }
     }
 
-    protected Object getValue(ResultSet rs, String columnName, ValueType valueType,
-            Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
+    protected Object getValue(ResultSet rs, String columnName, ValueType valueType, Map<String, Map<String, Integer>> selectIndexMap)
+            throws SQLException {
         final Object value;
         if (selectIndexMap != null) {
             value = ResourceContext.getLocalValue(rs, columnName, valueType, selectIndexMap);
@@ -239,8 +239,8 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         return value;
     }
 
-    protected void throwMappingClassCastException(Object entity, DBMeta dbmeta, TnPropertyMapping mapping,
-            Object selectedValue, ClassCastException e) {
+    protected void throwMappingClassCastException(Object entity, DBMeta dbmeta, TnPropertyMapping mapping, Object selectedValue,
+            ClassCastException e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to cast a class while data mapping.");
         br.addItem("Advice");
@@ -349,21 +349,33 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     // ===================================================================================
     //                                                                             Fix Row
     //                                                                             =======
-    // share with relation row
     /**
      * Adjust created row. (clearing modified info, ...)
      * @param row The row of result list. (NotNull)
-     * @param bmd The bean meta data of the row. (NotNull)
+     * @param checkNonSp Does is use the check of access to non-specified column?
+     * @param basePointBmd The bean meta data of the row for base-point table. (NotNull)
      */
-    public static void adjustCreatedRow(final Object row, TnBeanMetaData bmd) {
+    public static void adjustCreatedRow(final Object row, boolean checkNonSp, TnBeanMetaData basePointBmd) {
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // static for handler calling
+        // however no other callers now so unnecessary, exists once...
+        // only for uniformity with relation
+        //
+        // *similar implementation for relation row exists
+        // no refactoring because it needs high performance here,
+        // comment only to avoid wasted calculation and determination
+        // _/_/_/_/_/_/_/_/_/_/
         if (row instanceof Entity) {
             final Entity entity = (Entity) row;
+            if (checkNonSp) { // contains enabled by CB and using SpecifyColumn
+                entity.modifiedToSpecified();
+            }
             entity.clearModifiedInfo();
             entity.markAsSelect();
         } else { // not DBFlute entity
             // actually any bean meta data can be accepted
             // because only it gets modified properties
-            bmd.getModifiedPropertyNames(row).clear();
+            basePointBmd.getModifiedPropertyNames(row).clear();
         }
     }
 

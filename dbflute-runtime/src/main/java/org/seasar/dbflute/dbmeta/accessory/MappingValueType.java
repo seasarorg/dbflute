@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.dbmeta;
+package org.seasar.dbflute.dbmeta.accessory;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
  * }
  * </pre>
  * @author jflute
- * @since 1.0.6A (2014/06/22 Sunday)
+ * @since 1.0.5J (2014/06/22 Sunday)
  */
 @Target({ ElementType.FIELD, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)

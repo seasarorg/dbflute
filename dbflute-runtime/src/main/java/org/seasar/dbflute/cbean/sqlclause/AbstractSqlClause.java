@@ -129,6 +129,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected Map<String, String> _selectedRelationBasicMap;
 
     /**
+     * The path-to-alias map of selected relation. (NullAllowed: lazy-loaded) <br />
+     * map:{foreignRelationPath: relationNoSuffix = foreignTableAliasName}
+     */
+    protected Map<String, String> _selectedRelationPathToTableAliasMap;
+
+    /**
      * The column map of selected relation. (NullAllowed: lazy-loaded) <br />
      * map:{foreignTableAliasName : map:{columnName : selectedRelationColumn}}
      */
@@ -1152,8 +1158,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return false; // as default
     }
 
-    protected void buildJoinTableClause(StringBuilder sb, LeftOuterJoinInfo joinInfo, String joinExp,
-            boolean canBeInnerJoin) {
+    protected void buildJoinTableClause(StringBuilder sb, LeftOuterJoinInfo joinInfo, String joinExp, boolean canBeInnerJoin) {
         final String foreignTableDbName = joinInfo.getForeignTableDbName();
         final int tablePos = 3 + joinExp.length(); // basically for in-line view indent
         final DBMeta foreignDBMeta = findDBMeta(foreignTableDbName);
@@ -1172,8 +1177,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
     }
 
-    protected String getInlineViewClause(TableSqlName inlineTableSqlName, List<QueryClause> inlineWhereClauseList,
-            int tablePos) {
+    protected String getInlineViewClause(TableSqlName inlineTableSqlName, List<QueryClause> inlineWhereClauseList, int tablePos) {
         final String inlineBaseAlias = getInlineViewBasePointAlias();
         final StringBuilder sb = new StringBuilder();
         sb.append("(select * from ").append(inlineTableSqlName).append(" ").append(inlineBaseAlias);
@@ -1194,16 +1198,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return sb.toString();
     }
 
-    protected void buildJoinOnClause(StringBuilder sb, LeftOuterJoinInfo joinInfo,
-            Map<ColumnRealName, ColumnRealName> joinOnMap) {
+    protected void buildJoinOnClause(StringBuilder sb, LeftOuterJoinInfo joinInfo, Map<ColumnRealName, ColumnRealName> joinOnMap) {
         int currentConditionCount = 0;
         currentConditionCount = doBuildJoinOnClauseBasic(sb, joinInfo, joinOnMap, currentConditionCount);
         currentConditionCount = doBuildJoinOnClauseFixed(sb, joinInfo, joinOnMap, currentConditionCount);
         currentConditionCount = doBuildJoinOnClauseAdditional(sb, joinInfo, joinOnMap, currentConditionCount);
     }
 
-    protected int doBuildJoinOnClauseBasic(StringBuilder sb, LeftOuterJoinInfo joinInfo,
-            Map<ColumnRealName, ColumnRealName> joinOnMap, int currentConditionCount) {
+    protected int doBuildJoinOnClauseBasic(StringBuilder sb, LeftOuterJoinInfo joinInfo, Map<ColumnRealName, ColumnRealName> joinOnMap,
+            int currentConditionCount) {
         for (Entry<ColumnRealName, ColumnRealName> joinOnEntry : joinOnMap.entrySet()) {
             final ColumnRealName localRealName = joinOnEntry.getKey();
             final ColumnRealName foreignRealName = joinOnEntry.getValue();
@@ -1214,8 +1217,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return currentConditionCount;
     }
 
-    protected int doBuildJoinOnClauseFixed(StringBuilder sb, LeftOuterJoinInfo joinInfo,
-            Map<ColumnRealName, ColumnRealName> joinOnMap, int currentConditionCount) {
+    protected int doBuildJoinOnClauseFixed(StringBuilder sb, LeftOuterJoinInfo joinInfo, Map<ColumnRealName, ColumnRealName> joinOnMap,
+            int currentConditionCount) {
         if (joinInfo.hasFixedCondition()) {
             final String fixedCondition = joinInfo.getFixedCondition();
             if (isInlineViewOptimizedCondition(fixedCondition)) {
@@ -1336,17 +1339,25 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /**
      * {@inheritDoc}
      */
-    public void registerSelectedRelation(String foreignTableAliasName, String localTableDbName,
-            String foreignPropertyName, String localRelationPath, String foreignRelationPath) {
+    public void registerSelectedRelation(String foreignTableAliasName, String localTableDbName, String foreignPropertyName,
+            String localRelationPath, String foreignRelationPath) {
         assertObjectNotNull("foreignTableAliasName", foreignTableAliasName);
         assertObjectNotNull("localTableDbName", localTableDbName);
         assertObjectNotNull("foreignPropertyName", foreignPropertyName);
         assertObjectNotNull("foreignRelationPath", foreignRelationPath);
         getSelectedRelationBasicMap().put(foreignRelationPath, foreignPropertyName);
-        final Map<String, SelectedRelationColumn> columnMap = createSelectedSelectColumnInfo(foreignTableAliasName,
-                localTableDbName, foreignPropertyName, localRelationPath);
+        final Map<String, SelectedRelationColumn> columnMap =
+                createSelectedSelectColumnInfo(foreignTableAliasName, localTableDbName, foreignPropertyName, localRelationPath);
         getSelectedRelationColumnMap().put(foreignTableAliasName, columnMap);
         analyzeSelectedNextConnectingRelation(foreignRelationPath);
+    }
+
+    /** {@inheritDoc} */
+    public String translateSelectedRelationPathToPropName(String foreignRelationPath) {
+        if (_selectedRelationBasicMap == null) {
+            return null;
+        }
+        return _selectedRelationBasicMap.get(foreignRelationPath);
     }
 
     protected Map<String, String> getSelectedRelationBasicMap() {
@@ -1356,8 +1367,23 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _selectedRelationBasicMap;
     }
 
-    protected Map<String, SelectedRelationColumn> createSelectedSelectColumnInfo(String foreignTableAliasName,
-            String localTableDbName, String foreignPropertyName, String localRelationPath) {
+    /** {@inheritDoc} */
+    public String translateSelectedRelationPathToTableAlias(String foreignRelationPath) {
+        if (_selectedRelationPathToTableAliasMap == null) {
+            return null;
+        }
+        return _selectedRelationPathToTableAliasMap.get(foreignRelationPath);
+    }
+
+    protected Map<String, String> getSelectedRelationPathToAliasMap() {
+        if (_selectedRelationPathToTableAliasMap == null) {
+            _selectedRelationPathToTableAliasMap = new LinkedHashMap<String, String>();
+        }
+        return _selectedRelationPathToTableAliasMap;
+    }
+
+    protected Map<String, SelectedRelationColumn> createSelectedSelectColumnInfo(String foreignTableAliasName, String localTableDbName,
+            String foreignPropertyName, String localRelationPath) {
         final DBMeta dbmeta = findDBMeta(localTableDbName);
         final ForeignInfo foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
         final int relationNo = foreignInfo.getRelationNo();
@@ -1427,8 +1453,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      * {@inheritDoc}
      */
     public boolean isSelectedNextConnectingRelation(String foreignRelationPath) {
-        return _selectedNextConnectingRelationSet != null
-                && _selectedNextConnectingRelationSet.contains(foreignRelationPath);
+        return _selectedNextConnectingRelationSet != null && _selectedNextConnectingRelationSet.contains(foreignRelationPath);
     }
 
     protected Set<String> getSelectedNextConnectingRelationSet() {
@@ -1447,9 +1472,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /**
      * {@inheritDoc}
      */
-    public void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
-            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath,
-            ForeignInfo foreignInfo, String fixedCondition, FixedConditionResolver fixedConditionResolver) {
+    public void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName, String localTableDbName,
+            Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath, ForeignInfo foreignInfo, String fixedCondition,
+            FixedConditionResolver fixedConditionResolver) {
         doRegisterOuterJoin(foreignAliasName, foreignTableDbName, localAliasName, localTableDbName // basic
                 , joinOnMap, relationPath, foreignInfo // join object
                 , fixedCondition, fixedConditionResolver); // fixed condition
@@ -1459,8 +1484,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      * {@inheritDoc}
      */
     public void registerOuterJoinFixedInline(String foreignAliasName, String foreignTableDbName, String localAliasName,
-            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath,
-            ForeignInfo foreignInfo, String fixedCondition, FixedConditionResolver fixedConditionResolver) {
+            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath, ForeignInfo foreignInfo,
+            String fixedCondition, FixedConditionResolver fixedConditionResolver) {
         doRegisterOuterJoin(foreignAliasName, foreignTableDbName, localAliasName, localTableDbName // same as normal
                 , joinOnMap, relationPath, foreignInfo // normal until here
                 , null, null); // null set to OnClause
@@ -1474,9 +1499,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
     }
 
-    protected void doRegisterOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
-            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath,
-            ForeignInfo foreignInfo, String fixedCondition, FixedConditionResolver fixedConditionResolver) {
+    protected void doRegisterOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName, String localTableDbName,
+            Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath, ForeignInfo foreignInfo, String fixedCondition,
+            FixedConditionResolver fixedConditionResolver) {
         assertAlreadyOuterJoin(foreignAliasName);
         assertJoinOnMapNotEmpty(joinOnMap, foreignAliasName);
         final Map<String, LeftOuterJoinInfo> outerJoinMap = getOuterJoinMap();
@@ -2205,8 +2230,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
     }
 
-    protected OrderByElement newOrderByElement(ColumnInfo columnInfo, boolean derived, String aliasName,
-            String columnName) {
+    protected OrderByElement newOrderByElement(ColumnInfo columnInfo, boolean derived, String aliasName, String columnName) {
         return new OrderByElement(aliasName, columnName, columnInfo, derived);
     }
 
@@ -2231,8 +2255,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             public String setup(String columnName, String orderByElementClause, boolean nullsFirst) {
                 final String thenNumber = nullsFirst ? "1" : "0";
                 final String elseNumber = nullsFirst ? "0" : "1";
-                final String caseWhen = "case when " + columnName + " is not null then " + thenNumber + " else "
-                        + elseNumber + " end asc";
+                final String caseWhen = "case when " + columnName + " is not null then " + thenNumber + " else " + elseNumber + " end asc";
                 return caseWhen + ", " + orderByElementClause;
             }
         };
@@ -2990,8 +3013,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         for (final Iterator<QueryClauseFilter> ite = _whereClauseSimpleFilterList.iterator(); ite.hasNext();) {
             final QueryClauseFilter filter = ite.next();
             if (filter == null) {
-                String msg = "The list of filter should not have null: _whereClauseSimpleFilterList="
-                        + _whereClauseSimpleFilterList;
+                String msg = "The list of filter should not have null: _whereClauseSimpleFilterList=" + _whereClauseSimpleFilterList;
                 throw new IllegalStateException(msg);
             }
             clauseElement = filter.filterClauseElement(clauseElement);
@@ -3369,8 +3391,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         sb.append(")");
     }
 
-    protected void buildQueryUpdateDirectClause(Map<String, Object> columnParameterMap, String whereClause,
-            DBMeta dbmeta, StringBuilder sb) {
+    protected void buildQueryUpdateDirectClause(Map<String, Object> columnParameterMap, String whereClause, DBMeta dbmeta, StringBuilder sb) {
         if (hasUnionQuery()) {
             throwQueryUpdateUnavailableFunctionException("union", dbmeta);
         }
@@ -3423,8 +3444,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return whereClause.contains("exists (") || whereClause.contains("(select ");
     }
 
-    protected void buildQueryUpdateSetClause(Map<String, Object> columnParameterMap, DBMeta dbmeta, StringBuilder sb,
-            String aliasName) {
+    protected void buildQueryUpdateSetClause(Map<String, Object> columnParameterMap, DBMeta dbmeta, StringBuilder sb, String aliasName) {
         if (columnParameterMap == null) {
             String msg = "The argument 'columnParameterMap' should not be null.";
             throw new IllegalArgumentException(msg);

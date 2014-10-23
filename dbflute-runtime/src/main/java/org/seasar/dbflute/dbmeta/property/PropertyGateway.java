@@ -13,22 +13,28 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.dbmeta;
+package org.seasar.dbflute.dbmeta.property;
+
+import org.seasar.dbflute.Entity;
 
 /**
- * The interface of derived mappable object (basically entity), for (Specify)DerivedReferrer.
+ * The interface of property gateway.
  * @author jflute
- * @since 1.0.6A (2014/06/18 Wednesday)
+ * @since 0.9.9.3D (2012/03/26 Monday)
  */
-public interface DerivedMappable {
-
-    /** The prefix mark for derived mapping alias. */
-    String MAPPING_ALIAS_PREFIX = "$";
+public interface PropertyGateway {
 
     /**
-     * Register value derived by (Specify)DerivedReferrer.
-     * @param aliasName The alias name of derived-referrer. (NotNull)
-     * @param selectedValue The selected value from database. (NullAllowed)
+     * Read the property value from the entity.
+     * @param entity The target entity to read. (NotNull)
+     * @return The read value. (NullAllowed)
      */
-    void registerDerivedValue(String aliasName, Object selectedValue);
+    Object read(Entity entity);
+
+    /**
+     * Write the property value to the entity.
+     * @param entity The target entity to write. (NotNull)
+     * @param value The written value. (NullAllowed)
+     */
+    void write(Entity entity, Object value);
 }

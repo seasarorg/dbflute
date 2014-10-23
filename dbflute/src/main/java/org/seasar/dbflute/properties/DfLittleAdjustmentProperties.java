@@ -444,6 +444,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isOverridingQueryAllowed", isCompatibleBeforeJava8());
     }
 
+    public boolean isNonSpecifiedColumnAccessAllowed() { // closet
+        return isProperty("isNonSpecifiedColumnAccessAllowed", isCompatibleBeforeJava8());
+    }
+
     // ===================================================================================
     //                                                                      ConditionQuery
     //                                                                      ==============

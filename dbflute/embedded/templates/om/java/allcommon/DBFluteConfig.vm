@@ -97,6 +97,7 @@ public class ${glDBFluteConfig} {
     protected boolean _emptyStringQueryAllowed;
     protected boolean _emptyStringParameterAllowed;
     protected boolean _overridingQueryAllowed = ${database.isOverridingQueryAllowed()};
+    protected boolean _nonSpecifiedColumnAccessAllowed = ${database.isNonSpecifiedColumnAccessAllowed()};
     protected boolean _disableSelectIndex;
     protected boolean _queryUpdateCountPreCheck = ${database.isQueryUpdateCountPreCheck()};
 
@@ -205,7 +206,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void setPagingCountLater(boolean pagingCountLater) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting pagingCountLater: " + pagingCountLater);
         }
@@ -217,7 +218,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void setPagingCountLeastJoin(boolean pagingCountLeastJoin) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting pagingCountLeastJoin: " + pagingCountLeastJoin);
         }
@@ -232,7 +233,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void setInnerJoinAutoDetect(boolean innerJoinAutoDetect) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting innerJoinAutoDetect: " + innerJoinAutoDetect);
         }
@@ -247,7 +248,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void setThatsBadTimingDetect(boolean thatsBadTimingDetect) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting thatsBadTimingDetect: " + thatsBadTimingDetect);
         }
@@ -267,7 +268,7 @@ public class ${glDBFluteConfig} {
      * @param nullOrEmptyQueryAllowed The determination, true or false.
      */
     public void setNullOrEmptyQueryAllowed(boolean nullOrEmptyQueryAllowed) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting nullOrEmptyQueryAllowed: " + nullOrEmptyQueryAllowed);
         }
@@ -290,7 +291,7 @@ public class ${glDBFluteConfig} {
      * @param emptyStringQueryAllowed The determination, true or false.
      */
     public void setEmptyStringQueryAllowed(boolean emptyStringQueryAllowed) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting emptyStringQueryAllowed: " + emptyStringQueryAllowed);
         }
@@ -307,7 +308,7 @@ public class ${glDBFluteConfig} {
      * @param emptyStringParameterAllowed The determination, true or false.
      */
     public void setEmptyStringParameterAllowed(boolean emptyStringParameterAllowed) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting emptyStringParameterAllowed: " + emptyStringParameterAllowed);
         }
@@ -324,11 +325,31 @@ public class ${glDBFluteConfig} {
      * @param overridingQueryAllowed The determination, true or false.
      */
     public void setOverridingQueryAllowed(boolean overridingQueryAllowed) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting overridingQueryAllowed: " + overridingQueryAllowed);
         }
         _overridingQueryAllowed = overridingQueryAllowed;
+    }
+
+    // ===================================================================================
+    //                                                                Non-Specified Access
+    //                                                                ====================
+    public boolean isNonSpecifiedColumnAccessAllowed() {
+        return _nonSpecifiedColumnAccessAllowed;
+    }
+
+    /**
+     * Set whether non-specified column access is allowed or not. <br />
+     * This configuration is only for ConditionBean.
+     * @param nonSpecifiedColumnAccessAllowed The determination, true or false.
+     */
+    public void setNonSpecifiedColumnAccessAllowed(boolean nonSpecifiedColumnAccessAllowed) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting nonSpecifiedColumnAccessAllowed: " + nonSpecifiedColumnAccessAllowed);
+        }
+        _nonSpecifiedColumnAccessAllowed = nonSpecifiedColumnAccessAllowed;
     }
 
     // ===================================================================================
@@ -339,7 +360,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void setDisableSelectIndex(boolean disableSelectIndex) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting disableSelectIndex: " + disableSelectIndex);
         }
@@ -354,7 +375,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void setQueryUpdateCountPreCheck(boolean queryUpdateCountPreCheck) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting queryUpdateCountPreCheck: " + queryUpdateCountPreCheck);
         }
@@ -365,7 +386,7 @@ public class ${glDBFluteConfig} {
     //                                                                Query Log Level Info
     //                                                                ====================
     public void setQueryLogLevelInfo(boolean queryLogLevelInfo) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting queryLogLevelInfo: " + queryLogLevelInfo);
         }
@@ -378,7 +399,7 @@ public class ${glDBFluteConfig} {
     //                                                       Execute Status Log Level Info
     //                                                       =============================
     public void setExecuteStatusLogLevelInfo(boolean executeStatusLogLevelInfo) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting executeStatusLogLevelInfo: " + executeStatusLogLevelInfo);
         }
@@ -395,7 +416,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void setLogDateFormat(String logDateFormat) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting logDateFormat: " + logDateFormat);
         }
@@ -407,7 +428,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void setLogTimestampFormat(String logTimestampFormat) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting logTimestampFormat: " + logTimestampFormat);
         }
@@ -422,7 +443,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void setDefaultStatementConfig(StatementConfig defaultStatementConfig) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting defaultStatementConfig: " + defaultStatementConfig);
         }
@@ -437,7 +458,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void setCursorSelectFetchSize(Integer cursorSelectFetchSize) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting cursorSelectFetchSize: " + cursorSelectFetchSize);
         }
@@ -459,7 +480,7 @@ public class ${glDBFluteConfig} {
      * @param dataSourceHandler The handler of data source. (NullAllowed)
      */
     public void setDataSourceHandler(DataSourceHandler dataSourceHandler) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting dataSourceHandler: " + dataSourceHandler);
         }
@@ -481,7 +502,7 @@ public class ${glDBFluteConfig} {
      * @param physicalConnectionDigger The digger of physical connection. (NotNull)
      */
     public void setPhysicalConnectionDigger(PhysicalConnectionDigger physicalConnectionDigger) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting physicalConnectionDigger: " + physicalConnectionDigger);
         }
@@ -506,7 +527,7 @@ public class ${glDBFluteConfig} {
      * @param sqlExceptionDigger The digger of SQLException. (NotNull)
      */
     public void setSQLExceptionDigger(SQLExceptionDigger sqlExceptionDigger) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting sqlExceptionDigger: " + sqlExceptionDigger);
         }
@@ -530,7 +551,7 @@ public class ${glDBFluteConfig} {
      * @param outsideSqlPackage The package of outside SQL. (NullAllowed)
      */
     public void setOutsideSqlPackage(String outsideSqlPackage) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting outsideSqlPackage: " + outsideSqlPackage);
         }
@@ -546,7 +567,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void setUseSqlLogRegistry(boolean useSqlLogRegistry) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting useSqlLogRegistry: " + useSqlLogRegistry);
         }
@@ -568,7 +589,7 @@ public class ${glDBFluteConfig} {
      * @param sequenceCacheKeyGenerator The key generator of sequence cache. (NullAllowed)
      */
     public void setSequenceCacheKeyGenerator(SequenceCacheKeyGenerator sequenceCacheKeyGenerator) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting sequenceCacheKeyGenerator: " + sequenceCacheKeyGenerator);
         }
@@ -590,7 +611,7 @@ public class ${glDBFluteConfig} {
      * @param sqlClauseCreator The creator of SQL clause. (NullAllowed)
      */
     public void setSqlClauseCreator(SqlClauseCreator sqlClauseCreator) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting sqlClauseCreator: " + sqlClauseCreator);
         }
@@ -615,7 +636,7 @@ public class ${glDBFluteConfig} {
      * @param tableSqlNameFilter The SQL name filter for table. (NullAllowed)
      */
     public void setTableSqlNameFilter(SqlNameFilter tableSqlNameFilter) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting tableSqlNameFilter: " + tableSqlNameFilter);
         }
@@ -631,7 +652,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void setOutsideSqlExecutorFactory(OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting outsideSqlExecutorFactory: " + outsideSqlExecutorFactory);
         }
@@ -647,7 +668,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void setGearedCipherManager(GearedCipherManager gearedCipherManager) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting gearedCipherManager: " + gearedCipherManager);
         }
@@ -667,7 +688,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void useDefaultFullTextSearchOperand() {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Using fullTextSearchOperand: Default");
         }
@@ -675,7 +696,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void useOldFullTextSearchOperand() {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Using fullTextSearchOperand: Old");
         }
@@ -692,7 +713,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void setInternalDebug(boolean internalDebug) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting internalDebug: " + internalDebug);
         }
@@ -709,7 +730,7 @@ public class ${glDBFluteConfig} {
      * @param valueType The basic value type. (NotNull)
      */
     public void registerBasicValueType(Class<?> keyType, ValueType valueType) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Registering basic valueType: " + keyType + " = " + valueType);
         }
@@ -717,7 +738,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void removeBasicValueType(Class<?> keyType) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Removing basic valueType: " + keyType);
         }
@@ -731,7 +752,7 @@ public class ${glDBFluteConfig} {
      * @param valueType The plug-in value type. (NotNull)
      */
     public void registerPluginValueType(String keyName, ValueType valueType) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Registering plug-in valueType: " + keyName + " = " + valueType);
         }
@@ -739,7 +760,7 @@ public class ${glDBFluteConfig} {
     }
 
     public void removePluginValueType(String keyName) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Removing plug-in valueType: keyName=" + keyName);
         }
@@ -749,10 +770,6 @@ public class ${glDBFluteConfig} {
     // ===================================================================================
     //                                                                  Configuration Lock
     //                                                                  ==================
-    public boolean isLocked() {
-        return _locked;
-    }
-
     public void lock() {
         if (_locked) {
             return;
@@ -773,7 +790,11 @@ public class ${glDBFluteConfig} {
         _locked = false;
     }
 
-    protected void assertNotLocked() {
+    public boolean isLocked() {
+        return _locked;
+    }
+
+    protected void assertUnlocked() {
         if (!isLocked()) {
             return;
         }

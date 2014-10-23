@@ -126,6 +126,26 @@ public final class DfTypeUtil {
         }
     }
 
+    public static String toStringNumber(Number value, String pattern) {
+        if (value != null) {
+            if (pattern != null) {
+                return createDecimalFormat(pattern).format(value);
+            }
+            return value.toString();
+        }
+        return null;
+    }
+
+    public static String toStringDate(Date value, String pattern, TimeZone timeZone) {
+        if (value != null) {
+            if (pattern != null) {
+                return createDateFormat(pattern, timeZone).format(value);
+            }
+            return value.toString();
+        }
+        return null;
+    }
+
     protected static String toStringFromNumber(Number value, String pattern) {
         if (value != null) {
             if (pattern != null) {

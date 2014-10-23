@@ -26,6 +26,7 @@ import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.dbmeta.name.TableSqlName;
+import org.seasar.dbflute.dbmeta.property.PropertyGateway;
 
 /**
  * The interface of DB meta for one table.

@@ -45,7 +45,7 @@ import org.seasar.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
-import org.seasar.dbflute.dbmeta.DerivedTypeHandler;
+import org.seasar.dbflute.dbmeta.accessory.DerivedTypeHandler;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
@@ -143,8 +143,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** The configuration of statement. {Internal} (NullAllowed) */
     protected StatementConfig _statementConfig;
 
-    /** Does it cache of relation entity instance? {Internal} */
-    protected boolean _relationMappingCache = true;
+    /** Can the relation mapping (entity instance) be cached? {Internal} */
+    protected boolean _canRelationMappingCache = true; // fixedly true as default
+
+    /** Does it allow access to non-specified column? {Internal} */
+    protected boolean _nonSpecifiedColumnAccessAllowed; // the default is on the DBFlute generator (false @since 1.1)
 
     /** The option of cursor select. {Internal} (NullAllowed) */
     protected CursorSelectOption _cursorSelectOption; // set by sub-class
@@ -198,8 +201,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
         final String foreignTableAliasName = callback.qf().xgetAliasName();
         final String localRelationPath = localCQ().xgetRelationPath();
         final String foreignRelationPath = callback.qf().xgetRelationPath();
-        getSqlClause().registerSelectedRelation(foreignTableAliasName, getTableDbName(), foreignPropertyName,
-                localRelationPath, foreignRelationPath);
+        getSqlClause().registerSelectedRelation(foreignTableAliasName, getTableDbName(), foreignPropertyName, localRelationPath,
+                foreignRelationPath);
     }
 
     protected static interface SsCall {
@@ -285,8 +288,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                        Column Query
     //                                                                        ============
-    protected <CB extends ConditionBean> HpCalculator xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp,
-            SpecifyQuery<CB> rightSp, final String operand) {
+    protected <CB extends ConditionBean> HpCalculator xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp, SpecifyQuery<CB> rightSp,
+            final String operand) {
         assertQueryPurpose();
 
         final HpCalcSpecification<CB> leftCalcSp = xcreateCalcSpecification(leftSp);
@@ -310,8 +313,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return new HpColQyOperand<CB>(handler);
     }
 
-    protected <CB extends ConditionBean> HpColQyOperand.HpExtendedColQyOperandMySql<CB> xcreateColQyOperandMySql(
-            HpColQyHandler<CB> handler) {
+    protected <CB extends ConditionBean> HpColQyOperand.HpExtendedColQyOperandMySql<CB> xcreateColQyOperandMySql(HpColQyHandler<CB> handler) {
         return new HpColQyOperand.HpExtendedColQyOperandMySql<CB>(handler);
     }
 
@@ -328,8 +330,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return xbuildColQyColumn(rightCB, realName.toString(), "right");
     }
 
-    protected <CB extends ConditionBean> ColumnRealName xextractColQyColumnRealName(CB cb,
-            HpCalcSpecification<CB> calcSp) {
+    protected <CB extends ConditionBean> ColumnRealName xextractColQyColumnRealName(CB cb, HpCalcSpecification<CB> calcSp) {
         final Object mysticBinding = cb.xgetMysticBinding();
         if (mysticBinding != null) {
             calcSp.setMysticBindingSnapshot(mysticBinding);
@@ -338,14 +339,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return xdoExtractColQyColumnSpecifiedColumn(calcSp);
     }
 
-    protected <CB extends ConditionBean> ColumnRealName xdoExtractColQyColumnMysticBinding(CB cb,
-            final Object mysticBinding) {
+    protected <CB extends ConditionBean> ColumnRealName xdoExtractColQyColumnMysticBinding(CB cb, final Object mysticBinding) {
         final String exp = cb.getSqlClause().registerFreeParameterToThemeList("mystic", mysticBinding);
         return ColumnRealName.create(null, new ColumnSqlName(exp));
     }
 
-    protected <CB extends ConditionBean> ColumnRealName xdoExtractColQyColumnSpecifiedColumn(
-            HpCalcSpecification<CB> calcSp) {
+    protected <CB extends ConditionBean> ColumnRealName xdoExtractColQyColumnSpecifiedColumn(HpCalcSpecification<CB> calcSp) {
         final ColumnRealName realName = calcSp.getResolvedSpecifiedColumnRealName();
         if (realName == null) {
             createCBExThrower().throwColumnQueryInvalidColumnSpecificationException(this);
@@ -437,8 +436,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return SubQueryIndentProcessor.moveSubQueryEndToRear(columnExp + inserted);
     }
 
-    protected <CB extends ConditionBean> void xregisterColQyClause(QueryClause queryClause,
-            final HpCalcSpecification<CB> leftCalcSp, final HpCalcSpecification<CB> rightCalcSp) {
+    protected <CB extends ConditionBean> void xregisterColQyClause(QueryClause queryClause, final HpCalcSpecification<CB> leftCalcSp,
+            final HpCalcSpecification<CB> rightCalcSp) {
         // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
         // may null-revived -> no way to be inner-join
         // (DerivedReferrer or conversion's coalesce)
@@ -1259,14 +1258,27 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public void disableRelationMappingCache() {
         // deprecated methods from the beginning are not defined as interface methods
-        _relationMappingCache = false;
+        _canRelationMappingCache = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean canRelationMappingCache() {
-        return _relationMappingCache;
+        return _canRelationMappingCache;
+    }
+
+    /** {@inheritDoc} */
+    public void enableNonSpecifiedColumnAccess() {
+        _nonSpecifiedColumnAccessAllowed = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableNonSpecifiedColumnAccess() {
+        _nonSpecifiedColumnAccessAllowed = false;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isNonSpecifiedColumnAccessAllowed() {
+        return _nonSpecifiedColumnAccessAllowed;
     }
 
     // ===================================================================================

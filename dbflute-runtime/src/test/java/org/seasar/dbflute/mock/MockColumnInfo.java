@@ -18,9 +18,9 @@ package org.seasar.dbflute.mock;
 import java.lang.reflect.Method;
 
 import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType;
-import org.seasar.dbflute.dbmeta.PropertyGateway;
-import org.seasar.dbflute.dbmeta.PropertyMethodFinder;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.property.PropertyGateway;
+import org.seasar.dbflute.dbmeta.property.PropertyMethodFinder;
 
 /**
  * @author jflute

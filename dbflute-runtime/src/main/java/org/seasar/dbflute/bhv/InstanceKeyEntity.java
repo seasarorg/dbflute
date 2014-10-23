@@ -82,8 +82,8 @@ public class InstanceKeyEntity implements Entity {
         return _actualEntity.myuniqueDrivenProperties();
     }
 
-    public Set<String> modifiedProperties() {
-        return _actualEntity.modifiedProperties();
+    public Set<String> mymodifiedProperties() {
+        return _actualEntity.mymodifiedProperties();
     }
 
     public void clearModifiedInfo() {
@@ -92,6 +92,18 @@ public class InstanceKeyEntity implements Entity {
 
     public boolean hasModification() {
         return _actualEntity.hasModification();
+    }
+
+    public void modifiedToSpecified() {
+        _actualEntity.mymodifiedProperties();
+    }
+
+    public Set<String> myspecifiedProperties() {
+        return _actualEntity.myspecifiedProperties();
+    }
+
+    public void clearSpecifiedInfo() {
+        _actualEntity.clearSpecifiedInfo();
     }
 
     public void markAsSelect() {

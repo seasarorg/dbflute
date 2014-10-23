@@ -39,16 +39,8 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 #if ($table.needsMappingValueType())
 import org.seasar.dbflute.dbmeta.MappingValueType;
 #end
-#if ($table.isEntityDerivedMappable())
-import org.seasar.dbflute.dbmeta.DerivedMappable;
-#end
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
-#end
-import org.seasar.dbflute.Entity.EntityUniqueDrivenProperties;
-import org.seasar.dbflute.Entity.EntityModifiedProperties;
-#if ($table.isEntityDerivedMappable())
-import org.seasar.dbflute.Entity.EntityDerivedMap;
 #end
 import org.seasar.dbflute.Entity.FunCustodial;
 import org.seasar.dbflute.helper.beans.DfCoupleProperties;
@@ -66,11 +58,11 @@ import ${myExtendedEntityPackageName}._;
 #if ($table.isLoadableCustomizeEntity())
 import ${glPackageExtendedEntity}._;
 #end
-#set ($myEntityInterfaceName = "")
+#set ($myEntityInterfaceDef = "")
 #if (${table.hasAllCommonColumn()})
-  #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumn})
+#set ($myEntityInterfaceDef = " with ${glEntityDefinedCommonColumn}")
 #else
-  #set ($myEntityInterfaceName = "Entity")
+#set ($myEntityInterfaceDef = "")
 #end
 #if ($table.hasRelationalNullObjectProviderImport())
 import ${table.relationalNullObjectProviderPackage}._;
@@ -121,7 +113,7 @@ import ${table.relationalNullObjectProviderPackage}._;
  * </pre>
  * @author ${database.classAuthor}
  */
-abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[${myImmutableExtendedObjectClassName}] with Serializable with Cloneable${table.derivedMappableDefinition} {
+abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef} with DBableEntity[${myImmutableExtendedObjectClassName}] with Serializable with Cloneable${table.derivedMappableDefinition} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -134,28 +126,6 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
     protected var _${col.uncapitalisedJavaName}: ${col.javaNative} = ${col.javaNativeVariableDefaultValue};
 
 #end
-    // -----------------------------------------------------
-    //                                              Internal
-    //                                              --------
-    /** The unique-driven properties for this entity. (NotNull) */
-    protected val __uniqueDrivenProperties: EntityUniqueDrivenProperties = newUniqueDrivenProperties();
-
-    /** The modified properties for this entity. (NotNull) */
-    protected val __modifiedProperties: EntityModifiedProperties = newModifiedProperties();
-#if ($table.isEntityDerivedMappable())
-
-    /** The map of derived value, key is alias name. (NullAllowed: lazy-loaded) */
-    protected var __derivedMap: EntityDerivedMap = null;
-#end
-#if ($table.hasAllCommonColumn())
-
-    /** Is common column auto set up effective? */
-    protected var __canCommonColumnAutoSetup: Boolean = true;
-#end
-
-    /** Is the entity created by DBFlute select process? */
-    protected var __createdBySelect: Boolean = false;
-
     // ===================================================================================
     //                                                                           Immutable
     //                                                                           =========
@@ -202,7 +172,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
     /**
      * {@inheritDoc}
      */
-    def getTablePropertyName(): String = { // according to Java Beans rule
+    def getTablePropertyName(): String = {
         return "${table.javaBeansRulePropertyName}";
     }
 
@@ -248,17 +218,6 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
     }
 #end
 
-    /**
-     * {@inheritDoc}
-     */
-    def myuniqueDrivenProperties(): Set[String] = {
-        return __uniqueDrivenProperties.getPropertyNames();
-    }
-
-    protected def newUniqueDrivenProperties(): EntityUniqueDrivenProperties = {
-        return new EntityUniqueDrivenProperties();
-    }
-
 #if ($table.hasClassification())
     // ===================================================================================
     //                                                             Classification Property
@@ -289,9 +248,9 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
      */
     def set${col.javaName}As${col.classificationName}(cdef: ${glCDef}.${col.classificationName}): Unit = {
 #if ($col.isJavaNativeNumberObject())
-        set${col.javaName}(if (cdef != null) { FunCustodial.toNumber(cdef.code, classOf[${col.javaNative}]) } else { null });
+        set${col.javaName}(if (cdef != null) { toNumber(cdef.code, classOf[${col.javaNative}]) } else { null });
 #elseif ($col.isJavaNativeBooleanObject())
-        set${col.javaName}(if (cdef != null) { FunCustodial.toBoolean(cdef.code) } else { null });
+        set${col.javaName}(if (cdef != null) { toBoolean(cdef.code) } else { null });
 #else
         set${col.javaName}(if (cdef != null) { cdef.code } else { null });
 #end
@@ -577,114 +536,6 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
     }
 
     // ===================================================================================
-    //                                                                 Modified Properties
-    //                                                                 ===================
-    /**
-     * {@inheritDoc}
-     */
-    def modifiedProperties(): Set[String] = {
-        return __modifiedProperties.getPropertyNames();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    def clearModifiedInfo(): Unit = {
-        __modifiedProperties.clear();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    def hasModification(): scala.Boolean = {
-        return !__modifiedProperties.isEmpty();
-    }
-
-    protected def newModifiedProperties(): EntityModifiedProperties = {
-        return new EntityModifiedProperties();
-    }
-
-    // ===================================================================================
-    //                                                                     Birthplace Mark
-    //                                                                     ===============
-    /**
-     * {@inheritDoc}
-     */
-    def markAsSelect(): Unit = {
-        __createdBySelect = true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    def createdBySelect(): scala.Boolean = {
-        return __createdBySelect;
-    }
-#if (${table.hasAllCommonColumn()})
-
-    // ===================================================================================
-    //                                                                       Common Column
-    //                                                                       =============
-    /**
-     * {@inheritDoc}
-     */
-    def enableCommonColumnAutoSetup(): Unit = {
-        __canCommonColumnAutoSetup = true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    def disableCommonColumnAutoSetup(): Unit = {
-        __canCommonColumnAutoSetup = false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    def canCommonColumnAutoSetup(): scala.Boolean = {
-        return __canCommonColumnAutoSetup;
-    }
-#end
-#if ($table.isEntityDerivedMappable())
-
-    // ===================================================================================
-    //                                                                    Derived Mappable
-    //                                                                    ================
-    /**
-     * {@inheritDoc}
-     */
-    def registerDerivedValue(aliasName: String, selectedValue: Object): Unit = {
-        if (__derivedMap == null) { __derivedMap = newDerivedMap(); }
-        __derivedMap.registerDerivedValue(aliasName, selectedValue);
-    }
-
-    /**
-     * Find the derived value from derived map.
-     * <pre>
-     * mapping type:
-     *  count()      : Integer
-     *  max(), min() : (same as property type of the column)
-     *  sum(), avg() : BigDecimal
-     *
-     * e.g. use count()
-     *  Integer loginCount = member.derived("$LOGIN_COUNT");
-     * </pre>
-     * @param <VALUE> The type of the value.
-     * @param aliasName The alias name of derived-referrer. (NotNull)
-     * @return The derived value found in the map. (NullAllowed: when null selected)
-     */
-    def derived[VALUE](aliasName: String): VALUE = {
-        if (__derivedMap == null) { __derivedMap = newDerivedMap(); }
-        return __derivedMap.findDerivedValue(aliasName);
-    }
-
-    protected def newDerivedMap(): EntityDerivedMap = {
-        return new EntityDerivedMap();
-    }
-#end
-
-    // ===================================================================================
     //                                                                        Scala Helper
     //                                                                        ============
     protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): immutable.List[ENTITY] = {
@@ -701,7 +552,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
      * @param obj The object as other entity. (NullAllowed: if null, returns false fixedly)
      * @return Comparing result.
      */
-    override def equals(obj: Any) = {
+    override protected def doEquals(obj: Any) = {
         obj match {
             case obj: $myClassName => {
                 val other: $myClassName = obj.asInstanceOf[$myClassName];
@@ -716,57 +567,34 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
             case _ => false
         }
     }
-    protected def xSV(v1: Object, v2: Object): scala.Boolean = {
-        return FunCustodial.isSameValue(v1, v2);
-    }
 
-    /**
-     * Calculate the hash-code from primary-keys or columns.
-     * @return The hash-code from primary-key or columns.
-     */
-    override def hashCode(): Int = {
-        var hs: Int = 17;
+    override protected def doHashCode(initial: Int): Int = {
+        var hs: Int = initial;
         hs = xCH(hs, getTableDbName());
 #foreach ($col in $table.equalsHashcodeColumnList)
         hs = xCH(hs, get${col.javaName}());
 #end
         return hs;
     }
-    protected def xCH(hs: Int, value: Object): Int = {
-        return FunCustodial.calculateHashcode(hs, value);
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    def instanceHash(): Int = {
-        return super.hashCode();
-    }
-
-    /**
-     * Convert to display string of entity's data. (no relation data)
-     * @return The display string of all columns and relation existences. (NotNull)
-     */
-    override def toString(): String = {
-        return buildDisplayString(FunCustodial.toClassTitle(this), true, true);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    def toStringWithRelation(): String = {
-        val sb: StringBuilder = new StringBuilder();
-        sb.append(toString());
+    override protected def doBuildStringWithRelation(li: String): String = {
 #if ($table.hasRelation())
-        val li: String = "\n  ";
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
+#if ($fk.isForeignPropertyOptionalEntity())
+        if (${foreignVariableName} != null && ${foreignVariableName}.isEmpty)
+#else
         if (${foreignVariableName} != null)
+#end
         { sb.append(li).append(xbRDS(${foreignVariableName}, "${fk.foreignPropertyName}")); }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+#if ($fk.isForeignPropertyOptionalEntity())
+        if (${referrerVariableName} != null && ${referrerVariableName}.isEmpty)
+#else
         if (${referrerVariableName} != null)
+#end
         { sb.append(li).append(xbRDS(${referrerVariableName}, "${referrer.referrerPropertyNameAsOne}")); }
 #end
 #foreach ($referrer in $table.referrerAsManyList)
@@ -776,31 +604,14 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
 #end
         return sb.toString();
     }
-#if ($table.hasRelation())
-    protected def xbRDS(et: Entity, name: String): String = {
-        return et.buildDisplayString(name, true, true);
-    }
-#end
 #if ($table.hasOptionalRelation())
     protected def xbRDS[ET <: Entity](et: ${database.relationOptionalEntityClassName}[ET], name: String): String = {
         return et.get.buildDisplayString(name, true, true);
     }
 #end
 
-    /**
-     * {@inheritDoc}
-     */
-    def buildDisplayString(name: String, column: scala.Boolean, relation: scala.Boolean): String = {
+    override protected def doBuildColumnString(dm: String): String = {
         val sb: StringBuilder = new StringBuilder();
-        if (name != null) { sb.append(name).append(if (column || relation) { ":" } else { "" }); }
-        if (column) { sb.append(buildColumnString()); }
-        if (relation) { sb.append(buildRelationString()); }
-        sb.append("@").append(Integer.toHexString(hashCode()));
-        return sb.toString();
-    }
-    protected def buildColumnString(): String = {
-        val sb: StringBuilder = new StringBuilder();
-        val dm: String = ", ";
 #foreach ($col in $table.columns)
 #if ($col.isJavaNativeUtilDate())
         sb.append(dm).append(xfUD(get${col.javaName}()));
@@ -816,42 +627,25 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
         sb.insert(0, "{").append("}");
         return sb.toString();
     }
-#if ($table.hasUtilDateColumn())
-    protected def xfUD(date: Date): String = { // formatUtilDate()
-        return FunCustodial.toString(date, xgDP());
-    }
-    protected def xgDP(): String = { // getDatePattern
-#if ($database.isDatabaseOracle())
-        return "yyyy-MM-dd HH:mm:ss"; // time parts for Oracle only
-#else
-        return "yyyy-MM-dd";
-#end
-    }
-#end
-#if ($table.hasByteArrayColumn())
-    protected def xfBA(bytes: byte[]): String = { // formatByteArray()
-        return FunCustodial.toString(bytes);
-    }
-#end
-    protected def buildRelationString(): String = {
+
+    override protected def doBuildRelationString(dm: String): String = {
 #if ($table.hasRelation())
         val sb: StringBuilder = new StringBuilder();
-        val cm: String = ",  ";
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
-        if (${foreignVariableName} != null) { sb.append(cm).append("${fk.foreignPropertyName}"); }
+        if (${foreignVariableName} != null) { sb.append(dm).append("${fk.foreignPropertyName}"); }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
-        if (${referrerVariableName} != null) { sb.append(cm).append("${referrer.referrerPropertyNameAsOne}"); }
+        if (${referrerVariableName} != null) { sb.append(dm).append("${referrer.referrerPropertyNameAsOne}"); }
 #end
 #foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
         if (${referrerVariableName} != null && !${referrerVariableName}.isEmpty)
-        { sb.append(cm).append("${referrer.referrerPropertyName}"); }
+        { sb.append(dm).append("${referrer.referrerPropertyName}"); }
 #end
-        if (sb.length() > cm.length()) {
-            sb.delete(0, cm.length()).insert(0, "(").append(")");
+        if (sb.length() > dm.length()) {
+            sb.delete(0, dm.length()).insert(0, "(").append(")");
         }
         return sb.toString();
 #else
@@ -859,18 +653,8 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
 #end
     }
 
-    /**
-     * Clone entity instance using super.clone(). (shallow copy) 
-     * @return The cloned instance of this entity. (NotNull)
-     */
     override def clone(): ${myExtendedObjectClassName} = {
-        try {
-            return super.clone().asInstanceOf[${myExtendedObjectClassName}];
-        } catch {
-            case e: CloneNotSupportedException => {
-                throw new IllegalStateException("Failed to clone the entity: " + toString(), e);
-            }
-        }
+        return super.clone().asInstanceOf[${myExtendedObjectClassName}];
     }
 
 #set ($propertyLoopIndex = 0)
@@ -967,17 +751,5 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
         set${col.javaName}(${col.uncapitalisedJavaName});
     }
 #end
-#end
-#if ($table.hasEntityConvertEmptyStringToNull())
-
-    protected def convertEmptyToNull(value: String): String = {
-        return FunCustodial.convertEmptyToNull(value);
-    }
-#end
-#if ($table.hasCheckClassificationCodeOnEntity())
-
-    protected def checkClassificationCode(columnDbName: String, meta: ${glCDef}.DefMeta, value: Object): Unit = {
-        FunCustodial.checkClassificationCode(this, columnDbName, meta, value);
-    }
 #end
 }

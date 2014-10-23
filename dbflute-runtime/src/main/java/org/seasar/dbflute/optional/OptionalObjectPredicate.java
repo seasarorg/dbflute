@@ -27,12 +27,5 @@ package org.seasar.dbflute.optional;
  * @author jflute
  * @since 1.0.5G (2014/05/26 Monday)
  */
-public interface OptionalObjectPredicate<OBJ> {
-
-    /**
-     * Test the object in the optional object.
-     * @param obj The wrapped object in the optional object. (NotNull)
-     * @return The determination, true or false.
-     */
-    boolean test(OBJ obj);
+public interface OptionalObjectPredicate<OBJ> extends OptionalThingPredicate<OBJ> {
 }

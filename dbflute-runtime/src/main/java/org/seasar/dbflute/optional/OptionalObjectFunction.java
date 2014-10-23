@@ -28,12 +28,5 @@ package org.seasar.dbflute.optional;
  * @author jflute
  * @since 1.0.5F (2014/05/10 Saturday)
  */
-public interface OptionalObjectFunction<OBJ, RESULT> {
-
-    /**
-     * Apply the object in the optional object.
-     * @param obj The wrapped object in the optional object. (NotNull)
-     * @return The result of mapping. (NullAllowed: if null, map() returns empty optional object)
-     */
-    RESULT apply(OBJ obj);
+public interface OptionalObjectFunction<OBJ, RESULT> extends OptionalThingFunction<OBJ, RESULT> {
 }

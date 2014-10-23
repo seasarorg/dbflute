@@ -54,14 +54,14 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     //                                                                          ==========
     protected static final OptionalEntity<Object> EMPTY_INSTANCE;
     static {
-        EMPTY_INSTANCE = new OptionalEntity<Object>(null, new OptionalObjectExceptionThrower() {
+        EMPTY_INSTANCE = new OptionalEntity<Object>(null, new OptionalThingExceptionThrower() {
             public void throwNotFoundException() {
                 String msg = "The empty optional so the value is null.";
                 throw new EntityAlreadyDeletedException(msg);
             }
         });
     }
-    protected static final OptionalObjectExceptionThrower NOWAY_THROWER = new OptionalObjectExceptionThrower() {
+    protected static final OptionalThingExceptionThrower NOWAY_THROWER = new OptionalThingExceptionThrower() {
         public void throwNotFoundException() {
             throw new EntityAlreadyDeletedException("no way");
         }
@@ -74,7 +74,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * @param entity The wrapped instance of entity. (NullAllowed)
      * @param thrower The exception thrower when illegal access. (NotNull)
      */
-    public OptionalEntity(ENTITY entity, OptionalObjectExceptionThrower thrower) { // basically called by DBFlute
+    public OptionalEntity(ENTITY entity, OptionalThingExceptionThrower thrower) { // basically called by DBFlute
         super(entity, thrower);
     }
 
@@ -103,7 +103,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * @param thrower The exception thrower when illegal access. (NotNull)
      * @return The new-created instance as existing or empty optional object. (NotNull)
      */
-    public static <ENTITY> OptionalEntity<ENTITY> ofNullable(ENTITY entity, OptionalObjectExceptionThrower thrower) {
+    public static <ENTITY> OptionalEntity<ENTITY> ofNullable(ENTITY entity, OptionalThingExceptionThrower thrower) {
         if (entity != null) {
             return of(entity);
         } else {
@@ -125,7 +125,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
             String msg = "The argument 'relation' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        return new OptionalEntity<EMPTY>(null, new OptionalObjectExceptionThrower() {
+        return new OptionalEntity<EMPTY>(null, new OptionalThingExceptionThrower() {
             public void throwNotFoundException() {
                 throwNonSetupSelectRelationAccessException(entity, relation);
             }
@@ -208,7 +208,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * </pre>
      * @param consumer The callback interface to consume the optional value. (NotNull)
      */
-    public void ifPresent(OptionalObjectConsumer<ENTITY> consumer) {
+    public void ifPresent(OptionalThingConsumer<ENTITY> consumer) {
         callbackIfPresent(consumer);
     }
 
@@ -244,7 +244,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * @param predicate The callback to predicate whether the entity is remained. (NotNull)
      * @return The filtered optional entity, might be empty. (NotNull)
      */
-    public OptionalEntity<ENTITY> filter(OptionalObjectPredicate<ENTITY> predicate) {
+    public OptionalEntity<ENTITY> filter(OptionalThingPredicate<ENTITY> predicate) {
         return (OptionalEntity<ENTITY>) callbackFilter(predicate);
     }
 
@@ -252,8 +252,8 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * {@inheritDoc}
      */
     @Override
-    protected <ARG> OptionalObject<ARG> createOptionalFilteredObject(ARG obj) {
-        return new OptionalObject<ARG>(obj, _thrower);
+    protected <ARG> OptionalThing<ARG> createOptionalFilteredObject(ARG obj) {
+        return new OptionalThing<ARG>(obj, _thrower);
     }
 
     /**
@@ -262,7 +262,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * MemberCB cb = new MemberCB();
      * cb.query().set...
      * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
-     * OptionalObject&lt;MemberWebBean&gt; bean = entity.<span style="color: #DD4747">map</span>(member -&gt; {
+     * OptionalThing&lt;MemberWebBean&gt; bean = entity.<span style="color: #DD4747">map</span>(member -&gt; {
      *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
      *     return new MemberWebBean(member);
      * });
@@ -270,16 +270,16 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * @param mapper The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    public <RESULT> OptionalObject<RESULT> map(OptionalObjectFunction<? super ENTITY, ? extends RESULT> mapper) {
-        return (OptionalObject<RESULT>) callbackMapping(mapper); // downcast allowed because factory is overridden
+    public <RESULT> OptionalThing<RESULT> map(OptionalThingFunction<? super ENTITY, ? extends RESULT> mapper) {
+        return (OptionalThing<RESULT>) callbackMapping(mapper); // downcast allowed because factory is overridden
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected <ARG> OptionalObject<ARG> createOptionalMappedObject(ARG obj) {
-        return new OptionalObject<ARG>(obj, _thrower);
+    protected <ARG> OptionalThing<ARG> createOptionalMappedObject(ARG obj) {
+        return new OptionalThing<ARG>(obj, _thrower);
     }
 
     // almost no needed
@@ -289,19 +289,19 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     // * MemberCB cb = new MemberCB();
     // * cb.query().set...
     // * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
-    // * OptionalObject&lt;MemberWebBean&gt; bean = entity.<span style="color: #DD4747">map</span>(member -&gt; {
+    // * OptionalThing&lt;MemberWebBean&gt; bean = entity.<span style="color: #DD4747">map</span>(member -&gt; {
     // *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
     // *     if (member.getMemberId() % 2 == 0) {
-    // *         return OptionalObject.of(new MemberWebBean(member));
+    // *         return OptionalThing.of(new MemberWebBean(member));
     // *     } else {
-    // *         return OptionalObject.empty();
+    // *         return OptionalThing.empty();
     // *     }
     // * });
     // * </pre>
     // * @param mapper The callback interface to apply. (NotNull)
     // * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
     // */
-    //public <RESULT> OptionalObject<RESULT> flatMap(OptionalObjectFunction<? super ENTITY, OptionalObject<RESULT>> mapper) {
+    //public <RESULT> OptionalThing<RESULT> flatMap(OptionalThingFunction<? super ENTITY, OptionalThing<RESULT>> mapper) {
     //    return callbackFlatMapping(mapper);
     //}
 
@@ -327,7 +327,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * @param entityLambda The callback interface to consume the optional value. (NotNull)
      * @exception EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
      */
-    public void alwaysPresent(OptionalObjectConsumer<ENTITY> entityLambda) {
+    public void alwaysPresent(OptionalThingConsumer<ENTITY> entityLambda) {
         assertEntityLambdaNotNull(entityLambda);
         callbackAlwaysPresent(entityLambda);
     }
@@ -359,8 +359,9 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * </pre>
      * @param consumer The callback interface to consume the optional value. (NotNull)
      * @exception EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
+     * @deprecated use alwaysPresent(), this is old style
      */
-    public void required(OptionalObjectConsumer<ENTITY> consumer) {
+    public void required(OptionalThingConsumer<ENTITY> consumer) {
         callbackRequired(consumer);
     }
 

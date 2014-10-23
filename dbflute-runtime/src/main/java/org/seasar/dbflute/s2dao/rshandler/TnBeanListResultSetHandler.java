@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
@@ -83,6 +84,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
 
         final TnBeanMetaData basePointBmd = getBeanMetaData();
         final boolean hasCB = hasConditionBean();
+        final boolean checkNonSp = hasCB && checkNonSpecifiedColumnAccess();
         final boolean skipRelationLoop;
         {
             final boolean emptyRelationCB = hasCB && isSelectedRelationEmpty();
@@ -107,7 +109,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
             final Object row = createRow(rs, selectIndexMap, propertyCache);
 
             if (skipRelationLoop) {
-                adjustCreatedRow(row, basePointBmd);
+                adjustCreatedRow(row, checkNonSp, basePointBmd);
                 handler.handle(row);
                 continue;
             }
@@ -129,7 +131,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                 mappingFirstRelation(rs, row, rpt, selectColumnMap, selectIndexMap, relPropCache, relRowCache,
                         relSelector);
             }
-            adjustCreatedRow(row, basePointBmd);
+            adjustCreatedRow(row, checkNonSp, basePointBmd);
             handler.handle(row);
         }
     }
@@ -156,6 +158,22 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
 
             public boolean canUseRelationCache(String relationNoSuffix) {
                 return cb != null && cb.getSqlClause().canUseRelationCache(relationNoSuffix);
+            }
+
+            public boolean isNonSpecifiedColumnAccessAllowed(String relationNoSuffix) {
+                return cb != null && cb.isNonSpecifiedColumnAccessAllowed();
+            }
+
+            public boolean isUsingSpecifyColumnInRelation(String relationNoSuffix) {
+                if (cb == null) {
+                    return false;
+                }
+                final SqlClause sqlClause = cb.getSqlClause();
+                final String tableAlias = sqlClause.translateSelectedRelationPathToTableAlias(relationNoSuffix);
+                if (tableAlias == null) { // no way but just in case
+                    return false;
+                }
+                return sqlClause.hasSpecifiedSelectColumn(tableAlias);
             }
         };
     }
@@ -222,7 +240,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                         , selectColumnMap, selectIndexMap // select resource
                         , relKey, relPropCache, relRowCache, relSelector); // relation resource
                 if (relationRow != null) { // is new created relation row
-                    adjustCreatedRow(relationRow, rpt.getYourBeanMetaData());
+                    adjustCreatedRelationRow(relationRow, relationNoSuffix, relSelector, rpt);
                     if (canUseRelationCache) {
                         relRowCache.addRelationRow(relationNoSuffix, relKey, relationRow);
                     }
@@ -283,6 +301,20 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     protected boolean canRelationMappingCache() {
         final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
         return cb.canRelationMappingCache();
+    }
+
+    /**
+     * Does it check access to non-specified column? <br />
+     * You should call {@link #hasConditionBean()} before calling this.
+     * @return The determination, true or false.
+     */
+    protected boolean checkNonSpecifiedColumnAccess() {
+        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+        if (cb.isNonSpecifiedColumnAccessAllowed()) {
+            return false;
+        }
+        final String aliasName = cb.getSqlClause().getBasePointAliasName();
+        return cb.getSqlClause().hasSpecifiedSelectColumn(aliasName);
     }
 
     // ===================================================================================

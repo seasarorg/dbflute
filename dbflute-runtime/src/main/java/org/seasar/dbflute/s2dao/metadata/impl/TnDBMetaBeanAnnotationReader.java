@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.dbmeta.MappingValueType;
+import org.seasar.dbflute.dbmeta.accessory.MappingValueType;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
