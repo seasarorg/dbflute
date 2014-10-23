@@ -408,8 +408,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                 if (fr != null) {
                     try {
                         fr.close();
-                    } catch (IOException ignored) {
-                    }
+                    } catch (IOException ignored) {}
                 }
             }
         }

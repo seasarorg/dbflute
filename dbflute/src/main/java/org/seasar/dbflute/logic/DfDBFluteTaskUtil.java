@@ -111,16 +111,14 @@ public final class DfDBFluteTaskUtil {
                         if (ins != null) {
                             try {
                                 ins.close();
-                            } catch (IOException ignored) {
-                            }
+                            } catch (IOException ignored) {}
                         }
                     }
                 } finally {
                     if (fis != null) {
                         try {
                             fis.close();
-                        } catch (IOException ignored) {
-                        }
+                        } catch (IOException ignored) {}
                     }
                 }
                 final Set<Entry<Object, Object>> entrySet = currentProp.entrySet();

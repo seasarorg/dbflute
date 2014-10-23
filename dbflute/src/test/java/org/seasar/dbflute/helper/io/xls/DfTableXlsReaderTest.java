@@ -242,8 +242,8 @@ public class DfTableXlsReaderTest extends PlainTestCase {
         final Map<String, String> tableNameMap = StringKeyMap.createAsCaseInsensitive();
         final Map<String, List<String>> notTrimTableColumnMap = prepareNotTrimTableColumnMap();
         final Map<String, List<String>> stringEmptyTableColumnMap = prepareStringEmptyTableColumnMap();
-        return new DfTableXlsReader(xlsFile, tableNameMap, notTrimTableColumnMap, stringEmptyTableColumnMap,
-                skipSheetPattern, rtrimCellValue);
+        return new DfTableXlsReader(xlsFile, tableNameMap, notTrimTableColumnMap, stringEmptyTableColumnMap, skipSheetPattern,
+                rtrimCellValue);
     }
 
     protected Map<String, List<String>> prepareNotTrimTableColumnMap() {
@@ -262,8 +262,7 @@ public class DfTableXlsReaderTest extends PlainTestCase {
         final Map<String, String> tableNameMap = StringKeyMap.createAsCaseInsensitive();
         final Map<String, List<String>> notTrimTableColumnMap = StringKeyMap.createAsCaseInsensitive();
         final Map<String, List<String>> stringEmptyTableColumnMap = StringKeyMap.createAsCaseInsensitive();
-        return new DfTableXlsReaderEmpty(tableNameMap, notTrimTableColumnMap, stringEmptyTableColumnMap,
-                skipSheetPattern);
+        return new DfTableXlsReaderEmpty(tableNameMap, notTrimTableColumnMap, stringEmptyTableColumnMap, skipSheetPattern);
     }
 
     protected static class DfTableXlsReaderEmpty extends DfTableXlsReader {

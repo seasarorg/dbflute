@@ -931,8 +931,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
                 final Object value = entry.getValue();
                 if (!(value instanceof List<?>)) {
                     final String typeExp = value != null ? value.getClass().getName() : null;
-                    String msg = "The element of suppressReferrerRelationMap should be list but: " + typeExp + " key="
-                            + key;
+                    String msg = "The element of suppressReferrerRelationMap should be list but: " + typeExp + " key=" + key;
                     throw new DfIllegalPropertyTypeException(msg);
                 }
                 @SuppressWarnings("unchecked")

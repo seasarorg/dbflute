@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
- */ 
+ */
 package org.seasar.dbflute.logic.generate.language.typemapping;
 
 import org.seasar.dbflute.unit.core.PlainTestCase;

@@ -1732,8 +1732,7 @@ public class Column {
         final DfLanguageGrammar grammar = getLanguageDependency().getLanguageGrammar();
         final String beginMark = grammar.getGenericBeginMark();
         final String endMark = grammar.getGenericEndMark();
-        return javaNative.equals("java.util.List")
-                || (Srl.startsWith(javaNative, "List" + beginMark) && Srl.endsWith(javaNative, endMark));
+        return javaNative.equals("java.util.List") || (Srl.startsWith(javaNative, "List" + beginMark) && Srl.endsWith(javaNative, endMark));
     }
 
     public boolean isJavaNativeValueOfAbleObject() { // Java Only: valueOf-able by String
@@ -2473,8 +2472,7 @@ public class Column {
     //                                         Native Method
     //                                         -------------
     public boolean isForceClassificationSetting() {
-        return hasClassification() && canBeForcedClassification()
-                && getClassificationTop().isForceClassificationSetting();
+        return hasClassification() && canBeForcedClassification() && getClassificationTop().isForceClassificationSetting();
     }
 
     protected boolean canBeForcedClassification() {

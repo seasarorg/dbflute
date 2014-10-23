@@ -160,8 +160,7 @@ public class DfTableXlsWriterTest extends PlainTestCase {
         final Map<String, String> tableNameMap = StringKeyMap.createAsCaseInsensitive();
         final Map<String, List<String>> notTrimTableColumnMap = StringKeyMap.createAsCaseInsensitive();
         final Map<String, List<String>> stringEmptyTableColumnMap = StringKeyMap.createAsCaseInsensitive();
-        return new DfTableXlsReader(xlsFile, tableNameMap, notTrimTableColumnMap, stringEmptyTableColumnMap, null,
-                false);
+        return new DfTableXlsReader(xlsFile, tableNameMap, notTrimTableColumnMap, stringEmptyTableColumnMap, null, false);
     }
 
     protected void refresh() throws IOException {

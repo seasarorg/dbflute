@@ -1346,8 +1346,8 @@ public class ForeignKey implements Constraint {
         return null; // unreachable
     }
 
-    protected String doExtractFixedConditionEmbeddedCommentClassificationNormalCode(
-            DfClassificationTop classificationTop, String elementName) {
+    protected String doExtractFixedConditionEmbeddedCommentClassificationNormalCode(DfClassificationTop classificationTop,
+            String elementName) {
         final String codeType = classificationTop.getCodeType();
         final List<DfClassificationElement> elementList = classificationTop.getClassificationElementList();
         String code = null;
@@ -1361,8 +1361,7 @@ public class ForeignKey implements Constraint {
         return code;
     }
 
-    protected String doExtractFixedConditionEmbeddedCommentClassificationGroupCode(
-            DfClassificationTop classificationTop, String elementName) {
+    protected String doExtractFixedConditionEmbeddedCommentClassificationGroupCode(DfClassificationTop classificationTop, String elementName) {
         String code = null;
         final String codeType = classificationTop.getCodeType();
         final List<DfClassificationGroup> groupList = classificationTop.getGroupList();
@@ -1404,8 +1403,8 @@ public class ForeignKey implements Constraint {
         throw new DfFixedConditionInvalidClassificationEmbeddedCommentException(msg);
     }
 
-    protected void throwFixedConditionEmbeddedCommentClassificationElementNotFoundException(
-            DfClassificationTop classificationTop, String elementName) {
+    protected void throwFixedConditionEmbeddedCommentClassificationElementNotFoundException(DfClassificationTop classificationTop,
+            String elementName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the classification element in fixed condition.");
         br.addItem("Foreign Key");

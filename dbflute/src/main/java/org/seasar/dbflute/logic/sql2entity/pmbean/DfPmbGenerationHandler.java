@@ -185,8 +185,7 @@ public class DfPmbGenerationHandler {
         return entityGenericDef;
     }
 
-    protected String prepareVoidResultGenericDef(boolean immutable, String bhvType, String customizeType,
-            String immuType) {
+    protected String prepareVoidResultGenericDef(boolean immutable, String bhvType, String customizeType, String immuType) {
         // it works when not use void in Java but not need it and also for compatibility 
         // (Scala cannot use void in the generic so customize this logic here)
         final DfLanguageGrammar grammar = getLanguageGrammar();
@@ -452,15 +451,13 @@ public class DfPmbGenerationHandler {
         return findPmbMetaData(className).getPropertyOptionClassificationFixedElementValueExp(propertyName);
     }
 
-    public DfClassificationTop getPropertyOptionClassificationTop(String className, String propertyName,
-            AppData schemaData) {
+    public DfClassificationTop getPropertyOptionClassificationTop(String className, String propertyName, AppData schemaData) {
         return findPmbMetaData(className).getPropertyOptionClassificationTop(propertyName, schemaData);
     }
 
-    public String getPropertyOptionClassificationSettingElementValueExp(String className, String propertyName,
-            String element, AppData schemaData) {
-        return findPmbMetaData(className).getPropertyOptionClassificationSettingElementValueExp(propertyName, element,
-                schemaData);
+    public String getPropertyOptionClassificationSettingElementValueExp(String className, String propertyName, String element,
+            AppData schemaData) {
+        return findPmbMetaData(className).getPropertyOptionClassificationSettingElementValueExp(propertyName, element, schemaData);
     }
 
     // -----------------------------------------------------

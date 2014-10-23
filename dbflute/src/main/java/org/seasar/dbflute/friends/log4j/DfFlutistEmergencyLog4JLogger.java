@@ -144,8 +144,7 @@ public class DfFlutistEmergencyLog4JLogger implements Log {
             if (bw != null) {
                 try {
                     bw.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }
@@ -171,8 +170,7 @@ public class DfFlutistEmergencyLog4JLogger implements Log {
             if (stringWriter != null) {
                 try {
                     stringWriter.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
             if (printWriter != null) {
                 printWriter.close();

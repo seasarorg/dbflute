@@ -511,8 +511,7 @@ public class TypeMap {
         return javaType;
     }
 
-    protected static String processAutoMappingNumber(String jdbcType, Integer columnSize, Integer decimalDigits,
-            String javaType) {
+    protected static String processAutoMappingNumber(String jdbcType, Integer columnSize, Integer decimalDigits, String javaType) {
         if (needsAutoMappingNumber(jdbcType, javaType)) {
             final String defaultJavaNativeType;
             if (NUMERIC.equalsIgnoreCase(jdbcType)) {
