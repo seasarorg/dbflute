@@ -26,7 +26,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.RelationEntityNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.optional.OptionalObjectExceptionThrower;
+import org.seasar.dbflute.optional.OptionalThingExceptionThrower;
 import org.seasar.dbflute.optional.RelationOptionalFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
@@ -91,7 +91,7 @@ public class TnRelationRowOptionalHandler {
         return _relationOptionalFactory.createOptionalNullEntity(createOptionalNullableThrower(row, rpt));
     }
 
-    protected OptionalObjectExceptionThrower createOptionalNullableThrower(final Object row, TnRelationPropertyType rpt) {
+    protected OptionalThingExceptionThrower createOptionalNullableThrower(final Object row, TnRelationPropertyType rpt) {
         final String propertyName = rpt.getPropertyDesc().getPropertyName();
         final DBMeta localDBMeta = rpt.getMyBeanMetaData().getDBMeta();
         final ConditionBean cb;
@@ -110,15 +110,15 @@ public class TnRelationRowOptionalHandler {
             outsideSqlPath = null;
             parameterBean = null;
         }
-        return new OptionalObjectExceptionThrower() {
+        return new OptionalThingExceptionThrower() {
             public void throwNotFoundException() {
                 throwRelationEntityNotFoundException(row, propertyName, localDBMeta, cb, outsideSqlPath, parameterBean);
             }
         };
     }
 
-    protected void throwRelationEntityNotFoundException(Object row, String propertyName, DBMeta localDBMeta,
-            ConditionBean cb, String outsideSqlPath, Object parameterBean) {
+    protected void throwRelationEntityNotFoundException(Object row, String propertyName, DBMeta localDBMeta, ConditionBean cb,
+            String outsideSqlPath, Object parameterBean) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The relation entity was NOT found.");
         br.addItem("Advice");

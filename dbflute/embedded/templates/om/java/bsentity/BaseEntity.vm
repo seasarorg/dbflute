@@ -686,6 +686,7 @@ public abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef}
     @MappingValueType(keyName = "bytesOidType")
 #end
     public ${col.javaNative} get${col.javaName}() {
+        checkSpecifiedProperty("${col.javaBeansRulePropertyName}");
 #if ($col.isEntityConvertEmptyStringToNull())
         return convertEmptyToNull(_${col.uncapitalisedJavaName});
 #else

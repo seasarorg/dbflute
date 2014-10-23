@@ -391,6 +391,22 @@ public class TnRelationRowCreationResource {
         return _relSelector.canUseRelationCache(_relationNoSuffix);
     }
 
+    /**
+     * Is the access to non-specified column allowed?
+     * @return The determination, true or false.
+     */
+    public boolean isNonSpecifiedColumnAccessAllowed() {
+        return _relSelector.isNonSpecifiedColumnAccessAllowed(_relationNoSuffix);
+    }
+
+    /**
+     * Does the relation use SpecifyColumn?
+     * @return The determination, true or false.
+     */
+    public boolean isUsingSpecifyColumnInRelation() {
+        return _relSelector.isUsingSpecifyColumnInRelation(_relationNoSuffix);
+    }
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========

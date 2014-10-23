@@ -1346,6 +1346,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         assertObjectNotNull("foreignPropertyName", foreignPropertyName);
         assertObjectNotNull("foreignRelationPath", foreignRelationPath);
         getSelectedRelationBasicMap().put(foreignRelationPath, foreignPropertyName);
+        getSelectedRelationPathToAliasMap().put(foreignRelationPath, foreignTableAliasName);
         final Map<String, SelectedRelationColumn> columnMap =
                 createSelectedSelectColumnInfo(foreignTableAliasName, localTableDbName, foreignPropertyName, localRelationPath);
         getSelectedRelationColumnMap().put(foreignTableAliasName, columnMap);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2014 the original author or authors.
+ * Copyright 2004-2014 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,7 +153,7 @@ public class OptionalProperty<PROP> extends BaseOptional<PROP> {
      * @param oneArgLambda The callback interface to apply. (NotNull)
      * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    public <RESULT> OptionalThing<RESULT> map(OptionalObjectFunction<? super PROP, ? extends RESULT> oneArgLambda) {
+    public <RESULT> OptionalThing<RESULT> map(OptionalThingFunction<? super PROP, ? extends RESULT> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
         return (OptionalThing<RESULT>) callbackMapping(oneArgLambda); // downcast allowed because factory is overridden
     }
@@ -172,7 +172,7 @@ public class OptionalProperty<PROP> extends BaseOptional<PROP> {
      * @param oneArgLambda The callback interface to apply. (NotNull)
      * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    public <RESULT> OptionalThing<RESULT> flatMap(OptionalObjectFunction<? super PROP, OptionalThing<RESULT>> oneArgLambda) {
+    public <RESULT> OptionalThing<RESULT> flatMap(OptionalThingFunction<? super PROP, OptionalThing<RESULT>> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
         return callbackFlatMapping(oneArgLambda);
     }
@@ -185,7 +185,7 @@ public class OptionalProperty<PROP> extends BaseOptional<PROP> {
      * @param oneArgLambda The callback interface to consume the optional object. (NotNull)
      * @throws EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
      */
-    public void alwaysPresent(OptionalObjectConsumer<PROP> oneArgLambda) {
+    public void alwaysPresent(OptionalThingConsumer<PROP> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
         callbackAlwaysPresent(oneArgLambda);
     }

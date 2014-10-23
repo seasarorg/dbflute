@@ -21,7 +21,7 @@ import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.CursorHandler;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.optional.OptionalEntity;
-import org.seasar.dbflute.optional.OptionalObjectExceptionThrower;
+import org.seasar.dbflute.optional.OptionalThingExceptionThrower;
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 import org.seasar.dbflute.outsidesql.typed.AutoPagingHandlingPmb;
 import org.seasar.dbflute.outsidesql.typed.CursorHandlingPmb;
@@ -100,12 +100,11 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
     public <ENTITY> OptionalEntity<ENTITY> selectEntity(final EntityHandlingPmb<BEHAVIOR, ENTITY> pmb) {
-        return OptionalEntity.ofNullable(_basicExecutor.entityHandling().selectEntity(pmb),
-                new OptionalObjectExceptionThrower() {
-                    public void throwNotFoundException() {
-                        createBhvExThrower().throwSelectEntityAlreadyDeletedException(pmb);
-                    }
-                });
+        return OptionalEntity.ofNullable(_basicExecutor.entityHandling().selectEntity(pmb), new OptionalThingExceptionThrower() {
+            public void throwNotFoundException() {
+                createBhvExThrower().throwSelectEntityAlreadyDeletedException(pmb);
+            }
+        });
     }
 
     // ===================================================================================

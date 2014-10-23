@@ -27,6 +27,7 @@ package org.seasar.dbflute.optional;
  * @param <RESULT> The type of result of mapping.
  * @author jflute
  * @since 1.0.5F (2014/05/10 Saturday)
+ * @deprecated
  */
 public interface OptionalObjectFunction<OBJ, RESULT> extends OptionalThingFunction<OBJ, RESULT> {
 }

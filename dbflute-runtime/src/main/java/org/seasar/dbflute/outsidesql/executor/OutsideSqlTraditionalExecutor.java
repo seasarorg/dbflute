@@ -21,7 +21,7 @@ import org.seasar.dbflute.cbean.PagingResultBean;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.CursorHandler;
 import org.seasar.dbflute.optional.OptionalEntity;
-import org.seasar.dbflute.optional.OptionalObjectExceptionThrower;
+import org.seasar.dbflute.optional.OptionalThingExceptionThrower;
 import org.seasar.dbflute.outsidesql.typed.AutoPagingHandlingPmb;
 import org.seasar.dbflute.outsidesql.typed.ManualPagingHandlingPmb;
 
@@ -75,7 +75,7 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      */
     public <ENTITY> OptionalEntity<ENTITY> selectEntity(String path, final Object pmb, Class<ENTITY> entityType) {
         return OptionalEntity.ofNullable(_basicExecutor.entityHandling().selectEntity(path, pmb, entityType),
-                new OptionalObjectExceptionThrower() {
+                new OptionalThingExceptionThrower() {
                     public void throwNotFoundException() {
                         createBhvExThrower().throwSelectEntityAlreadyDeletedException(pmb);
                     }

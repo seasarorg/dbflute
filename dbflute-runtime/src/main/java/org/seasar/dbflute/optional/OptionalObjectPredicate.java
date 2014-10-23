@@ -26,6 +26,7 @@ package org.seasar.dbflute.optional;
  * @param <OBJ> The type of wrapped object in optional object.
  * @author jflute
  * @since 1.0.5G (2014/05/26 Monday)
+ * @deprecated
  */
 public interface OptionalObjectPredicate<OBJ> extends OptionalThingPredicate<OBJ> {
 }
