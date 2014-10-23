@@ -24,9 +24,9 @@ cd ../../dbflute-guice-example/dbflute_exampledb
 rm ./log/*.log
 . manage.sh renewal
 . manage.sh load-data-reverse
-. manage.sh schema-sync-check
 . manage.sh freegen
 . diffworld-test.sh
+. syncworld-test.sh
 . sqlap-manage.sh regenerate
 
 cd ../../dbflute-cdi-example/dbflute_exampledb
