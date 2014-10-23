@@ -59,8 +59,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
      * @param purpose The purpose of condition-bean. (NotNull)
      * @param dbmetaProvider The provider of DB meta. (NotNull)
      */
-    protected HpAbstractSpecification(ConditionBean baseCB, HpSpQyCall<CQ> qyCall, HpCBPurpose purpose,
-            DBMetaProvider dbmetaProvider) {
+    protected HpAbstractSpecification(ConditionBean baseCB, HpSpQyCall<CQ> qyCall, HpCBPurpose purpose, DBMetaProvider dbmetaProvider) {
         _baseCB = baseCB;
         _qyCall = qyCall;
         _purpose = purpose;

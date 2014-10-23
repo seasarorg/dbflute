@@ -332,8 +332,7 @@ public class SqlAnalyzer {
     }
 
     protected boolean isLoopVariableComment(String comment) {
-        return comment.startsWith(LoopFirstNode.MARK) || comment.startsWith(LoopNextNode.MARK)
-                || comment.startsWith(LoopLastNode.MARK);
+        return comment.startsWith(LoopFirstNode.MARK) || comment.startsWith(LoopNextNode.MARK) || comment.startsWith(LoopLastNode.MARK);
     }
 
     protected void parseLoopVariable() { // should be in FOR comment scope
@@ -444,8 +443,7 @@ public class SqlAnalyzer {
         return new BindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter);
     }
 
-    protected EmbeddedVariableNode createEmbeddedVariableNode(String expr, String testValue, boolean replaceOnly,
-            boolean terminalDot) {
+    protected EmbeddedVariableNode createEmbeddedVariableNode(String expr, String testValue, boolean replaceOnly, boolean terminalDot) {
         researchIfNeeds(_researchEmbeddedVariableCommentList, expr); // for research
         return new EmbeddedVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, replaceOnly, terminalDot);
     }
@@ -566,17 +564,16 @@ public class SqlAnalyzer {
     // ===================================================================================
     //                                                                          DisplaySql
     //                                                                          ==========
-    public static String convertTwoWaySql2DisplaySql(SqlAnalyzerFactory factory, String twoWaySql, Object arg,
-            String logDateFormat, String logTimestampFormat) {
+    public static String convertTwoWaySql2DisplaySql(SqlAnalyzerFactory factory, String twoWaySql, Object arg, String logDateFormat,
+            String logTimestampFormat) {
         final String[] argNames = new String[] { "pmb" };
         final Class<?>[] argTypes = new Class<?>[] { arg.getClass() };
         final Object[] args = new Object[] { arg };
-        return convertTwoWaySql2DisplaySql(factory, twoWaySql, argNames, argTypes, args, logDateFormat,
-                logTimestampFormat);
+        return convertTwoWaySql2DisplaySql(factory, twoWaySql, argNames, argTypes, args, logDateFormat, logTimestampFormat);
     }
 
-    public static String convertTwoWaySql2DisplaySql(SqlAnalyzerFactory factory, String twoWaySql, String[] argNames,
-            Class<?>[] argTypes, Object[] args, String logDateFormat, String logTimestampFormat) {
+    public static String convertTwoWaySql2DisplaySql(SqlAnalyzerFactory factory, String twoWaySql, String[] argNames, Class<?>[] argTypes,
+            Object[] args, String logDateFormat, String logTimestampFormat) {
         final CommandContext context;
         {
             final SqlAnalyzer parser = createSqlAnalyzer4DisplaySql(factory, twoWaySql);

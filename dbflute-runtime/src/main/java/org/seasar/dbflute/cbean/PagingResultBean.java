@@ -395,8 +395,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
         sb.append(" of ").append(getAllRecordCount());
         sb.append(" ").append(isExistPrePage()).append("/").append(isExistNextPage());
         if (_pageGroupOption != null) {
-            sb.append(" group:{").append(getPageGroupSize()).append(",").append(pageGroup().createPageNumberList())
-                    .append("}");
+            sb.append(" group:{").append(getPageGroupSize()).append(",").append(pageGroup().createPageNumberList()).append("}");
         }
         if (_pageRangeOption != null) {
             sb.append(" range:{").append(getPageRangeSize()).append(",").append(_pageRangeOption.isFillLimit());

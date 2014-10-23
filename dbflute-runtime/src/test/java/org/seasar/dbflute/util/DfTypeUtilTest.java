@@ -146,8 +146,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals(BigInteger.valueOf(-33333), DfTypeUtil.toBigInteger("-33333"));
         assertEquals(BigInteger.valueOf(33333), DfTypeUtil.toBigInteger("33,333"));
         assertEquals(new BigInteger("18446744073709551615"), DfTypeUtil.toBigInteger("18446744073709551615"));
-        assertEquals(new BigInteger("18446744073709551615"),
-                DfTypeUtil.toBigInteger(new BigDecimal("18446744073709551615")));
+        assertEquals(new BigInteger("18446744073709551615"), DfTypeUtil.toBigInteger(new BigDecimal("18446744073709551615")));
         assertEquals(new BigInteger("123456789123456"), DfTypeUtil.toBigInteger("123456789123456"));
         assertEquals(new BigInteger("18446744073709551615"), new BigInteger("18446744073709551615") {
             private static final long serialVersionUID = 1L;

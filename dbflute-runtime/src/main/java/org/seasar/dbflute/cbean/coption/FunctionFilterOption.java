@@ -477,8 +477,7 @@ public class FunctionFilterOption implements ParameterOption {
         return doProcessDateAdd(functionExp, index, addedSecond, "addSecond", minus);
     }
 
-    protected String doProcessDateAdd(String functionExp, int index, Object addedValue, String propertyName,
-            boolean minus) {
+    protected String doProcessDateAdd(String functionExp, int index, Object addedValue, String propertyName, boolean minus) {
         if (addedValue == null) {
             return functionExp;
         }
@@ -505,8 +504,7 @@ public class FunctionFilterOption implements ParameterOption {
         }
     }
 
-    protected String doProcessDateAddMySQL(String functionExp, int index, Object addedValue, String propertyName,
-            boolean minus) {
+    protected String doProcessDateAddMySQL(String functionExp, int index, Object addedValue, String propertyName, boolean minus) {
         final String bindPath = buildAddedBindParameter(index, addedValue, propertyName);
         final String type = buildDateAddExpType(propertyName, null, false);
         final String prefixSign = minus ? "-" : "";
@@ -514,8 +512,7 @@ public class FunctionFilterOption implements ParameterOption {
         // e.g. date_add(FOO_DATE, interval 1 month)
     }
 
-    protected String doProcessDateAddPostgreSQL(String functionExp, int index, Object addedValue, String propertyName,
-            boolean minus) {
+    protected String doProcessDateAddPostgreSQL(String functionExp, int index, Object addedValue, String propertyName, boolean minus) {
         // no binding because it does not allowed
         final String type = buildDateAddExpType(propertyName, null, true);
         final String valueExp;
@@ -539,8 +536,7 @@ public class FunctionFilterOption implements ParameterOption {
         //  o FOO_DATE + (FOO_DAYS || 'months')::interval
     }
 
-    protected String doProcessDateAddOracle(String functionExp, int index, Object addedValue, String propertyName,
-            boolean minus) {
+    protected String doProcessDateAddOracle(String functionExp, int index, Object addedValue, String propertyName, boolean minus) {
         final String bindParameter = buildAddedBindParameter(index, addedValue, propertyName);
         final String prefixSign = minus ? "-" : "";
         final String calcSign = minus ? "-" : "+";
@@ -566,8 +562,7 @@ public class FunctionFilterOption implements ParameterOption {
         //  o FOO_DATE + 1 / 24
     }
 
-    protected String doProcessDateAddDB2(String functionExp, int index, Object addedValue, String propertyName,
-            boolean minus) {
+    protected String doProcessDateAddDB2(String functionExp, int index, Object addedValue, String propertyName, boolean minus) {
         final String bindParameter = buildAddedBindParameter(index, addedValue, propertyName);
         final String type = buildDateAddExpType(propertyName, null, false);
         final String calcSign = minus ? "-" : "+";
@@ -594,8 +589,7 @@ public class FunctionFilterOption implements ParameterOption {
         // e.g. FOO_DATE + 1 month
     }
 
-    protected String doProcessDateAddSQLServer(String functionExp, int index, Object addedValue, String propertyName,
-            boolean minus) {
+    protected String doProcessDateAddSQLServer(String functionExp, int index, Object addedValue, String propertyName, boolean minus) {
         final String valueExp = buildAddedEmbeddedValueExp(addedValue);
         final String type = buildDateAddExpType(propertyName, null, false);
         final String prefixSign = minus ? "-" : "";
@@ -697,22 +691,19 @@ public class FunctionFilterOption implements ParameterOption {
     // ===================================================================================
     //                                                                    Create Processor
     //                                                                    ================
-    public SpecifyDerivedReferrer createSpecifyDerivedReferrer(SubQueryPath subQueryPath,
-            ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
-            GearedCipherManager cipherManager, String mainSubQueryIdentity, String aliasName) {
-        return new SpecifyDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel,
-                subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, aliasName);
+    public SpecifyDerivedReferrer createSpecifyDerivedReferrer(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity,
+            DBMeta subQueryDBMeta, GearedCipherManager cipherManager, String mainSubQueryIdentity, String aliasName) {
+        return new SpecifyDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
+                subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, aliasName);
     }
 
-    public QueryDerivedReferrer createQueryDerivedReferrer(SubQueryPath subQueryPath,
-            ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
-            GearedCipherManager cipherManager, String mainSubQueryIdentity, String operand, Object value,
+    public QueryDerivedReferrer createQueryDerivedReferrer(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity,
+            DBMeta subQueryDBMeta, GearedCipherManager cipherManager, String mainSubQueryIdentity, String operand, Object value,
             String parameterPath) {
-        return new QueryDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel,
-                subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, operand, value,
-                parameterPath);
+        return new QueryDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
+                subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, operand, value, parameterPath);
     }
 
     // ===================================================================================
@@ -726,8 +717,7 @@ public class FunctionFilterOption implements ParameterOption {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected String processSimpleFunction(String functionExp, String functionName, String thirdArg, boolean leftArg,
-            Object bindKey) {
+    protected String processSimpleFunction(String functionExp, String functionName, String thirdArg, boolean leftArg, Object bindKey) {
         final String bindExp = buildBindParameter(bindKey);
         final StringBuilder sb = new StringBuilder();
         sb.append(functionName).append("(");

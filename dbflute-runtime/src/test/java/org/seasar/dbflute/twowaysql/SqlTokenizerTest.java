@@ -305,8 +305,7 @@ public class SqlTokenizerTest extends PlainTestCase {
 
         // ## Act ##
         try {
-            while (SqlTokenizer.EOF != tokenizer.next()) {
-            }
+            while (SqlTokenizer.EOF != tokenizer.next()) {}
 
             // ## Assert ##
             fail();

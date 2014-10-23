@@ -181,8 +181,7 @@ public class OrderByElement implements Serializable {
         return columnAlias;
     }
 
-    protected void setupManualOrderClause(StringBuilder sb, String columnAlias,
-            Map<String, String> selectClauseRealColumnAliasMap) {
+    protected void setupManualOrderClause(StringBuilder sb, String columnAlias, Map<String, String> selectClauseRealColumnAliasMap) {
         final String realAlias;
         if (_mob.hasOrderByCalculation()) {
             final HpCalcSpecification<ConditionBean> calculationOrder = _mob.getOrderByCalculation();
@@ -249,8 +248,7 @@ public class OrderByElement implements Serializable {
         return conditionKey.equals(ConditionKey.CK_IS_NULL) || conditionKey.equals(ConditionKey.CK_IS_NOT_NULL);
     }
 
-    protected void throwOrderByColumnNotFoundException(String columnName,
-            Map<String, String> selectClauseRealColumnAliasMap) {
+    protected void throwOrderByColumnNotFoundException(String columnName, Map<String, String> selectClauseRealColumnAliasMap) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The column for order-by was not found in select-clause!" + ln();

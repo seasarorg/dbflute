@@ -40,9 +40,8 @@ public interface OutsideSqlExecutorFactory {
      * @param outsideSqlOption The option of outsideSql. (NullAllowed: if null, means for an entry instance)
      * @return The instance of executor. (NotNull)
      */
-    <BEHAVIOR> OutsideSqlBasicExecutor<BEHAVIOR> createBasic(BehaviorCommandInvoker behaviorCommandInvoker,
-            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig,
-            OutsideSqlOption outsideSqlOption);
+    <BEHAVIOR> OutsideSqlBasicExecutor<BEHAVIOR> createBasic(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
+            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption);
 
     /**
      * Create the cursor executor of outside-SQL.
@@ -53,8 +52,8 @@ public interface OutsideSqlExecutorFactory {
      * @param outsideSqlOption The option of outsideSql. (NotNull)
      * @return The instance of executor. (NotNull)
      */
-    <BEHAVIOR> OutsideSqlCursorExecutor<BEHAVIOR> createCursor(BehaviorCommandInvoker behaviorCommandInvoker,
-            String tableDbName, DBDef currentDBDef, OutsideSqlOption outsideSqlOption);
+    <BEHAVIOR> OutsideSqlCursorExecutor<BEHAVIOR> createCursor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
+            DBDef currentDBDef, OutsideSqlOption outsideSqlOption);
 
     /**
      * Create the entity executor of outside-SQL.
@@ -66,9 +65,8 @@ public interface OutsideSqlExecutorFactory {
      * @param outsideSqlOption The option of outsideSql. (NotNull)
      * @return The instance of executor. (NotNull)
      */
-    <BEHAVIOR> OutsideSqlEntityExecutor<BEHAVIOR> createEntity(BehaviorCommandInvoker behaviorCommandInvoker,
-            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig,
-            OutsideSqlOption outsideSqlOption);
+    <BEHAVIOR> OutsideSqlEntityExecutor<BEHAVIOR> createEntity(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
+            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption);
 
     /**
      * Create the manual-paging executor of outside-SQL.
@@ -80,9 +78,8 @@ public interface OutsideSqlExecutorFactory {
      * @param outsideSqlOption The option of outsideSql. (NotNull)
      * @return The instance of executor. (NotNull)
      */
-    <BEHAVIOR> OutsideSqlManualPagingExecutor<BEHAVIOR> createManualPaging(
-            BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
-            StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption);
+    <BEHAVIOR> OutsideSqlManualPagingExecutor<BEHAVIOR> createManualPaging(BehaviorCommandInvoker behaviorCommandInvoker,
+            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption);
 
     /**
      * Create the auto-paging executor of outside-SQL.
@@ -94,7 +91,6 @@ public interface OutsideSqlExecutorFactory {
      * @param outsideSqlOption The option of outsideSql. (NotNull)
      * @return The instance of executor. (NotNull)
      */
-    <BEHAVIOR> OutsideSqlAutoPagingExecutor<BEHAVIOR> createAutoPaging(BehaviorCommandInvoker behaviorCommandInvoker,
-            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig,
-            OutsideSqlOption outsideSqlOption);
+    <BEHAVIOR> OutsideSqlAutoPagingExecutor<BEHAVIOR> createAutoPaging(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
+            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption);
 }

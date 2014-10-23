@@ -173,8 +173,7 @@ public class OptionalObject<THING> extends BaseOptional<THING> {
      * @param oneArgLambda The callback interface to apply. (NotNull)
      * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    public <RESULT> OptionalThing<RESULT> flatMap(
-            OptionalThingFunction<? super THING, OptionalThing<RESULT>> oneArgLambda) {
+    public <RESULT> OptionalThing<RESULT> flatMap(OptionalThingFunction<? super THING, OptionalThing<RESULT>> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
         return callbackFlatMapping(oneArgLambda);
     }

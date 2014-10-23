@@ -196,8 +196,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * @return The grouped list. (NotNull)
      * @deprecated Use {@link #groupingList(GroupingListDeterminer)}
      */
-    public <ROW> List<ROW> groupingList(GroupingRowSetupper<ROW, ENTITY> groupingRowSetupper,
-            GroupingOption<ENTITY> groupingOption) {
+    public <ROW> List<ROW> groupingList(GroupingRowSetupper<ROW, ENTITY> groupingRowSetupper, GroupingOption<ENTITY> groupingOption) {
         final List<ROW> groupingList = new ArrayList<ROW>();
         final int breakCount = groupingOption.getElementCount();
         GroupingRowEndDeterminer<ENTITY> endDeterminer = groupingOption.getGroupingRowEndDeterminer();

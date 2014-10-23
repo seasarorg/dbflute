@@ -620,8 +620,7 @@ public class LazyDatabaseMetaDataWrapper implements DatabaseMetaData {
         return getActualMetaData().getExportedKeys(s, s1, s2);
     }
 
-    public ResultSet getCrossReference(String s, String s1, String s2, String s3, String s4, String s5)
-            throws SQLException {
+    public ResultSet getCrossReference(String s, String s1, String s2, String s3, String s4, String s5) throws SQLException {
         return getActualMetaData().getCrossReference(s, s1, s2, s3, s4, s5);
     }
 

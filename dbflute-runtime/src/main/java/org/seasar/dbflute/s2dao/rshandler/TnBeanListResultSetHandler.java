@@ -49,8 +49,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
      * @param rowCreator Row creator. (NotNull)
      * @param relationRowCreator Relation row creator. (NotNul)
      */
-    public TnBeanListResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator,
-            TnRelationRowCreator relationRowCreator) {
+    public TnBeanListResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator, TnRelationRowCreator relationRowCreator) {
         super(beanMetaData, rowCreator, relationRowCreator);
     }
 
@@ -128,8 +127,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                 if (relSelector.isNonSelectedRelation(rpt.getRelationNoSuffixPart())) {
                     continue;
                 }
-                mappingFirstRelation(rs, row, rpt, selectColumnMap, selectIndexMap, relPropCache, relRowCache,
-                        relSelector);
+                mappingFirstRelation(rs, row, rpt, selectColumnMap, selectIndexMap, relPropCache, relRowCache, relSelector);
             }
             adjustCreatedRow(row, checkNonSp, basePointBmd);
             handler.handle(row);
@@ -221,10 +219,9 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
      * @param relSelector The selector of relation, which can determines e.g. is it not-selected relation?. (NotNull)
      * @throws SQLException
      */
-    protected void mappingFirstRelation(ResultSet rs, Object row, TnRelationPropertyType rpt,
-            Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap,
-            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache,
-            TnRelationSelector relSelector) throws SQLException {
+    protected void mappingFirstRelation(ResultSet rs, Object row, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
+            Map<String, Map<String, Integer>> selectIndexMap, Map<String, Map<String, TnPropertyMapping>> relPropCache,
+            TnRelationRowCache relRowCache, TnRelationSelector relSelector) throws SQLException {
         final String relationNoSuffix = getFirstLevelRelationPath(rpt);
         final TnRelationKey relKey = relRowCache.createRelationKey(rs, rpt // basic resource
                 , selectColumnMap, selectIndexMap // select resource

@@ -88,8 +88,7 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
         doAccept(ctx, firstValue, firstType, loopInfo, false);
     }
 
-    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo loopInfo,
-            boolean inheritLoop) {
+    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo loopInfo, boolean inheritLoop) {
         assertInLoopOnlyOptionInLoop(loopInfo);
         final ValueAndType valueAndType = new ValueAndType();
         valueAndType.setFirstValue(firstValue);
@@ -213,8 +212,7 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
     }
 
     protected void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException() {
-        NodeUtil.throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(_expression, _specifiedSql,
-                isBind());
+        NodeUtil.throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(_expression, _specifiedSql, isBind());
     }
 
     protected void throwBindOrEmbeddedCommentParameterEmptyListException() {

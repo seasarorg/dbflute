@@ -262,8 +262,7 @@ public class ManualOrderBean implements HpCalculator {
             final HpMobCaseWhenElement lastElement = getAcceptedLastElement();
             final List<HpMobCaseWhenElement> connectedElementList = lastElement.getConnectedElementList();
             if (!connectedElementList.isEmpty()) { // check same connectors
-                final HpMobCaseWhenElement previousConnected = connectedElementList
-                        .get(connectedElementList.size() - 1);
+                final HpMobCaseWhenElement previousConnected = connectedElementList.get(connectedElementList.size() - 1);
                 final HpMobConnectionMode previousMode = previousConnected.getConnectionMode();
                 if (previousMode != null && !previousMode.equals(addedElement.getConnectionMode())) {
                     throwManualOrderTwoConnectorUnsupportedException(conditionKey, orderValue, lastElement);
@@ -288,8 +287,7 @@ public class ManualOrderBean implements HpCalculator {
         return new HpMobConnectedBean(this);
     }
 
-    protected void throwManualOrderPreviousConditionNotFoundException(HpMobConnectionMode mode,
-            ConditionKey conditionKey, Object orderValue) {
+    protected void throwManualOrderPreviousConditionNotFoundException(HpMobConnectionMode mode, ConditionKey conditionKey, Object orderValue) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found previous condition of 'case when' for connecting next condition.");
         br.addItem("Advice");
@@ -668,8 +666,7 @@ public class ManualOrderBean implements HpCalculator {
     }
 
     protected boolean canBeLiteralClassificationCodeType(ClassificationCodeType codeType) {
-        return codeType != null && codeType.equals(ClassificationCodeType.Number)
-                && codeType.equals(ClassificationCodeType.Boolean);
+        return codeType != null && codeType.equals(ClassificationCodeType.Number) && codeType.equals(ClassificationCodeType.Boolean);
     }
 
     protected String buildLiteralNumberExpression(Object plainValue) {

@@ -247,8 +247,7 @@ public class ValueAndTypeSetupper {
         return DfReflectionUtil.invoke(method, target, null);
     }
 
-    protected void throwPropertyReadFailureException(Class<?> targetType, String propertyName,
-            DfBeanIllegalPropertyException e) {
+    protected void throwPropertyReadFailureException(Class<?> targetType, String propertyName, DfBeanIllegalPropertyException e) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("Failed to read the property on the " + _commentType.textName() + ".");
         br.addItem("Advice");

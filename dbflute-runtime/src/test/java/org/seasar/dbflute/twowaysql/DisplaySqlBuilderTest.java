@@ -111,8 +111,8 @@ public class DisplaySqlBuilderTest extends PlainTestCase {
 
         // ## Assert ##
         log(actual);
-        assertTrue(Srl.containsAll(actual, fooName, barCode, String.valueOf(bazId), "/*foo's bar*/", "escape '|'",
-                "/*qux?*/", "/*quux'?*/and"));
+        assertTrue(Srl.containsAll(actual, fooName, barCode, String.valueOf(bazId), "/*foo's bar*/", "escape '|'", "/*qux?*/",
+                "/*quux'?*/and"));
     }
 
     public void test_buildDisplaySql_beforeComment_quotationOverComment() {

@@ -310,8 +310,8 @@ public class BehaviorCommandInvoker {
         ResourceContext.createSQLExceptionHandler().handleSQLException(e, resource);
     }
 
-    protected <RESULT> void callbackSqlResultHanler(BehaviorCommand<RESULT> behaviorCommand,
-            SqlResultHandler sqlResultHander, Object ret, Long commandBefore, Long commandAfter, RuntimeException cause) {
+    protected <RESULT> void callbackSqlResultHanler(BehaviorCommand<RESULT> behaviorCommand, SqlResultHandler sqlResultHander, Object ret,
+            Long commandBefore, Long commandAfter, RuntimeException cause) {
         final SqlLogInfo sqlLogInfo = getResultSqlLogInfo(behaviorCommand);
         final Long sqlBefore = InternalMapContext.getSqlBeforeTimeMillis();
         final Long sqlAfter = InternalMapContext.getSqlAfterTimeMillis();
@@ -325,12 +325,11 @@ public class BehaviorCommandInvoker {
         if (sqlLogInfo != null) {
             return sqlLogInfo;
         }
-        return new SqlLogInfo(behaviorCommand, null, new Object[] {}, new Class<?>[] {},
-                new SqlLogInfo.SqlLogDisplaySqlBuilder() {
-                    public String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
-                        return null;
-                    }
-                }); // as dummy
+        return new SqlLogInfo(behaviorCommand, null, new Object[] {}, new Class<?>[] {}, new SqlLogInfo.SqlLogDisplaySqlBuilder() {
+            public String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
+                return null;
+            }
+        }); // as dummy
     }
 
     // ===================================================================================
@@ -421,8 +420,7 @@ public class BehaviorCommandInvoker {
     // ===================================================================================
     //                                                                      Log SqlCommand
     //                                                                      ==============
-    protected <RESULT> void logSqlExecution(BehaviorCommand<RESULT> behaviorCommand, SqlExecution execution,
-            long beforeCmd, long afterCmd) {
+    protected <RESULT> void logSqlExecution(BehaviorCommand<RESULT> behaviorCommand, SqlExecution execution, long beforeCmd, long afterCmd) {
         final String view = DfTraceViewUtil.convertToPerformanceView(afterCmd - beforeCmd);
         log("SqlExecution Initialization Cost: [" + view + "]");
     }
@@ -434,8 +432,7 @@ public class BehaviorCommandInvoker {
         final StackTraceElement[] stackTrace = new Exception().getStackTrace();
         final BehaviorInvokeNameResult behaviorInvokeNameResult = extractBehaviorInvoke(behaviorCommand, stackTrace);
         saveBehaviorInvokeName(behaviorInvokeNameResult);
-        final BehaviorInvokePathResult invokePathResult = buildInvokePath(behaviorCommand, stackTrace,
-                behaviorInvokeNameResult);
+        final BehaviorInvokePathResult invokePathResult = buildInvokePath(behaviorCommand, stackTrace, behaviorInvokeNameResult);
         if (invokePathResult != null) {
             saveClientInvokeName(invokePathResult);
             saveByPassInvokeName(invokePathResult);
@@ -485,8 +482,7 @@ public class BehaviorCommandInvoker {
             outsideSqlResultType = outsideSqlContext.getResultType();
             outsideSqlAutoPaging = outsideSqlContext.isAutoPagingLogging();
         }
-        final BehaviorInvokeNameExtractor extractor = createBehaviorInvokeNameExtractor(dbmeta, outsideSqlResultType,
-                outsideSqlAutoPaging);
+        final BehaviorInvokeNameExtractor extractor = createBehaviorInvokeNameExtractor(dbmeta, outsideSqlResultType, outsideSqlAutoPaging);
         return extractor.extractBehaviorInvoke(stackTrace);
     }
 
@@ -502,8 +498,8 @@ public class BehaviorCommandInvoker {
         return new BehaviorInvokeNameResult(expNoMethodSuffix + "()", expNoMethodSuffix, null, null);
     }
 
-    protected BehaviorInvokeNameExtractor createBehaviorInvokeNameExtractor(final DBMeta dbmeta,
-            Class<?> outsideSqlResultType, boolean outsideSqlAutoPaging) {
+    protected BehaviorInvokeNameExtractor createBehaviorInvokeNameExtractor(final DBMeta dbmeta, Class<?> outsideSqlResultType,
+            boolean outsideSqlAutoPaging) {
         return new BehaviorInvokeNameExtractor(dbmeta, outsideSqlResultType, outsideSqlAutoPaging);
     }
 
@@ -529,8 +525,8 @@ public class BehaviorCommandInvoker {
     // -----------------------------------------------------
     //                                      Build InvokePath
     //                                      ----------------
-    protected <RESULT> BehaviorInvokePathResult buildInvokePath(BehaviorCommand<RESULT> behaviorCommand,
-            StackTraceElement[] stackTrace, BehaviorInvokeNameResult behaviorInvokeNameResult) {
+    protected <RESULT> BehaviorInvokePathResult buildInvokePath(BehaviorCommand<RESULT> behaviorCommand, StackTraceElement[] stackTrace,
+            BehaviorInvokeNameResult behaviorInvokeNameResult) {
         final String[] clientNames = _invokerAssistant.assistClientInvokeNames();
         final String[] byPassNames = _invokerAssistant.assistByPassInvokeNames();
         final BehaviorInvokePathBuilder invokePathBuilder = new BehaviorInvokePathBuilder(clientNames, byPassNames);
@@ -571,8 +567,7 @@ public class BehaviorCommandInvoker {
     // ===================================================================================
     //                                                                          Log Result
     //                                                                          ==========
-    protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
-            long before, long after) {
+    protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret, long before, long after) {
         final BehaviorResultBuilder behaviorResultBuilder = createBehaviorResultBuilder();
         final String resultExp = behaviorResultBuilder.buildResultExp(retType, ret, before, after);
         log(resultExp);

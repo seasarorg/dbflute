@@ -76,7 +76,8 @@ public class ConditionBeanContext {
     //                                                          EntityRowHandler on Thread
     //                                                          ==========================
     /** The thread-local for entity row handler. */
-    private static final ThreadLocal<EntityRowHandler<? extends Entity>> _entityRowHandlerLocal = new ThreadLocal<EntityRowHandler<? extends Entity>>();
+    private static final ThreadLocal<EntityRowHandler<? extends Entity>> _entityRowHandlerLocal =
+            new ThreadLocal<EntityRowHandler<? extends Entity>>();
 
     /**
      * Get the handler of entity row. on thread.
@@ -146,8 +147,7 @@ public class ConditionBeanContext {
         {
             final Class<?> clazz = org.seasar.dbflute.cbean.SimplePagingBean.class;
             if (debugEnabled) {
-                sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass())
-                        .append(ln());
+                sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(ln());
             }
         }
         {
@@ -179,8 +179,8 @@ public class ConditionBeanContext {
     // ===================================================================================
     //                                                                          DisplaySql
     //                                                                          ==========
-    public static String convertConditionBean2DisplaySql(SqlAnalyzerFactory factory, ConditionBean cb,
-            String logDateFormat, String logTimestampFormat) {
+    public static String convertConditionBean2DisplaySql(SqlAnalyzerFactory factory, ConditionBean cb, String logDateFormat,
+            String logTimestampFormat) {
         final String twoWaySql = cb.getSqlClause().getClause();
         return SqlAnalyzer.convertTwoWaySql2DisplaySql(factory, twoWaySql, cb, logDateFormat, logTimestampFormat);
     }
