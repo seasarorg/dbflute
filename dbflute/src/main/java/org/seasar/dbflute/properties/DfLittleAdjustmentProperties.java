@@ -42,6 +42,11 @@ import org.seasar.dbflute.util.Srl;
 public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperties {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final String MYSQL_DYNAMIC_ROW_MAGIC_FETCH_SIZE_EXP = "Integer.MIN_VALUE";
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfLittleAdjustmentProperties(Properties prop) {
@@ -778,8 +783,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                                        CursorSelect
-    //                                                                        ============
+    //                                                                     JDBC Fetch Size
+    //                                                                     ===============
+    // -----------------------------------------------------
+    //                                   Cursor Select Fetch
+    //                                   -------------------
     public boolean isCursorSelectFetchSizeValid() {
         return getCursorSelectFetchSize() != null;
     }
@@ -797,7 +805,37 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         if (!isCursorSelectFetchSizeValid()) {
             return false;
         }
-        return "Integer.MIN_VALUE".equals(getCursorSelectFetchSize());
+        return MYSQL_DYNAMIC_ROW_MAGIC_FETCH_SIZE_EXP.equals(getCursorSelectFetchSize());
+    }
+
+    // -----------------------------------------------------
+    //                                   Entity Select Fetch
+    //                                   -------------------
+    public boolean isEntitySelectFetchSizeValid() {
+        return getEntitySelectFetchSize() != null;
+    }
+
+    public String getEntitySelectFetchSize() {
+        final String defaultValue = getDefaultEntitySelectFetchSize();
+        return getProperty("entitySelectFetchSize", defaultValue);
+    }
+
+    protected String getDefaultEntitySelectFetchSize() {
+        // default value is invalid for compatible in 1.0.x
+        //// several databases fetch all records when the result set is created
+        //// and the check of fetching the illegal second record does not work
+        //// so enable real fetching when entity select
+        //final String defaultValue;
+        //final DfBasicProperties prop = getBasicProperties();
+        //if (prop.isDatabaseMySQL()) {
+        //    defaultValue = MYSQL_DYNAMIC_ROW_MAGIC_FETCH_SIZE_EXP;
+        //} else if (prop.isDatabasePostgreSQL()) {
+        //    defaultValue = "1";
+        //} else {
+        //    defaultValue = null;
+        //}
+        //return defaultValue;
+        return null;
     }
 
     // ===================================================================================
