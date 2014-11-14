@@ -1225,4 +1225,59 @@ public class ${glDBFluteConfig} {
         }
     }
 #end
+
+    // ===================================================================================
+    //                                                                         Hyper Patch
+    //                                                                         ===========
+    // patch for 1.0.5M #hope: should be embedded at next version
+    public static class SelectCursorCBCommandHyperPatch<ENTITY extends org.seasar.dbflute.Entity> extends org.seasar.dbflute.bhv.core.command.SelectCursorCBCommand<ENTITY> {
+
+        @Override
+        protected TnRelationRowCreatorHyperPatch createRelationRowCreator(org.seasar.dbflute.s2dao.metadata.TnBeanMetaData bmd) {
+            return new TnRelationRowCreatorHyperPatch(createRelationOptionalFactory());
+        }
+    }
+
+    public static class SelectListCBCommandHyperPatch<ENTITY extends org.seasar.dbflute.Entity> extends org.seasar.dbflute.bhv.core.command.SelectListCBCommand<ENTITY> {
+
+        @Override
+        protected TnRelationRowCreatorHyperPatch createRelationRowCreator(org.seasar.dbflute.s2dao.metadata.TnBeanMetaData bmd) {
+            return new TnRelationRowCreatorHyperPatch(createRelationOptionalFactory());
+        }
+    }
+
+    public static class TnRelationRowCreatorHyperPatch extends org.seasar.dbflute.s2dao.extension.TnRelationRowCreatorExtension {
+
+        public TnRelationRowCreatorHyperPatch(org.seasar.dbflute.s2dao.extension.TnRelationRowOptionalHandler optionalFactory) {
+            super(optionalFactory);
+        }
+
+        @Override
+        protected void registerRelationValue(org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCreationResource res, String columnName) throws SQLException {
+            final org.seasar.dbflute.s2dao.metadata.TnPropertyMapping mapping = res.getCurrentPropertyMapping();
+            Object value = null;
+            if (res.containsRelationKeyColumn(columnName)) { // #RELKEY
+                // if this column is relation key, it gets the value from relation key values
+                // for performance and avoiding twice getting same column value
+                value = res.extractRelationKeyValue(columnName);
+            } else {
+                final org.seasar.dbflute.jdbc.ValueType valueType = mapping.getValueType();
+                final java.util.Map<String, java.util.Map<String, Integer>> selectIndexMap = res.getSelectIndexMap();
+                final java.sql.ResultSet rs = res.getResultSet();
+                if (selectIndexMap != null) {
+                    final String relationNoSuffix = res.getRelationNoSuffix();
+                    value = org.seasar.dbflute.resource.ResourceContext.getRelationValue(rs, relationNoSuffix, columnName, valueType, selectIndexMap);
+                } else {
+                    value = valueType.getValue(rs, columnName);
+                }
+            }
+            if (value != null) {
+                res.incrementValidValueCount();
+            }
+            // null is also set to trace modified properties for specified properties
+            // little performance cost because only setupSelect and specified columns are here
+            // (no setupSelect relation does not come here: old days, S2Dao might be possible)
+            doRegisterRelationValue(res, mapping, value);
+        }
+    }
 }
