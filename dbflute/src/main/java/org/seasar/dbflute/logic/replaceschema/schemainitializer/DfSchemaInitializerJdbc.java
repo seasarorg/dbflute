@@ -77,6 +77,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     protected boolean _suppressDropProcedure;
     protected boolean _suppressDropDBLink;
     protected boolean _suppressLoggingSql;
+    protected boolean _suppressConnectionFailure; // basically for additional drop
 
     // ===================================================================================
     //                                                                   Initialize Schema
@@ -84,7 +85,16 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     public void initializeSchema() {
         Connection conn = null;
         try {
-            conn = _dataSource.getConnection();
+            try {
+                conn = _dataSource.getConnection();
+            } catch (SQLException e) {
+                if (_suppressConnectionFailure) {
+                    handleSuppressedConnectionFailure(e);
+                    return;
+                } else {
+                    throw e;
+                }
+            }
             final List<DfTableMeta> tableMetaList;
             try {
                 final DatabaseMetaData metaData = conn.getMetaData();
@@ -104,6 +114,21 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 } catch (SQLException ignored) {
                     _log.info("connection.close() threw the exception!", ignored);
                 }
+            }
+        }
+    }
+
+    protected void handleSuppressedConnectionFailure(SQLException e) {
+        final String msgRoot = e.getMessage();
+        _log.info("*Suppressed the failure: " + (msgRoot != null ? msgRoot.trim() : null));
+        final Throwable causeFirst = e.getCause();
+        if (causeFirst != null) {
+            final String msgFirst = causeFirst.getMessage();
+            _log.info(" -> " + (msgFirst != null ? msgFirst.trim() : null));
+            final Throwable causeSecond = causeFirst.getCause();
+            if (causeSecond != null) {
+                final String msgSecond = causeSecond.getMessage();
+                _log.info(" -> " + (msgSecond != null ? msgSecond.trim() : null));
             }
         }
     }
@@ -630,7 +655,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     public void setSuppressTruncateTable(boolean suppressTruncateTable) {
-        this._suppressTruncateTable = suppressTruncateTable;
+        _suppressTruncateTable = suppressTruncateTable;
     }
 
     public boolean isSuppressDropForeignKey() {
@@ -638,7 +663,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     public void setSuppressDropForeignKey(boolean suppressDropForeignKey) {
-        this._suppressDropForeignKey = suppressDropForeignKey;
+        _suppressDropForeignKey = suppressDropForeignKey;
     }
 
     public boolean isSuppressDropTable() {
@@ -646,7 +671,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     public void setSuppressDropTable(boolean suppressDropTable) {
-        this._suppressDropTable = suppressDropTable;
+        _suppressDropTable = suppressDropTable;
     }
 
     public boolean isSuppressDropSequence() {
@@ -654,7 +679,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     public void setSuppressDropSequence(boolean suppressDropSequence) {
-        this._suppressDropSequence = suppressDropSequence;
+        _suppressDropSequence = suppressDropSequence;
     }
 
     public boolean isSuppressDropProcedure() {
@@ -662,7 +687,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     public void setSuppressDropProcedure(boolean suppressDropProcedure) {
-        this._suppressDropProcedure = suppressDropProcedure;
+        _suppressDropProcedure = suppressDropProcedure;
     }
 
     public boolean isSuppressDropDBLink() {
@@ -670,7 +695,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     public void setSuppressDropDBLink(boolean suppressDropDBLink) {
-        this._suppressDropDBLink = suppressDropDBLink;
+        _suppressDropDBLink = suppressDropDBLink;
     }
 
     public boolean isSuppressLoggingSql() {
@@ -678,6 +703,14 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     public void setSuppressLoggingSql(boolean suppressLoggingSql) {
-        this._suppressLoggingSql = suppressLoggingSql;
+        _suppressLoggingSql = suppressLoggingSql;
+    }
+
+    public boolean isSuppressConnectionFailure() {
+        return _suppressConnectionFailure;
+    }
+
+    public void setSuppressConnectionFailure(boolean suppressConnectionFailure) {
+        _suppressConnectionFailure = suppressConnectionFailure;
     }
 }

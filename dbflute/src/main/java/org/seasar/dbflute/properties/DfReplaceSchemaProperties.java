@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -638,7 +639,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return castToList(obj, "additionalDropMapList.objectTypeTargetList");
     }
 
-    public Connection createAdditionalDropConnection(Map<String, Object> additionalDropMap) {
+    public Connection createAdditionalDropConnection(Map<String, Object> additionalDropMap) throws SQLException {
         final String driver = getDatabaseProperties().getDatabaseDriver();
         String url = getAdditionalDropUrl(additionalDropMap);
         url = url != null && url.trim().length() > 0 ? url : getDatabaseProperties().getDatabaseUrl();
@@ -656,12 +657,22 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             password = getDatabaseProperties().getDatabasePassword();
         }
         final Properties prop = getAdditionalDropPropertiesMap(additionalDropMap);
-        Properties info = new Properties();
+        final Properties info = new Properties();
         info.putAll(prop);
         info.put("user", user);
         info.put("password", password);
-        _log.info("...Creating a connection for additional drop");
-        return createConnection(driver, url, getAdditionalDropSchema(additionalDropMap), info);
+        final boolean suppress = isProperty("isSuppressConnectionFailure", false, additionalDropMap);
+        _log.info("...Creating a connection for additional drop: failure-suppressed=" + suppress);
+        try {
+            return createConnection(driver, url, getAdditionalDropSchema(additionalDropMap), info);
+        } catch (RuntimeException e) { // contains connection info 
+            String msg = "Failed to connect the schema as additional drop: " + additionalDropMap;
+            throw new SQLException(msg, e);
+        }
+    }
+
+    public boolean isSuppressAdditionalDropSchemaConnectionFailure(Map<String, Object> additionalDropMap) {
+        return isProperty("isSuppressConnectionFailure", false, additionalDropMap);
     }
 
     // ===================================================================================
