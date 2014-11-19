@@ -577,7 +577,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     public String getSelectClause() {
         reflectClauseLazilyIfExists();
         if (isSelectClauseNonUnionScalar()) {
-            return buildSelectClauseScalar(getSpecifiedColumnTableAliasNameAsOne());
+            final String specifiedColumnTableAliasName = getSpecifiedColumnTableAliasNameAsOne(); // not null here
+            return buildSelectClauseScalar(specifiedColumnTableAliasName);
         }
         // if it's a scalar-select, it always has union-query since here
         final StringBuilder sb = new StringBuilder();
