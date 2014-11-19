@@ -384,6 +384,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     // ===================================================================================
     //                                                                       Scalar Select
     //                                                                       =============
+#if ($table.isCompatibleSelectScalarOldName())
     /**
      * Select the scalar value derived by a function from uniquely-selected records. <br />
      * You should call a function method after this method called like as follows:
@@ -403,6 +404,27 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         return facadeScalarSelect(resultType);
     }
 
+#else
+    /**
+     * Select the scalar value derived by a function from uniquely-selected records. <br>
+     * You should call a function method after this method called like as follows:
+     * <pre>
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectScalar</span>(Date.class).max(new ScalarQuery() {
+     *     public void query(${myConditionBeanClassName} cb) {
+     *         cb.specify().<span style="color: #DD4747">columnFooDatetime()</span>; <span style="color: #3F7E5E">// required for a function</span>
+     *         cb.query().setBarName_PrefixSearch("S");
+     *     }
+     * });
+     * </pre>
+     * @param <RESULT> The type of result.
+     * @param resultType The type of result. (NotNull)
+     * @return The scalar function object to specify function for scalar value. (NotNull)
+     */
+    public <RESULT> HpSLSFunction<${myConditionBeanClassName}, RESULT> selectScalar(Class<RESULT> resultType) {
+        return facadeScalarSelect(resultType);
+    }
+
+#end
     // ===================================================================================
     //                                                                            Sequence
     //                                                                            ========
