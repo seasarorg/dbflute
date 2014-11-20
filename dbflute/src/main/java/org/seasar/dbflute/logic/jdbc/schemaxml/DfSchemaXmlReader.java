@@ -101,8 +101,13 @@ public class DfSchemaXmlReader {
             } else {
                 tableExceptGenOnlyList = _databaseProp.getTableExceptGenOnlyList();
             }
-            final List<String> targetEmptyList = DfCollectionUtil.emptyList();
-            return !isTargetByHint(tableName, targetEmptyList, tableExceptGenOnlyList);
+            final List<String> tableTargetGenOnlyList;
+            if (additional != null) {
+                tableTargetGenOnlyList = additional.getTableTargetGenOnlyList();
+            } else {
+                tableTargetGenOnlyList = _databaseProp.getTableTargetGenOnlyList();
+            }
+            return !isTargetByHint(tableName, tableTargetGenOnlyList, tableExceptGenOnlyList);
         }
 
         public boolean isColumnExcept(UnifiedSchema unifiedSchema, String tableName, String columnName) {

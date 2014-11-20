@@ -442,20 +442,47 @@ object ${glDBFluteConfig} {
         }
         _cursorSelectFetchSize = cursorSelectFetchSize;
     }
-TODO
+
     // ===================================================================================
-    //                                                              CursorSelect FetchSize
+    //                                                              EntitySelect FetchSize
     //                                                              ======================
-    def getCursorSelectFetchSize(): Integer = {
-        return _cursorSelectFetchSize;
+    def getEntitySelectFetchSize(): Integer = {
+        return _entitySelectFetchSize;
     }
 
-    def setCursorSelectFetchSize(cursorSelectFetchSize: Integer): Unit = {
+    def setEntitySelectFetchSize(entitySelectFetchSize: Integer): Unit = {
         assertUnlocked();
         if (_log.isInfoEnabled()) {
-            _log.info("...Setting cursorSelectFetchSize: " + cursorSelectFetchSize);
+            _log.info("...Setting entitySelectFetchSize: " + entitySelectFetchSize);
         }
-        _cursorSelectFetchSize = cursorSelectFetchSize;
+        _entitySelectFetchSize = entitySelectFetchSize;
+    }
+
+    // ===================================================================================
+    //                                                              PagingSelect FetchSize
+    //                                                              ======================
+    def isUsePagingByCursorSkipSynchronizedFetchSize(): Boolean = {
+        return _usePagingByCursorSkipSynchronizedFetchSize;
+    }
+
+    def setUsePagingByCursorSkipSynchronizedFetchSize(usePagingByCursorSkipSynchronizedFetchSize: Boolean): Unit = {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting usePagingByCursorSkipSynchronizedFetchSize: " + usePagingByCursorSkipSynchronizedFetchSize);
+        }
+        _usePagingByCursorSkipSynchronizedFetchSize = usePagingByCursorSkipSynchronizedFetchSize;
+    }
+
+    def getFixedPagingByCursorSkipSynchronizedFetchSize(): Integer = {
+        return _fixedPagingByCursorSkipSynchronizedFetchSize;
+    }
+
+    def setFixedPagingByCursorSkipSynchronizedFetchSize(fixedPagingByCursorSkipSynchronizedFetchSize: Integer): Unit = {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting fixedPagingByCursorSkipSynchronizedFetchSize: " + fixedPagingByCursorSkipSynchronizedFetchSize);
+        }
+        _fixedPagingByCursorSkipSynchronizedFetchSize = fixedPagingByCursorSkipSynchronizedFetchSize;
     }
 
     // [DBFlute-0.9.0]
