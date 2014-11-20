@@ -24,6 +24,7 @@ import java.util.Map;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.accessory.DomainEntity;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
@@ -82,12 +83,20 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         TnRelationSelector relSelector = null;
 
         final TnBeanMetaData basePointBmd = getBeanMetaData();
+
+        // condition-bean info (variable for minimum thread local access)
         final boolean hasCB = hasConditionBean();
-        final boolean checkNonSp = hasCB && checkNonSpecifiedColumnAccess();
+        final ConditionBean cb = hasCB ? getConditionBean() : null;
+
+        // outsideSql info (also variable for minimum thread local access)
+        final boolean hasOql = hasOutsideSqlContext();
+        final OutsideSqlContext oqlCtx = OutsideSqlContext.getOutsideSqlContextOnThread();
+
+        final boolean checkNonSp = checkNonSpecifiedColumnAccess(hasCB, cb, hasOql, oqlCtx);
         final boolean skipRelationLoop;
         {
-            final boolean emptyRelationCB = hasCB && isSelectedRelationEmpty();
-            final boolean specifiedOutsideSql = hasOutsideSqlContext() && isSpecifiedOutsideSql();
+            final boolean emptyRelationCB = hasCB && isSelectedRelationEmpty(cb);
+            final boolean specifiedOutsideSql = hasOql && isSpecifiedOutsideSql(oqlCtx);
 
             // if it has condition-bean that has no relation to get
             // or it has outside SQL context that is specified-outside-sql,
@@ -120,7 +129,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                 relPropCache = createRelationPropertyCache(selectColumnMap, selectIndexMap, relSelector);
             }
             if (relRowCache == null) {
-                relRowCache = createRelationRowCache(hasCB);
+                relRowCache = createRelationRowCache(hasCB, cb);
             }
             final List<TnRelationPropertyType> rptList = basePointBmd.getRelationPropertyTypeList();
             for (TnRelationPropertyType rpt : rptList) {
@@ -178,15 +187,16 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
 
     /**
      * Create the cache of relation row.
-     * @param hasCB Does the select have condition-bean?
+     * @param hasCB Does the select use condition-bean?
+     * @param cb The condition-bean for the select. (NullAllowed: not condition-bean select)
      * @return The cache of relation row. (NotNull)
      */
-    protected TnRelationRowCache createRelationRowCache(boolean hasCB) {
+    protected TnRelationRowCache createRelationRowCache(boolean hasCB, ConditionBean cb) {
         final int relSize;
         {
             final int defaultRelSize = 4; // as default
             if (hasCB) { // mainly here
-                final int selectedRelationCount = getSelectedRelationCount();
+                final int selectedRelationCount = getSelectedRelationCount(cb);
                 if (selectedRelationCount > 0) {
                     relSize = selectedRelationCount;
                 } else { // basically no way (if no count, cache is not created)
@@ -198,7 +208,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         }
         final boolean canRowCache;
         if (hasCB) { // mainly here
-            canRowCache = canRelationMappingCache();
+            canRowCache = canRelationMappingCache(cb);
         } else { // basically no way (only relation of DBFlute entity is supported)
             canRowCache = true;
         }
@@ -273,45 +283,82 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     }
 
     /**
-     * Is the selected relation empty?
-     * You should call {@link #hasConditionBean()} hasConditionBean() before calling this!
+     * Get the condition-bean on the thread if it exists.
+     * @return The condition-bean for the select. (NullAllowed)
+     */
+    protected ConditionBean getConditionBean() {
+        return ConditionBeanContext.getConditionBeanOnThread();
+    }
+
+    /**
+     * Is the selected relation empty? <br>
+     * You should call {@link #hasConditionBean()} before calling this.
+     * @param cb The condition-bean for the select. (NotNull)
      * @return The determination, true or false.
      */
-    protected boolean isSelectedRelationEmpty() {
-        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+    protected boolean isSelectedRelationEmpty(ConditionBean cb) {
         return cb.getSqlClause().isSelectedRelationEmpty();
     }
 
     /**
-     * Get the count of selected relation.
+     * Get the count of selected relation. <br>
+     * You should call {@link #hasConditionBean()} before calling this.
+     * @param cb The condition-bean for the select. (NotNull)
      * @return The integer of the count. (NotMinus)
      */
-    protected int getSelectedRelationCount() {
-        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+    protected int getSelectedRelationCount(ConditionBean cb) {
         return cb.getSqlClause().getSelectedRelationCount();
     }
 
     /**
-     * Can the relation mapping (entity instance) cache?
+     * Can the relation mapping (entity instance) cache? <br>
+     * You should call {@link #hasConditionBean()} before calling this.
+     * @param cb The condition-bean for the select. (NotNull)
      * @return The determination, true or false.
      */
-    protected boolean canRelationMappingCache() {
-        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+    protected boolean canRelationMappingCache(ConditionBean cb) {
         return cb.canRelationMappingCache();
     }
 
+    // -----------------------------------------------------
+    //                                         Non Specified
+    //                                         -------------
     /**
-     * Does it check access to non-specified column? <br />
-     * You should call {@link #hasConditionBean()} before calling this.
+     * Does it check access to non-specified column in base-point table?
+     * @param hasCB Does it have condition-bean context in thread local?
+     * @param cb The condition-bean for the select. (NullAllowed: when not condition-bean select)
+     * @param hasOql Does it have outsideSql context in thread local?
+     * @param oqlCtx The context of outsideSql. (NullAllowed: when not outsideSql select)
      * @return The determination, true or false.
      */
-    protected boolean checkNonSpecifiedColumnAccess() {
-        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
-        if (cb.isNonSpecifiedColumnAccessAllowed()) {
-            return false;
+    protected boolean checkNonSpecifiedColumnAccess(boolean hasCB, ConditionBean cb, boolean hasOql, OutsideSqlContext oqlCtx) {
+        if (hasCB) {
+            if (cb.isNonSpecifiedColumnAccessAllowed()) {
+                return false;
+            }
+            final String aliasName = cb.getSqlClause().getBasePointAliasName();
+            return cb.getSqlClause().hasSpecifiedSelectColumn(aliasName);
+        } else if (hasOql) {
+            final Class<?> resultType = oqlCtx.getResultType();
+            if (resultType == null) { // basically no way, just in case
+                return false;
+            }
+            return isOutsideSqlNonSpecifiedColumnAccessChecked(oqlCtx, resultType);
         }
-        final String aliasName = cb.getSqlClause().getBasePointAliasName();
-        return cb.getSqlClause().hasSpecifiedSelectColumn(aliasName);
+        return false;
+    }
+
+    protected boolean isOutsideSqlNonSpecifiedColumnAccessChecked(OutsideSqlContext context, Class<?> resultType) {
+        // the check is no risk so checkable so basically not allowed
+        // but context has determination for compatible option
+        System.out.println("****: " + context.isNonSpecifiedColumnAccessAllowed());
+        return isOutsideSqlNonSpecifiedColumnAccessCheckTarget(resultType) && !context.isNonSpecifiedColumnAccessAllowed();
+    }
+
+    protected boolean isOutsideSqlNonSpecifiedColumnAccessCheckTarget(Class<?> resultType) {
+        // customize-entity does not need to check because it is generated by select clause
+        // and using other customize-entity is rare case so no check
+        return DomainEntity.class.isAssignableFrom(resultType);
     }
 
     // ===================================================================================
@@ -321,11 +368,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         return OutsideSqlContext.isExistOutsideSqlContextOnThread();
     }
 
-    protected boolean isSpecifiedOutsideSql() {
-        if (!hasOutsideSqlContext()) {
-            return false;
-        }
-        final OutsideSqlContext context = OutsideSqlContext.getOutsideSqlContextOnThread();
+    protected boolean isSpecifiedOutsideSql(OutsideSqlContext context) {
         return context.isSpecifiedOutsideSql();
     }
 }

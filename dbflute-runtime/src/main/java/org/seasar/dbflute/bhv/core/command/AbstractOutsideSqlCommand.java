@@ -132,6 +132,7 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
         outsideSqlContext.setRemoveBlockComment(option.isRemoveBlockComment());
         outsideSqlContext.setRemoveLineComment(option.isRemoveLineComment());
         outsideSqlContext.setFormatSql(option.isFormatSql());
+        outsideSqlContext.setNonSpecifiedColumnAccessAllowed(option.isNonSpecifiedColumnAccessAllowed());
         outsideSqlContext.setInternalDebug(ResourceContext.isInternalDebug());
         outsideSqlContext.setupBehaviorQueryPathIfNeeds();
     }

@@ -33,10 +33,9 @@ public class OutsideSqlOption {
     protected String _pagingRequestType = "non";
 
     protected boolean _removeBlockComment;
-
     protected boolean _removeLineComment;
-
     protected boolean _formatSql;
+    protected boolean _nonSpecifiedColumnAccessAllowed;
 
     /** The configuration of statement specified by configure(). (NullAllowed) */
     protected StatementConfig _statementConfig;
@@ -72,6 +71,11 @@ public class OutsideSqlOption {
         _formatSql = true;
     }
 
+    public OutsideSqlOption enableNonSpecifiedColumnAccess() {
+        _nonSpecifiedColumnAccessAllowed = true;
+        return this;
+    }
+
     // ===================================================================================
     //                                                                          Unique Key
     //                                                                          ==========
@@ -98,6 +102,9 @@ public class OutsideSqlOption {
         if (_formatSql) {
             copyOption.formatSql();
         }
+        if (_nonSpecifiedColumnAccessAllowed) {
+            copyOption.enableNonSpecifiedColumnAccess();
+        }
         // inherit only queryTimeout (others are basically not related to count select)
         if (_statementConfig != null && _statementConfig.hasQueryTimeout()) {
             final Integer queryTimeout = _statementConfig.getQueryTimeout();
@@ -115,7 +122,7 @@ public class OutsideSqlOption {
         sb.append("{").append("paging=").append(_pagingRequestType);
         if (_statementConfig != null) {
             if (_statementConfig.hasResultSetType()) {
-                sb.append(", rs-type=").append(_statementConfig.buildResultSetTypeDisp());
+                sb.append(", resultSet=").append(_statementConfig.buildResultSetTypeDisp());
             }
             if (_statementConfig.hasQueryTimeout()) {
                 sb.append(", timeout=").append(_statementConfig.getQueryTimeout());
@@ -128,6 +135,9 @@ public class OutsideSqlOption {
             }
         } else {
             sb.append(", config=default");
+        }
+        if (_tableDbName != null) {
+            sb.append(", related to table");
         }
         sb.append("}");
         return sb.toString();
@@ -158,6 +168,10 @@ public class OutsideSqlOption {
 
     public boolean isFormatSql() {
         return _formatSql;
+    }
+
+    public boolean isNonSpecifiedColumnAccessAllowed() {
+        return _nonSpecifiedColumnAccessAllowed;
     }
 
     public StatementConfig getStatementConfig() {

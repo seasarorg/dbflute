@@ -32,6 +32,11 @@ import org.seasar.dbflute.Entity;
 #end
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.AbstractEntity;
+#if ($isSql2Entity)
+import org.seasar.dbflute.dbmeta.accessory.CustomizeEntity;
+#else
+import org.seasar.dbflute.dbmeta.accessory.DomainEntity;
+#end
 #if ($table.needsMappingValueType())
 import org.seasar.dbflute.dbmeta.accessory.MappingValueType;
 #end
@@ -55,10 +60,13 @@ import ${myExtendedEntityPackageName}._;
 import ${glPackageExtendedEntity}._;
 #end
 #set ($myEntityInterfaceDef = "")
-#if (${table.hasAllCommonColumn()})
-#set ($myEntityInterfaceDef = " with ${glEntityDefinedCommonColumn}")
+#if ($isSql2Entity)
+#set ($myEntityInterfaceDef = "CustomizeEntity")
 #else
-#set ($myEntityInterfaceDef = "")
+#set ($myEntityInterfaceDef = "DomainEntity")
+#end
+#if (${table.hasAllCommonColumn()})
+#set ($myEntityInterfaceDef = "${myEntityInterfaceDef} with ${glEntityDefinedCommonColumn}")
 #end
 #if ($table.hasRelationalNullObjectProviderImport())
 import ${table.relationalNullObjectProviderPackage}._;
@@ -109,7 +117,7 @@ import ${table.relationalNullObjectProviderPackage}._;
  * </pre>
  * @author ${database.classAuthor}
  */
-abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef} with DBableEntity[${myImmutableExtendedObjectClassName}] with Serializable with Cloneable {
+abstract class $myClassName extends AbstractEntity with ${myEntityInterfaceDef} with DBableEntity[${myImmutableExtendedObjectClassName}] with Serializable with Cloneable {
 
     // ===================================================================================
     //                                                                           Attribute

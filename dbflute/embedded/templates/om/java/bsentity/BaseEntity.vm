@@ -24,6 +24,11 @@ import org.seasar.dbflute.Entity;
 #end
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.AbstractEntity;
+#if ($isSql2Entity)
+import org.seasar.dbflute.dbmeta.accessory.CustomizeEntity;
+#else
+import org.seasar.dbflute.dbmeta.accessory.DomainEntity;
+#end
 #if ($table.needsMappingValueType())
 import org.seasar.dbflute.dbmeta.accessory.MappingValueType;
 #end
@@ -44,10 +49,13 @@ import ${myExtendedEntityPackageName}.*;
 import ${glPackageExtendedEntity}.*;
 #end
 #set ($myEntityInterfaceDef = "")
-#if (${table.hasAllCommonColumn()})
-#set ($myEntityInterfaceDef = " implements ${glEntityDefinedCommonColumn}")
+#if ($isSql2Entity)
+#set ($myEntityInterfaceDef = "CustomizeEntity")
 #else
-#set ($myEntityInterfaceDef = "")
+#set ($myEntityInterfaceDef = "DomainEntity")
+#end
+#if (${table.hasAllCommonColumn()})
+#set ($myEntityInterfaceDef = "${myEntityInterfaceDef}, ${glEntityDefinedCommonColumn}")
 #end
 #if ($table.hasRelationalNullObjectProviderImport())
 import ${table.relationalNullObjectProviderPackage}.*;
@@ -98,7 +106,7 @@ import ${table.relationalNullObjectProviderPackage}.*;
  * </pre>
  * @author ${database.classAuthor}
  */
-public abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef} {
+public abstract class $myClassName extends AbstractEntity implements ${myEntityInterfaceDef} {
 
     // ===================================================================================
     //                                                                          Definition

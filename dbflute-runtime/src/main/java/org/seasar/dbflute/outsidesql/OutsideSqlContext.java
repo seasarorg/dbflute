@@ -151,19 +151,13 @@ public class OutsideSqlContext {
     //                                                Option
     //                                                ------
     protected boolean _offsetByCursorForcedly;
-
     protected boolean _limitByCursorForcedly;
-
     protected boolean _autoPagingLogging; // for logging
-
     protected OutsideSqlFilter _outsideSqlFilter;
-
     protected boolean _removeBlockComment;
-
     protected boolean _removeLineComment;
-
     protected boolean _formatSql;
-
+    protected boolean _nonSpecifiedColumnAccessAllowed; // when domain entity
     protected boolean _internalDebug;
 
     // ===================================================================================
@@ -456,7 +450,7 @@ public class OutsideSqlContext {
     }
 
     public void setOutsideSqlPath(String outsideSqlPath) {
-        this._outsideSqlPath = outsideSqlPath;
+        _outsideSqlPath = outsideSqlPath;
     }
 
     public Object getParameterBean() {
@@ -464,7 +458,7 @@ public class OutsideSqlContext {
     }
 
     public void setParameterBean(Object parameterBean) {
-        this._parameterBean = parameterBean;
+        _parameterBean = parameterBean;
     }
 
     public Class<?> getResultType() {
@@ -472,7 +466,7 @@ public class OutsideSqlContext {
     }
 
     public void setResultType(Class<?> resultType) {
-        this._resultType = resultType;
+        _resultType = resultType;
     }
 
     public CursorHandler getCursorHandler() {
@@ -488,7 +482,7 @@ public class OutsideSqlContext {
     }
 
     public void setMethodName(String methodName) {
-        this._methodName = methodName;
+        _methodName = methodName;
     }
 
     public StatementConfig getStatementConfig() {
@@ -496,7 +490,7 @@ public class OutsideSqlContext {
     }
 
     public void setStatementConfig(StatementConfig statementConfig) {
-        this._statementConfig = statementConfig;
+        _statementConfig = statementConfig;
     }
 
     public String getTableDbName() {
@@ -504,7 +498,7 @@ public class OutsideSqlContext {
     }
 
     public void setTableDbName(String tableDbName) {
-        this._tableDbName = tableDbName;
+        _tableDbName = tableDbName;
     }
 
     // -----------------------------------------------------
@@ -515,7 +509,7 @@ public class OutsideSqlContext {
     }
 
     public void setOffsetByCursorForcedly(boolean offsetByCursorForcedly) {
-        this._offsetByCursorForcedly = offsetByCursorForcedly;
+        _offsetByCursorForcedly = offsetByCursorForcedly;
     }
 
     public boolean isLimitByCursorForcedly() {
@@ -523,7 +517,7 @@ public class OutsideSqlContext {
     }
 
     public void setLimitByCursorForcedly(boolean limitByCursorForcedly) {
-        this._limitByCursorForcedly = limitByCursorForcedly;
+        _limitByCursorForcedly = limitByCursorForcedly;
     }
 
     public boolean isAutoPagingLogging() { // for logging
@@ -531,7 +525,7 @@ public class OutsideSqlContext {
     }
 
     public void setAutoPagingLogging(boolean autoPagingLogging) { // for logging
-        this._autoPagingLogging = autoPagingLogging;
+        _autoPagingLogging = autoPagingLogging;
     }
 
     public OutsideSqlFilter getOutsideSqlFilter() {
@@ -539,7 +533,7 @@ public class OutsideSqlContext {
     }
 
     public void setOutsideSqlFilter(OutsideSqlFilter outsideSqlFilter) {
-        this._outsideSqlFilter = outsideSqlFilter;
+        _outsideSqlFilter = outsideSqlFilter;
     }
 
     public boolean isRemoveBlockComment() {
@@ -547,7 +541,7 @@ public class OutsideSqlContext {
     }
 
     public void setRemoveBlockComment(boolean removeBlockComment) {
-        this._removeBlockComment = removeBlockComment;
+        _removeBlockComment = removeBlockComment;
     }
 
     public boolean isRemoveLineComment() {
@@ -555,7 +549,7 @@ public class OutsideSqlContext {
     }
 
     public void setRemoveLineComment(boolean removeLineComment) {
-        this._removeLineComment = removeLineComment;
+        _removeLineComment = removeLineComment;
     }
 
     public boolean isFormatSql() {
@@ -563,7 +557,15 @@ public class OutsideSqlContext {
     }
 
     public void setFormatSql(boolean formatSql) {
-        this._formatSql = formatSql;
+        _formatSql = formatSql;
+    }
+
+    public boolean isNonSpecifiedColumnAccessAllowed() {
+        return _nonSpecifiedColumnAccessAllowed;
+    }
+
+    public void setNonSpecifiedColumnAccessAllowed(boolean nonSpecifiedColumnAccessAllowed) {
+        _nonSpecifiedColumnAccessAllowed = nonSpecifiedColumnAccessAllowed;
     }
 
     public boolean isInternalDebug() {
@@ -571,6 +573,6 @@ public class OutsideSqlContext {
     }
 
     public void setInternalDebug(boolean internalDebug) {
-        this._internalDebug = internalDebug;
+        _internalDebug = internalDebug;
     }
 }

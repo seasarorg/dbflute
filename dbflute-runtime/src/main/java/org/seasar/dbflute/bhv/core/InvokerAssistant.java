@@ -28,6 +28,7 @@ import org.seasar.dbflute.jdbc.SQLExceptionDigger;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.optional.RelationOptionalFactory;
+import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
@@ -83,6 +84,12 @@ public interface InvokerAssistant {
      * @return The instance of factory. (NotNull)
      */
     SqlAnalyzerFactory assistSqlAnalyzerFactory();
+
+    /**
+     * @param tableDbName The DB name of table to be related to. (NotNull)
+     * @return The first option of outside-SQL. (NullAllowed: if null, lazy-loaded)
+     */
+    OutsideSqlOption assistFirstOutsideSqlOption(String tableDbName);
 
     /**
      * Assist the factory of outside SQL executor.

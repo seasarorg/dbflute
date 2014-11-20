@@ -33,6 +33,7 @@ import org.seasar.dbflute.jdbc.SQLExceptionDigger;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.optional.RelationOptionalFactory;
+import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.outsidesql.factory.DefaultOutsideSqlExecutorFactory;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
@@ -274,6 +275,23 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
 
     protected DefaultSqlAnalyzerFactory newDefaultSqlAnalyzerFactory() {
         return new DefaultSqlAnalyzerFactory();
+    }
+
+    // -----------------------------------------------------
+    //                               First OutsideSql Option
+    //                               -----------------------
+    /** {@inheritDoc} */
+    public OutsideSqlOption assistFirstOutsideSqlOption(String tableDbName) {
+        return prepareFirstOutsideSqlOption(tableDbName);
+    }
+
+    protected OutsideSqlOption prepareFirstOutsideSqlOption(String tableDbName) {
+        if (${glDBFluteConfig}.getInstance().isNonSpecifiedColumnAccessAllowed()) {
+            OutsideSqlOption option = new OutsideSqlOption();
+            option.setTableDbName(tableDbName);
+            return option.enableNonSpecifiedColumnAccess();
+        }
+        return null; // no instance (lazy-loaded) as default
     }
 
     // -----------------------------------------------------

@@ -106,11 +106,10 @@ object ${glDBFluteConfig} {
 
     // environment
     protected var _defaultStatementConfig: StatementConfig = null;
-#if (${database.isCursorSelectFetchSizeValid()})
-    protected var _cursorSelectFetchSize: Integer = ${database.cursorSelectFetchSize};
-#else
-    protected var _cursorSelectFetchSize: Integer;
-#end
+    protected var _cursorSelectFetchSize: Integer = ${database.cursorSelectFetchSizeExp};
+    protected var _entitySelectFetchSize: Integer = ${database.entitySelectFetchSizeExp};
+    protected var _usePagingByCursorSkipSynchronizedFetchSize: Boolean = ${database.isUsePagingByCursorSkipSynchronizedFetchSize()};
+    protected var _fixedPagingByCursorSkipSynchronizedFetchSize: Integer = ${database.fixedPagingByCursorSkipSynchronizedFetchSizeExp};
     protected var _dataSourceHandler: DataSourceHandler = null;
     protected var _physicalConnectionDigger: PhysicalConnectionDigger = null;
     protected var _sqlExceptionDigger: SQLExceptionDigger = null;
@@ -429,6 +428,21 @@ object ${glDBFluteConfig} {
         _defaultStatementConfig = defaultStatementConfig;
     }
 
+    // ===================================================================================
+    //                                                              CursorSelect FetchSize
+    //                                                              ======================
+    def getCursorSelectFetchSize(): Integer = {
+        return _cursorSelectFetchSize;
+    }
+
+    def setCursorSelectFetchSize(cursorSelectFetchSize: Integer): Unit = {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting cursorSelectFetchSize: " + cursorSelectFetchSize);
+        }
+        _cursorSelectFetchSize = cursorSelectFetchSize;
+    }
+TODO
     // ===================================================================================
     //                                                              CursorSelect FetchSize
     //                                                              ======================

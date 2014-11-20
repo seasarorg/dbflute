@@ -45,6 +45,7 @@ import org.seasar.dbflute.jdbc.SqlResultInfo;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.optional.RelationOptionalFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
+import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.resource.DBFluteSystem;
@@ -697,7 +698,8 @@ public class BehaviorCommandInvoker {
         final OutsideSqlExecutorFactory factory = _invokerAssistant.assistOutsideSqlExecutorFactory();
         final DBDef dbdef = _invokerAssistant.assistCurrentDBDef();
         final StatementConfig config = _invokerAssistant.assistDefaultStatementConfig();
-        return factory.createBasic(this, tableDbName, dbdef, config, null); // for an entry instance
+        final OutsideSqlOption option = _invokerAssistant.assistFirstOutsideSqlOption(tableDbName); // might be null
+        return factory.createBasic(this, tableDbName, dbdef, config, option); // for an entry instance
     }
 
     // ===================================================================================
