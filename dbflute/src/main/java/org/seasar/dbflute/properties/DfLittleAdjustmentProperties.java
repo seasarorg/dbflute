@@ -793,7 +793,22 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public String getCursorSelectFetchSize() {
-        return getProperty("cursorSelectFetchSize", null);
+        return getProperty("cursorSelectFetchSize", getDefaultCursorSelectFetchSize());
+    }
+
+    protected String getDefaultCursorSelectFetchSize() {
+        final String defaultValue;
+        final DfBasicProperties prop = getBasicProperties();
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // also MySQL is all data fetching, but MIN_VALUE has the adverse effect
+        // e.g. you cannot select in cursor callback when MIN_VALUE
+        // _/_/_/_/_/_/_/_/_/_/
+        if (prop.isDatabasePostgreSQL()) { // is all data fetching as default
+            defaultValue = "100";
+        } else {
+            defaultValue = null;
+        }
+        return defaultValue;
     }
 
     public boolean isCursorSelectOptionAllowed() {
@@ -821,21 +836,54 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     protected String getDefaultEntitySelectFetchSize() {
-        // default value is invalid for compatible in 1.0.x
-        //// several databases fetch all records when the result set is created
-        //// and the check of fetching the illegal second record does not work
-        //// so enable real fetching when entity select
-        //final String defaultValue;
-        //final DfBasicProperties prop = getBasicProperties();
-        //if (prop.isDatabaseMySQL()) {
-        //    defaultValue = MYSQL_DYNAMIC_ROW_MAGIC_FETCH_SIZE_EXP;
-        //} else if (prop.isDatabasePostgreSQL()) {
-        //    defaultValue = "1";
-        //} else {
-        //    defaultValue = null;
-        //}
-        //return defaultValue;
-        return null;
+        // several databases fetch all records when the result set is created
+        // and the check of fetching the illegal second record does not work
+        // so enable real fetching when entity select
+        final String defaultValue;
+        final DfBasicProperties prop = getBasicProperties();
+        if (prop.isDatabaseMySQL()) {
+            defaultValue = MYSQL_DYNAMIC_ROW_MAGIC_FETCH_SIZE_EXP;
+        } else if (prop.isDatabasePostgreSQL()) {
+            defaultValue = "1";
+        } else {
+            defaultValue = null;
+        }
+        return defaultValue;
+    }
+
+    // -----------------------------------------------------
+    //                                    PagingSelect Fetch
+    //                                    ------------------
+    // cursor-skip only (because manual paging is no memory problem)
+    public boolean isUsePagingByCursorSkipSynchronizedFetchSize() {
+        final boolean defaultValue = determineDefaultUsePagingByCursorSkipSynchronizedFetchSize();
+        return isProperty("isUsePagingByCursorSkipSynchronizedFetchSize", defaultValue);
+    }
+
+    protected boolean determineDefaultUsePagingByCursorSkipSynchronizedFetchSize() {
+        final DfBasicProperties prop = getBasicProperties();
+        return prop.isDatabaseMySQL() || prop.isDatabasePostgreSQL(); // are all data fetching as default
+    }
+
+    public boolean isFixedPagingByCursorSkipSynchronizedFetchSizeValid() {
+        return getFixedPagingByCursorSkipSynchronizedFetchSize() != null;
+    }
+
+    public String getFixedPagingByCursorSkipSynchronizedFetchSize() {
+        // this size is used when isUsePagingByCursorSkipSynchronizedFetchSize is true
+        final String defaultValue = getDefaultFixedPagingByCursorSkipSynchronizedFetchSize();
+        return getProperty("fixedPagingSynchronizedFetchSize", defaultValue);
+    }
+
+    protected String getDefaultFixedPagingByCursorSkipSynchronizedFetchSize() {
+        final String defaultValue;
+        final DfBasicProperties prop = getBasicProperties();
+        if (prop.isDatabaseMySQL()) { // MySQL cannot set normal fetch size e.g. 1, 20 so magic size
+            defaultValue = MYSQL_DYNAMIC_ROW_MAGIC_FETCH_SIZE_EXP;
+        } else {
+            defaultValue = null;
+        }
+        return defaultValue;
     }
 
     // ===================================================================================

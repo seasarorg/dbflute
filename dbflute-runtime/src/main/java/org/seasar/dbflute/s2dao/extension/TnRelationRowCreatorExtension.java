@@ -140,10 +140,17 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
                 value = valueType.getValue(rs, columnName);
             }
         }
+        handleRelationValueRegistration(res, mapping, value);
+    }
+
+    protected void handleRelationValueRegistration(TnRelationRowCreationResource res, TnPropertyMapping mapping, Object value) {
         if (value != null) {
             res.incrementValidValueCount();
-            doRegisterRelationValue(res, mapping, value);
         }
+        // null is also set to trace modified properties for specified properties
+        // little performance cost because only setupSelect and specified columns are here
+        // (no setupSelect relation does not come here: old days, S2Dao might be possible)
+        doRegisterRelationValue(res, mapping, value);
     }
 
     protected void doRegisterRelationValue(TnRelationRowCreationResource res, TnPropertyMapping mapping, Object value) {

@@ -17,6 +17,7 @@ package org.seasar.dbflute.s2dao.jdbc;
 
 import java.sql.ResultSet;
 
+import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
@@ -279,7 +280,7 @@ public class TnStatementFactoryImplTest extends PlainTestCase {
         // ## Arrange ##
         TnStatementFactoryImpl impl = new TnStatementFactoryImpl() {
             @Override
-            protected boolean isSelectCursorCommand() {
+            protected boolean isSelectCursorFetchSizeCommand(BehaviorCommand<?> command) {
                 return true;
             }
         };
@@ -299,7 +300,7 @@ public class TnStatementFactoryImplTest extends PlainTestCase {
         // ## Arrange ##
         TnStatementFactoryImpl impl = new TnStatementFactoryImpl() {
             @Override
-            protected boolean isSelectCursorCommand() {
+            protected boolean isSelectCursorFetchSizeCommand(BehaviorCommand<?> command) {
                 return true;
             }
         };
@@ -326,7 +327,7 @@ public class TnStatementFactoryImplTest extends PlainTestCase {
         // ## Arrange ##
         TnStatementFactoryImpl impl = new TnStatementFactoryImpl() {
             @Override
-            protected boolean isSelectCursorCommand() {
+            protected boolean isSelectCursorFetchSizeCommand(BehaviorCommand<?> command) {
                 return true;
             }
         };
@@ -354,7 +355,7 @@ public class TnStatementFactoryImplTest extends PlainTestCase {
         // ## Arrange ##
         TnStatementFactoryImpl impl = new TnStatementFactoryImpl() {
             @Override
-            protected boolean isSelectCursorCommand() {
+            protected boolean isSelectCursorFetchSizeCommand(BehaviorCommand<?> command) {
                 return false;
             }
         };
@@ -371,7 +372,7 @@ public class TnStatementFactoryImplTest extends PlainTestCase {
         // ## Arrange ##
         TnStatementFactoryImpl impl = new TnStatementFactoryImpl() {
             @Override
-            protected boolean isSelectCursorCommand() {
+            protected boolean isSelectCursorFetchSizeCommand(BehaviorCommand<?> command) {
                 return false;
             }
         };
@@ -398,7 +399,7 @@ public class TnStatementFactoryImplTest extends PlainTestCase {
         // ## Arrange ##
         TnStatementFactoryImpl impl = new TnStatementFactoryImpl() {
             @Override
-            protected boolean isSelectCursorCommand() {
+            protected boolean isSelectCursorFetchSizeCommand(BehaviorCommand<?> command) {
                 return false;
             }
         };

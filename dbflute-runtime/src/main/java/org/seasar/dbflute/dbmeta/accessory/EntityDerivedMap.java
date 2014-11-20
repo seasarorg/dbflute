@@ -305,7 +305,7 @@ public class EntityDerivedMap implements Serializable {
         br.addElement("    String highestAlias = \"$HIGHEST_PURCHASE_PRICE\"");
         br.addElement("    cb.specify().derivedPurchaseList().max(purchaseCB -> {");
         br.addElement("        purchaseCB.specify().columnPurchasePrice();");
-        br.addElement("    }, highestAlias, op -> op.coalesce(0)); // *point");
+        br.addElement("    }, highestAlias, new DerivedReferrerOption().coalesce(0)); // *point");
         br.addElement("    ...");
         br.addElement("    Member member = ...");
         br.addElement("    member.derived(highestAlias, Integer.class).alwaysPresent(...); // OK");
