@@ -351,7 +351,6 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     protected boolean isOutsideSqlNonSpecifiedColumnAccessChecked(OutsideSqlContext context, Class<?> resultType) {
         // the check is no risk so checkable so basically not allowed
         // but context has determination for compatible option
-        System.out.println("****: " + context.isNonSpecifiedColumnAccessAllowed());
         return isOutsideSqlNonSpecifiedColumnAccessCheckTarget(resultType) && !context.isNonSpecifiedColumnAccessAllowed();
     }
 
