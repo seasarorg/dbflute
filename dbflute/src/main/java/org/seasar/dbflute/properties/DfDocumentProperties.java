@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import java.util.Properties;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
@@ -440,6 +442,101 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //                                           -----------
     public boolean isSuppressSchemaHtmlToSisterLink() { // closet
         return isProperty("isSuppressSchemaHtmlToSisterLink", false, getDocumentDefinitionMap());
+    }
+
+    // -----------------------------------------------------
+    //                               Neighborhood SchemaHtml
+    //                               -----------------------
+    protected Map<String, Map<String, Object>> _neighborhoodSchemaHtmlMap;
+
+    protected Map<String, Map<String, Object>> getNeighborhoodSchemaHtmlMap() { // closet
+        if (_neighborhoodSchemaHtmlMap != null) {
+            return _neighborhoodSchemaHtmlMap;
+        }
+        final String key = "neighborhoodSchemaHtmlMap";
+        @SuppressWarnings("unchecked")
+        final Map<String, Map<String, Object>> map = (Map<String, Map<String, Object>>) getDocumentDefinitionMap().get(key);
+        if (map != null) {
+            _neighborhoodSchemaHtmlMap = map;
+        } else {
+            _neighborhoodSchemaHtmlMap = DfCollectionUtil.emptyMap();
+        }
+        return _neighborhoodSchemaHtmlMap;
+    }
+
+    public boolean hasNeighborhoodSchemaHtml() {
+        return !getNeighborhoodSchemaHtmlMap().isEmpty();
+    }
+
+    public List<String> getNeighborhoodSchemaHtmlKeyList() {
+        return new ArrayList<String>(getNeighborhoodSchemaHtmlMap().keySet());
+    }
+
+    public String getNeighborhoodSchemaHtmlPath(String key) {
+        final Map<String, Object> elementMap = getNeighborhoodSchemaHtmlMap().get(key);
+        if (elementMap == null) { // mistake of system
+            throw new IllegalStateException("Unknown key of neighborhood: " + key);
+        }
+        final String path = (String) elementMap.get("path");
+        if (path == null) {
+            throw new DfIllegalPropertySettingException("Not found path of neighborhood: " + key);
+        }
+        return path;
+    }
+
+    // -----------------------------------------------------
+    //                                        Schema Diagram
+    //                                        --------------
+    protected Map<String, Map<String, Object>> _schemaDiagramMap;
+
+    protected Map<String, Map<String, Object>> getSchemaDiagramMap() { // closet
+        if (_schemaDiagramMap != null) {
+            return _schemaDiagramMap;
+        }
+        final String key = "schemaDiagramMap";
+        @SuppressWarnings("unchecked")
+        final Map<String, Map<String, Object>> map = (Map<String, Map<String, Object>>) getDocumentDefinitionMap().get(key);
+        if (map != null) {
+            _schemaDiagramMap = map;
+        } else {
+            _schemaDiagramMap = DfCollectionUtil.emptyMap();
+        }
+        return _schemaDiagramMap;
+    }
+
+    public boolean hasSchemaDiagram() {
+        return !getSchemaDiagramMap().isEmpty();
+    }
+
+    public List<String> getSchemaDiagramKeyList() {
+        return new ArrayList<String>(getSchemaDiagramMap().keySet());
+    }
+
+    public String getSchemaDiagramPath(String key) {
+        return doGetSchemaDiagramAttr(key, "path", null); // null means required
+    }
+
+    public String getSchemaDiagramWidth(String key) {
+        return doGetSchemaDiagramAttr(key, "width", "100%");
+    }
+
+    public String getSchemaDiagramHeight(String key) {
+        return doGetSchemaDiagramAttr(key, "height", "100%");
+    }
+
+    protected String doGetSchemaDiagramAttr(String key, String attrName, String defaultValue) {
+        final Map<String, Object> elementMap = getSchemaDiagramMap().get(key);
+        if (elementMap == null) { // mistake of system
+            throw new IllegalStateException("Unknown key of schema diagram: " + key);
+        }
+        final String attrValue = (String) elementMap.get(attrName);
+        if (attrValue == null) {
+            if (defaultValue != null) {
+                return defaultValue;
+            }
+            throw new DfIllegalPropertySettingException("Not found " + attrName + " of schema diagram: " + key);
+        }
+        return attrValue;
     }
 
     // ===================================================================================
