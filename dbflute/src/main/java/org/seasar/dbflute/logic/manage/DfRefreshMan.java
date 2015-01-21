@@ -9,20 +9,31 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
 package org.seasar.dbflute.logic.manage;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.filesystem.FileTextIO;
+import org.seasar.dbflute.helper.filesystem.FileTextLineFilter;
 import org.seasar.dbflute.logic.generate.refresh.DfRefreshResourceProcess;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.Srl;
+import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
@@ -31,9 +42,16 @@ import org.seasar.dbflute.util.Srl;
 public class DfRefreshMan {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Log _log = LogFactory.getLog(DfRefreshMan.class);
+    private static final String AUTO_DETECT_MARK = "$$AutoDetect$$";
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _specifiedRefreshProject;
+    protected boolean _specified;
+    protected String _specifiedRefreshProject; // e.g. from command line argument
 
     // ===================================================================================
     //                                                                             Execute
@@ -41,15 +59,21 @@ public class DfRefreshMan {
     public void refresh() {
         final List<String> refreshList = getRefreshProjectList();
         if (refreshList.isEmpty()) {
-            String msg = "No refresh project specified.";
-            throw new IllegalStateException(msg);
+            if (_specified) { // e.g. refresh task
+                _log.info("*No refresh project");
+            }
+            return; // no settings
         }
         final String requestUrl = getRefreshRequestUrl();
         if (requestUrl == null || requestUrl.trim().length() == 0) {
             String msg = "No refresh request URL specified.";
             throw new IllegalStateException(msg);
         }
-        new DfRefreshResourceProcess(refreshList, requestUrl).refreshResources();
+        createResourceProcess(refreshList, requestUrl).refreshResources();
+    }
+
+    protected DfRefreshResourceProcess createResourceProcess(List<String> refreshList, String requestUrl) {
+        return new DfRefreshResourceProcess(refreshList, requestUrl);
     }
 
     protected List<String> getRefreshProjectList() {
@@ -62,7 +86,68 @@ public class DfRefreshMan {
                 refreshList.addAll(getRefreshProperties().getProjectNameList());
             }
         }
-        return refreshList;
+        return resolveProjectAutoDetect(refreshList);
+    }
+
+    protected List<String> resolveProjectAutoDetect(List<String> refreshList) {
+        if (refreshList.isEmpty()) {
+            return refreshList;
+        }
+        final List<String> filteredList = new ArrayList<String>(refreshList.size());
+        for (String projectName : refreshList) {
+            if (AUTO_DETECT_MARK.equalsIgnoreCase(projectName)) {
+                final String eclipseProjectName = detectEclipseProjectName();
+                if (eclipseProjectName != null) {
+                    filteredList.add(0, eclipseProjectName); // first refresh
+                    continue;
+                }
+                _log.info("*Cannot auto-detect your refresh Eclipse proejct.");
+                // no continue so added plainly as dummy to avoid non-specified exception
+                // cannot auto-detect has no exception
+            }
+            filteredList.add(projectName);
+        }
+        return filteredList;
+    }
+
+    protected String detectEclipseProjectName() {
+        // e.g.
+        //  PROJECT_ROOT
+        //   |-dbflute_maihamadb
+        //   |-mydbflute
+        //   |-...
+        //   |-.project
+        final File projectFile = new File("../.project");
+        if (!projectFile.exists()) {
+            return null;
+        }
+        final Set<String> resultSet = new HashSet<String>();
+        try {
+            new FileTextIO().encodeAsUTF8().readFilteringLine(new FileInputStream(projectFile), new FileTextLineFilter() {
+                boolean _found = false;
+
+                public String filter(String line) {
+                    if (_found || !line.contains("<name>")) {
+                        return null;
+                    }
+                    ScopeInfo scopeInfo = Srl.extractScopeFirst(line, "<name>", "</name>");
+                    if (scopeInfo == null) { // basically no way, just in case
+                        return null;
+                    }
+                    final String content = scopeInfo.getContent().trim();
+                    resultSet.add(content);
+                    _found = true;
+                    return null;
+                }
+            });
+        } catch (FileNotFoundException ignored) { // no way because of already checked, just in case
+            return null;
+        }
+        if (resultSet.isEmpty()) {
+            _log.info("*The .project file exists but not found project name: " + projectFile);
+            return null;
+        }
+        return resultSet.iterator().next();
     }
 
     protected List<String> getSpecifiedProjectList() {
@@ -91,6 +176,7 @@ public class DfRefreshMan {
     //                                                                            Accessor
     //                                                                            ========
     public DfRefreshMan specifyRefreshProject(String refreshProject) {
+        _specified = true;
         _specifiedRefreshProject = refreshProject;
         return this;
     }
