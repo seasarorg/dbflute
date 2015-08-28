@@ -9,13 +9,12 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
 package org.seasar.dbflute.logic.replaceschema.loaddata.impl;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -504,7 +503,7 @@ public abstract class DfAbsractDataWriter {
                 return true;
             }
         }
-        // if meta data is not found (basically no way) 
+        // if meta data is not found (basically no way)
         try {
             final Boolean booleanValue = DfTypeUtil.toBoolean(value);
             ps.setBoolean(bindCount, booleanValue);
@@ -706,28 +705,19 @@ public abstract class DfAbsractDataWriter {
                 if (!binaryFile.exists()) {
                     throwLoadDataBinaryFileNotFoundException(tableName, columnName, path, rowNumber);
                 }
-                final List<Byte> byteList = new ArrayList<Byte>();
-                BufferedInputStream bis = null;
+                FileInputStream fis = null;
                 try {
-                    bis = new BufferedInputStream(new FileInputStream(binaryFile));
-                    for (int availableSize; (availableSize = bis.available()) > 0;) {
-                        final byte[] bytes = new byte[availableSize];
-                        bis.read(bytes);
-                        for (byte b : bytes) {
-                            byteList.add(b);
-                        }
-                    }
-                    byte[] bytes = new byte[byteList.size()];
-                    for (int i = 0; i < byteList.size(); i++) {
-                        bytes[i] = byteList.get(i);
-                    }
+                    fis = new FileInputStream(binaryFile);
+                    int fileSize = (int) binaryFile.length();
+                    byte[] bytes = new byte[fileSize];
+                    fis.read(bytes);
                     ps.setBytes(bindCount, bytes);
                 } catch (IOException e) {
                     throwLoadDataBinaryFileReadFailureException(tableName, columnName, path, rowNumber, e);
                 } finally {
-                    if (bis != null) {
+                    if (fis != null) {
                         try {
-                            bis.close();
+                            fis.close();
                         } catch (IOException ignored) {}
                     }
                 }
@@ -867,7 +857,7 @@ public abstract class DfAbsractDataWriter {
      * @param ps The prepared statement. (NotNull)
      * @param bindCount The count of binding.
      * @param obj The bound value. (NotNull)
-     * @param rowNumber The row number of the current value. 
+     * @param rowNumber The row number of the current value.
      * @throws SQLException
      */
     protected void bindNotNullValueByInstance(String tableName, String columnName, Connection conn, PreparedStatement ps, int bindCount,
