@@ -66,6 +66,7 @@ import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
+ * @author tty (pull request for processBinary(), thanks)
  * @since 0.9.4 (2009/03/25 Wednesday)
  */
 public abstract class DfAbsractDataWriter {
@@ -708,8 +709,8 @@ public abstract class DfAbsractDataWriter {
                 FileInputStream fis = null;
                 try {
                     fis = new FileInputStream(binaryFile);
-                    int fileSize = (int) binaryFile.length();
-                    byte[] bytes = new byte[fileSize];
+                    final int fileSize = (int) binaryFile.length();
+                    final byte[] bytes = new byte[fileSize];
                     fis.read(bytes);
                     ps.setBytes(bindCount, bytes);
                 } catch (IOException e) {
