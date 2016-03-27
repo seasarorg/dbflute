@@ -170,6 +170,7 @@ import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.DfDependencyInjectionProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.assistant.DfTableDeterminer;
 import org.seasar.dbflute.properties.assistant.DfTableFinder;
@@ -2493,23 +2494,29 @@ public class Database {
     // = = = = = = = = = =/
 
     public String getDBFluteInitializerComponentName() {
-        return filterComponentNameWithProjectPrefix("introduction");
+        return filterRuntimeComponentPrefix("introduction");
     }
 
     public String getInvokerAssistantComponentName() {
-        return filterComponentNameWithProjectPrefix("invokerAssistant");
+        return filterRuntimeComponentPrefix("invokerAssistant");
     }
 
     public String getCommonColumnAutoSetupperComponentName() {
-        return filterComponentNameWithProjectPrefix("commonColumnAutoSetupper");
+        return filterRuntimeComponentPrefix("commonColumnAutoSetupper");
     }
 
     public String getBehaviorSelectorComponentName() {
-        return filterComponentNameWithProjectPrefix("behaviorSelector");
+        return filterRuntimeComponentPrefix("behaviorSelector");
     }
 
     public String getBehaviorCommandInvokerComponentName() {
-        return filterComponentNameWithProjectPrefix("behaviorCommandInvoker");
+        return filterRuntimeComponentPrefix("behaviorCommandInvoker");
+    }
+
+    protected String filterRuntimeComponentPrefix(String componentName) {
+        final DfDependencyInjectionProperties prop = getProperties().getDependencyInjectionProperties();
+        final String filtered = prop.filterRuntimeComponentPrefix(componentName);
+        return filterComponentNameWithProjectPrefix(filtered);
     }
 
     // -----------------------------------------------------
