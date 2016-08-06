@@ -121,7 +121,7 @@ public class ${glDBFluteInitializer} {
         }
     }
 
-    protected void loadCoolClasses() { // for S2Container 
+    protected void loadCoolClasses() { // for S2Container
         ConditionBeanContext.loadCoolClasses(); // against the ClassLoader Headache!
     }
 
@@ -143,10 +143,15 @@ public class ${glDBFluteInitializer} {
         if (dataSourceHandler != null) {
             return;
         }
-        if (dataSourceFqcn.startsWith("org.apache.commons.dbcp.")) {
+        if (needsSpringTransactionalDataSource(dataSourceFqcn)) {
             config.unlock();
             config.setDataSourceHandler(new ${glDBFluteConfig}.SpringTransactionalDataSourceHandler());
         }
+    }
+
+    protected boolean needsSpringTransactionalDataSource(String dataSourceFqcn) {
+        return dataSourceFqcn.startsWith("org.apache.commons.dbcp.")
+            || dataSourceFqcn.startsWith("org.apache.tomcat.jdbc.pool.");
     }
 
     // ===================================================================================
