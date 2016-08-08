@@ -287,7 +287,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     }
 
     protected void takeFinally(String sqlRootDir, boolean previous) {
-        final DfTakeFinallyProcess process = createTakeFinallyProcess(sqlRootDir);
+        final DfTakeFinallyProcess process = createTakeFinallyProcess(sqlRootDir, previous);
         _takeFinallyFinalInfo = process.execute();
         final SQLFailureException breakCause = _takeFinallyFinalInfo.getBreakCause();
         if (breakCause != null) { // high priority exception
@@ -299,8 +299,12 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         }
     }
 
-    protected DfTakeFinallyProcess createTakeFinallyProcess(String sqlRootDir) {
-        return DfTakeFinallyProcess.createAsCore(sqlRootDir, getDataSource());
+    protected DfTakeFinallyProcess createTakeFinallyProcess(String sqlRootDir, boolean previous) {
+        if (previous) {
+            return DfTakeFinallyProcess.createAsPrevious(sqlRootDir, getDataSource());
+        } else {
+            return DfTakeFinallyProcess.createAsCore(sqlRootDir, getDataSource());
+        }
     }
 
     protected void setupReplaceSchemaFinalInfo() {
