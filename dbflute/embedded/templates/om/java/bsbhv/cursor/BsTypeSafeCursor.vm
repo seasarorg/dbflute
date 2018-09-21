@@ -23,7 +23,7 @@ import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
- * The cursor of ${table.basicInfoDispString}. <br />
+ * The cursor of ${table.basicInfoDispString}. <br>
 #if ($table.isCommentForJavaDocValid())
  * ${table.commentForJavaDoc}
 #end
@@ -112,7 +112,7 @@ public class ${myClassName} {
     //                                                                  ==================
 #foreach ($col in $table.columns)
     /**
-     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end

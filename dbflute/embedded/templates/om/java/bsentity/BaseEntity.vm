@@ -62,7 +62,7 @@ import ${table.relationalNullObjectProviderPackage}.*;
 #end
 
 /**
- * The entity of ${table.basicInfoDispString}. <br />
+ * The entity of ${table.basicInfoDispString}. <br>
 #if ($table.isCommentForJavaDocValid())
  * ${table.commentForJavaDoc}
 #end
@@ -179,7 +179,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 #foreach ($uq in $table.keyableUniqueList)
 
     /**
-     * To be unique by the unique column. <br />
+     * To be unique by the unique column. <br>
      * You can update the entity by the key when entity update (NOT batch update).
      * ${uq.argsJavaDocString}
      */
@@ -200,8 +200,8 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 #if ($col.hasClassification())
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
     /**
-     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br>
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -213,8 +213,8 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
     }
 
     /**
-     * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br>
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -232,8 +232,8 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 #if ($classificationTop.isSisterBooleanHandling())
 
     /**
-     * Set the value of ${col.uncapitalisedJavaName} as boolean. <br />
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * Set the value of ${col.uncapitalisedJavaName} as boolean. <br>
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -253,7 +253,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 #if ($col.hasClassification())
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
-     * Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name} (${classificationElement.code}). <br />
+     * Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name} (${classificationElement.code}). <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
 #if ($classificationElement.isDeprecated())
@@ -265,7 +265,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 
 #if ($database.isMakeEntityOldStyleClassify())
     /**
-     * Same as set${col.javaName}_${classificationElement.name}. <br />
+     * Same as set${col.javaName}_${classificationElement.name}. <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     public void classify${col.javaName}${classificationElement.name}() {
@@ -276,7 +276,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 #end
 #if ($database.isMakeEntityOldStyleClassify())
     /**
-     * Same as set${col.javaName}As${col.classificationName}(cdef). <br />
+     * Same as set${col.javaName}As${col.classificationName}(cdef). <br>
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed)
      */
     public void classify${col.javaName}(${glCDef}.${col.classificationName} cdef) {
@@ -293,7 +293,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 #if ($col.hasClassification())
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
-     * Is the value of ${col.uncapitalisedJavaName} ${classificationElement.name}? <br />
+     * Is the value of ${col.uncapitalisedJavaName} ${classificationElement.name}? <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return The determination, true or false.
@@ -310,7 +310,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 #foreach ($group in $col.classificationTop.groupList)
 #if ($group.hasGroupComment())
     /**
-     * ${group.groupCommentForJavaDoc} <br />
+     * ${group.groupCommentForJavaDoc} <br>
      * ${group.buildElementDisp()}
      * @return The determination, true or false.
      */
@@ -687,7 +687,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 
 #end
     /**
-     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end
@@ -713,7 +713,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
     }
 
     /**
-     * [set] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * [set] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end

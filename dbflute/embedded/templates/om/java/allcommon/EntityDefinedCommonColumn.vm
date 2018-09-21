@@ -50,21 +50,21 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
 #foreach ($classificationElement in $classificationTop.classificationElementList)
 
     /**
-     * Set the value of ${uncapitalisedJavaName} as ${classificationElement.name}. <br />
+     * Set the value of ${uncapitalisedJavaName} as ${classificationElement.name}. <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     void set${javaName}_${classificationElement.name}();
 #if ($database.isMakeEntityOldStyleClassify())
 
     /**
-     * Same as set${javaName}_${classificationElement.name}. <br />
+     * Same as set${javaName}_${classificationElement.name}. <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     void classify${javaName}${classificationElement.name}();
 #end
 
     /**
-     * Is the value of ${uncapitalisedJavaName} '${classificationElement.name}'? <br />
+     * Is the value of ${uncapitalisedJavaName} '${classificationElement.name}'? <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return The determination, true or false.
@@ -76,13 +76,13 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
 #end
 
     /**
-	 * Enable common column auto set up. <br />
+	 * Enable common column auto set up. <br>
 	 * It's only for after disable because the default is enabled.
 	 */
     void enableCommonColumnAutoSetup();
 
     /**
-	 * Disable common column auto set up. <br />
+	 * Disable common column auto set up. <br>
 	 * This is an old style. You can get the same process
 	 * by varyingInsert() and varyingUpdate() and so on.
 	 */
